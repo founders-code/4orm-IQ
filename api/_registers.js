@@ -26,6 +26,13 @@
    securities-administrators.ca does reach the CSA in both senses. */
 const HOST_MAP = {
   /* 01 Identity */
+  'sunbiz.org':                 ['Florida Sunbiz'],
+  'search.sunbiz.org':          ['Florida Sunbiz'],
+  'opencorporates.com':         ['OpenCorporates'],
+  'sos.wyo.gov':                ['OpenCorporates'],
+  'icis.corp.delaware.gov':     ['OpenCorporates'],
+  'bizfileonline.sos.ca.gov':   ['OpenCorporates'],
+  'apps.sos.ny.gov':            ['OpenCorporates'],
   'ised-isde.canada.ca':        ['Corporations Canada', 'OSB Bankruptcy'],
   'canadasbusinessregistries.ca': ['Corporations Canada'],
   'ontario.ca':                 ['Ontario Registry'],
@@ -46,7 +53,19 @@ const HOST_MAP = {
   'adviserinfo.sec.gov':        ['BrokerCheck'],
   'nfa.futures.org':            ['NFA BASIC'],
 
+  /* 02 Licensing, money services */
+  'fincen.gov':                 ['FinCEN MSB'],
+  'nasaa.org':                  ['CSA Registration'],
+  'flofr.gov':                  ['FinCEN MSB'],
+
   /* 03 Enforcement */
+  'justice.gov':                ['DOJ Press'],
+  'irs.gov':                    ['IRS-CI'],
+  'fbi.gov':                    ['DOJ Press'],
+  'usmarshals.gov':             ['DOJ Press'],
+  'myfloridalegal.com':         ['State AG'],
+  'ag.ny.gov':                  ['State AG'],
+  'oag.ca.gov':                 ['State AG'],
   'iosco.org':                  ['IOSCO I-SCAN'],
   'bcsc.bc.ca':                 ['BCSC Caution List'],
   'asc.ca':                     ['ASC Caution List'],
@@ -62,6 +81,19 @@ const HOST_MAP = {
   'asic.gov.au':                ['ASIC Banned'],
 
   /* 05 Legal */
+  'uscourts.gov':               ['PACER'],
+  'pacer.gov':                  ['PACER'],
+  'dockets.justia.com':         ['Justia Dockets'],
+  'law.justia.com':             ['Justia Dockets'],
+  'trellis.law':                ['Justia Dockets'],
+  'unicourt.com':               ['Justia Dockets'],
+  'pacermonitor.com':           ['Justia Dockets'],
+  'kccllc.net':                 ['Bankruptcy Claims'],
+  'omniagentsolutions.com':     ['Bankruptcy Claims'],
+  'veritaglobal.net':           ['Bankruptcy Claims'],
+  'stretto.com':                ['Bankruptcy Claims'],
+  'donlinrecano.com':           ['Bankruptcy Claims'],
+  'epiqglobal.com':             ['Bankruptcy Claims'],
   'canlii.org':                 ['CanLII'],
   'courtlistener.com':          ['CourtListener'],
   'gov.uk':                     ['UK Insolvency'],
@@ -74,6 +106,19 @@ const HOST_MAP = {
   'virustotal.com':             ['VirusTotal'],
   'urlscan.io':                 ['urlscan.io'],
   'transparencyreport.google.com': ['Google Web Risk'],
+
+  /* 10 Claim dates against the record */
+  'web.archive.org':            ['Wayback Machine'],
+  'archive.org':                ['Wayback Machine'],
+  'crt.sh':                     ['Certificate Log', 'First Certificate'],
+  'censys.io':                  ['First Certificate'],
+  'trademarks.justia.com':      ['Trademark Filing'],
+  'tsdr.uspto.gov':             ['Trademark Filing'],
+  'uspto.gov':                  ['Trademark Filing'],
+  'securitytrails.com':         ['Domain History'],
+  'whois.domaintools.com':      ['Domain History'],
+  'linkedin.com':               ['Public Profile'],
+  'crunchbase.com':             ['Public Profile'],
 
   /* 07 Reviews */
   'trustpilot.com':             ['Trustpilot'],

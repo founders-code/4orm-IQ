@@ -59,14 +59,14 @@ export const PAYLOAD_SCHEMA = {
 
     categories: {
       type: 'array',
-      minItems: 9,
-      maxItems: 9,
-      description: 'All nine, in order C1 to C9. A category you could not reach is GREY, never GREEN.',
+      minItems: 10,
+      maxItems: 10,
+      description: 'All ten, in order C1 to C10. A category you could not reach is GREY, never GREEN.',
       items: {
         type: 'object',
         required: ['id', 'state', 'summary', 'evidence'],
         properties: {
-          id:      { type: 'string', enum: ['C1','C2','C3','C4','C5','C6','C7','C8','C9'] },
+          id:      { type: 'string', enum: ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'] },
           state:   STATE,
           summary: { type: 'string', description: 'One sentence a consumer understands. No jargon.' },
           evidence: {

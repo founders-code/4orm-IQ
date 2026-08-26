@@ -24,9 +24,44 @@ export const DOMAINS = {
   ca_payments:   ['fintrac-canafe.canada.ca','bankofcanada.ca','canada.ca'],
   ca_corporate:  ['ised-isde.canada.ca','canadasbusinessregistries.ca','ontario.ca','bcregistry.gov.bc.ca'],
   ca_courts:     ['canlii.org','scc-csc.ca','fct-cf.gc.ca','ic.gc.ca'],
+  /* United States securities, futures and consumer regulators. */
   us:            ['sec.gov','finra.org','brokercheck.finra.org','adviserinfo.sec.gov',
                   'cftc.gov','nfa.futures.org','nmlsconsumeraccess.org','ftc.gov',
                   'ic3.gov','consumerfinance.gov','dfpi.ca.gov'],
+
+  /* Criminal and money services. Added after the first real entity checked was a
+     Florida corporation whose arrest and guilty plea were published by the
+     Department of Justice and by IRS Criminal Investigation, neither of which was
+     in the pinned list. FinCEN carries the money services business register, which
+     is the decisive check for anyone pooling funds and paying distributions. */
+  us_criminal:   ['justice.gov','irs.gov','fbi.gov','fincen.gov','treasury.gov',
+                  'hsi.dhs.gov','usmarshals.gov'],
+
+  /* State corporate registries. A company's home registry answers the identity
+     question that no federal register can. */
+  us_corporate:  ['sunbiz.org','sos.wyo.gov','icis.corp.delaware.gov','bizfileonline.sos.ca.gov',
+                  'businesssearch.sos.ca.gov','apps.sos.ny.gov','sos.state.tx.us',
+                  'mycorporation.sos.state.nv.us','opencorporates.com'],
+
+  /* Courts, dockets, receivership and bankruptcy. */
+  us_courts:     ['uscourts.gov','pacer.gov','courtlistener.com','dockets.justia.com',
+                  'law.justia.com','trellis.law','unicourt.com','pacermonitor.com',
+                  'kccllc.net','omniagentsolutions.com','veritaglobal.net','stretto.com',
+                  'donlinrecano.com','epiqglobal.com'],
+
+  /* The record of when a thing first existed. This is what a dated claim is
+     checked against, and it is the whole of category 10. */
+  timeline:      ['web.archive.org','archive.org','crt.sh','censys.io',
+                  'trademarks.justia.com','tsdr.uspto.gov','uspto.gov',
+                  'whois.domaintools.com','securitytrails.com'],
+
+  /* People. A name found in a record is worth searching on its own. */
+  people:        ['linkedin.com','crunchbase.com','youtube.com','x.com','twitter.com',
+                  'instagram.com','facebook.com','muckrack.com','opencorporates.com'],
+
+  /* State securities regulators and attorneys general. */
+  us_states:     ['nasaa.org','myfloridalegal.com','flofr.gov','ag.ny.gov','oag.ca.gov',
+                  'dfpi.ca.gov','dfi.wa.gov','dobs.pa.gov'],
   uk:            ['fca.org.uk','register.fca.org.uk','gov.uk',
                   'find-and-update.company-information.service.gov.uk'],
   intl:          ['asic.gov.au','mas.gov.sg','iosco.org','sfc.hk','fma.govt.nz','cysec.gov.cy','mfsa.mt'],
@@ -133,7 +168,7 @@ export async function parallel(objective, queries, opts = {}) {
 /* Which categories a check may run. The console sends the switch state; an
    absent or empty list means every check runs, which is the default state of
    the panel. A search is kept when any category it feeds is still switched on. */
-export const ALL_CATS = ['C1','C2','C3','C4','C5','C6','C7','C8','C9'];
+export const ALL_CATS = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 
 export function plan(q, domain, enabled) {
   const on = (Array.isArray(enabled) && enabled.length) ? new Set(enabled) : new Set(ALL_CATS);
@@ -159,8 +194,20 @@ export function plan(q, domain, enabled) {
       { label:'C3 sanctions', cats:['C3'], query:`${name} sanctions designated entity`,
         includeDomains:D.sanctions, numResults:3 },
 
+      { label:'C3 criminal and money services', cats:['C3','C2'],
+        query:`${name} charged indicted arrested fraud money laundering registration`,
+        includeDomains:[...D.us_criminal, ...D.us_states], numResults:6, fullText:true, maxChars:3000 },
+
+      { label:'C1 state corporate registry', cats:['C1'],
+        query:`${name} corporation registered agent officers annual report entity record`,
+        includeDomains:D.us_corporate, numResults:4 },
+
       { label:'C5 courts and insolvency', cats:['C5'], query:`${name} lawsuit judgment insolvency order`,
-        includeDomains:[...D.ca_courts, 'sec.gov','gov.uk'], numResults:3 },
+        includeDomains:[...D.ca_courts, ...D.us_courts, 'sec.gov','gov.uk'], numResults:5, fullText:true },
+
+      { label:'C5 receivership and bankruptcy', cats:['C5'],
+        query:`${name} receiver appointed chapter 11 bankruptcy claims creditors`,
+        includeDomains:D.us_courts, numResults:4 },
 
       /* The review sweep is split three ways on purpose. One search pinned to
          fifteen hosts returns whatever ranks highest and can miss a platform
@@ -177,6 +224,21 @@ export function plan(q, domain, enabled) {
       { label:'C7 trading and workplace community', cats:['C7'],
         query:`${name} scam warning account manager pressure deposit`,
         includeDomains:D.reviews_community, numResults:6, fullText:true, maxChars:3000 },
+
+      /* Category 10. Two halves: what the party says about how long it has been
+         doing this, and the independent record of when it first existed. The
+         check is the comparison, and it is arithmetic rather than opinion. */
+      { label:'C10 dated claims, from the party itself', cats:['C10'],
+        query:`${name} ${d} since founded established years of experience track record returns in`,
+        includeDomains:[d].filter(Boolean), numResults:6, fullText:true, maxChars:3200 },
+
+      { label:'C10 the record of first existence', cats:['C10','C6'],
+        query:`${d} ${name} first archived capture certificate issued trademark filed domain history`,
+        includeDomains:D.timeline, numResults:6, fullText:true, maxChars:2600 },
+
+      { label:'C10 first public mention', cats:['C10'],
+        query:`"${name}" earliest announcement launch press first mention`,
+        numResults:5 },
 
       { label:'Open sweep, the subject’s own claims', cats:['C1','C2'],
         query:`${name} ${d} about us regulated licensed years operating history`,
@@ -231,6 +293,117 @@ export function plan(q, domain, enabled) {
   };
 
   return { exa: built.exa.filter(keep), par: built.par.filter(keep), enabled: [...on] };
+}
+
+/**
+ * Round two.
+ *
+ * Round one searches the identifier the consumer typed. Round two searches what
+ * round one turned up: the people named in the records, the case numbers on the
+ * dockets, and the entities that appear alongside the subject.
+ *
+ * This is the difference between a single sweep and an investigation. A check
+ * that finds a chief executive's name and never searches it has stopped one
+ * step short of the answer.
+ *
+ * Seeds are supplied by the caller, which extracts them from round one results.
+ * Nothing here invents a seed.
+ */
+export function planRound2(q, domain, seeds = {}, enabled) {
+  const on = (Array.isArray(enabled) && enabled.length) ? new Set(enabled) : new Set(ALL_CATS);
+  const keep = e => !e.cats || e.cats.some(c => on.has(c));
+  const D = DOMAINS;
+  const out = [];
+
+  (seeds.people || []).slice(0, 3).forEach((person, i) => {
+    out.push({ label:`R2 person, ${person}`, cats:['C4','C3'], numResults:5, fullText:true, maxChars:2400,
+      query:`"${person}" charged barred disciplined enforcement registration director officer`,
+      includeDomains:[...D.us_criminal, ...D.us, ...D.ca_securities, ...D.us_states, ...D.uk] });
+    if (i === 0) {
+      out.push({ label:`R2 person, courts, ${person}`, cats:['C5','C4'], numResults:4,
+        query:`"${person}" lawsuit judgment docket case`,
+        includeDomains:[...D.us_courts, ...D.ca_courts] });
+    }
+    out.push({ label:`R2 person, public profile, ${person}`, cats:['C4','C10'], numResults:5,
+      query:`"${person}" ${q} profile role history previous companies`,
+      includeDomains:D.people });
+  });
+
+  (seeds.caseNumbers || []).slice(0, 3).forEach(c => {
+    out.push({ label:`R2 docket, ${c}`, cats:['C5'], numResults:4, fullText:true, maxChars:3000,
+      query:`"${c}" ${q} complaint order docket`,
+      includeDomains:[...D.us_courts, ...D.us_criminal] });
+  });
+
+  (seeds.relatedEntities || []).slice(0, 3).forEach(e => {
+    out.push({ label:`R2 related entity, ${e}`, cats:['C9','C1'], numResults:4,
+      query:`"${e}" ${q} related connected same operator registration`,
+      includeDomains:[...D.us_corporate, ...D.us_criminal, ...D.us_courts, ...D.ca_corporate] });
+  });
+
+  (seeds.domains || []).slice(0, 3).forEach(d2 => {
+    out.push({ label:`R2 sibling domain, ${d2}`, cats:['C9','C6'], numResults:3,
+      query:`${d2} ${q} same operator cloned site` });
+  });
+
+  return out.filter(keep);
+}
+
+/**
+ * Extract round two seeds from round one output. Deterministic, and it never
+ * proposes a seed that is not present verbatim in a retrieved result.
+ */
+export function extractSeeds(exaOut = [], parOut = [], subjectDomain = null, subject = '') {
+  const subj = String(subject || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const isSubject = v => {
+    const t = String(v).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    return !!subj && (t === subj || t.includes(subj) || subj.includes(t));
+  };
+  const text = [];
+  exaOut.forEach(b => (b.results || []).forEach(r => {
+    text.push(r.title || ''); text.push(r.text || ''); (r.highlights || []).forEach(h => text.push(h));
+  }));
+  parOut.forEach(b => (b.results || []).forEach(r => {
+    text.push(r.title || ''); (r.excerpts || []).forEach(e => text.push(e));
+  }));
+  const blob = text.join('\n');
+
+  /* Federal and state case numbers, in the forms courts actually print them. */
+  const caseNumbers = [...new Set(
+    (blob.match(/\b\d{1,2}:\d{2}-(?:cv|cr|mj|bk)-\d{3,6}(?:-[A-Z]{2,4})?\b/g) || [])
+    .concat(blob.match(/\b\d{4}-CA-\d{6}-[A-Z]\b/gi) || [])
+    .concat(blob.match(/\bMDL\s*No\.?\s*\d{3,5}\b/gi) || [])
+  )].slice(0, 6);
+
+  /* People named in a role. Requires the role word, so a headline noun phrase
+     does not become a person. */
+  const ROLE = '(?:chief executive|CEO|founder|president|director|officer|owner|manager|principal)';
+  const people = [...new Set(
+    (blob.match(new RegExp('([A-Z][a-z]+(?:\\s+[A-Z][a-z\\.]+){1,2})\\s*,?\\s+(?:the\\s+)?' + ROLE, 'g')) || [])
+      .map(m => m.replace(new RegExp('\\s*,?\\s+(?:the\\s+)?' + ROLE + '$'), '').trim())
+      .concat(
+        (blob.match(new RegExp(ROLE + '\\s+(?:of\\s+[A-Za-z0-9 ]+\\s+)?([A-Z][a-z]+(?:\\s+[A-Z][a-z\\.]+){1,2})', 'g')) || [])
+          .map(m => m.replace(new RegExp('^' + ROLE + '\\s+(?:of\\s+[A-Za-z0-9 ]+\\s+)?'), '').trim())
+      )
+      .filter(n => n.split(/\s+/).length >= 2 && n.length < 44 && !isSubject(n))
+      .filter(n => !/(Inc|LLC|Ltd|LP|Corp|Ventures|Capital|Partners|Holdings|Group)$/i.test(n))
+  )].slice(0, 4);
+
+  /* Corporate suffixes, so a sentence fragment does not become an entity. */
+  const relatedEntities = [...new Set(
+    (blob.match(/\b([A-Z][A-Za-z0-9&'\-]+(?:\s+[A-Z][A-Za-z0-9&'\-]+){0,3}\s+(?:Inc|LLC|Ltd|LP|LLP|Corp|Corporation|Holdings|Ventures|Capital|Partners|Group)\.?)\b/g) || [])
+      .map(x => x.trim())
+      .filter(x => x.length > 6 && x.length < 54)
+  )].filter(e => !isSubject(e)).slice(0, 5);
+
+  const domains = [...new Set(
+    (blob.match(/\bhttps?:\/\/([a-z0-9.\-]+\.[a-z]{2,})/gi) || [])
+      .map(u => { try { return new URL(u).hostname.replace(/^www\./, '').toLowerCase(); } catch { return null; } })
+      .filter(Boolean)
+  )].filter(h => h !== subjectDomain && !/(gov|reddit|trustpilot|bbb|linkedin|youtube|facebook|instagram|wikipedia)\./.test(h))
+    .slice(0, 4);
+
+  return { people, caseNumbers, relatedEntities, domains };
 }
 
 export default { exa, parallel, plan, DOMAINS };

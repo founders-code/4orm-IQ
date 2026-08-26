@@ -410,6 +410,70 @@ their own strength.
 
 ---
 
+### C10 · CLAIM DATES AGAINST THE RECORD
+*Could the story have happened in the time the record allows?*
+
+This is the check that needs no regulator, no complaint and no opinion. A party makes a
+dated factual claim about itself. Independent records establish when the party, the
+domain, the certificate, the trademark and the company first existed. Where the claim
+predates the record, the claim cannot be true as stated. That is arithmetic between two
+retrieved records.
+
+**Step 1. Collect every dated claim the party makes about itself, verbatim.**
+
+| Claim form | Example |
+|---|---|
+| Founding year | "Serving clients since 2016" |
+| Track record | "$1.35 billion earned for our members in 2025" |
+| Duration | "Twelve years of experience in digital assets" |
+| Volume over time | "400,000 users since launch" |
+| Copyright line | "(c) 2014 to 2026" |
+| Award or milestone | "Named best broker 2019" |
+| Team tenure | "Our CEO has led the firm for a decade" |
+
+**Step 2. Establish the independent record of first existence.**
+
+| Record | What it establishes | Where |
+|---|---|---|
+| \`DOMAIN_CREATED\` | The domain did not exist before this date | ICANN RDAP. Definitive. |
+| \`INCORPORATION_DATE\` | The legal entity did not exist before this date | The home corporate registry |
+| \`ARCHIVE_FIRST_CAPTURE\` | The site was not being published before this date | Wayback Machine |
+| \`CERT_FIRST_ISSUED\` | No certificate existed for this host before this date | Certificate transparency |
+| \`TRADEMARK_FILED\` | The mark was not filed before this date | USPTO and equivalents |
+| \`FIRST_PUBLIC_MENTION\` | Nothing referred to this party before this date | Open search, weakest of the six |
+
+**Step 3. Compare, and name the specific pair.**
+
+| Signal | Trigger |
+|---|---|
+| \`CLAIM_PREDATES_DOMAIN\` | A dated claim is earlier than the domain creation date |
+| \`CLAIM_PREDATES_INCORPORATION\` | A dated claim is earlier than the entity's own registry record |
+| \`CLAIM_PREDATES_FIRST_CAPTURE\` | A dated claim is earlier than anything ever archived of the site |
+| \`CLAIM_PREDATES_CERTIFICATE\` | A dated claim is earlier than the first certificate for the host |
+| \`TRACK_RECORD_UNSUPPORTED\` | A performance history longer than the party has demonstrably existed |
+| \`COPYRIGHT_YEAR_MISMATCH\` | A copyright line starting before the domain or the entity |
+| \`FOUNDING_YEAR_DRIFT\` | The stated founding year has changed between captures |
+
+**Decision rule.** \`CLAIM_PREDATES_DOMAIN\` and \`CLAIM_PREDATES_INCORPORATION\` are
+material contradictions and carry **RED** on their own, because both sides of the
+comparison are Tier A records and the conflict is arithmetic. \`CLAIM_PREDATES_FIRST_CAPTURE\`
+and \`CLAIM_PREDATES_CERTIFICATE\` are **YELLOW** on their own: an archive gap is an
+archive gap and a certificate can post-date a site. \`FOUNDING_YEAR_DRIFT\` is **YELLOW**
+and feeds C9.
+
+**What must never happen here.**
+
+- Never infer a domain creation date from an archive capture, a copyright line or a first
+  press mention. The registry record is the only source for that date.
+- A brand can legitimately predate its domain. A company founded in 1998 may have
+  registered its .com in 2004. The contradiction is not the gap; it is a claim that the
+  gap makes impossible, such as trading results attributed to a period before the entity
+  or the site existed.
+- Where the party's own dated claim cannot be retrieved verbatim, there is no comparison
+  to make, and the category is GREY.
+
+---
+
 ## 4. SOURCE AUTHORITY TIERS
 
 Every evidence record carries a tier. The tier is not decoration - it gates what the
@@ -733,7 +797,7 @@ Binding rules for that call, on top of everything above:
 1. Every \`quote\` field is VERBATIM text from the source. If you did not read
    the words, leave the field out. Never paraphrase into a quote field.
 2. Every \`url\` resolves to the record you actually read.
-3. All nine categories appear, C1 through C9, in order. A category you could not
+3. All ten categories appear, C1 through C10, in order. A category you could not
    reach is GREY with an empty evidence array and a matching entry in
    coverage_gaps. It is never GREEN.
 4. C8 Transaction and payment is GREY unless payment instructions were supplied.

@@ -437,7 +437,7 @@ body[data-stage="console"] .console{padding-top:112px}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
 /* ================= the split, below the search bar =================
    The search bar keeps the full width at the top. Everything under it
-   runs in two columns: what the check concluded on the left, the nine
+   runs in two columns: what the check concluded on the left, the ten
    checks and their registers on the right. The right column sticks, so
    the category index stays in view while the assessment is read. */
 .split{max-width:1220px;margin:0 auto;padding:0 28px;
@@ -921,8 +921,8 @@ body[data-stage="console"] .console{padding-top:112px}
           <span class="mode" id="liveLbl" style="display:none">Live</span>
         </div>
         <div class="r">
-          <span>Categories <b>9</b></span>
-          <span>Registers <b>48</b></span>
+          <span>Categories <b>10</b></span>
+          <span>Registers <b>64</b></span>
           <span>Jurisdictions <b>130+</b></span>
           <span id="clock">--:--:-- UTC</span>
         </div>
@@ -962,7 +962,7 @@ body[data-stage="console"] .console{padding-top:112px}
         <div class="boardwrap">
           <div class="board">
             <div class="boardhd">
-              <span class="lbl" id="boardT">Source board</span><span class="lbl" style="color:var(--tx-4);text-transform:none;letter-spacing:.04em;font-weight:400">48 registers, drawn from the 34 connectors in the opening set</span>
+              <span class="lbl" id="boardT">Source board</span><span class="lbl" style="color:var(--tx-4);text-transform:none;letter-spacing:.04em;font-weight:400">64 registers, drawn from the connectors in the opening set</span>
               <span class="bc" id="boardC">0 of 0 reached</span>
             </div>
             <div class="boardprog"><i id="boardBar"></i></div>
@@ -1149,7 +1149,7 @@ body[data-stage="console"] .console{padding-top:112px}
   <div class="wrap">
     <div class="sechead kb-rv">
       <div>
-        <div class="lbl gold">The nine checks</div>
+        <div class="lbl gold">The ten checks</div>
         <h2 id="catH2">Every category, and the registers behind it.</h2>
         <p id="catP">Open any tile to read which regulators, registries and databases sit underneath that check, what each one is allowed to prove, and whether its terms permit commercial use.</p>
       </div>
@@ -1217,7 +1217,7 @@ var NET = {
   reads: [
     ["46,466", "Alerts in IOSCO I-SCAN, retrieved 25 Aug 2026"],
     ["130", "Jurisdictions in the IOSCO network", "+"],
-    ["9", "Verification categories"],
+    ["10", "Verification categories"],
     ["90", "National authorities contributing to I-SCAN", "+"]
   ],
   stats: [
@@ -1225,7 +1225,7 @@ var NET = {
     ["14","","Direct feeds","41","a","documented API or structured feed"],
     ["130","+","Jurisdictions reachable",99,"a","99% of world securities markets, via IOSCO"],
     ["46,466","","Regulator alerts searchable",100,"c","IOSCO I-SCAN, 90+ national authorities"],
-    ["9","","Checks run on every search",100,"a","each returns evidence or a published gap"]
+    ["10","","Checks run on every search",100,"a","each returns evidence or a published gap"]
   ],
   bars: [
     ["Canada", 11, "a"],
@@ -1239,7 +1239,7 @@ var NET = {
   foot: "The opening set is 34 connectors: 25 authoritative, 4 independent structured, 5 consumer. It expands through the IOSCO member network rather than an invented country list. The hard problem is permissions, not engineering. Every connector carries its commercial-use terms from the day it is registered."
 };
 
-/* ======================= the nine categories ======================= */
+/* ======================= the ten categories ======================= */
 var CATS = [
   {id:"01", key:"C1", name:"Identity & existence",
    q:"Does this company or person actually exist, and are we looking at the right one?",
@@ -1412,6 +1412,19 @@ var CATS = [
     ["identity-mutation: the entity previously operated under another name or domain","4orm","4orm","Internal","open",""],
     ["claim-drift: licence number, address or founding year changed since the last check","4orm","4orm","Internal","open",""],
     ["infrastructure-cluster: shared nameservers, IP, ASN or registrar with prior red entities","4orm","4orm","Internal","open",""]
+   ]},
+  {id:"10", key:"C10", name:"Claim dates against the record",
+   q:"Could the story this party tells have happened in the time the record allows?",
+   blurb:"Every dated claim the party makes, against the independent record of when it first existed.",
+   rule:"A dated factual claim that predates the domain creation date or the entity's own registry record is a <b>material contradiction</b> and carries <b>red</b> on its own, because both sides are Tier A records and the conflict is arithmetic. A claim earlier than the first archived capture or the first certificate is <b>yellow</b>: an archive gap is an archive gap. A brand may legitimately predate its domain; what cannot stand is a trading history attributed to a period before the entity or the site existed. The domain creation date comes from the registry record only and is never inferred from an archive capture, a copyright line or a first press mention.",
+   src:[
+    ["ICANN RDAP, domain creation date","GLOBAL","A","REST API","open","https://rdap.org/"],
+    ["Home corporate registry, incorporation date","VARIES","A","Web","open",""],
+    ["Internet Archive Wayback Machine, first capture","GLOBAL","B","REST API","open","https://web.archive.org/"],
+    ["Certificate transparency, first certificate issued","GLOBAL","B","Web","open","https://crt.sh/"],
+    ["USPTO and equivalents, trademark filing date","US","A","Web","open","https://tsdr.uspto.gov/"],
+    ["Passive DNS and domain history","GLOBAL","B","Web","restricted","https://securitytrails.com/"],
+    ["Public professional profiles, stated tenure","GLOBAL","D","Web","open",""]
    ]}
 ];
 
@@ -1427,7 +1440,7 @@ var CORPUS = {
     ["7","","Authoritative records",50,"a","two regulator listings, four registry records, one central bank"],
     ["8","","Claims cross-examined",100,"a","every one contradicted by the record"],
     ["7","","Material issues",100,"c","two critical, five high"],
-    ["9","","Sources not reached",39,"n","all nine named further down this page"]
+    ["9","","Sources not reached",39,"n","all ten named further down this page"]
   ],
   bars:[["Tier A, authoritative",7,"a"],["Tier B, structured",3,"b"],["Tier D, open web",4,"c"],["Sources not reached",9,"n"],["Claims cross-examined",8,"a"],["Material issues",7,"a"]],
   barFoot:"Fourteen sources returned a definitive result. Seven are authoritative: two regulator listings, four registry records and one statement from a central bank. Nine sources that should have been reached were not, and every one of them is named further down this page.",
@@ -1473,7 +1486,17 @@ var CORPUS = {
         quote:"creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM",url:"https://rdap.verisign.com/com/v1/domain/nexlares.com"},
        {t:"B",src:"nexlares.com, the sibling brand's published claims",when:"25 Aug 2026",
         find:"The sibling brand repeats the same unfalsifiable registration claim, with no number and no regulator named.",
-        quote:"Nexlares is an officially registered company in Canada; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",url:"https://nexlares.com"}]}
+        quote:"Nexlares is an officially registered company in Canada; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",url:"https://nexlares.com"}]},
+    C10:{state:"RED",sum:"The site claims results for 2025 on a domain that did not exist until February 2026.",
+      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+        find:"The domain investhelm.com was created on 22 February 2026. Nothing on it can be older than that date.",
+        quote:"registration 2026-02-22T09:14:07Z",url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"},
+       {t:"B",src:"investhelm.com, the party's own promotional material",when:"25 Aug 2026",
+        find:"The site states a 2025 earnings figure and a user count accumulated over a period that predates the domain by a full year.",
+        quote:"$1.35 billion earned by our members in 2025; 400,000 Canadians already using the platform",url:"https://investhelm.com"},
+       {t:"B",src:"Internet Archive Wayback Machine",when:"25 Aug 2026",
+        find:"No capture of this host exists before 2026. There is no archived version of the site in the period the claim covers.",
+        quote:"No results for investhelm.com prior to 2026",url:"https://web.archive.org/web/*/investhelm.com"}]}
   },
   claims:[
     {q:"400,000 Canadians are already using the platform",s:"ICANN RDAP, Verisign registry",r:"Domain investhelm.com was created 22 February 2026",v:"RED"},
@@ -1500,6 +1523,7 @@ var CORPUS = {
     "If you have already paid, move today. Credit card and PayPal dispute windows close. Bank transfer and crypto have no recovery path. Report it to the Canadian Anti-Fraud Centre and call your bank."
   ],
   board:{"BCSC Caution List":"adverse","CSA Alerts":"adverse","ICANN RDAP":"adverse",
+    "ICANN RDAP Date":"adverse","Wayback Machine":"adverse","First Certificate":"caution","Domain History":"clear","Incorporation Date":"caution",
     "VirusTotal":"adverse","Certificate Log":"caution","Infrastructure Cluster":"adverse",
     "Document Fingerprint":"caution"},
   reviews:{checked:0,carrying:0,reports:0,state:"manufactured",
@@ -1528,7 +1552,7 @@ var CORPUS = {
     ["3","","Authoritative records",43,"a","all three from the domain registry"],
     ["4","","Claims cross-examined",100,"a","every one contradicted by the record"],
     ["4","","Material issues",100,"c","one critical, three high"],
-    ["9","","Sources not reached",56,"n","all nine named further down this page"]
+    ["9","","Sources not reached",56,"n","all ten named further down this page"]
   ],
   bars:[["Tier A, authoritative",3,"a"],["Tier B, structured",2,"b"],["Tier D, open web",2,"c"],["Sources not reached",9,"n"],["Claims cross-examined",4,"a"],["Material issues",4,"a"]],
   barFoot:"Seven sources returned a definitive result. The decisive one is a registry record: all three nameservers and the registrar match a brand already on the BC Securities Commission caution list. Nine sources that should have been reached were not.",
@@ -1578,7 +1602,7 @@ var CORPUS = {
     "Search the BC Securities Commission Investment Caution List for its sibling, Investhelm. Same nameservers, same registrar, same promotional template, and it is already listed.",
     "Do not send by bank transfer or crypto. Neither has a recovery path, and this party has given you nothing a regulator could be asked to stand behind."
   ],
-  board:{"ICANN RDAP":"adverse","Infrastructure Cluster":"adverse","Document Fingerprint":"caution"},
+  board:{"ICANN RDAP":"adverse","ICANN RDAP Date":"adverse","Wayback Machine":"adverse","Infrastructure Cluster":"adverse","Document Fingerprint":"caution"},
   reviews:{checked:0,carrying:0,reports:0,state:"manufactured",
     note:"No organic negative corpus. The same promotional review template runs under this brand and three others, each within days of its own domain registration. Seven months old, no complainants yet. That is a timing fact, not a clean record.",
     rows:[]},
@@ -1732,15 +1756,16 @@ var GREY = {
    serves. `w` is the wave it runs in, which is what makes the lights move in
    the right order during a sweep. */
 var SOURCES = [
- {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House"]},
- {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC"]},
- {c:"03 Enforcement", w:1, items:["IOSCO I-SCAN","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated"]},
+ {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates"]},
+ {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB"]},
+ {c:"03 Enforcement", w:1, items:["IOSCO I-SCAN","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG"]},
  {c:"04 People", w:2, items:["ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined"]},
- {c:"05 Legal", w:2, items:["CanLII","OSB Bankruptcy","CourtListener","UK Insolvency"]},
+ {c:"05 Legal", w:2, items:["CanLII","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims"]},
  {c:"06 Web", w:1, items:["ICANN RDAP","Certificate Log","Google Web Risk","VirusTotal","urlscan.io","Mail Config"]},
  {c:"07 Reviews", w:2, items:["Trustpilot","Sitejabber","BBB Scam Tracker","Forex Peace Army","Reddit","Glassdoor"]},
  {c:"08 Payment", w:2, items:["Beneficiary Match","IBAN and SWIFT","Chainabuse","Chain Analytics"]},
- {c:"09 4orm", w:3, items:["Infrastructure Cluster","Identifier Reuse","Document Fingerprint"]}
+ {c:"09 4orm", w:3, items:["Infrastructure Cluster","Identifier Reuse","Document Fingerprint"]},
+ {c:"10 Claim dates", w:1, items:["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile"]}
 ];
 var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
 
@@ -2326,7 +2351,7 @@ function toResult(d,label){
   spec.style.display = d.specimen ? "flex" : "none";
 
   var full=!!d.cats;
-  id("catH2").textContent = full ? "Nine checks, nine results." : "Every category, and the registers behind it.";
+  id("catH2").textContent = full ? "Ten checks, ten results." : "Every category, and the registers behind it.";
   id("catP").textContent = full
     ? "Open any tile to read the records themselves, with the source, the tier, the date it was retrieved and the words it actually says, then the full register list behind that check."
     : "Nothing resolved for this party. The tiles below still show which regulators and registries sit behind each check.";
@@ -2528,8 +2553,8 @@ function buildAudit(d){
   });
   h+='</div><div class="arp"><b>'+lit+' of '+tot+'</b> sources returned a result on this check.</div></div>';
 
-  /* 3. the nine checks */
-  h+='<div class="arsec"><div class="lbl gold">Section 03</div><div class="arh">The nine checks, and the records underneath them.</div>';
+  /* 3. the ten checks */
+  h+='<div class="arsec"><div class="lbl gold">Section 03</div><div class="arh">The ten checks, and the records underneath them.</div>';
   CATS.forEach(function(c){
     var r=d.cats?d.cats[c.key]:null; if(!r) return;
     h+='<div class="arcat"><div class="arcath">'+

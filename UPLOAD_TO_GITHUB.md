@@ -142,6 +142,51 @@ in that one source. The states now read: waiting to run, reading it now, nothing
 here, worth a look, something against them, could not reach it. One `stateWord()` map
 drives every place a state is shown to a reader.
 
+## The Goliath finding, and what changed because of it
+
+A live check on a Florida company would have missed the arrest and the guilty plea. The
+registers that carry them were not in the pinned list. This build fixes that and the two
+structural gaps behind it.
+
+**Fifty three register domains added.** `justice.gov`, `irs.gov`, `fbi.gov`, `fincen.gov`,
+state corporate registries including `sunbiz.org`, federal and state court dockets,
+receivership and bankruptcy claims agents, state attorneys general, the Internet Archive,
+certificate transparency, trademark registers and public professional profiles. The pinned
+list goes from 63 domains to 116, and the board from 48 registers to 64.
+
+**A second retrieval round.** Round one searches what the consumer typed. Round two
+searches what round one found: the people named in the records, the case numbers on the
+dockets, the entities alongside the subject, the sibling domains. Seeds are extracted
+deterministically and nothing is proposed that does not appear verbatim in a round one
+result. Capped at six searches by `KBYS_MAX_ROUND2`.
+
+**Names now get searched properly.** A person seed runs three searches of its own: criminal
+and regulatory registers, court dockets, and public professional profiles.
+
+## Category 10, claim dates against the record
+
+This is a new check and it is the one that needs no regulator, no complaint and no opinion.
+
+Step one collects every dated claim the party makes about itself, verbatim. Founding year,
+track record, duration, volume over time, copyright line, awards, team tenure.
+
+Step two establishes the independent record of when things first existed: the domain
+creation date from ICANN RDAP, the incorporation date from the home registry, the first
+Wayback capture, the first certificate, the trademark filing date.
+
+Step three compares them and names the specific pair.
+
+`CLAIM_PREDATES_DOMAIN` and `CLAIM_PREDATES_INCORPORATION` carry RED on their own, because
+both sides are Tier A records and the conflict is arithmetic rather than opinion.
+`CLAIM_PREDATES_FIRST_CAPTURE` and `CLAIM_PREDATES_CERTIFICATE` are YELLOW: an archive gap
+is an archive gap. A brand may legitimately predate its domain, and the category says so.
+
+The domain creation date comes from the registry record only. It is never inferred from an
+archive capture, a copyright line or a first press mention.
+
+**One environment variable to add:** `KBYS_MAX_ROUND2` = `6`. And raise
+`KBYS_MAX_SEARCHES` to `16`, because round one now carries sixteen searches.
+
 ## Run manual
 
 `4orm KBYS Run Manual.pdf` is in the 4orm KBYS folder. Eight pages covering

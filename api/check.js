@@ -22,7 +22,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { SEARCH_CUE, OUTPUT_INSTRUCTION } from './_cue.js';
 import { PAYLOAD_SCHEMA } from './_schema.js';
 import { runConnectors, siblingCheck } from './_connectors.js';
-import { exa, parallel, plan, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
+import { exa, parallel, plan, planRound2, extractSeeds, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
 import { retrievedSources, reachedBoard, overlayBoard, reviewLedger } from './_registers.js';
 import { recordRun } from './_store.js';
 
@@ -30,7 +30,10 @@ export const config = { maxDuration: 300 };
 
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 const MAX_INPUT = 200;
-const MAX_SEARCHES = Math.max(3, Math.min(14, Number(process.env.KBYS_MAX_SEARCHES) || 10));
+const MAX_SEARCHES  = Math.max(3, Math.min(20, Number(process.env.KBYS_MAX_SEARCHES) || 13));
+/* Round two is seeded by round one. Capped separately so a subject that surfaces
+   many names cannot run the bill up without a deliberate change. */
+const MAX_ROUND2    = Math.max(0, Math.min(10, Number(process.env.KBYS_MAX_ROUND2) || 6));
 const WINDOW_MS = 60_000;
 const PER_WINDOW = 5;
 
@@ -268,6 +271,22 @@ export default async function handler(req, res) {
       siblings = await siblingCheck(subj, [...new Set(cands)].slice(0, 4));
     }
 
+    /* Round two. Round one searched what the consumer typed. Round two searches
+       what round one found: the people named in the records, the case numbers on
+       the dockets, the entities alongside the subject and the sibling domains.
+       Nothing here is invented; every seed appears verbatim in a round one result.
+
+       This exists because the first real entity anybody checked was a company
+       whose chief executive's name was in the results and never searched. */
+    let seeds = { people: [], caseNumbers: [], relatedEntities: [], domains: [] };
+    let exa2 = [];
+    if (MAX_ROUND2 > 0) {
+      seeds = extractSeeds(exaOut, [], domain, q);
+      const r2 = planRound2(q, domain, seeds, checks).slice(0, MAX_ROUND2);
+      if (r2.length) exa2 = await Promise.all(r2.map(x => exa(x.query, x)));
+    }
+    const exaAll = exaOut.concat(exa2);
+
     /* Tier 2. */
     const parOut = await Promise.all(p.par.map(o => parallel(o.objective, o.queries, o)));
     const tRetrieval = Date.now() - t0;
@@ -275,7 +294,7 @@ export default async function handler(req, res) {
     /* Board, pass 1. Every URL that came back is attributed to the register it
        belongs to, so a light means retrieval reached that register on this run.
        Pass 2 runs after the assessment and carries adverse states onto it. */
-    const sources = retrievedSources(exaOut, parOut);
+    const sources = retrievedSources(exaAll, parOut);
     const board0  = reachedBoard(sources, conn, siblings);
     const ledger  = reviewLedger(sources, REVIEW_HOSTS);
 
@@ -307,7 +326,7 @@ export default async function handler(req, res) {
               `"switched off before this run", and never as a clean result. Evidence coverage ` +
               `must reflect that they were not attempted.\n\n`
             : '') +
-          brief(q, domain, conn, exaOut, parOut, siblings) +
+          brief(q, domain, conn, exaAll, parOut, siblings) +
           '\n\n================ REVIEW PLATFORM LEDGER (COUNTED, NOT JUDGED) ================\n' +
           'This ledger is counted from the retrieval above, not estimated. Your\n' +
           'review_narratives block must agree with it. platforms_checked is the number\n' +
@@ -322,7 +341,7 @@ export default async function handler(req, res) {
       message: 'Retrieval completed but no assessment was produced. Nothing has been guessed at.',
       stop_reason: msg.stop_reason });
 
-    const exaCost = exaOut.reduce((n, b) => n + (b.cost || 0), 0);
+    const exaCost = exaAll.reduce((n, b) => n + (b.cost || 0), 0);
     const board = overlayBoard(board0, call.input);
     const payload = toRenderShape(call.input, {
       board,
@@ -331,8 +350,11 @@ export default async function handler(req, res) {
       checks,
       pipeline: {
         connectors: { reached: conn.reached, unreached: conn.unreached, siblings: siblings.length },
-        exa:      { calls: exaOut.length, ok: exaOut.filter(b => b.status === 'found').length,
-                    results: exaOut.reduce((n, b) => n + b.results.length, 0), cost_usd: exaCost || null },
+        exa:      { calls: exaAll.length, round1: exaOut.length, round2: exa2.length,
+                    ok: exaAll.filter(b => b.status === 'found').length,
+                    results: exaAll.reduce((n, b) => n + b.results.length, 0), cost_usd: exaCost || null },
+        seeds:    { people: seeds.people, case_numbers: seeds.caseNumbers,
+                    related_entities: seeds.relatedEntities, domains: seeds.domains },
         parallel: { calls: parOut.length, ok: parOut.filter(b => b.status === 'found').length,
                     results: parOut.reduce((n, b) => n + b.results.length, 0) },
         claude:   { model: MODEL,
