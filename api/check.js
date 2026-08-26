@@ -2,64 +2,134 @@
  * 4orm - Know Before You Send
  * POST /api/check   { "q": "<identifier>" }  ->  the console's render payload
  *
- * The model does the sweeping. This file does three things and nothing else:
- * guards the endpoint, runs the call, and translates the semantic assessment
- * into the positional shape the console renders.
+ * Three tiers, in this order:
+ *
+ *   0  CONNECTORS  free, certain, milliseconds. RDAP and mail configuration.
+ *                  When one returns you know you reached it, so coverage is
+ *                  counted rather than estimated.
+ *   1  EXA         broad semantic retrieval, pinned to register domains.
+ *   2  PARALLEL    objective-driven multi-query research with cited excerpts,
+ *                  for the questions no single page answers.
+ *   3  CLAUDE      the contradiction engine. No search tool. It reads what the
+ *                  first three tiers found, cross-examines it, and emits the
+ *                  payload against a forced schema.
+ *
+ * Retrieval is cheap and parallel. Judgment is the only expensive call, and it
+ * happens once.
  */
 
 import Anthropic from '@anthropic-ai/sdk';
 import { SEARCH_CUE, OUTPUT_INSTRUCTION } from './_cue.js';
 import { PAYLOAD_SCHEMA } from './_schema.js';
+import { runConnectors, siblingCheck } from './_connectors.js';
+import { exa, parallel, plan } from './_retrieval.js';
 
 export const config = { maxDuration: 300 };
 
-const MODEL       = process.env.KBYS_MODEL || 'claude-sonnet-4-6';
-const MAX_SEARCH  = parseInt(process.env.KBYS_MAX_SEARCHES || '25', 10);
-const MAX_INPUT   = 200;
-
-/* ------------------------------------------------------------------ */
-/* Rate limit.                                                         */
-/* In-memory, so it resets whenever the function cold-starts and is    */
-/* per-instance rather than global. It stops a hammering tab, not a    */
-/* determined one. Before this faces real traffic, move the counter to */
-/* Vercel KV or Upstash - see README, "Before it goes public".         */
-/* ------------------------------------------------------------------ */
-const HITS = new Map();
+const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-4-6';
+const MAX_INPUT = 200;
 const WINDOW_MS = 60_000;
 const PER_WINDOW = 5;
 
+/* In-memory, per-instance, resets on cold start. Stops a stuck tab, not a
+   determined person. Move to Vercel KV before this URL is public. */
+const HITS = new Map();
 function overLimit(ip) {
   const now = Date.now();
   const hits = (HITS.get(ip) || []).filter(t => now - t < WINDOW_MS);
-  hits.push(now);
-  HITS.set(ip, hits);
+  hits.push(now); HITS.set(ip, hits);
   if (HITS.size > 5000) HITS.clear();
   return hits.length > PER_WINDOW;
 }
 
-/* ------------------------------------------------------------------ */
-/* Transform: semantic assessment -> console render shape              */
-/* ------------------------------------------------------------------ */
+const isDomain = v => /^([\w-]+\.)+[a-z]{2,}$/i.test(v);
 const pct = (n, d) => (d > 0 ? Math.max(0, Math.min(100, Math.round((n / d) * 100))) : 0);
 
-function toRenderShape(a) {
-  const s   = a.scores || {};
-  const checked  = s.sources_checked     || 0;
-  const missed   = s.sources_not_reached || 0;
+/* ---------------- assemble the evidence brief for Claude ---------------- */
+function brief(q, domain, conn, exaOut, parOut, siblings) {
+  const L = [];
+  L.push(`IDENTIFIER: ${q}`);
+  if (domain) L.push(`DOMAIN: ${domain}`);
+  L.push(`DATE: ${new Date().toISOString().slice(0, 10)}`);
+  L.push('');
+  L.push('================ TIER 0 - DIRECT REGISTRY RECORDS ================');
+  L.push('These were retrieved directly. Treat them as Tier A and quote them verbatim.');
+  L.push('');
+
+  const r = conn.records.rdap;
+  if (r?.status === 'found') {
+    L.push(`[ICANN RDAP] ${r.url}`);
+    L.push(`  created: ${r.created}  (${r.age_days} days old at the time of this check)`);
+    L.push(`  registrar: ${r.registrar}`);
+    L.push(`  nameservers: ${(r.nameservers || []).join(', ')}`);
+    L.push(`  status: ${(r.statuses || []).join(', ')}`);
+    L.push(`  VERBATIM: ${r.raw_excerpt}`);
+  } else {
+    L.push(`[ICANN RDAP] ${r?.status || 'not run'} - report this in coverage_gaps.`);
+  }
+  L.push('');
+
+  const m = conn.records.mail;
+  if (m?.status === 'found') {
+    L.push(`[Mail configuration] VERBATIM: ${m.raw_excerpt}`);
+    L.push(`  ${m.note}`);
+  } else {
+    L.push(`[Mail configuration] ${m?.status || 'not run'}`);
+  }
+  L.push('');
+
+  if (siblings?.length) {
+    L.push('[4orm infrastructure cluster] Domains sharing nameservers or registrar with the subject:');
+    siblings.forEach(s => {
+      L.push(`  ${s.domain} - shared nameservers: ${s.shared_nameservers.join(', ') || 'none'}` +
+             `; same registrar: ${s.same_registrar}`);
+      L.push(`  VERBATIM: ${s.raw_excerpt}`);
+    });
+    L.push('');
+  }
+
+  L.push('================ TIER 1 - EXA, PINNED TO REGISTER DOMAINS ================');
+  exaOut.forEach(b => {
+    L.push(`--- ${b.label} [${b.status}] ---`);
+    if (!b.results.length) { L.push('  nothing returned'); return; }
+    b.results.forEach(x => {
+      L.push(`  URL: ${x.url}`);
+      L.push(`  TITLE: ${x.title || ''}${x.date ? '  (' + x.date + ')' : ''}`);
+      if (x.highlights?.length) L.push(`  HIGHLIGHT: ${x.highlights.join(' | ').slice(0, 700)}`);
+      if (x.text) L.push(`  TEXT: ${x.text.slice(0, 1600)}`);
+      L.push('');
+    });
+  });
+
+  L.push('================ TIER 2 - PARALLEL, CITED EXCERPTS ================');
+  parOut.forEach(b => {
+    L.push(`--- ${b.label} [${b.status}] ---`);
+    if (!b.results.length) { L.push('  nothing returned'); return; }
+    b.results.forEach(x => {
+      L.push(`  URL: ${x.url}`);
+      L.push(`  TITLE: ${x.title || ''}${x.date ? '  (' + x.date + ')' : ''}`);
+      (x.excerpts || []).forEach(e => L.push(`  EXCERPT: ${e.slice(0, 1200)}`));
+      L.push('');
+    });
+  });
+
+  return L.join('\n');
+}
+
+/* ---------------- semantic assessment -> console render shape ---------------- */
+function toRenderShape(a, meta) {
+  const s = a.scores || {};
+  const checked = s.sources_checked || 0;
+  const missed  = s.sources_not_reached || 0;
   const universe = checked + missed;
 
   const cats = {};
   (a.categories || []).forEach(c => {
     cats[c.id] = {
-      state: c.state,
-      sum:   c.summary,
+      state: c.state, sum: c.summary,
       ev: (c.evidence || []).map(e => ({
-        t:     e.tier,
-        src:   e.source,
-        when:  e.retrieved,
-        find:  e.finding,
-        quote: e.quote || '',
-        url:   e.url   || ''
+        t: e.tier, src: e.source, when: e.retrieved,
+        find: e.finding, quote: e.quote || '', url: e.url || ''
       }))
     };
   });
@@ -68,58 +138,50 @@ function toRenderShape(a) {
   const claims = a.claims || [];
 
   return {
-    name:      a.entity?.display_name || '',
-    domain:    a.entity?.domain || '',
-    verdict:   a.verdict?.state || 'GREY',
-    headline:  a.verdict?.headline || 'Insufficient information',
+    name: a.entity?.display_name || '', domain: a.entity?.domain || '',
+    verdict: a.verdict?.state || 'GREY',
+    headline: a.verdict?.headline || 'Insufficient information',
     statement: a.verdict?.statement || '',
-    idc:       s.identity_confidence || 0,
-    cov:       s.evidence_coverage   || 0,
+    idc: s.identity_confidence || 0, cov: s.evidence_coverage || 0,
 
     reads: [
-      [String(checked),                 'Sources checked'],
-      [String(s.jurisdictions  || 0),   'Jurisdictions touched'],
-      [String(s.verified_facts || 0),   'Verified facts'],
-      [String(s.concerns       || 0),   'Concerns']
+      [String(checked), 'Sources checked'],
+      [String(s.jurisdictions || 0), 'Jurisdictions touched'],
+      [String(s.verified_facts || 0), 'Verified facts'],
+      [String(s.concerns || 0), 'Concerns']
     ],
-
     stats: [
       [String(checked), '', 'Sources returning a result', pct(checked, universe), 'a',
         universe ? `of ${universe} that should have applied` : 'nothing applied to this party'],
       [String(s.tier_a_records || 0), '', 'Authoritative records', pct(s.tier_a_records || 0, checked), 'a',
         'government, regulator, court or registry'],
       [String(claims.length), '', 'Claims cross-examined', claims.length ? 100 : 0, 'a',
-        claims.length ? `${claims.filter(c => c.result === 'RED').length} contradicted by the record` : 'no claims could be bound to a source'],
+        claims.length ? `${claims.filter(c => c.result === 'RED').length} contradicted by the record`
+                      : 'no claims could be bound to a source'],
       [String(issues.length), '', 'Material issues', issues.length ? 100 : 0, 'c',
-        issues.length
-          ? `${issues.filter(i => i.severity === 'critical').length} critical, ${issues.filter(i => i.severity === 'high').length} high`
-          : 'none found in the checks completed'],
+        issues.length ? `${issues.filter(i => i.severity === 'critical').length} critical, ${issues.filter(i => i.severity === 'high').length} high`
+                      : 'none found in the checks completed'],
       [String(missed), '', 'Sources not reached', pct(missed, universe), 'n',
         missed ? 'every one named further down this page' : 'nothing was left unchecked']
     ],
-
     bars: [
       ['Tier A, authoritative', s.tier_a_records || 0, 'a'],
       ['Tier B, structured',    s.tier_b_records || 0, 'b'],
       ['Tier D, open web',      s.tier_d_records || 0, 'c'],
-      ['Sources not reached',   missed,                'n'],
-      ['Claims cross-examined', claims.length,         'a'],
-      ['Material issues',       issues.length,         'a']
+      ['Sources not reached',   missed, 'n'],
+      ['Claims cross-examined', claims.length, 'a'],
+      ['Material issues',       issues.length, 'a']
     ],
-
     barFoot: s.evidence_note ||
-      `${checked} sources returned a definitive result. ${missed} that should have been reached were not, and every one of them is named further down this page.`,
+      `${checked} sources returned a definitive result. ${missed} that should have been reached were not, and every one is named further down this page.`,
 
     cats,
     claims: claims.map(c => ({ q: c.claim, s: c.adjudicating_source, r: c.record_says, v: c.result })),
     issues: issues.map(i => ({ t: i.title, x: i.explanation, sev: i.severity, tier: i.tier })),
-    bys:    a.before_you_send || [],
-    gaps:  (a.coverage_gaps || []).map(g => [g.source, g.reason]),
+    bys: a.before_you_send || [],
+    gaps: (a.coverage_gaps || []).map(g => [g.source, g.reason]),
     unresolved: a.unresolved_questions || [],
 
-    /* The negative-review report card. Positives are cheap to manufacture and
-       negatives are not, so the console reads the one-star corpus first and
-       reports convergence across platforms rather than volume on any one. */
     reviews: a.review_narratives ? {
       checked:  a.review_narratives.platforms_checked || 0,
       carrying: a.review_narratives.platforms_carrying_negatives || 0,
@@ -127,85 +189,118 @@ function toRenderShape(a) {
       state:    a.review_narratives.corpus_state || 'absent',
       note:     a.review_narratives.note || '',
       rows: (a.review_narratives.narratives || []).map(n => ({
-        id:    n.id,
-        label: n.label,
-        pf:    n.platforms || 0,
-        names: n.platform_names || [],
-        n:     n.reports || 0,
-        quote: n.quote || '',
-        period:n.period || ''
+        id: n.id, label: n.label, pf: n.platforms || 0,
+        names: n.platform_names || [], n: n.reports || 0,
+        quote: n.quote || '', period: n.period || ''
       }))
     } : null,
 
+    board: meta.board,
     live: true,
-    checked_at: new Date().toISOString()
+    checked_at: new Date().toISOString(),
+    pipeline: meta.pipeline
   };
 }
 
-/* ------------------------------------------------------------------ */
+/* --------------------------------- handler --------------------------------- */
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST')
     return res.status(405).json({ error: 'method_not_allowed', message: 'POST only.' });
-  }
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(503).json({
-      error: 'not_configured',
-      message: 'Live checking is not switched on. ANTHROPIC_API_KEY is not set on this deployment.'
-    });
-  }
+  if (!process.env.ANTHROPIC_API_KEY)
+    return res.status(503).json({ error: 'not_configured',
+      message: 'Live checking is not switched on. ANTHROPIC_API_KEY is not set on this deployment.' });
 
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
-  if (overLimit(ip)) {
+  if (overLimit(ip))
     return res.status(429).json({ error: 'rate_limited', message: 'Too many checks. Wait a minute and try again.' });
-  }
 
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
   const q = String(body?.q || '').trim().slice(0, MAX_INPUT);
-  if (!q) {
-    return res.status(400).json({ error: 'no_input', message: 'Supply an identifier to check.' });
-  }
+  if (!q) return res.status(400).json({ error: 'no_input', message: 'Supply an identifier to check.' });
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const domain = isDomain(q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0])
+    ? q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase()
+    : null;
+
+  const t0 = Date.now();
+  const p = plan(q, domain);
 
   try {
+    /* Tier 0 and Tier 1 run together. Nothing here depends on anything else. */
+    const [conn, exaOut] = await Promise.all([
+      runConnectors(domain),
+      Promise.all(p.exa.map(s => exa(s.query, s)))
+    ]);
+    const tExa = Date.now() - t0;
+
+    /* The sibling check needs the subject's RDAP record, so it waits for Tier 0.
+       Candidate domains come out of what Exa already surfaced. */
+    let siblings = [];
+    const subj = conn.records?.rdap;
+    if (subj?.status === 'found' && subj.nameservers?.length) {
+      const seen = new Set([domain]);
+      const cands = exaOut.flatMap(b => b.results.map(r => {
+        try { return new URL(r.url).hostname.replace(/^www\./, '').toLowerCase(); } catch { return null; }
+      })).filter(h => h && !seen.has(h) && !h.endsWith('.gov') && !/(reddit|trustpilot|bbb|google)\./.test(h));
+      siblings = await siblingCheck(subj, [...new Set(cands)].slice(0, 4));
+    }
+
+    /* Tier 2. */
+    const parOut = await Promise.all(p.par.map(o => parallel(o.objective, o.queries, o)));
+    const tRetrieval = Date.now() - t0;
+
+    /* Board status: green where a tier returned, dark where it did not. */
+    const board = {};
+    board['ICANN RDAP']  = subj?.status === 'found' ? 'clear' : 'unreached';
+    board['Mail Config'] = conn.records?.mail?.status === 'found' ? 'clear' : 'unreached';
+    if (siblings.length) board['Infrastructure Cluster'] = 'adverse';
+
+    /* Tier 3. One call. No search tool. Reasoning only. */
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const msg = await client.messages.create({
       model: MODEL,
       max_tokens: 16000,
       system: SEARCH_CUE + OUTPUT_INSTRUCTION,
-      tools: [
-        { type: 'web_search_20250305', name: 'web_search', max_uses: MAX_SEARCH },
-        {
-          name: 'emit_assessment',
-          description: 'Return the completed Know Before You Send assessment. Call exactly once, after searching.',
-          input_schema: PAYLOAD_SCHEMA
-        }
-      ],
-      tool_choice: { type: 'any' },
+      tools: [{
+        name: 'emit_assessment',
+        description: 'Return the completed Know Before You Send assessment. Call exactly once.',
+        input_schema: PAYLOAD_SCHEMA
+      }],
+      tool_choice: { type: 'tool', name: 'emit_assessment' },
       messages: [{
         role: 'user',
         content:
-          `Run a full Know Before You Send check on this identifier: ${q}\n\n` +
-          `Today's date is ${new Date().toISOString().slice(0, 10)}. ` +
-          `No document or payment instruction was supplied with this request.`
+          `Run a full Know Before You Send assessment on: ${q}\n\n` +
+          `You have no search tool on this call. Everything retrievable has already been ` +
+          `retrieved and is below. Work only from it. Where a source is absent from this ` +
+          `brief, it was not reached, and it belongs in coverage_gaps as such - never as a ` +
+          `clean result. Every quote field must be verbatim text that appears below.\n\n` +
+          `No document or payment instruction was supplied, so C8 is GREY.\n\n` +
+          brief(q, domain, conn, exaOut, parOut, siblings)
       }]
     });
 
     const call = msg.content.find(b => b.type === 'tool_use' && b.name === 'emit_assessment');
-    if (!call) {
-      return res.status(502).json({
-        error: 'no_assessment',
-        message: 'The sweep completed but produced no assessment. Nothing has been guessed at.',
-        stop_reason: msg.stop_reason
-      });
-    }
+    if (!call) return res.status(502).json({ error: 'no_assessment',
+      message: 'Retrieval completed but no assessment was produced. Nothing has been guessed at.',
+      stop_reason: msg.stop_reason });
 
-    const payload = toRenderShape(call.input);
-    payload.usage = {
-      input_tokens:  msg.usage?.input_tokens,
-      output_tokens: msg.usage?.output_tokens,
-      web_searches:  msg.usage?.server_tool_use?.web_search_requests
-    };
+    const exaCost = exaOut.reduce((n, b) => n + (b.cost || 0), 0);
+    const payload = toRenderShape(call.input, {
+      board,
+      pipeline: {
+        connectors: { reached: conn.reached, unreached: conn.unreached, siblings: siblings.length },
+        exa:      { calls: exaOut.length, ok: exaOut.filter(b => b.status === 'found').length,
+                    results: exaOut.reduce((n, b) => n + b.results.length, 0), cost_usd: exaCost || null },
+        parallel: { calls: parOut.length, ok: parOut.filter(b => b.status === 'found').length,
+                    results: parOut.reduce((n, b) => n + b.results.length, 0) },
+        claude:   { model: MODEL,
+                    input_tokens: msg.usage?.input_tokens,
+                    output_tokens: msg.usage?.output_tokens },
+        ms: { retrieval: tRetrieval, exa: tExa, total: Date.now() - t0 }
+      }
+    });
 
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json(payload);
@@ -213,8 +308,7 @@ export default async function handler(req, res) {
   } catch (err) {
     const status = err?.status || 500;
     return res.status(status >= 400 && status < 600 ? status : 500).json({
-      error: 'upstream_error',
-      message: err?.message || 'The check could not be completed.'
+      error: 'upstream_error', message: err?.message || 'The check could not be completed.'
     });
   }
 }

@@ -13,11 +13,14 @@ no framework, no bundler.
 
 ```
 index.html            the console. one self-contained file, no dependencies
-api/check.js          POST /api/check - runs a live sweep, returns the payload
+api/check.js          POST /api/check - orchestrates the four tiers
+api/_connectors.js    Tier 0. RDAP, DNS, sibling check. No key, no cost
+api/_retrieval.js     Tier 1 and 2. Exa and Parallel, plus the register domains
 api/_cue.js           the Search Cue v1.0 as the system prompt
 api/_schema.js        the output contract, enforced at the tool-call layer
 assets/               drop the real logo.png here. read the note inside first
 docs/SEARCH_CUE.md    the cue as a human document. keep in step with _cue.js
+docs/PIPELINE.md      how the four tiers fit together
 docs/DEPLOY.md        deployment and wiring notes
 docs/LIVE_RUN_investhelm.md   a real assessment, run 25 Aug 2026
 docs/PAYLOAD_EXAMPLE.json     the shape the console renders
@@ -48,110 +51,65 @@ Add an A record and a CNAME at the existing DNS host instead.
 
 ## Turn on live checking
 
-Off by default. The console reads a small seeded corpus of entities retrieved
-from real public records on 25 August 2026, and returns **grey** for anything
-else. That is a safe state, not a broken one.
+Off by default. The console reads a seeded corpus of entities retrieved from
+real public records, and returns **grey** for anything else. That is a safe
+state, not a broken one.
 
-**Step 1.** Vercel - Settings - Environment Variables:
+### The three keys
 
-| Name | Value |
-|---|---|
-| `ANTHROPIC_API_KEY` | your key |
-| `KBYS_MODEL` | a model that supports the web search tool |
-| `KBYS_MAX_SEARCHES` | `25` to start |
+| Variable | Where | Cost | Missing key |
+|---|---|---|---|
+| `ANTHROPIC_API_KEY` | platform.claude.com | tokens | 503, live checking off |
+| `EXA_API_KEY` | exa.ai | ~$1.50 / 1k, 1,000 free monthly | Tier 1 skipped, declared as a gap |
+| `PARALLEL_API_KEY` | parallel.ai | ~$0.005 / 10 results | Tier 2 skipped, declared as a gap |
 
-**Step 2.** Redeploy so the function picks the variables up.
+Set them in Vercel under Settings, Environment Variables. Add `KBYS_MODEL` too.
+Redeploy, then open `yourdomain.com/?live=1`.
 
-**Step 3.** Visit `yourdomain.com/?live=1`.
+Only the Anthropic key is required. Without the other two the check still runs
+on whatever answered, and says in `coverage_gaps` exactly what it could not
+reach. Nothing degrades into a confident answer.
 
-The console shows a **Live checking** badge, and every identifier typed runs a
-real sweep instead of reading the corpus. Drop the `?live=1` and it is back on
-the corpus. Keep it that way on the public URL until you have watched twenty
-real runs.
+### What runs, in order
 
-With no key set, `/api/check` answers `503` and the console says live checking
-is not switched on. It does not fall back to something that looks real.
+**Tier 0, connectors.** No key, no cost, milliseconds. ICANN RDAP for the domain
+record, DNS for mail configuration, then a sibling check that re-runs RDAP
+against the domains Exa surfaced. Shared nameservers mean one operator behind
+two brands. This tier is the only place coverage is counted rather than
+estimated.
 
-### How the endpoint works
+**Tier 1, Exa.** Eight searches in parallel, six of them pinned with
+`includeDomains` to 63 register domains, so a search returns the regulator's own
+page rather than an article about it. The negative review search is pinned to
+the fifteen review platforms and nothing else.
 
-`api/check.js` does three things: guards the request, runs one call, and
-translates the result.
+**Tier 2, Parallel.** Three objectives that no single page answers: the negative
+review narratives, regulatory standing, and the operator pattern behind the
+brand.
 
-- **The cue is the system prompt**, unaltered. Everything the engine may and may
-  not do lives in `docs/SEARCH_CUE.md` and is mirrored into `api/_cue.js`.
-- **`web_search`** is Anthropic's server-side tool. The model decides what to
-  search; `max_uses` is the ceiling.
-- **`emit_assessment`** is a forced tool call whose `input_schema` is the output
-  contract. Forcing the shape at the tool layer means the model retries on a
-  mismatch instead of returning prose to parse. Never ask for JSON in a prompt
-  and hope.
-- **`toRenderShape()`** turns the semantic assessment into the positional shape
-  the console draws. The model never sees the render shape, because models get
-  positional arrays wrong and get named fields right.
+**Tier 3, Claude.** One call, **no search tool.** Everything found is assembled
+into an evidence brief and handed over with the cue as the system prompt and a
+forced schema. The model reads, cross-examines and emits. It cannot search, so
+it cannot quietly fill a gap with something it went and found.
+
+Retrieval is cheap and parallel. Judgment is expensive and happens once.
+
+Full detail in `docs/PIPELINE.md`.
+
+### Adding a register
+
+`DOMAINS` in `api/_retrieval.js`. One line per domain, grouped by the check it
+serves. Adding a regulator raises coverage for every check from that point on.
 
 ### What it costs
 
-Web search is billed per search on top of tokens, and tokens will be the larger
-number - the cue is a long system prompt and search results are heavy input.
+Read the `pipeline` block on every response. It carries Exa's actual
+`cost_usd`, Parallel's call count, Claude's token counts and the wall clock for
+each tier.
 
-Do not model this from a guess. Run twenty checks, read the actual usage
-reported back in `payload.usage`, then build the unit economics.
-
----
-
-## Before it faces the public
-
-1. **Move the rate limiter.** `api/check.js` counts in memory, which resets on
-   every cold start and is per-instance. It stops a hammering tab, not a
-   determined one. Use Vercel KV or Upstash for a real counter.
-2. **Cache by identifier.** The same domain checked twice in a week should serve
-   the stored assessment. That halves the bill and starts the evidence corpus.
-3. **Store every assessment.** Category 09, the proprietary signals, cannot work
-   until that corpus exists. Search velocity, identifier reuse, beneficiary
-   reuse and infrastructure clusters are all patterns across prior checks. Today
-   they return grey because there is nothing to compare against.
-4. **Watch the coverage floor hold.** Thin evidence must render grey, never a
-   confident colour. Verify that in live output before anyone outside sees it.
-5. **Log the failures.** Any run that produces no assessment, or one that fails
-   schema validation, gets recorded. Those are the cases that show where the cue
-   is thin.
-
----
-
-## The rules the product is built on
-
-These are not style preferences. They are the reason it can be trusted.
-
-- **No trust score.** Two numbers only: identity confidence and evidence
-  coverage. A single number out of a hundred gets read as permission.
-- **Verdict order is red, then grey, then yellow, then green.** Green is the last
-  thing the engine may conclude and never the default.
-- **A category that could not be reached is grey.** Never green.
-- **Coverage gaps are published.** A report showing only what it found lies by
-  omission. The gap list is also the connector backlog, generated free by every
-  run.
-- **Tier C and D never carry red alone.** A forum post does not outweigh a
-  regulator. They are promoted only when Tier A or B corroborates.
-- **Read the one-star reviews first.** Positive reviews are cheap to
-  manufacture; negative ones are not, because nobody is paid to write one. The
-  signal is the same mechanic in different people's words across platforms that
-  do not share a user base - never volume on any one platform.
-- **Nothing is ever invented.** No licence number, registry reference, case
-  number or filing date that was not read from a record. A fabricated regulator
-  hit is the single failure this product cannot survive.
-
----
-
-## The demo entities
-
-| Identifier | What it shows |
-|---|---|
-| `investhelm.com` | Real. On the BCSC Investment Caution List since 14 Jul 2026. Every record retrieved 25 Aug 2026 |
-| `nexlares.com` | Real. Shares all three nameservers and its registrar with the above |
-| `atlanticglobalwealth.com` | **Specimen. Does not exist.** Every figure invented, labelled as such on screen, present only to show a fully populated assessment |
-| anything else | Grey. The corpus does not contain it, and inventing a result is the one thing this must never do |
-
----
+Do not model this from a guess. Run twenty checks, read the real numbers, then
+build the economics. Expect tokens to dominate: retrieval is fractions of a
+cent, and the Claude call reads everything the first three tiers found.
 
 ## What the console shows
 
