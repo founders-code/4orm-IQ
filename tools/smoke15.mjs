@@ -27,11 +27,12 @@ const h=doc.getElementById('sumBody').innerHTML;
 console.log('\nsections present:');
 ['Know before you send','The check, in numbers','The party, and the dates on the record',
  'Names found in the records','The main hits','Before you send anything, do these',
- 'If money has already gone','What this is']
+ 'If money has already gone','Read this before you rely on any of it']
  .forEach(x=>console.log((t.includes(x)?'  found  ':'  MISSING')+'  '+x));
 
 console.log('\ncarries the ask:');
-[['the name', t.includes('ATLANTIC GLOBAL WEALTH')],
+[['the disclaimer names what it is not', /not financial, investment, legal or tax advice/.test(t)],
+ ['the name', t.includes('ATLANTIC GLOBAL WEALTH')],
  ['the website', t.includes('atlanticglobalwealth.com')],
  ['the verdict', /HIGH RISK|High risk/i.test(t)],
  ['website registration date', /Website registered/.test(t)],
