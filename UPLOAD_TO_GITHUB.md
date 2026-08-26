@@ -220,6 +220,66 @@ twenty two seconds.
 **Categories, registers and jurisdictions** in the top bar now carry a border and a gold
 figure so they read as instruments rather than as small print.
 
+## Results now arrive as they are found
+
+A check takes about two minutes. Two minutes of silence reads as a broken page, and
+holding back facts that are already final for the sake of one tidy response was the
+wrong trade.
+
+`/api/check` now streams newline delimited JSON when the client asks for it. Every
+phase is announced as it starts, and the half of the answer that retrieval has already
+settled is released the moment retrieval ends rather than held for the reasoning call.
+
+    plan        16 searches, 10 checks
+    retrieve    reading the registers
+    retrieved   14 of 16 returned, 58 pages
+    round2      following what the first pass found
+    research    assembling what no single page answers
+    partial     the board, the ledger and every page read, final
+    reason      cross-examining the evidence
+    result      the assessment
+
+The board lights up for real at the `partial` event, roughly a minute in, while the
+reasoning call is still running. The sweep animation now yields to it: retrieval
+outranks the animation, always, so the sweep can never paint over a real result.
+
+If the browser or the host will not stream, it falls back to a single response and the
+error handling is identical.
+
+**On IM Academy returning nothing:** most likely the request outran the client's
+patience or a gateway timeout before anything could be shown. The stream makes that
+visible either way, because you will see how far it got.
+
+## The consent gate
+
+The corner toast is gone. It faded away on its own after twenty two seconds, which
+means it was never read, which is the same as not having one.
+
+In its place: a modal over a blurred, inert page that has to be answered. It covers what
+the tool is and is not, that nothing on it is financial, investment, legal or tax advice,
+that records are incomplete and change, and that the decision and the responsibility for
+it stay with the reader. If money has already gone, it carries the two things to do in
+the first hour with the Canadian Anti-Fraud Centre number live on the screen, and a
+button into the support directory.
+
+**The wording needs a lawyer before launch.** It is written to be honest and plain
+rather than to be a binding release, and I am not in a position to draft one.
+
+## Rules as colour
+
+"How this check is decided" was three paragraphs of prose per category. It is now a
+colour keyed list of conditions, fifty two of them across the ten checks. Read down the
+colour, not across the sentence.
+
+    RED     A sanctions match. The check stops being advisory
+    RED     Named on any regulator warning or caution list
+    GREEN   No matching entry in the lists actually queried
+    GREY    A list could not be reached
+    NEVER   Absence from a list is never a clean bill of health
+
+The NEVER rows are the ones worth reading twice. They are the guarantees, and they are
+gold rather than a verdict colour because they are not outcomes.
+
 ## Run manual
 
 `4orm KBYS Run Manual.pdf` is in the 4orm KBYS folder. Eight pages covering

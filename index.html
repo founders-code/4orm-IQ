@@ -437,6 +437,58 @@ body[data-stage="console"] .console{padding-top:112px}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
+/* ---- rules as colour, not as paragraphs ---- */
+.rulelist{display:grid;gap:2px;background:var(--border);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;margin-top:4px}
+.rulerow{background:var(--surface);padding:11px 14px;display:flex;align-items:center;gap:14px}
+.rulerow .rk{flex:none;width:62px;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.11em;text-transform:uppercase;padding:4px 0;text-align:center;
+  border-radius:4px;border:1px solid var(--border-strong);color:var(--tx-3)}
+.rulerow .rt{font-size:13px;color:var(--tx-2);line-height:1.5}
+.rulerow[data-v="RED"]{background:linear-gradient(90deg,var(--bad-bg),var(--surface) 42%)}
+.rulerow[data-v="RED"] .rk{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.rulerow[data-v="YELLOW"]{background:linear-gradient(90deg,var(--warn-bg),var(--surface) 42%)}
+.rulerow[data-v="YELLOW"] .rk{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+.rulerow[data-v="GREEN"]{background:linear-gradient(90deg,var(--ok-bg),var(--surface) 42%)}
+.rulerow[data-v="GREEN"] .rk{color:var(--ok);border-color:var(--ok-br);background:var(--ok-bg)}
+.rulerow[data-v="GREY"] .rk{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
+.rulerow[data-v="NEVER"]{background:var(--bg-2)}
+.rulerow[data-v="NEVER"] .rk{color:var(--gold);border-color:var(--gold-br);background:var(--gold-50);font-size:8px}
+.rulerow[data-v="NEVER"] .rt{color:var(--tx-3);font-size:12.5px}
+/* ---- the consent gate. Everything behind it is inert until it is answered. ---- */
+.gatescrim{position:fixed;inset:0;z-index:400;background:rgba(4,7,12,.82);backdrop-filter:blur(9px) saturate(60%);
+  transition:opacity .45s var(--ease)}
+.gatebox{position:fixed;z-index:401;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(720px,92vw);max-height:88vh;display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);
+  box-shadow:var(--sh-xl);overflow:hidden;transition:opacity .45s var(--ease),transform .5s var(--spring)}
+.gatescrim.gone,.gatebox.gone{opacity:0;pointer-events:none}
+.gatebox.gone{transform:translate(-50%,-46%) scale(.99)}
+.gatehd{padding:18px 26px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.gatebody{overflow-y:auto;overscroll-behavior:contain;padding:26px}
+.gatebody h2{font-size:23px;font-weight:800;letter-spacing:-.03em;color:var(--tx);line-height:1.16;margin-bottom:16px}
+.gatebody p{font-size:13.5px;color:var(--tx-2);line-height:1.68;margin-bottom:14px;max-width:70ch}
+.gatebody p b{color:var(--tx)}
+.gatefine{font-size:12.5px;color:var(--tx-3);border-top:1px solid var(--border);padding-top:16px;margin-top:6px}
+.gatehelp{margin:20px 0 18px;padding:18px;border:1px solid var(--warn-br);border-radius:var(--r);background:var(--warn-bg)}
+.gatehelp .gh{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--warn);margin-bottom:14px}
+.ghrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.ghcard .ght{font-size:13.5px;font-weight:700;color:var(--tx);letter-spacing:-.015em;line-height:1.35}
+.ghcard .ghx{font-size:12.5px;color:var(--tx-2);line-height:1.6;margin-top:6px}
+.ghtel{font-family:var(--mono);font-size:12.5px;color:var(--warn);border-bottom:1px solid var(--warn-br);text-decoration:none}
+.ghtel:hover{color:var(--gold)}
+.ghmore{margin-top:16px;display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:999px;
+  border:1px solid var(--gold-dp);background:transparent;color:var(--gold);
+  font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.ghmore:hover{background:#2C240F}
+.gatefoot{padding:18px 26px;border-top:1px solid var(--border);background:var(--bg-2);display:flex;justify-content:flex-end}
+.gateok{padding:13px 30px;border-radius:999px;background:var(--blue);color:#fff;border:none;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  transition:transform .3s var(--pop),background .25s var(--ease)}
+.gateok:hover{background:var(--blue-lt);transform:translateY(-1px)}
+@media(max-width:640px){.gatebox{inset:0;top:0;left:0;transform:none;width:100%;max-height:100%;border-radius:0;border:none}
+  .gatebox.gone{transform:none}}
 /* ---- the quick strip. Everything the check produced, one row, one click.
        Nothing here scrolls the page; each opens a snapshot over it. ---- */
 .quickrow{display:none;flex-wrap:wrap;gap:8px;margin-top:16px}
@@ -1293,12 +1345,58 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   <div class="arbody" id="arBody"></div>
 </div>
 
-<div class="notfin" id="notFin" role="note">
-  <span class="k"></span>
-  <span class="x"><b>This is not financial advice.</b> 4orm reports what public records show, with the source
-  and the date beside every finding. It does not tell you whether to send money, and green never means
-  4orm certifies, endorses or guarantees anyone.</span>
-  <button class="notfinx" type="button" id="notFinX" aria-label="Dismiss">&times;</button>
+<div class="gatescrim" id="gateScrim"></div>
+<div class="gatebox" id="gateBox" role="dialog" aria-modal="true" aria-labelledby="gateH">
+  <div class="gatehd">
+    <span class="led"><i></i><span class="lbl gold">Know before you send</span></span>
+  </div>
+  <div class="gatebody">
+    <h2 id="gateH">Before you use this, please read.</h2>
+
+    <p><b>4orm IQ is a research tool, not advice.</b> It reports what public records show
+    about a party, with the source and the date beside every finding, so that you can open
+    those sources and judge for yourself. It does not tell you whether to send money.</p>
+
+    <p><b>Nothing here is financial, investment, legal or tax advice</b>, and using it does
+    not create a professional relationship of any kind. A green result never means 4orm has
+    certified, endorsed, approved or guaranteed anyone. A red result means contradictions
+    were found in the records we checked. It is not a legal finding, an accusation, or a
+    determination that any person has done anything wrong.</p>
+
+    <p><b>Records are incomplete and they change.</b> Some registers are unreachable, some
+    are out of date, and a check made today can be wrong tomorrow. Every source we could not
+    reach is published in the result rather than hidden, but an absence in a register is
+    never proof that something does not exist. The decision, and the responsibility for it,
+    stays with you.</p>
+
+    <div class="gatehelp">
+      <div class="gh">If money has already gone, do these two things first</div>
+      <div class="ghrow">
+        <div class="ghcard">
+          <div class="ght">Call the bank or card issuer that sent it</div>
+          <div class="ghx">Use the number on the back of your card, not one you were given.
+          Ask for the fraud team, ask them to attempt a recall, and ask for a case number
+          before you hang up. Every payment route has a clock and it is already running.</div>
+        </div>
+        <div class="ghcard">
+          <div class="ght">Report it and get a file number</div>
+          <div class="ghx">Canadian Anti-Fraud Centre
+            <a class="ghtel" href="tel:18884958501">1-888-495-8501</a>.
+            In the United States, the FBI Internet Crime Complaint Center at ic3.gov.
+            Your bank, your card issuer and any lawyer will ask for that number first.</div>
+        </div>
+      </div>
+      <button class="ghmore" type="button" data-dir="open"><span class="hi">&#9873;</span> Find support near you</button>
+    </div>
+
+    <p class="gatefine">By continuing you confirm that you understand the above, that you
+    will not treat anything on this page as advice, and that any decision you make after
+    using it is your own. If you need advice about your situation, speak to a lawyer or a
+    licensed professional.</p>
+  </div>
+  <div class="gatefoot">
+    <button class="gateok" type="button" id="gateOk">I understand, continue</button>
+  </div>
 </div>
 
 <div class="dirscrim" id="infoScrim"></div>
@@ -1986,6 +2084,64 @@ var REGINFO = {
 "Public Profile":["GLOBAL","D","Stated tenure and history on public professional profiles. Self reported, and treated as such.",""]
 };
 
+
+/* How each check is decided, as conditions rather than paragraphs.
+   [verdict, the condition] . Read down the colour, not across the prose. */
+var RULES = {
+C1:[["RED","No registry record anywhere, for a party asking you for money"],
+    ["RED","A record that is dissolved, struck off, or in default"],
+    ["GREEN","An active record that matches the party"],
+    ["GREY","A record found but not confidently the same party"],
+    ["NEVER","Same name in two countries is never treated as one company"]],
+C2:[["RED","A licence number that the register does not return"],
+    ["RED","A licence number that returns a different legal name"],
+    ["RED","Claims regulation, names no regulator, gives no number"],
+    ["GREEN","Registered, in good standing, category matches the activity"],
+    ["GREY","The register could not be reached"],
+    ["NEVER","Not found is reported as not found, never as unlicensed"]],
+C3:[["RED","A sanctions match. The check stops being advisory"],
+    ["RED","Named on any regulator warning or caution list"],
+    ["RED","Prior enforcement, a revoked licence, a cease trade order"],
+    ["GREEN","No matching entry in the lists actually queried"],
+    ["GREY","A list could not be reached"],
+    ["NEVER","Absence from a list is never a clean bill of health"]],
+C4:[["RED","A named officer barred or disciplined anywhere"],
+    ["YELLOW","The person in charge is not in the corporate record"],
+    ["GREEN","Officers named and found in official records"],
+    ["GREY","Ownership registers unreachable or closed"],
+    ["NEVER","Two people with one name are never merged"]],
+C5:[["RED","An unsatisfied judgment against the party"],
+    ["RED","An insolvency order, receivership or asset freeze"],
+    ["YELLOW","Active litigation that bears on the money"],
+    ["GREEN","Nothing found in the courts actually searched"],
+    ["NEVER","A case the party filed is not a finding against them"]],
+C6:[["RED","A dated claim that predates the domain"],
+    ["YELLOW","A domain days or weeks old, taking money"],
+    ["YELLOW","No mailbox on the domain it writes to you from"],
+    ["GREEN","Age, mail and certificates consistent with the story"],
+    ["GREY","The registry record could not be retrieved"]],
+C7:[["YELLOW","The same mechanic described across separate platforms"],
+    ["YELLOW","Withdrawals delayed or blocked, in more than one account"],
+    ["GREY","No corpus exists yet, which is not the same as clean"],
+    ["NEVER","Community evidence alone never turns a check red"],
+    ["NEVER","Volume is not the signal. Platforms are"]],
+C8:[["RED","The receiving name does not match the party"],
+    ["RED","The payment destination changed after it was given"],
+    ["YELLOW","A wallet with reported abuse against it"],
+    ["GREEN","Beneficiary, account and party all reconcile"],
+    ["GREY","No payment instruction was supplied. This is normal"]],
+C9:[["RED","Two proprietary signals converging on one operator"],
+    ["RED","A beneficiary reused from a party already found adverse"],
+    ["YELLOW","Shared infrastructure with an unrelated brand"],
+    ["GREY","The corpus is too thin to say anything yet"]],
+C10:[["RED","A dated claim earlier than the domain was created"],
+    ["RED","A dated claim earlier than the company was incorporated"],
+    ["YELLOW","A claim earlier than anything ever archived of the site"],
+    ["YELLOW","A stated founding year that has changed over time"],
+    ["GREEN","Every dated claim fits inside the record"],
+    ["NEVER","A brand may predate its domain. The gap alone is not the finding"]]
+};
+
 var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
 
 
@@ -2568,8 +2724,14 @@ function toggleDrill(key){
     (res ? '<div class="infop"><b>On this check.</b> '+esc(res.sum)+'</div>' : '')+
     '</div>';
 
+  var rl = RULES[c.key];
   h += '<div class="infosec"><div class="infoh">How this check is decided</div>'+
-       '<div class="infop" style="margin-top:0">'+c.rule+'</div></div>';
+       (rl ? '<div class="rulelist">'+rl.map(function(r){
+              return '<div class="rulerow" data-v="'+esc(r[0])+'"><span class="rk">'+esc(r[0])+'</span>'+
+                     '<span class="rt">'+esc(r[1])+'</span></div>';
+            }).join('')+'</div>'
+          : '<div class="infop" style="margin-top:0">'+c.rule+'</div>')+
+       '</div>';
 
   if(res && res.ev && res.ev.length){
     h += '<div class="infosec"><div class="infoh">'+res.ev.length+' record'+(res.ev.length===1?'':'s')+' found</div>'+
@@ -2621,6 +2783,43 @@ input.addEventListener("input",function(){ paintIds(detect(input.value)); go.dis
    body, the sweep order and the API contract all keep one source of truth. */
 function enabledChecks(){ return CATS.map(function(c){ return c.key; }); }
 
+/* ------------------------------------------------------------------ *
+ * LIVE PROGRESS
+ *
+ * A check takes a couple of minutes. Silence for two minutes reads as a
+ * broken page, so every phase is announced as it starts and the half of the
+ * answer that is already final, the board and the pages read, is painted the
+ * moment retrieval ends rather than held for the reasoning call.
+ * ------------------------------------------------------------------ */
+var PHASE_PCT = { plan:6, retrieve:14, retrieved:46, round2:58, research:68, reason:84 };
+var PARTIAL = null;
+
+function onLiveEvent(ev){
+  if(ev.t==="phase"){
+    var v=ev.v||{};
+    var extra = v.step==="plan"     ? " ("+v.searches+" searches, "+v.categories+" checks)"
+              : v.step==="retrieved"? " ("+v.ok+" of "+v.of+" returned, "+v.pages+" pages)"
+              : v.step==="round2"   ? " ("+v.searches+" more)"
+              : "";
+    id("modeLbl").textContent = v.label + extra;
+    id("boardT").textContent = v.label;
+    if(PHASE_PCT[v.step]) topBar(PHASE_PCT[v.step]);
+  }
+  else if(ev.t==="partial"){
+    /* Real lights, from real retrieval, while the reasoning call still runs. */
+    PARTIAL = ev.v;
+    var b = ev.v.board || {};
+    SOURCES.forEach(function(g){ g.items.forEach(function(n){
+      var c=id("brows").querySelector('.src[data-n="'+slug(n)+'"]');
+      if(c) c.setAttribute("data-s", b[n] || "unreached");
+    }); });
+    boardCount();
+    var c2=ev.v.counts||{};
+    id("modeLbl").textContent = "Read "+(c2.registers_reached||0)+" registers and "+(c2.pages||0)+" pages. Cross-examining.";
+    topBar(80);
+  }
+}
+
 /* The bar at the very top of the viewport. It sits outside every panel so
    that the page always answers "is something running" without the reader
    hunting for a spinner inside a box. */
@@ -2645,6 +2844,7 @@ function runScan(board, done){
   id("modeLbl").textContent="Sweeping";
   id("boardT").textContent="Sweeping the source board";
   id("brows").classList.add("scanning");
+  PARTIAL=null;
   topBar(0);
   id("auditRow").classList.remove("on");
   id("verdictWrap").classList.remove("on");
@@ -2673,9 +2873,12 @@ function runScan(board, done){
     }, step*i));
     timers.push(setTimeout(function(){
       var c=id("brows").querySelector('.src[data-n="'+slug(n)+'"]');
-      if(c) c.setAttribute("data-s", (board && board[n]) || "unreached");
+      /* In live mode the real board may already have landed. Retrieval outranks
+         the animation, always: the sweep must never paint over a real result. */
+      var lb = (LIVE && PARTIAL && PARTIAL.board) ? PARTIAL.board : null;
+      if(c) c.setAttribute("data-s", (lb && lb[n]) || (board && board[n]) || "unreached");
       boardCount();
-      topBar(Math.round((i+1)/order.length*100));
+      if(!LIVE) topBar(Math.round((i+1)/order.length*100));
     }, step*i + (reduce?10:340)));
   });
 
@@ -2683,7 +2886,7 @@ function runScan(board, done){
   timers.push(setTimeout(function(){
     id("boardT").textContent="Source board";
     id("brows").classList.remove("scanning");
-    topBar(100);
+    if(!LIVE) topBar(100);
     done();
   }, total));
 }
@@ -2840,6 +3043,7 @@ function toResult(d,label){
   id("auditRow").classList.toggle("on", !!d.cats);
   id("verdictWrap").classList.add("on");
   renderQuick(d);
+  topBar(100);
 
   id("kbName").textContent=d.name||label;
   id("kbDom").textContent=d.domain||label;
@@ -2916,27 +3120,49 @@ function errorResult(q, msg){
   return g;
 }
 
-function liveCheck(q){
+/* Read the stream. Every event lands the moment the server produces it, so the
+   board fills in while the reasoning call is still running instead of after it.
+   Falls back to a single response if the browser or the host will not stream. */
+function liveCheck(q, onEvent){
   return fetch("/api/check",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({q:q, checks:enabledChecks()})
+    body:JSON.stringify({q:q, checks:enabledChecks(), stream:true})
   }).then(function(r){
-    /* Read the body as text first. A gateway timeout or a crashed function
-       answers with HTML, and parsing that as JSON would report a syntax error
-       instead of the thing that actually went wrong. */
-    return r.text().then(function(t){
-      var j=null;
-      try{ j=JSON.parse(t); }catch(e){ j=null; }
-      if(!r.ok){
-        var m = (j&&j.message) ? j.message
-              : (r.status===504 ? "The check ran past the time limit for a single request. The sweep did not finish."
-              : "The check failed with status "+r.status+".");
-        throw new Error(m+" [HTTP "+r.status+"]");
-      }
-      if(!j) throw new Error("The endpoint answered with something that is not a result. [HTTP "+r.status+"]");
-      return j;
-    });
+    var ct = r.headers.get("content-type")||"";
+    if(!r.body || !r.body.getReader || ct.indexOf("ndjson")<0){
+      /* Not a stream. Read it whole, and keep the error handling identical. */
+      return r.text().then(function(t){
+        var j=null; try{ j=JSON.parse(t); }catch(e){ j=null; }
+        if(!r.ok){
+          throw new Error(((j&&j.message) ? j.message
+            : (r.status===504 ? "The check ran past the time limit for a single request. The sweep did not finish."
+            : "The check failed with status "+r.status+"."))+" [HTTP "+r.status+"]");
+        }
+        if(!j) throw new Error("The endpoint answered with something that is not a result. [HTTP "+r.status+"]");
+        return j;
+      });
+    }
+    var reader=r.body.getReader(), dec=new TextDecoder(), buf="", result=null, errObj=null;
+    function pump(){
+      return reader.read().then(function(res){
+        buf += dec.decode(res.value||new Uint8Array(), {stream:!res.done});
+        var lines = buf.split("\n");
+        buf = res.done ? "" : lines.pop();
+        lines.forEach(function(line){
+          line=line.trim(); if(!line) return;
+          var ev=null; try{ ev=JSON.parse(line); }catch(e){ return; }
+          if(ev.t==="result") result=ev.v;
+          else if(ev.t==="error") errObj=ev.v;
+          else if(onEvent) { try{ onEvent(ev); }catch(e){} }
+        });
+        if(!res.done) return pump();
+        if(errObj) throw new Error(errObj.message || "The check could not be completed.");
+        if(!result) throw new Error("The stream ended before a result was produced. Nothing has been guessed at.");
+        return result;
+      });
+    }
+    return pump();
   }).catch(function(e){
     if(e instanceof TypeError) throw new Error("The request never reached the endpoint. Check the deployment is live.");
     throw e;
@@ -2947,7 +3173,7 @@ function check(q){
   var key=(q||"").trim().toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
 
   if(LIVE){
-    var pending = liveCheck(q);
+    var pending = liveCheck(q, onLiveEvent);
     /* Handlers are attached when the scan animation finishes, seconds later.
        A fetch that fails immediately would be an unhandled rejection in that
        gap and would print a browser console error on a check that is in fact
@@ -3523,8 +3749,18 @@ if(/[?&]debug=1\b/.test(window.location.search)){
                     check:check, liveCheck:liveCheck, current:function(){return CURRENT;} };
 }
 
-id("notFinX").addEventListener("click",function(){ id("notFin").classList.add("gone"); });
-setTimeout(function(){ var n=id("notFin"); if(n && !n.classList.contains("gone")) n.classList.add("gone"); }, 22000);
+/* The gate. It is answered once per visit, it does not time out, and nothing
+   behind it can be operated until it is. A disclaimer that fades away on its
+   own was never read, which is the same as not having one. */
+(function(){
+  var sc=id("gateScrim"), bx=id("gateBox");
+  document.body.style.overflow="hidden";
+  id("gateOk").addEventListener("click",function(){
+    sc.classList.add("gone"); bx.classList.add("gone");
+    document.body.style.overflow="";
+    setTimeout(function(){ sc.style.display="none"; bx.style.display="none"; input.focus(); },500);
+  });
+})();
 
 document.body.setAttribute("data-stage","landing");
 toIdle();

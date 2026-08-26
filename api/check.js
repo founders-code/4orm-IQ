@@ -232,6 +232,12 @@ export default async function handler(req, res) {
   if (overLimit(ip))
     return res.status(429).json({ error: 'rate_limited', message: 'Too many checks. Wait a minute and try again.' });
 
+  /* Streaming. The client asks for it with stream:true and reads newline
+     delimited JSON as the work happens. Retrieval takes most of the wall clock
+     and produces real, final facts long before the reasoning call returns, so
+     those facts are released as they land rather than held back for a single
+     response two minutes later. Without it the page sits silent and a user
+     reasonably concludes that nothing happened. */
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
   const q = String(body?.q || '').trim().slice(0, MAX_INPUT);
@@ -248,16 +254,43 @@ export default async function handler(req, res) {
     ? q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase()
     : null;
 
+  const stream = body?.stream === true || req.query?.stream === '1';
+  let sent = false;
+  const emit = (t, v) => {
+    if (!stream) return;
+    if (!sent) {
+      res.writeHead(200, {
+        'Content-Type': 'application/x-ndjson; charset=utf-8',
+        'Cache-Control': 'no-store, no-transform',
+        'X-Accel-Buffering': 'no',
+        'Connection': 'keep-alive'
+      });
+      sent = true;
+    }
+    try { res.write(JSON.stringify({ t, v }) + '\n'); } catch { /* client gone */ }
+  };
+  const fail = (status, obj) => {
+    if (stream) { emit('error', obj); try { res.end(); } catch {} return; }
+    return res.status(status).json(obj);
+  };
+
   const t0 = Date.now();
   const p = plan(q, domain, checks);
+  emit('phase', { step: 'plan', label: 'Planning the sweep',
+                  searches: p.exa.length, objectives: p.par.length, categories: checks.length });
 
   try {
     /* Tier 0 and Tier 1 run together. Nothing here depends on anything else. */
+    emit('phase', { step: 'retrieve', label: 'Reading the registers' });
     const [conn, exaOut] = await Promise.all([
       on('C6') ? runConnectors(domain) : Promise.resolve({ records:{}, reached:0, unreached:0 }),
       Promise.all(p.exa.slice(0, MAX_SEARCHES).map(s => exa(s.query, s)))
     ]);
     const tExa = Date.now() - t0;
+    emit('phase', { step: 'retrieved', label: 'Registers read',
+                    ok: exaOut.filter(b => b.status === 'found').length, of: exaOut.length,
+                    pages: exaOut.reduce((n, b) => n + b.results.length, 0), ms: tExa });
+    if (conn?.records) emit('connectors', conn);
 
     /* The sibling check needs the subject's RDAP record, so it waits for Tier 0.
        Candidate domains come out of what Exa already surfaced. */
@@ -286,8 +319,11 @@ export default async function handler(req, res) {
       if (r2.length) exa2 = await Promise.all(r2.map(x => exa(x.query, x)));
     }
     const exaAll = exaOut.concat(exa2);
+    if (exa2.length) emit('phase', { step: 'round2', label: 'Following what the first pass found',
+                                     searches: exa2.length, seeds });
 
     /* Tier 2. */
+    emit('phase', { step: 'research', label: 'Assembling what no single page answers' });
     const parOut = await Promise.all(p.par.map(o => parallel(o.objective, o.queries, o)));
     const tRetrieval = Date.now() - t0;
 
@@ -297,6 +333,25 @@ export default async function handler(req, res) {
     const sources = retrievedSources(exaAll, parOut);
     const board0  = reachedBoard(sources, conn, siblings);
     const ledger  = reviewLedger(sources, REVIEW_HOSTS);
+
+    /* Everything above is retrieval, and it is final. The board, the ledger and
+       the page list do not change when the reasoning call returns, so they go to
+       the client now rather than in two minutes. */
+    emit('partial', {
+      board: board0, ledger,
+      retrieved: sources.slice(0, 150).map(x => ({
+        tier: x.tier, label: x.label, url: x.url, title: x.title,
+        date: x.date, host: x.host, reg: x.registers || [], snip: (x.snippet || '').slice(0, 340)
+      })),
+      counts: {
+        registers_reached: Object.values(board0).filter(v => v !== 'unreached').length,
+        pages: sources.length,
+        platforms_searched: ledger.filter(r => r.searched).length,
+        platforms_returning: ledger.filter(r => r.pages > 0).length
+      },
+      ms: Date.now() - t0
+    });
+    emit('phase', { step: 'reason', label: 'Cross-examining the evidence' });
 
     /* Tier 3. One call. No search tool. Reasoning only. */
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -337,7 +392,7 @@ export default async function handler(req, res) {
     });
 
     const call = msg.content.find(b => b.type === 'tool_use' && b.name === 'emit_assessment');
-    if (!call) return res.status(502).json({ error: 'no_assessment',
+    if (!call) return fail(502, { error: 'no_assessment',
       message: 'Retrieval completed but no assessment was produced. Nothing has been guessed at.',
       stop_reason: msg.stop_reason });
 
@@ -375,12 +430,13 @@ export default async function handler(req, res) {
     }).catch(e => ({ stored: false, reason: e?.message || 'store threw' }));
     payload.pipeline.store = stored;
 
+    if (stream) { emit('result', payload); try { res.end(); } catch {} return; }
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json(payload);
 
   } catch (err) {
     const status = err?.status || 500;
-    return res.status(status >= 400 && status < 600 ? status : 500).json({
+    return fail(status >= 400 && status < 600 ? status : 500, {
       error: 'upstream_error', message: err?.message || 'The check could not be completed.'
     });
   }
