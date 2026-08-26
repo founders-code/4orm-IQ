@@ -245,6 +245,17 @@ if (!/class="iqmark" src="data:image\/png;base64,/.test(html))
   fails.push('the 4 in the headline lockup is not the real mark file');
 if (!/<span class="iqlock"/.test(html))
   fails.push('the headline no longer carries the 4ormIQ lockup');
+/* The Finance logo is deliberately off geometric centre, because the blue mark
+   carries almost no contrast on this ground and the white letters carry it all.
+   Losing the nudge puts it back to looking pushed right. */
+const finRule = (styleBlock.match(/\.herofin\.landing-only\{[^}]*\}/) || [''])[0];
+if (!/translateX\(-\d/.test(finRule))
+  fails.push('the optical nudge on the 4orm Finance logo is gone, so it will read as sitting right of centre');
+/* flex:none on .tlead. The console rule gives it flex:1 1 420px, and in a
+   column flex container that basis is a height, which opens dead air under
+   the paragraph. It has already done that once. */
+if (!/\.cbtitle \.tlead\{flex:none/.test(styleBlock))
+  fails.push('.tlead has lost flex:none on the landing, which reopens the gap under the paragraph');
 
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];

@@ -192,7 +192,7 @@ body[data-stage="landing"] .cbh1{width:max-content;max-width:96vw;position:relat
 body[data-stage="landing"] .cbsub{
   margin:16px auto 0;font-size:clamp(15px,1.8vw,17.5px);color:var(--tx-2);max-width:52ch;line-height:1.55;
 }
-body[data-stage="landing"] .searchbox{margin-top:38px;box-shadow:var(--sh-lg)}
+body[data-stage="landing"] .searchbox{margin-top:22px;box-shadow:var(--sh-lg)}
 body[data-stage="landing"] .idrow{justify-content:center}
 body[data-stage="landing"] .herolock.landing-only{display:inline-flex}
 .servedrow{display:none}
@@ -218,9 +218,14 @@ body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justi
    of the words around it so the line reads as one line rather than as a
    headline with a picture stuck in it. */
 .herofin{display:none}
+/* Nudged left. The blue 4 sits on near black and carries little contrast,
+   while "orm FINANCE" is white and carries almost all of it, so the weight
+   of the mark reads well right of its geometric middle. Measured against
+   the page ground the contrast centroid is 11.7 per cent right of centre;
+   half of that is the correction that looks centred without looking pushed. */
 body[data-stage="landing"] .herofin.landing-only{
-  display:block;height:104px;width:auto;margin:-6px auto 20px}
-@media(max-width:620px){body[data-stage="landing"] .herofin.landing-only{height:68px;margin:-4px auto 14px}}
+  display:block;height:104px;width:auto;margin:-6px auto 44px;transform:translateX(-6%)}
+@media(max-width:620px){body[data-stage="landing"] .herofin.landing-only{height:68px;margin:-4px auto 30px}}
 
 /* The inline lockup, built from the same measurements as the large one.
    In the 400x200 source the blue 4 runs rows 54 to 144, so 90px tall. The
@@ -234,7 +239,10 @@ body[data-stage="landing"] .herofin.landing-only{
    below the text baseline. The mark is positioned out of flow and the space
    it occupies is held by the padding, which is what keeps "orm" sitting on
    the same baseline as every other word in the headline. */
-.iqlock{position:relative;display:inline-block;padding-left:.939em;white-space:nowrap;color:#FDFDFC}
+/* Lifted off the text baseline by a fraction. The mark and the letters move
+   together so the lockup keeps the proportions of the real file: only where
+   it sits in the line changes, never how it is built. */
+.iqlock{position:relative;top:-.07em;display:inline-block;padding-left:.939em;white-space:nowrap;color:#FDFDFC}
 .iqmark{position:absolute;left:0;bottom:-.387em;display:block;height:1.212em;width:auto}
 .iqwm{letter-spacing:-.045em}
 .iqiq{font-size:.5em;letter-spacing:-.02em;margin-left:.14em}
@@ -325,8 +333,11 @@ body[data-stage="console"] .console{padding-top:112px}
 .cbtitle{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap;justify-content:space-between;margin-bottom:20px}
 .cbtitle .tlead{flex:1 1 420px;min-width:0}
 .cbtitle .idrow{flex:none;padding-bottom:4px}
-body[data-stage="landing"] .cbtitle{flex-direction:column;justify-content:center;align-items:center;gap:22px;margin-bottom:0}
-body[data-stage="landing"] .cbtitle .tlead{align-self:stretch;width:100%;text-align:center}
+body[data-stage="landing"] .cbtitle{flex-direction:column;justify-content:center;align-items:center;gap:14px;margin-bottom:0}
+/* flex:none matters. The console rule sets flex:1 1 420px, and in a column
+   flex container that basis is a HEIGHT, which left 97px of dead air under
+   the paragraph. align-self handles the cross axis, it does not touch this. */
+body[data-stage="landing"] .cbtitle .tlead{flex:none;align-self:stretch;width:100%;text-align:center}
 body[data-stage="landing"] .tlead{display:block}
 @media(max-width:900px){.cbtitle{gap:16px}.cbtitle .idrow{flex:1 1 100%}}
 .idrow{display:flex;flex-wrap:wrap;gap:8px}
