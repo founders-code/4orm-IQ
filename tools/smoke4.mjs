@@ -5,7 +5,7 @@ const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'h
  beforeParse(w){ w.IntersectionObserver=class{observe(){}unobserve(){}disconnect(){}};
   w.matchMedia=()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});
   w.scrollTo=()=>{}; w.requestAnimationFrame=cb=>setTimeout(cb,0);
-  w.fetch=(u,o)=>{ lastBody=JSON.parse(o.body); return Promise.reject(new TypeError('blocked')); };
+  w.fetch=(u,o)=>{ if(o&&o.body){ try{ lastBody=JSON.parse(o.body); }catch(e){} } return Promise.reject(new TypeError('blocked')); };
   w.addEventListener('error',e=>errs.push('window.error: '+(e.error?.stack||e.message)));}});
 const {window}=dom, doc=window.document;
 window.console.error=(...a)=>errs.push('console.error: '+a.join(' '));
