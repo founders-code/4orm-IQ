@@ -39,9 +39,9 @@ const rail=doc.getElementById('sbRight');
 console.log('\nrail cards:', rail.children.length);
 rail.children[2].click(); await new Promise(r=>setTimeout(r,60));
 let m=doc.getElementById('infoBody').textContent;
-['Answered with a record','Asked, and came back empty','Could never have applied here','Never asked, or we could not get in']
+['Reached, and returned a record','Reached, nothing on file','Could never have applied here','Never asked, or we could not get in']
   .forEach(t=>console.log((m.includes(t)?'  found  ':'  MISSING')+'  '+t));
-console.log('  a dark light is not one thing:', m.includes('A dark light is not one thing'));
+console.log('  reaching a register and finding nothing is a result:', m.includes('Reaching a register and finding nothing is a result'));
 doc.getElementById('infoClose').click(); await new Promise(r=>setTimeout(r,30));
 
 rail.children[5].click(); await new Promise(r=>setTimeout(r,60));

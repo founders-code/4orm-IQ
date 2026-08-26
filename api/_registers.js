@@ -42,9 +42,9 @@ const HOST_MAP = {
   'find-and-update.company-information.service.gov.uk': ['Companies House', 'UK PSC Register'],
 
   /* 02 Licensing */
-  'securities-administrators.ca':        ['CSA Registration', 'CSA Alerts', 'CSA Disciplined'],
+  'securities-administrators.ca':        ['CSA Registration', 'CSA Alerts', 'CSA Disciplined', 'CSA Disciplined Persons'],
   'autorites-valeurs-mobilieres.ca':     ['CSA Registration'],
-  'ciro.ca':                    ['CIRO AdvisorReport'],
+  'ciro.ca':                    ['CIRO AdvisorReport', 'CIRO Discipline'],
   'fintrac-canafe.canada.ca':   ['FINTRAC MSB'],
   'bankofcanada.ca':            ['Bank of Canada PSP'],
   'register.fca.org.uk':        ['FCA Register'],
@@ -108,6 +108,60 @@ const HOST_MAP = {
   'urlscan.io':                 ['urlscan.io'],
   'transparencyreport.google.com': ['Google Web Risk'],
 
+  /* NEW. Source pack A, United States investing and retail trading. */
+  'adviserinfo.sec.gov':        ['SEC IAPD, Form ADV', 'IAPD First Registration', 'BrokerCheck'],
+  'reports.adviserinfo.sec.gov':['SEC IAPD, Form ADV', 'IAPD First Registration'],
+  'efts.sec.gov':               ['SEC Form D', 'Form D First Filing', 'EDGAR First Filing'],
+  'cftc.gov':                   ['CFTC Enforcement'],
+  'dfpi.ca.gov':                ['DFPI Crypto Scam Tracker'],
+
+  /* NEW. Source pack B, Canada. */
+  'sedarplus.ca':               ['SEDAR+', 'SEDAR+ First Filing'],
+  'sedar.com':                  ['SEDAR+', 'SEDAR+ First Filing'],
+  'sedi.ca':                    ['SEDI Insider Reports', 'SEDI First Insider Record'],
+
+  /* NEW. Source pack C, international. */
+  'asic.gov.au':                ['ASIC Banned'],
+  'moneysmart.gov.au':          ['ASIC Investor Alerts'],
+  'sfc.hk':                     ['SFC Public Register'],
+  'apps.sfc.hk':                ['SFC Public Register'],
+  'esma.europa.eu':             ['ESMA MiCA CASP'],
+  'eba.europa.eu':              ['ESMA MiCA CASP'],
+
+  /* NEW. Chain explorers. What moved, never who owns it. */
+  'etherscan.io':               ['Etherscan'],
+  'bscscan.com':                ['Etherscan'],
+  'arbiscan.io':                ['Etherscan'],
+  'polygonscan.com':            ['Etherscan'],
+  'solscan.io':                 ['Solscan'],
+  'solana.fm':                  ['Solscan'],
+  'tronscan.org':               ['Tronscan'],
+  'blockchain.com':             ['Bitcoin Explorer'],
+  'blockchair.com':             ['Bitcoin Explorer'],
+  'mempool.space':              ['Bitcoin Explorer'],
+
+  /* NEW. The operator graph. */
+  'publicwww.com':              ['Analytics and Pixel Reuse'],
+  'builtwith.com':              ['Site Technology'],
+  'securitytrails.com':         ['DNS and IP History', 'Domain History'],
+  'viewdns.info':               ['DNS and IP History'],
+  'dnslytics.com':              ['DNS and IP History'],
+  'censys.io':                  ['Host and Certificate Graph', 'First Certificate'],
+  'search.censys.io':           ['Host and Certificate Graph'],
+
+  /* NEW. Where a build first appears in public. */
+  'apps.apple.com':             ['App Store First Release'],
+  'play.google.com':            ['Google Play First Release'],
+  'github.com':                 ['GitHub Repository Created', 'GitHub First Commit'],
+  'npmjs.com':                  ['GitHub Repository Created'],
+  'prnewswire.com':             ['First Press Release'],
+  'businesswire.com':           ['First Press Release'],
+  'globenewswire.com':          ['First Press Release'],
+  'newswire.ca':                ['First Press Release'],
+  'youtube.com':                ['First YouTube Video'],
+  'x.com':                      ['First Social Post'],
+  'twitter.com':                ['First Social Post'],
+
   /* 10 Claim dates against the record */
   'web.archive.org':            ['Wayback Machine'],
   'archive.org':                ['Wayback Machine'],
@@ -159,14 +213,91 @@ export function host(url) {
   catch { return null; }
 }
 
-/* A host matches a map entry if it is that host or a subdomain of it. */
-function registersFor(h) {
+/* Several hosts serve more than one register, and which one a page belongs to
+   is decided by the PATH, not the host. sec.gov carries EDGAR, Form D and the
+   trading suspension list, and attributing a suspension notice to EDGAR would
+   light the wrong lamp on the board.
+
+   Each rule is [hostSuffix, pathTest, registers]. First match wins, and a page
+   that matches none falls back to the flat host map. */
+const PATH_MAP = [
+  ['sec.gov',      /litigation\/suspensions|trading-suspension|\/suspensions/i,
+                   ['SEC Trading Suspensions']],
+  ['sec.gov',      /form-?d|formd|exempt-?offering|\/d\/|regulation-?d/i,
+                   ['SEC Form D', 'Form D First Filing', 'Form D First Sale']],
+  ['sec.gov',      /edgar|browse-edgar|cgi-bin/i,
+                   ['SEC EDGAR', 'EDGAR First Filing']],
+  ['cftc.gov',     /check|red-?list|registration-?deficient/i,
+                   ['CFTC RED List']],
+  ['cftc.gov',     /enforcement|press|litigation|federal-?register/i,
+                   ['CFTC Enforcement']],
+  ['asic.gov.au',  /banned|disqualified|enforcement/i,
+                   ['ASIC Banned']],
+  ['asic.gov.au',  /register|licen[cs]|professional|authorised-?representative/i,
+                   ['ASIC Professional Register']],
+  ['asic.gov.au',  /alert|warning|imposter/i,
+                   ['ASIC Investor Alerts']],
+  ['sfc.hk',       /alert-?list|suspicious|unlicen[cs]ed/i,
+                   ['SFC Alert List']],
+  ['sfc.hk',       /register|licen[cs]|intermediaries|public-?register/i,
+                   ['SFC Public Register']],
+  ['ciro.ca',      /enforcement|disciplin|hearing|settlement/i,
+                   ['CIRO Discipline']],
+  ['ciro.ca',      /advisorreport|advisor-?report/i,
+                   ['CIRO AdvisorReport']],
+  ['securities-administrators.ca', /disciplined/i,
+                   ['CSA Disciplined', 'CSA Disciplined Persons']],
+  ['securities-administrators.ca', /alert|caution|warning/i,
+                   ['CSA Alerts']],
+  ['securities-administrators.ca', /nrs|registration|national-?registration/i,
+                   ['CSA Registration']],
+  ['dfpi.ca.gov',  /crypto-?scam/i, ['DFPI Crypto Scam Tracker']]
+];
+
+/* Everything a host can serve, whatever the path. Used when we know a domain
+   was queried but have no page from it: asking cftc.gov asks both the RED list
+   and the enforcement record, and the board should say we asked both. */
+const HOST_SERVES = (() => {
+  const m = {};
+  Object.entries(HOST_MAP).forEach(([h, regs]) => { m[h] = new Set(regs); });
+  PATH_MAP.forEach(([h, , regs]) => {
+    m[h] = m[h] || new Set();
+    regs.forEach(r => m[h].add(r));
+  });
+  return Object.fromEntries(Object.entries(m).map(([h, set]) => [h, [...set]]));
+})();
+
+function hostKey(h, table) {
+  if (!h) return null;
+  if (table[h]) return h;
+  for (const key of Object.keys(table)) if (h.endsWith('.' + key)) return key;
+  return null;
+}
+
+/**
+ * registersFor(host, url)
+ * Which register a RETRIEVED PAGE belongs to. Path aware, because a host can
+ * serve several and attributing a page to the wrong one lights the wrong lamp.
+ */
+function registersFor(h, url) {
   if (!h) return [];
-  if (HOST_MAP[h]) return HOST_MAP[h];
-  for (const key of Object.keys(HOST_MAP)) {
-    if (h.endsWith('.' + key)) return HOST_MAP[key];
+  const path = String(url || '');
+  for (const [suffix, test, regs] of PATH_MAP) {
+    if ((h === suffix || h.endsWith('.' + suffix)) && test.test(path)) return regs;
   }
-  return [];
+  const k = hostKey(h, HOST_MAP);
+  return k ? HOST_MAP[k] : [];
+}
+
+/**
+ * registersServedBy(host)
+ * Which registers we can honestly say were ASKED when this domain was pinned
+ * on a search. Broader than registersFor on purpose.
+ */
+export function registersServedBy(h) {
+  if (!h) return [];
+  const k = hostKey(String(h).toLowerCase().replace(/^www\./, ''), HOST_SERVES);
+  return k ? HOST_SERVES[k] : [];
 }
 
 /* Every URL retrieved this run, flattened, with its register attribution. */
@@ -176,7 +307,7 @@ export function retrievedSources(exaOut = [], parOut = []) {
     const h = host(r.url);
     out.push({
       tier: 'Exa', label: b.label || '', url: r.url, title: r.title || '',
-      date: r.date || null, host: h, registers: registersFor(h),
+      date: r.date || null, host: h, registers: registersFor(h, r.url),
       snippet: (r.highlights && r.highlights[0]) || (r.text || '').slice(0, 400) || ''
     });
   }));
@@ -184,7 +315,7 @@ export function retrievedSources(exaOut = [], parOut = []) {
     const h = host(r.url);
     out.push({
       tier: 'Parallel', label: b.label || '', url: r.url, title: r.title || '',
-      date: r.date || null, host: h, registers: registersFor(h),
+      date: r.date || null, host: h, registers: registersFor(h, r.url),
       snippet: (r.excerpts && r.excerpts[0]) ? r.excerpts[0].slice(0, 400) : ''
     });
   }));
@@ -213,8 +344,7 @@ export function reachedBoard(sources = [], conn = {}, siblings = []) {
 export function searchedBoard(board, searchedHosts = []) {
   const out = { ...board };
   new Set(searchedHosts).forEach(h => {
-    registersFor(String(h || '').toLowerCase().replace(/^www\./, ''))
-      .forEach(n => { if (!out[n]) out[n] = 'searched'; });
+    registersServedBy(h).forEach(n => { if (!out[n]) out[n] = 'searched'; });
   });
   return out;
 }
@@ -258,7 +388,7 @@ export function overlayBoard(board, assessment) {
     if (st !== 'caution' && st !== 'adverse') return;
     (c.evidence || []).forEach(e => {
       const names = new Set([
-        ...registersFor(host(e.url)),
+        ...registersFor(host(e.url), e.url),
         ...registersFor(String(e.source || '').toLowerCase())
       ]);
       /* An evidence item often names the register in prose rather than by URL. */

@@ -75,3 +75,33 @@ section 07B of the audit report.
 **Claim dates against the record** opens from check 10 and carries the comparison: every
 dated claim the party makes, every independently dated record reached, and what the
 comparison shows. Section 07C of the audit report carries the same table.
+
+---
+
+## Reading the board
+
+Six states, and two of them are yellow on purpose.
+
+| Light | Meaning | Counts as coverage |
+|---|---|---|
+| Green | Reached, and it returned a record about this party. Nothing in it was adverse | Yes |
+| Solid yellow | Worth a look. It returned something | Yes |
+| Red | Something against them | Yes |
+| **Hollow yellow** | **Reached, nothing on file.** We hit it and there was nothing there | Yes, it was reached |
+| Dashed grey | Could never have applied. Wrong jurisdiction or wrong activity | Not counted either way |
+| Dim grey | Never asked, or we could not get in | **No. This is the only gap** |
+
+The hollow yellow is the one that changed. A register we reached that had no entry used to
+read grey, which made a working sweep look like a dead one. It is a result, it is not
+clearance, and it now looks different from a register nobody asked.
+
+## Register attribution is path aware
+
+Several hosts serve more than one register. `sec.gov` carries EDGAR, Form D and the trading
+suspension list; `cftc.gov` carries the RED list and the enforcement record; `asic.gov.au`
+carries the professional register, the banned persons list and the investor alerts.
+
+`registersFor(host, url)` decides from the **path**, so a suspension notice lights the
+suspension lamp rather than EDGAR. `registersServedBy(host)` is deliberately broader and
+answers a different question: when a domain was pinned on a search that ran, every register
+that host serves was asked, and the board says so.

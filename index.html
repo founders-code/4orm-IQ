@@ -238,27 +238,21 @@ body[data-stage="console"] .console{padding-top:112px}
   .gobtn{padding:15px 20px}
 }
 
-.metarow{display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:15px;align-items:center}
-.idrow{display:flex;flex-wrap:wrap;gap:6px}
+.metarow{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:14px;align-items:center}
+.idrow{display:flex;flex-wrap:wrap;gap:8px}
 .idchip{
-  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  padding:5px 10px;border-radius:999px;color:var(--tx-4);
-  border:1px solid var(--border);background:var(--bg-2);transition:all .32s var(--ease);
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  padding:7px 14px;border-radius:999px;color:var(--tx-3);
+  border:1px solid var(--border-strong);background:var(--bg-2);transition:all .32s var(--ease);
 }
 .idchip.on{color:var(--bg);background:var(--gold);border-color:var(--gold);box-shadow:0 0 20px rgba(196,154,58,.26)}
-.tryrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
-.try{
-  font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:999px;
-  border:1px solid var(--border-strong);background:var(--bg-2);color:var(--tx-2);
-  transition:all .28s var(--ease);
-}
-.try:hover{color:var(--tx);border-color:var(--blue);background:var(--blue-50)}
+/* The seed row is gone. The six identifier chips are what sits under the bar. */
 .upnote{margin-top:16px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:74ch}
 .upnote b{color:var(--tx-2);font-weight:600}
 
 /* stat strip */
 .statstrip{
-  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:22px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:14px;
   border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--border);
 }
 @media(max-width:1100px){.statstrip{grid-template-columns:repeat(3,1fr)}}
@@ -318,8 +312,8 @@ body[data-stage="console"] .console{padding-top:112px}
    searched  the register was queried and returned nothing. That is a result.
    na        the register could never have applied to this party.
    unreached nobody asked it, or we could not get in. Only this hurts coverage. */
-.src[data-s="searched"]{color:var(--tx-2);opacity:.9;background:var(--surface-2);border-color:var(--border-strong)}
-.src[data-s="searched"] i{background:var(--tx-4);box-shadow:0 0 6px rgba(118,134,156,.55)}
+.src[data-s="searched"]{color:var(--warn);background:transparent;border-color:var(--warn-br)}
+.src[data-s="searched"] i{background:transparent;border:1.5px solid var(--warn);box-shadow:none}
 .src[data-s="na"]{color:var(--dim);background:transparent;border-color:var(--border-lit);
   border-style:dashed}
 .src[data-s="na"] i{background:transparent;border:1px solid var(--dim);box-shadow:none}
@@ -582,9 +576,19 @@ body[data-stage="console"] .console{padding-top:112px}
   color:var(--tx-4);text-transform:uppercase}
 .edu .et{font-size:15px;font-weight:700;color:var(--tx);letter-spacing:-.018em;margin-top:12px;line-height:1.3}
 .edu .ex{font-size:13px;color:var(--tx-2);line-height:1.62;margin-top:8px;max-width:70ch}
-.edudots{display:flex;gap:5px;margin-top:14px;justify-content:center}
-.edudots i{width:5px;height:5px;border-radius:50%;background:var(--border-lit);transition:all .3s var(--ease)}
-.edudots i.on{background:var(--gold);width:16px;border-radius:3px}
+.edunav{display:flex;align-items:center;gap:12px;margin-top:16px}
+.edubtn{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--border-strong);
+  background:var(--surface);color:var(--tx-3);font-size:13px;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:all .25s var(--ease)}
+.edubtn:hover{border-color:var(--gold);color:var(--gold);background:var(--surface-2)}
+.edubtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.edudots{display:flex;gap:6px;flex:1;justify-content:center;flex-wrap:wrap}
+.edudots button{width:8px;height:8px;padding:0;border-radius:50%;border:none;
+  background:var(--border-lit);transition:all .3s var(--ease);cursor:pointer}
+.edudots button:hover{background:var(--tx-4);transform:scale(1.3)}
+.edudots button.on{background:var(--gold);width:20px;border-radius:4px}
+.edudots button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.educount{flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--tx-4);min-width:44px;text-align:right}
 .waitdisc{margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
 .waitdisc .wdh{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--tx-4);margin-bottom:11px}
@@ -802,15 +806,12 @@ body[data-stage="console"] .verdictwrap.on{display:block}
    runs in two columns: what the check concluded on the left, the ten
    checks and their registers on the right. The right column sticks, so
    the category index stays in view while the assessment is read. */
-.split{max-width:1560px;margin:0 auto;padding:0 34px;
-  display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:34px;align-items:start}
-.split .wrap{max-width:none;padding:0;margin:0}
-.split .sec{padding:44px 0}
-.split .sec.tight{padding:26px 0}
-.split .deck{padding:34px 0 0}
-.col-r{position:sticky;top:92px}
-.col-r .sec{padding:34px 0 0}
-.col-r .tiles{grid-template-columns:1fr}
+/* The two column split is gone. Evidence composition, then the ten checks,
+   then what to do, each across the full page. */
+.deck .deckgrid{grid-template-columns:1fr}
+.deck .panel{width:100%}
+#categories .tiles{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+@media(max-width:720px){#categories .tiles{grid-template-columns:1fr}}
 @media(max-width:1080px){
   .split{grid-template-columns:1fr;gap:0}
   .col-r{position:static}
@@ -1315,15 +1316,11 @@ body[data-stage="console"] .verdictwrap.on{display:block}
           <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
         </form>
 
+        <!-- The six things this bar accepts. They light as you type, and they
+             sit directly under the bar because that is where somebody looks
+             when they are working out what to put in it. -->
         <div class="metarow">
           <div class="idrow" id="kbIds" aria-live="polite"></div>
-          <div class="tryrow">
-            <span class="lbl">Try</span>
-            <button class="try" type="button" data-seed="investhelm.com">investhelm.com</button>
-            <button class="try" type="button" data-seed="nexlares.com">nexlares.com</button>
-            <button class="try" type="button" data-seed="atlanticglobalwealth.com">atlanticglobalwealth.com</button>
-            <button class="try" type="button" data-seed="Northbank Capital Partners">Northbank Capital Partners</button>
-          </div>
         </div>
 
         <div class="statstrip" id="statstrip"></div>
@@ -1418,14 +1415,14 @@ body[data-stage="console"] .verdictwrap.on{display:block}
             <ul>
               <li><b style="background:var(--border-lit)"></b>Waiting to run</li>
               <li><b style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></b>Reading it now</li>
-              <li><b style="background:var(--ok);box-shadow:0 0 8px var(--ok)"></b>Nothing found here</li>
+              <li><b style="background:var(--ok);box-shadow:0 0 8px var(--ok)"></b>Reached, record found</li>
               <li><b style="background:var(--warn);box-shadow:0 0 8px var(--warn)"></b>Worth a look</li>
               <li><b style="background:var(--bad);box-shadow:0 0 8px var(--bad)"></b>Something against them</li>
-              <li><b style="background:var(--tx-4);box-shadow:0 0 5px rgba(118,134,156,.55)"></b>Asked, nothing came back</li>
+              <li><b style="background:transparent;border:1.5px solid var(--warn)"></b>Reached, nothing on file</li>
               <li><b style="background:transparent;border:1px solid var(--dim)"></b>Does not apply here</li>
               <li><b style="background:var(--dim)"></b>Never asked</li>
             </ul>
-            <p class="lx">Three of these lights are dark and they are not the same fact. <b>Asked, nothing came back</b> is a result: that register had no entry on the day we looked. <b>Does not apply here</b> means it could never have held one, so it is not a gap. Only <b>never asked</b> counts against coverage. No dark light ever means the source came back clean. And a green light means that one register had no entry about this party on the day we looked. It is one source saying nothing, not a clean record and never a guarantee.</p>
+            <p class="lx"><b>Two yellows, and they mean different things.</b> A <b>solid</b> yellow is a register that returned something worth a look. A <b>hollow</b> yellow is a register we reached that had no entry for this party: we hit it, and there was nothing there. That is a result, and it is not clearance. <b>Green</b> means that register answered with a record about this party and nothing in it was adverse. It is one source, not a clean record, and never a guarantee. Of the two dark states, <b>does not apply here</b> could never have held a record so it is not a gap, and <b>never asked</b> is the only thing that counts against coverage.</p>
           </aside>
         </div>
 
@@ -1448,12 +1445,13 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 
 
 
-<div class="split">
-  <div class="col col-l">
+<!-- One column, in the order a reader needs it: what the evidence is made of,
+     then the ten checks, then the three things to do before any money moves.
+     The two column split put the instruction beside the evidence and half the
+     page width went unused on a wide screen. -->
 <section class="deck" id="network">
   <div class="wrap">
     <div class="deckgrid">
-
       <div class="panel kb-rv">
         <div class="panelhd">
           <span class="lbl" id="barPanelT">Connector distribution</span>
@@ -1464,32 +1462,10 @@ body[data-stage="console"] .verdictwrap.on{display:block}
           <p class="barfoot" id="barFoot"></p>
         </div>
       </div>
-
     </div>
   </div>
 </section>
-<main class="res" id="kbRes">
-  <div class="wrap">
 
-
-
-
-    <section class="sec tight">
-      <div class="bys kb-rv">
-        <div class="lbl gold">Before you send</div>
-        <h3 id="kbBysH">Do these three things first.</h3>
-        <div class="byslist" id="kbBys"></div>
-        <div style="margin-top:22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-          <button class="helpbtn" type="button" data-dir="open"><span class="hi">&#9873;</span> Help me find support</button>
-          <span class="lbl" style="color:var(--tx-4)">Who to call, in what order, and what to say</span>
-        </div>
-      </div>
-    </section>
-
-  </div>
-</main>
-  </div>
-  <div class="col col-r">
 <section class="sec" id="categories">
   <div class="wrap">
     <div class="sechead kb-rv">
@@ -1503,8 +1479,23 @@ body[data-stage="console"] .verdictwrap.on{display:block}
     <div class="drill" id="drill" aria-live="polite"></div>
   </div>
 </section>
+
+<main class="res" id="kbRes">
+  <div class="wrap">
+    <section class="sec tight">
+      <div class="bys kb-rv">
+        <div class="lbl gold">Before you send</div>
+        <h3 id="kbBysH">Do these three things first.</h3>
+        <div class="byslist" id="kbBys"></div>
+        <div style="margin-top:22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+          <button class="helpbtn" type="button" data-dir="open"><span class="hi">&#9873;</span> Help me find support</button>
+          <span class="lbl" style="color:var(--tx-4)">Who to call, in what order, and what to say</span>
+        </div>
+      </div>
+    </section>
   </div>
-</div>
+</main>
+
 <div class="divide"></div>
 
 
@@ -1538,6 +1529,12 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 
   <div class="waitbody">
     <div class="edu" id="eduCard"></div>
+    <div class="edunav">
+      <button class="edubtn" type="button" id="eduPrev" aria-label="Previous card">&#8249;</button>
+      <div class="edudots" id="eduDots" role="tablist" aria-label="Choose a card"></div>
+      <button class="edubtn" type="button" id="eduNext" aria-label="Next card">&#8250;</button>
+      <span class="educount" id="eduCount"></span>
+    </div>
 
     <div class="waitdisc">
       <div class="wdh">While this runs, the part that matters</div>
@@ -2072,6 +2069,23 @@ var CORPUS = {
  * ------------------------------------------------------------------ */
 var SPECIMEN = {
   name:"ATLANTIC GLOBAL WEALTH", domain:"atlanticglobalwealth.com", specimen:true, asOf:"25 Aug 2026",
+
+  /* SPECIMEN ONLY. The board below shows all four states, because a specimen
+     that only ever shows two teaches the reader the wrong thing about what the
+     board can say. searched means we reached it and it had nothing. na means it
+     could never have applied to a party of this shape. */
+  searched:["Florida Sunbiz","OpenCorporates","FinCEN MSB","SEC Form D",
+      "SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DOJ Press",
+      "IRS-CI","State AG","PACER","Justia Dockets",
+      "Bankruptcy Claims","Etherscan","Solscan","Tronscan",
+      "Bitcoin Explorer","Site Technology","Analytics and Pixel Reuse","Host and Certificate Graph",
+      "Trademark Filing","Domain History","App Store First Release","Google Play First Release",
+      "GitHub Repository Created","GitHub First Commit","First Press Release","First YouTube Video",
+      "First Social Post","EDGAR First Filing","Form D First Filing","Form D First Sale",
+      "Public Profile"],
+  na:["BC Registry","Alberta Registry","CIRO Discipline","CSA Disciplined Persons",
+      "SEDAR+","SEDI Insider Reports","SEDAR+ First Filing","SEDI First Insider Record",
+      "SFC Public Register","SFC Alert List","ESMA MiCA CASP"],
 
   /* SPECIMEN ONLY. Every name, identifier, date and quote below is invented,
      and it exists to show what a populated operator graph and a populated
@@ -3324,10 +3338,10 @@ function openRegister(name){
   var msg = {
     ready:"This check has not been run yet, so nothing has been asked of this register.",
     check:"This register is being read right now.",
-    clear:"Reached, and nothing about this party came back from it. That is not a clean bill of health. It means this one source had no entry.",
+    clear:"Reached, and it returned a record about this party. Nothing in that record was adverse, which is not the same as a clean bill of health: it is one source, saying what it holds.",
     caution:"Something came back from this register that is worth looking at.",
     adverse:"Something came back from this register that is against this party.",
-    searched:"This register was searched on this run and returned nothing about this party. That is a real result, and it is not the same as a register we could not get into. It is also not a clean bill of health: it means this one source had no entry on the day we looked.",
+    searched:"We reached this register and it had no entry for this party. We hit it, and there was nothing there. That is a real result, and it is not the same as a register we could not get into, which is why it is yellow rather than dark. It is also not clearance: it means this one source had no entry on the day we looked.",
     na:"This register could not have held a record for this party. It covers a jurisdiction or an activity that does not apply here, so it is not counted against coverage and it is not a gap.",
     unreached:"Nothing was asked of this register on this run, or we could not get an answer out of it. It is reported as not reached, never as clean, and it is the only kind of dark light that counts against coverage."
   }[state] || "No result recorded.";
@@ -3496,13 +3510,13 @@ function snapSources(){
   });
   rows.sort(function(x,y){ var o={adverse:0,caution:1,clear:2,searched:3,na:4,unreached:5}; return (o[x[2]]||9)-(o[y[2]]||9); });
   var h='<div class="infosec">'+
-    snapCells([[String(reached),"Answered with a record",""],
-               [String(adverse),"Answered with something against them","bad"],
-               [String(empty),"Asked, and came back empty","warn"],
+    snapCells([[String(reached),"Reached, and returned a record","ok"],
+               [String(adverse),"Returned something against them","bad"],
+               [String(empty),"Reached, nothing on file","warn"],
                [String(na),"Could never have applied here",""],
                [String(dark),"Never asked, or we could not get in","bad"]])+
-    '<div class="infop"><b>A dark light is not one thing.</b> A register we asked that came back empty is a result, and it is reported that way. '+
-    'A register that covers a jurisdiction or an activity this party is not in could never have held a record, so it is not counted against coverage. '+
+    '<div class="infop"><b>Reaching a register and finding nothing is a result.</b> It shows yellow, because we hit it and there was nothing there. '+
+    'It is not clearance and it is not a gap. A register that covers a jurisdiction or an activity this party is not in could never have held a record, so it does not count against coverage either. '+
     'Only the last group, the ones nobody asked or we could not get into, is a real gap, and every one is named below.</div>'+
     '<div class="snaplist">'+rows.map(function(x){
       return '<button class="snaprow" type="button" data-reg="'+esc(x[1])+'">'+
@@ -3516,19 +3530,68 @@ function snapSources(){
   });
 }
 
+/* ------------------------------------------------------------------ *
+ * CROSS-EXAMINATION
+ *
+ * A dated claim put against the record that settles it IS a cross-examined
+ * claim, so the chronology feeds this list rather than sitting in a section of
+ * its own that nobody opens. Each one carries where it came from, so a reader
+ * can tell a claim the assessment bound to a source from one the date
+ * comparison produced.
+ * ------------------------------------------------------------------ */
+function allClaims(d){
+  if(!d) return [];
+  var out=(d.claims||[]).map(function(c){
+    return {q:c.q, s:c.s, r:c.r, v:c.v, from:"assessment"};
+  });
+  var ch=d.chrono;
+  if(ch && (ch.claims||[]).length){
+    /* The earliest independent record is what a dated claim is measured
+       against. Where there is none, the comparison cannot be made and the
+       claim is carried as unresolved rather than dropped. */
+    var recs=(ch.records||[]).slice().sort(function(a,b){
+      return String(a.date).localeCompare(String(b.date));
+    });
+    var first=recs[0];
+    var v = ch.verdict==="CONTRADICTED" ? "RED"
+          : ch.verdict==="CONSISTENT"   ? "GREEN"
+          : "YELLOW";
+    ch.claims.forEach(function(c){
+      out.push({
+        q: c.q,
+        s: first ? first.src : "No independently dated record was reached",
+        r: first
+            ? (first.what+" is dated "+first.date+", and it is the earliest independent record of this party we reached")
+            : "Nothing dated was retrieved, so this claim could not be put against a record",
+        v: first ? v : "YELLOW",
+        from:"claim dates",
+        url: first ? (first.url||"") : ""
+      });
+    });
+  }
+  return out;
+}
+
 /* --- claims, issues and gaps --- */
 function snapSimple(kind){
   var d=CURRENT; if(!d) return;
   var h='';
   if(kind==="claims"){
-    var cl=d.claims||[];
+    var cl=allClaims(d);
+    var dated=cl.filter(function(x){ return x.from==="claim dates"; }).length;
     h='<div class="infosec">'+snapCells([[String(cl.length),"Claims cross-examined",""],
-        [String(cl.filter(function(x){return x.v==="RED";}).length),"Contradicted by the record","bad"]])+
+        [String(cl.filter(function(x){return x.v==="RED";}).length),"Contradicted by the record","bad"],
+        [String(cl.filter(function(x){return x.v==="YELLOW";}).length),"Not supported either way","warn"],
+        [String(dated),"Of them, dated claims",""]])+
       '<div class="infop">Every claim the party makes, bound to the record that adjudicates it. This is the part a search engine cannot do for you.</div>'+
+      (dated?'<div class="infop">Dated claims are included here. A claim about how long they have been doing this is a claim like any other, and the record that carries the date is the thing that settles it. '+
+             'A gap between the two is a discrepancy that requires explanation, not on its own evidence of wrongdoing.</div>':'')+
       (cl.length?'<div class="snaplist">'+cl.map(function(c,i){
         return '<div class="snaprow"><span class="sx">'+(i<9?"0":"")+(i+1)+'</span>'+
           '<span class="sb"><span class="st2">'+esc(c.q)+'</span>'+
-          '<span class="sd"><b>'+esc(c.s)+'</b> says: '+esc(c.r)+'</span></span>'+
+          '<span class="sd"><b>'+esc(c.s)+'</b> says: '+esc(c.r)+'</span>'+
+          (c.from==="claim dates"?'<span class="sd" style="color:var(--tx-4)">From the date comparison in check 10</span>':'')+
+          '</span>'+
           '<span class="sg" data-s="'+esc(c.v)+'">'+esc(c.v)+'</span></div>';
       }).join('')+'</div>':'<div class="infop">No claim could be bound to a source on this check.</div>')+'</div>';
     infoOpen("Cross-examination", (d.name||"This party"), null, h);
@@ -3585,7 +3648,7 @@ function renderSummaryRail(d){
   var rev=d.reviews, led=d.ledger||[];
   var revN = rev?(rev.reports||0):led.reduce(function(n,p){return n+(p.pages||0);},0);
   var revP = rev?(rev.carrying||0):led.filter(function(p){return p.pages>0;}).length;
-  var claims=d.claims||[], issues=d.issues||[], gaps=d.gaps||[], unres=d.unresolved||[];
+  var claims=allClaims(d), issues=d.issues||[], gaps=d.gaps||[], unres=d.unresolved||[];
   var contradicted=claims.filter(function(x){return x.v==="RED";}).length;
   var realGaps=gaps.filter(function(x){ return isRealGap(x[1]); }).length;
   var critical=issues.filter(function(x){return x.sev==="critical"||x.sev==="high";}).length;
@@ -3613,7 +3676,7 @@ function renderSummaryRail(d){
          if(k==="searched") e++; else if(k==="na") na++; else dk++;
        }); });
        var bits=[];
-       if(e)  bits.push(e+" asked and came back empty");
+       if(e)  bits.push(e+" reached with nothing on file");
        if(na) bits.push(na+" could never have applied");
        if(dk) bits.push(dk+" never asked");
        return bits.length ? bits.join(", ") : "Every register that applied was reached";
@@ -4391,13 +4454,7 @@ function check(q){
 id("kbForm").addEventListener("submit",function(e){
   e.preventDefault(); if(!input.value.trim()) return; check(input.value);
 });
-var tries=document.querySelectorAll(".try");
-for(var ti=0;ti<tries.length;ti++){
-  tries[ti].addEventListener("click",function(){
-    input.value=this.getAttribute("data-seed");
-    paintIds(detect(input.value)); go.disabled=false; check(input.value);
-  });
-}
+/* The seeded example row was removed. Nothing prefills the bar now. */
 
 /* ---- audit report ---- */
 var arScrim=id("arScrim"), arBox=id("arBox"), arBody=id("arBody");
@@ -4417,9 +4474,11 @@ function tierWord(t){ var x=TIER_WORD[String(t||"").toUpperCase()]||TIER_WORD[t]
 function tierWhy(t){ var x=TIER_WORD[String(t||"").toUpperCase()]||TIER_WORD[t]; return x?x[1]:""; }
 
 var STATE_WORD = {
-  ready:"Waiting to run", check:"Reading it now", clear:"Nothing found here",
+  ready:"Waiting to run", check:"Reading it now",
+  clear:"Reached, record found",
   caution:"Worth a look", adverse:"Something against them",
-  unreached:"Never asked", searched:"Asked, nothing came back", na:"Does not apply here",
+  searched:"Reached, nothing on file",
+  unreached:"Never asked", na:"Does not apply here",
   organic:"Written by real customers", manufactured:"Looks manufactured",
   mixed:"Some of each", absent:"None found"
 };
@@ -5105,6 +5164,21 @@ if(/[?&]debug=1\b/.test(window.location.search)){
  *       act    what you can do before the money moves
  * ------------------------------------------------------------------ */
 var EDU = [
+  {tone:"method", k:"Who we are", v:"4orm",
+   t:"A verification desk, not a rating agency",
+   x:"We read public records and show you what they say, with the source and the date beside every finding, so you can open them and judge for yourself. We are not paid by the parties we check, we do not sell anybody a badge, and we never will.",
+   src:"4orm Finance"},
+
+  {tone:"method", k:"What we do", v:"Before",
+   t:"We check who you are dealing with before the money leaves",
+   x:"You type a company, a person, a website, an email, a phone number or a wallet address. We put it against the registers, read the records, and tell you what is there. Then we tell you what we could not reach, because a report that shows only what it found lies by omission.",
+   src:"4orm Finance"},
+
+  {tone:"act", k:"Why we do it", v:"Too late",
+   t:"Almost everything gets caught after the money is gone",
+   x:"Enforcement is slow, and it has to be: a regulator has to prove its case. That leaves a window where an operation is running and nothing official says so yet. This is built for that window, which is the only window you are ever standing in.",
+   src:"4orm Finance"},
+
   {tone:"loss", k:"Why this exists", v:"$20.9bn",
    t:"Reported to the FBI in a single year",
    x:"The Internet Crime Complaint Center recorded $20.877 billion in reported losses in 2025. Reported is the operative word. It counts only what somebody filed.",
@@ -5209,6 +5283,9 @@ var EDU = [
 var waitScrim=id("waitScrim"), waitBox=id("waitBox");
 var eduI=0, eduT=null, waitDone=false, waitAck=false, waitPayload=null, waitRender=null, waitReturn=null;
 
+/* The cards turn on their own, and a reader can take them at their own pace.
+   Touching the controls holds the current card long enough to finish reading
+   it, rather than yanking it away a second after they arrived. */
 function eduPaint(){
   var e=EDU[eduI % EDU.length], c=id("eduCard");
   c.classList.add("fade");
@@ -5216,13 +5293,44 @@ function eduPaint(){
     c.setAttribute("data-tone", e.tone||"method");
     c.innerHTML='<div class="ek">'+esc(e.k)+'</div><span class="ev">'+esc(e.v)+'</span>'+
       '<div class="et">'+esc(e.t)+'</div><div class="ex">'+esc(e.x)+'</div>'+
-      (e.src?'<span class="esrc">Source: '+esc(e.src)+'</span>':'')+
-      '<div class="edudots">'+EDU.map(function(_,i){
-        return '<i class="'+(i===(eduI%EDU.length)?"on":"")+'"></i>';
-      }).join('')+'</div>';
+      (e.src?'<span class="esrc">Source: '+esc(e.src)+'</span>':'');
     c.classList.remove("fade");
   }, 260);
+  eduNavPaint();
 }
+
+function eduNavPaint(){
+  var w=id("eduDots"); if(!w) return;
+  var cur=eduI % EDU.length;
+  if(w.children.length!==EDU.length){
+    w.innerHTML="";
+    EDU.forEach(function(e,i){
+      var b=el("button"); b.type="button";
+      b.setAttribute("aria-label", (i+1)+" of "+EDU.length+", "+e.k+", "+e.t);
+      b.addEventListener("click", function(){ eduGo(i); });
+      w.appendChild(b);
+    });
+  }
+  for(var i=0;i<w.children.length;i++){
+    w.children[i].classList.toggle("on", i===cur);
+    w.children[i].setAttribute("aria-current", i===cur ? "true" : "false");
+  }
+  var cnt=id("eduCount"); if(cnt) cnt.textContent=(cur+1)+" / "+EDU.length;
+}
+
+var EDU_HOLD = 7000;
+function eduRestart(ms){
+  clearInterval(eduT);
+  eduT=setInterval(function(){ eduI++; eduPaint(); }, ms||EDU_HOLD);
+}
+function eduGo(i){
+  eduI = ((i % EDU.length) + EDU.length) % EDU.length;
+  eduPaint();
+  /* Give them the full hold from the moment they chose, not whatever was
+     left on the clock. */
+  eduRestart(EDU_HOLD * 2);
+}
+function eduStep(n){ eduGo(eduI + n); }
 function waitOpen(q){
   waitDone=false; waitAck=false; waitPayload=null; eduI=0;
   id("waitQ").textContent=q;
@@ -5233,7 +5341,7 @@ function waitOpen(q){
   id("waitFine").textContent="Still working. You can read while you wait.";
   var ok=id("waitOk"); ok.disabled=false; ok.textContent="I understand";
   eduPaint();
-  clearInterval(eduT); eduT=setInterval(function(){ eduI++; eduPaint(); }, 7000);
+  eduRestart(EDU_HOLD);
   waitScrim.classList.add("on"); waitBox.classList.add("on");
   document.body.style.overflow="hidden";
   waitReturn = document.activeElement;
@@ -5304,6 +5412,15 @@ function waitClose(){
   waitReturn=null;
   if(waitRender){ var r=waitRender; waitRender=null; setTimeout(r,240); }
 }
+id("eduPrev").addEventListener("click",function(){ eduStep(-1); });
+id("eduNext").addEventListener("click",function(){ eduStep(1); });
+/* Arrow keys move the cards while the wait screen has focus, which is the
+   only thing on screen at that moment. */
+waitBox.addEventListener("keydown",function(e){
+  if(e.key==="ArrowLeft"){ eduStep(-1); }
+  else if(e.key==="ArrowRight"){ eduStep(1); }
+});
+
 id("waitOk").addEventListener("click",function(){
   waitAck=true;
   if(waitDone){ waitClose(); return; }
