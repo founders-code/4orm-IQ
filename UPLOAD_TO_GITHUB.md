@@ -68,6 +68,64 @@ body as text first and reports the real status.
 **Debug hook.** Add `?debug=1` to the URL and the console's internals are
 reachable from the browser console as `window.__KBYS__`. Inert without the flag.
 
+## Also in this build
+
+**The nav is two objects now.** The logo pill on the left, Find support alone
+on the far right, larger. Source network, Categories, Scoring and Run a check
+are gone from it. They pointed at sections of the same page you are already on.
+
+**The scoring section at the bottom is gone.** The tier ladder and the
+"there is no trust score" explainer both went. Everything they said is already
+said in one line each by the three chips under the search bar, and said again
+by the dials themselves. An explanation that repeats what the interface already
+shows is an explanation nobody reads.
+
+**The footer note is three sentences shorter.** What is left is the liability
+line, which stays because the product publishes adverse findings about real
+companies.
+
+**Find support is rebuilt as a real directory.** It was a menu of eight folders
+you had to guess your way into. It is now one continuous page: every category,
+every organisation and every telephone number rendered at once. The rail on the
+left is a table of contents that jumps you down the page rather than swapping
+it. The triage strip is a shortcut, not a gate. Search narrows what is already
+visible instead of replacing it with a result list. An "if money has already
+left" band sits above everything with the two things to do in the first hour.
+
+## This build
+
+**B612 Mono replaces JetBrains Mono on the instrument layer.** Designed by
+Intactile DESIGN for Airbus, out of research with ENAC and the Universite de
+Toulouse III, to be read at a glance on a cockpit screen. Every mono weight was
+normalised to 400 or 700, because those are the only two B612 Mono ships and a
+synthesised bold would throw away the crispness the face is being used for.
+Inter still sets every sentence.
+
+**The ground is black again.** The token block was inverted rather than the
+components rewritten, so every rule keeps working. The support directory
+redefines the same tokens locally on a lighter grey, because it is read rather
+than watched.
+
+**The lights change colour while a register is being read.** Each chip cycles
+blue, gold, green on a 1.45 second loop with the phase staggered four ways, and
+the board rows carry a matching edge. Both respect reduced motion.
+
+**Nine switches.** All armed on load. A dropped switch removes the retrieval for
+that category: the searches never run, the registers stay dark, the category
+comes back grey, and the reasoning call is told in writing to report it as
+switched off before the run rather than as clean. `plan()` filters the search
+list, connectors are gated on category 06 and the infrastructure graph on 09.
+Clearing every switch disables the Check button.
+
+**The page splits under the search bar.** The search bar keeps the full width.
+Below it: the assessment, the evidence composition and what to do next on the
+left, the nine checks and their registers on the right, sticky.
+
+## Run manual
+
+`4orm KBYS Run Manual.pdf` is in the 4orm KBYS folder. Eight pages covering
+everything to date.
+
 ## Test it
 
 Load: 4ormiq.com/?live=1

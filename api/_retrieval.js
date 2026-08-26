@@ -130,58 +130,65 @@ export async function parallel(objective, queries, opts = {}) {
 /* Everything Exa runs is pinned to register domains except the last two,
    which are deliberately open. Everything Parallel runs is an objective that
    cannot be answered by one page. */
-export function plan(q, domain) {
+/* Which categories a check may run. The console sends the switch state; an
+   absent or empty list means every check runs, which is the default state of
+   the panel. A search is kept when any category it feeds is still switched on. */
+export const ALL_CATS = ['C1','C2','C3','C4','C5','C6','C7','C8','C9'];
+
+export function plan(q, domain, enabled) {
+  const on = (Array.isArray(enabled) && enabled.length) ? new Set(enabled) : new Set(ALL_CATS);
+  const keep = e => !e.cats || e.cats.some(c => on.has(c));
   const name = q;
   const d = domain || q;
   const D = DOMAINS;
 
-  return {
+  const built = {
     exa: [
-      { label:'C1 corporate existence', category:'company', numResults:4,
+      { label:'C1 corporate existence', cats:['C1'], category:'company', numResults:4,
         query:`${name} company registration legal entity incorporation record`,
         includeDomains:[...D.ca_corporate, ...D.uk, 'sec.gov'] },
 
-      { label:'C2 registration and licensing', numResults:5,
+      { label:'C2 registration and licensing', cats:['C2'], numResults:5,
         query:`is ${name} registered or licensed to sell investments`,
         includeDomains:[...D.ca_securities, ...D.ca_payments, ...D.us, ...D.uk, ...D.intl] },
 
-      { label:'C3 caution and warning lists',
+      { label:'C3 caution and warning lists', cats:['C3'],
         query:`${name} investor alert caution list warning unregistered`,
         includeDomains:[...D.ca_securities, ...D.us, ...D.uk, ...D.intl], numResults:6, fullText:true },
 
-      { label:'C3 sanctions', query:`${name} sanctions designated entity`,
+      { label:'C3 sanctions', cats:['C3'], query:`${name} sanctions designated entity`,
         includeDomains:D.sanctions, numResults:3 },
 
-      { label:'C5 courts and insolvency', query:`${name} lawsuit judgment insolvency order`,
+      { label:'C5 courts and insolvency', cats:['C5'], query:`${name} lawsuit judgment insolvency order`,
         includeDomains:[...D.ca_courts, 'sec.gov','gov.uk'], numResults:3 },
 
       /* The review sweep is split three ways on purpose. One search pinned to
          fifteen hosts returns whatever ranks highest and can miss a platform
          entirely. Three narrower pins force results out of each group, which
          is what makes the platform ledger mean something. */
-      { label:'C7 review platforms',
+      { label:'C7 review platforms', cats:['C7'],
         query:`${name} review scam withdrawal refused cannot withdraw one star`,
         includeDomains:D.reviews_major, numResults:6, fullText:true, maxChars:3000 },
 
-      { label:'C7 complaint boards',
+      { label:'C7 complaint boards', cats:['C7'],
         query:`${name} complaint report ripoff refused refund`,
         includeDomains:D.reviews_boards, numResults:5, fullText:true, maxChars:3000 },
 
-      { label:'C7 trading and workplace community',
+      { label:'C7 trading and workplace community', cats:['C7'],
         query:`${name} scam warning account manager pressure deposit`,
         includeDomains:D.reviews_community, numResults:6, fullText:true, maxChars:3000 },
 
-      { label:'Open sweep, the subject’s own claims',
+      { label:'Open sweep, the subject’s own claims', cats:['C1','C2'],
         query:`${name} ${d} about us regulated licensed years operating history`,
         excludeDomains:D.reviews, numResults:4, fullText:true },
 
-      { label:'Open sweep, everything else',
+      { label:'Open sweep, everything else', cats:['C1','C3','C5'],
         query:`${name} ${d} fraud investigation regulator complaint`,
         numResults:5 }
     ],
 
     par: [
-      { label:'Negative review narratives',
+      { label:'Negative review narratives', cats:['C7'],
         objective:
           `Find NEGATIVE reviews and complaints about ${name} (${d}). Read one and two star reviews only. ` +
           `Ignore positive reviews entirely. For each complaint capture what was actually DONE to the person: ` +
@@ -196,7 +203,7 @@ export function plan(q, domain) {
           `${name} reddit scam warning`
         ], mode:'advanced', maxChars:18000 },
 
-      { label:'Regulatory standing',
+      { label:'Regulatory standing', cats:['C2','C3'],
         objective:
           `Establish whether ${name} (${d}) is registered, licensed or authorised to offer financial services ` +
           `in any jurisdiction, and whether any regulator has published a warning, caution listing or ` +
@@ -209,7 +216,7 @@ export function plan(q, domain) {
           `${name} regulatory action enforcement`
         ], mode:'advanced' },
 
-      { label:'People and operator pattern',
+      { label:'People and operator pattern', cats:['C4','C9'],
         objective:
           `Identify who is behind ${name} (${d}): named directors, officers, owners or executives, ` +
           `and whether those people appear in any official corporate or regulatory record. ` +
@@ -222,6 +229,8 @@ export function plan(q, domain) {
         ], mode:'fast' }
     ]
   };
+
+  return { exa: built.exa.filter(keep), par: built.par.filter(keep), enabled: [...on] };
 }
 
 export default { exa, parallel, plan, DOMAINS };

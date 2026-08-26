@@ -22,7 +22,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { SEARCH_CUE, OUTPUT_INSTRUCTION } from './_cue.js';
 import { PAYLOAD_SCHEMA } from './_schema.js';
 import { runConnectors, siblingCheck } from './_connectors.js';
-import { exa, parallel, plan, REVIEW_HOSTS } from './_retrieval.js';
+import { exa, parallel, plan, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
 import { retrievedSources, reachedBoard, overlayBoard, reviewLedger } from './_registers.js';
 import { recordRun } from './_store.js';
 
@@ -209,6 +209,7 @@ function toRenderShape(a, meta) {
       snip: (x.snippet || '').slice(0, 340)
     })),
     ledger: meta.ledger || [],
+    checks: meta.checks || null,
 
     live: true,
     checked_at: new Date().toISOString(),
@@ -233,17 +234,24 @@ export default async function handler(req, res) {
   const q = String(body?.q || '').trim().slice(0, MAX_INPUT);
   if (!q) return res.status(400).json({ error: 'no_input', message: 'Supply an identifier to check.' });
 
+  /* The switch panel. An absent or empty list means every check runs, which is
+     how the panel ships. Unknown keys are dropped rather than trusted. */
+  const checks = Array.isArray(body?.checks) && body.checks.length
+    ? body.checks.map(String).filter(c => ALL_CATS.includes(c))
+    : ALL_CATS.slice();
+  const on = k => checks.includes(k);
+
   const domain = isDomain(q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0])
     ? q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase()
     : null;
 
   const t0 = Date.now();
-  const p = plan(q, domain);
+  const p = plan(q, domain, checks);
 
   try {
     /* Tier 0 and Tier 1 run together. Nothing here depends on anything else. */
     const [conn, exaOut] = await Promise.all([
-      runConnectors(domain),
+      on('C6') ? runConnectors(domain) : Promise.resolve({ records:{}, reached:0, unreached:0 }),
       Promise.all(p.exa.slice(0, MAX_SEARCHES).map(s => exa(s.query, s)))
     ]);
     const tExa = Date.now() - t0;
@@ -252,7 +260,7 @@ export default async function handler(req, res) {
        Candidate domains come out of what Exa already surfaced. */
     let siblings = [];
     const subj = conn.records?.rdap;
-    if (subj?.status === 'found' && subj.nameservers?.length) {
+    if (on('C9') && subj?.status === 'found' && subj.nameservers?.length) {
       const seen = new Set([domain]);
       const cands = exaOut.flatMap(b => b.results.map(r => {
         try { return new URL(r.url).hostname.replace(/^www\./, '').toLowerCase(); } catch { return null; }
@@ -292,6 +300,13 @@ export default async function handler(req, res) {
           `brief, it was not reached, and it belongs in coverage_gaps as such - never as a ` +
           `clean result. Every quote field must be verbatim text that appears below.\n\n` +
           `No document or payment instruction was supplied, so C8 is GREY.\n\n` +
+          (checks.length < ALL_CATS.length
+            ? `THE OPERATOR SWITCHED OFF THESE CHECKS BEFORE THE RUN: ` +
+              ALL_CATS.filter(c => !checks.includes(c)).join(', ') + `. No retrieval was ` +
+              `performed for them. Report each one as GREY with a coverage_gaps entry reading ` +
+              `"switched off before this run", and never as a clean result. Evidence coverage ` +
+              `must reflect that they were not attempted.\n\n`
+            : '') +
           brief(q, domain, conn, exaOut, parOut, siblings) +
           '\n\n================ REVIEW PLATFORM LEDGER (COUNTED, NOT JUDGED) ================\n' +
           'This ledger is counted from the retrieval above, not estimated. Your\n' +
@@ -313,6 +328,7 @@ export default async function handler(req, res) {
       board,
       sources,
       ledger,
+      checks,
       pipeline: {
         connectors: { reached: conn.reached, unreached: conn.unreached, siblings: siblings.length },
         exa:      { calls: exaOut.length, ok: exaOut.filter(b => b.status === 'found').length,
