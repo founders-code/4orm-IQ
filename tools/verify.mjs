@@ -213,6 +213,39 @@ if (!shPlainRule) fails.push('the printed summary has no plain language block');
 else if (!/#E7F7EF/i.test(shPlainRule))
   fails.push('.sh-plain on the printed summary is no longer light green');
 
+/* ------------------- the wait screen must let go of the reader by itself.
+   It sat open after the sweep landed and waited to be dismissed, which reads
+   as a hung page. The countdown is the thing that fixes it, so the call from
+   waitFinish is checked rather than assumed. */
+const wfStart = script.indexOf('function waitFinish');
+/* the body only, to the first close at column zero. The helpers that follow
+   share the name, and matching those would pass a build where the call is gone. */
+const waitFin = script.slice(wfStart, script.indexOf('\n}', wfStart));
+if (!/[^n]\s*waitAutoGo\s*\(/.test(waitFin))
+  fails.push('waitFinish no longer starts the countdown off the disclaimer, so the panel will sit open');
+if (!/function\s+waitAutoCancel/.test(script))
+  fails.push('the countdown can no longer be held, so a reader mid card gets cut off');
+
+/* ------------------------ the summary box is sized by the band, not by itself.
+   The detail under the statement scrolls. If the verdict goes back into flow
+   the copy pushes the box taller than the gauges beside it, which is the one
+   thing the box was asked not to do. */
+if (!/\.sbleft \.verdictwrap\{position:absolute;inset:0\}/.test(styleBlock.replace(/\s+/g, m => m.includes('\n') ? '\n' : ' ')))
+  warn.push('check the summary band: the verdict may be back in flow and able to grow the box');
+const vmoreRule = (styleBlock.match(/\.vmore\s*\{[^}]*\}/) || [''])[0];
+if (!/overflow-y:\s*auto/.test(vmoreRule))
+  fails.push('the summary detail no longer scrolls');
+
+/* --------------------------------- two logos, both of them the real files.
+   4orm Finance sits above the headline, 4ormIQ sits inside it. Neither is
+   ever redrawn, so both must be image data and never text standing in. */
+if (!/class="herofin landing-only" src="data:image\/png;base64,/.test(html))
+  fails.push('the 4orm Finance logo above the headline is not the real image file');
+if (!/class="iqmark" src="data:image\/png;base64,/.test(html))
+  fails.push('the 4 in the headline lockup is not the real mark file');
+if (!/<span class="iqlock"/.test(html))
+  fails.push('the headline no longer carries the 4ormIQ lockup');
+
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
 if (prev && fs.existsSync(prev)) {
