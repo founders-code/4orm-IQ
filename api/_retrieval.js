@@ -42,11 +42,16 @@ export async function exa(query, opts = {}) {
   const key = process.env.EXA_API_KEY;
   if (!key) return { source: 'Exa', status: 'not_configured', results: [] };
 
+  /* Exa bills per request and again per page per content type, so text is
+     pulled only where the reasoning call needs prose. On a register lookup the
+     highlight is the answer, and the full page is waste. */
   const body = {
     query,
-    numResults: opts.numResults || 6,
+    numResults: opts.numResults || 5,
     type: opts.type || 'auto',
-    contents: { text: { maxCharacters: opts.maxChars || 2200 }, highlights: true }
+    contents: opts.fullText
+      ? { text: { maxCharacters: opts.maxChars || 2400 }, highlights: true }
+      : { highlights: true }
   };
   if (opts.includeDomains) body.includeDomains = opts.includeDomains;
   if (opts.excludeDomains) body.excludeDomains = opts.excludeDomains;
@@ -125,35 +130,35 @@ export function plan(q, domain) {
 
   return {
     exa: [
-      { label:'C1 corporate existence', category:'company',
+      { label:'C1 corporate existence', category:'company', numResults:4,
         query:`${name} company registration legal entity incorporation record`,
         includeDomains:[...D.ca_corporate, ...D.uk, 'sec.gov'] },
 
-      { label:'C2 registration and licensing',
+      { label:'C2 registration and licensing', numResults:5,
         query:`is ${name} registered or licensed to sell investments`,
         includeDomains:[...D.ca_securities, ...D.ca_payments, ...D.us, ...D.uk, ...D.intl] },
 
       { label:'C3 caution and warning lists',
         query:`${name} investor alert caution list warning unregistered`,
-        includeDomains:[...D.ca_securities, ...D.us, ...D.uk, ...D.intl], numResults:8 },
+        includeDomains:[...D.ca_securities, ...D.us, ...D.uk, ...D.intl], numResults:6, fullText:true },
 
       { label:'C3 sanctions', query:`${name} sanctions designated entity`,
-        includeDomains:D.sanctions, numResults:4 },
+        includeDomains:D.sanctions, numResults:3 },
 
       { label:'C5 courts and insolvency', query:`${name} lawsuit judgment insolvency order`,
-        includeDomains:[...D.ca_courts, 'sec.gov','gov.uk'], numResults:4 },
+        includeDomains:[...D.ca_courts, 'sec.gov','gov.uk'], numResults:3 },
 
       { label:'C7 negative reviews, pinned to review platforms',
         query:`${name} scam withdrawal refused cannot withdraw complaints one star`,
-        includeDomains:D.reviews, numResults:10, maxChars:3000 },
+        includeDomains:D.reviews, numResults:8, fullText:true, maxChars:3000 },
 
       { label:'Open sweep, the subject’s own claims',
         query:`${name} ${d} about us regulated licensed years operating history`,
-        excludeDomains:D.reviews, numResults:5 },
+        excludeDomains:D.reviews, numResults:4, fullText:true },
 
       { label:'Open sweep, everything else',
         query:`${name} ${d} fraud investigation regulator complaint`,
-        numResults:6 }
+        numResults:5 }
     ],
 
     par: [
@@ -195,7 +200,7 @@ export function plan(q, domain) {
           `${name} founder CEO director who owns`,
           `${d} same template other websites`,
           `${name} related companies same operator`
-        ], mode:'advanced' }
+        ], mode:'fast' }
     ]
   };
 }

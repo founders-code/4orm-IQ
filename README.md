@@ -111,6 +111,15 @@ Do not model this from a guess. Run twenty checks, read the real numbers, then
 build the economics. Expect tokens to dominate: retrieval is fractions of a
 cent, and the Claude call reads everything the first three tiers found.
 
+## Two stages
+
+**The landing is one thing to do.** White ground, a headline, and the search box.
+Nothing else. No dashboard, no explanation, no marketing.
+
+**Searching opens the console.** The instrument deck, the source board, the nine
+checks and the full result appear together, and the board starts lighting up
+while the sweep runs.
+
 ## What the console shows
 
 **Standing by.** The instruments read the network: how many registers the engine
@@ -144,7 +153,8 @@ referral service rather than a name, that is what it gives.
 
 `index.html` is one file. The parts you will touch:
 
-- `:root` - the design tokens. Every colour, radius and easing.
+- `:root` - the design tokens. White ground per the house standard; every colour, radius and easing.
+- `body[data-stage]` - `landing` or `console`. The two stages are pure CSS.
 - `NET` - the idle-state instrument readings.
 - `CATS` - the nine categories and the registers behind each one.
 - `CORPUS` - the seeded entities.

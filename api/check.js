@@ -26,7 +26,7 @@ import { exa, parallel, plan } from './_retrieval.js';
 
 export const config = { maxDuration: 300 };
 
-const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-4-6';
+const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 const MAX_INPUT = 200;
 const WINDOW_MS = 60_000;
 const PER_WINDOW = 5;
