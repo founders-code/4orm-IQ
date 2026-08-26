@@ -361,6 +361,7 @@
       },
       "status": "found",
       "finding": "Listed on the Investment Caution List, added 14 July 2026.",
+      "plain": "A securities regulator has publicly warned people about this name. That warning is on the record right now, and it is the strongest single reason on this page to stop.",
       "raw_excerpt": "This company is not registered with the BC Securities Commission.",
       "signal": "regulator-caution-listing",
       "severity": "critical"
@@ -387,6 +388,7 @@
       },
       "status": "found",
       "finding": "National investor alert published 15 July 2026; issuing regulator BCSC.",
+      "plain": "The warning did not stay local. It was republished nationally, so every Canadian regulator can see it. That is an escalation, not a repeat of the same thing.",
       "raw_excerpt": "Investhelm - https://investhelm.com - British Columbia Securities Commission - July 15, 2026",
       "signal": "regulator-caution-listing",
       "severity": "critical"
@@ -412,6 +414,7 @@
       },
       "status": "found",
       "finding": "Domain created 22 February 2026 - 184 days old at run time.",
+      "plain": "The website is under six months old. That alone is not fraud, but it means there is almost no history behind anything the site claims about itself.",
       "raw_excerpt": "registration 2026-02-22T18:15:58Z; last changed 2026-04-04T08:07:34Z; expiration 2027-02-22T18:15:58Z; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; client transfer prohibited",
       "signal": "history-contradiction",
       "severity": "critical"
@@ -438,6 +441,7 @@
       },
       "status": "found",
       "finding": "Shares all three nameservers and the registrar with investhelm.com.",
+      "plain": "This website and another one are run on the same machinery. Two brand names, one setup behind them.",
       "raw_excerpt": "creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM",
       "signal": "infrastructure-cluster",
       "severity": "high"
@@ -464,6 +468,7 @@
       },
       "status": "found",
       "finding": "The Bank of Canada states the Macklem investment video is fake.",
+      "plain": "The Governor of Canada's central bank has said publicly that the video promoting this platform is fake. Nobody at the Bank of Canada endorsed anything here.",
       "raw_excerpt": "This video is fake. To help Canadians avoid these kinds of scams, we encourage people to check the Bank's official channels ... as well as our website for genuine information from the Bank.",
       "signal": "fabricated-endorsement",
       "severity": "high"
@@ -489,6 +494,7 @@
       },
       "status": "found",
       "finding": "13 of 29 security sources report a warning; phishing signals present.",
+      "plain": "Close to half the security services that scan websites flag this one. Do not enter a password or a card number on it.",
       "raw_excerpt": "Trust score 1/100; 13 blacklist detections and phishing-related signals; registrar NETIM; hosting Private Layer INC, Bellinzona, Switzerland; IP 179.43.182.250; SSL valid June 4 - September 2, 2026; Do not enter passwords or payment data",
       "signal": "threat-feed-consensus",
       "severity": "high"
@@ -514,6 +520,7 @@
       },
       "status": "found",
       "finding": "No legal entity, registration number, address, phone or email published. Claims regulatory oversight without naming a regulator.",
+      "plain": "The site tells you nothing you could look up. Before you send anything, ask for the legal company name and its registration number in writing, then check that number in the register yourself.",
       "raw_excerpt": "operates under full regulatory oversight; 85% Accuracy; Advanced AI Algorithms; Bank-Level Security; Major credit cards, bank transfers, and PayPal; (c) 2026 Investhelm",
       "signal": "anonymous-operator,unverifiable-regulatory-claim",
       "severity": "high"
@@ -539,6 +546,7 @@
       },
       "status": "found",
       "finding": "Source of the impossible operating-history claims and the fabricated endorsement narrative.",
+      "plain": "This is the page the impossible history claims come from. It is marketing written to look like an independent review.",
       "raw_excerpt": "$350 to get started; average investor takes home between $2,800 and $4,500 per month; users collectively earned over $1.35 billion; 400,000 Canadians are already using; the platform is legal, it operates in Canada",
       "signal": "history-contradiction,fabricated-endorsement",
       "severity": "high"
@@ -564,6 +572,7 @@
       },
       "status": "found",
       "finding": "Identical template promotes Investhelm, Nexlares, Bay Assetholm and Cedar Assetgrove.",
+      "plain": "The favourable reviews you would find by searching are not reviews. The same text promotes four different brand names, which means somebody wrote it to be found.",
       "raw_excerpt": "Tiff Macklem Investhelm Review - Scam or Legit? | Tiff Macklem Bay Assetholm Review - Scam or Legit? | Tiff Macklem Nexlares Review - Scam or Legit? | Tiff Macklem Cedar Assetgrove Review - Scam or Legit?",
       "signal": "synthetic-review-network,document-fingerprint",
       "severity": "high"
@@ -591,6 +600,7 @@
       },
       "status": "found",
       "finding": "Sibling brand on shared infrastructure sells the same product using the same unfalsifiable registration claim.",
+      "plain": "The sibling brand makes the same registration claim in the same unprovable way. Ask either of them for the number, and check it yourself rather than following a link they send.",
       "raw_excerpt": "Nexlares is an officially registered company in Canada; AI-powered trading platform; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",
       "signal": "infrastructure-cluster,claim-template-reuse",
       "severity": "high"

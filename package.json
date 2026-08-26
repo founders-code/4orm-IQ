@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
-    "pg": "^8.13.1"
+    "jsdom": "^30.0.1",
+    "pg": "^8.13.1",
+    "playwright": "^1.62.1"
   }
 }

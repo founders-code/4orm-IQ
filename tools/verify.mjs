@@ -186,6 +186,33 @@ const regInfo = script.slice(script.indexOf('var REGINFO = {'), script.indexOf('
 const undocumented = regNames.filter(n => !regInfo.includes('"' + n + '"'));
 if (undocumented.length) fails.push('board registers with no reference entry: ' + undocumented.join(', '));
 
+/* --------------------- every specimen record carries a plain language sentence.
+   The schema makes `plain` required on every evidence record, because that one
+   sentence is what a reader who has never opened a registry actually reads. The
+   demo corpus is hand written, so nothing enforced it there and it silently had
+   none at all: the whole plain language layer was invisible in the showroom. */
+const evCount = (script.match(/\{t:"[ABCD4]",src:"/g) || []).length;
+const plainCount = (script.match(/\n\s*plain:"/g) || []).length;
+if (evCount !== plainCount)
+  fails.push(evCount + ' specimen evidence records but ' + plainCount + ' plain language sentences. ' +
+    'The schema requires one on every record, and the demo corpus is hand written so nothing else enforces it.');
+
+/* the plain sentence is written for a reader, so it has to be a sentence */
+const shortPlain = [...script.matchAll(/plain:"((?:[^"\\]|\\.)*)"/g)]
+  .map(m => m[1]).filter(t => t.length < 40);
+if (shortPlain.length) fails.push('plain language sentences too short to say anything: ' + shortPlain.join(' | '));
+
+/* --------------------------------------- the explainer note is green, everywhere.
+   Light green is the signal that says "this is the part that explains it". If a
+   note block drifts back to blue, blue stops meaning the product. */
+const evplainRule = (styleBlock.match(/\.evplain\s*\{[^}]*\}/) || [''])[0];
+if (!/--ok-bg/.test(evplainRule))
+  fails.push('.evplain is no longer on the light green ground');
+const shPlainRule = (styleBlock.match(/\.sh-plain\s*\{[^}]*\}/) || [''])[0];
+if (!shPlainRule) fails.push('the printed summary has no plain language block');
+else if (!/#E7F7EF/i.test(shPlainRule))
+  fails.push('.sh-plain on the printed summary is no longer light green');
+
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
 if (prev && fs.existsSync(prev)) {
