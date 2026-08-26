@@ -280,6 +280,79 @@ colour, not across the sentence.
 The NEVER rows are the ones worth reading twice. They are the guarantees, and they are
 gold rather than a verdict colour because they are not outcomes.
 
+## The waiting screen
+
+The disclaimer moved. It was on arrival, before anyone had done anything, which is the
+worst moment to ask somebody to read two paragraphs. It now appears the instant you press
+Check, over a dimmed page, alongside a bar that fills against real phases rather than a
+guess.
+
+The wait is spent on ten education cards that rotate every seven seconds: what the tool
+does, where it looks, how it helps, and what is actually happening to people. The
+$16.6 billion reported to the FBI in 2024. The $638 million reported to the Canadian
+Anti-Fraud Centre, against that Centre's own estimate that it sees five to ten per cent
+of what happens. Ask for the registration number, then check it yourself.
+
+The three pills that used to sit above the search bar are three of those cards now.
+
+You can acknowledge while it is still running, and the screen opens itself the moment the
+sweep lands. If you have not acknowledged, the button becomes "Show the result" and waits
+for you. A disclaimer that can be scrolled past is a disclaimer nobody read.
+
+## The layout
+
+**Header order is now:** status line, headline, search bar, the five figures, then the
+summary band.
+
+**The summary band is two columns.** The answer on the left at roughly two thirds, and
+the three things a reader opens first stacked on the right: the ten checks with a ten
+light strip showing every state at a glance, reviews with the platform count, and the
+source board with a fill bar. Each is a card you click. No wasted column.
+
+**The page is wider**, 1560 rather than 1320, with more air at the edges.
+
+The six pills stay under the band, and the evidence sections follow.
+
+## One bug worth naming
+
+`renderRail` already existed for the support directory. Function declarations hoist, so
+the later one silently won and the new summary rail rendered nothing at all, with no
+error anywhere. Renamed to `renderSummaryRail`, and the build check now fails on any
+duplicate function name.
+
+## The duplicated column is gone
+
+Reviews, cross-examination, material issues and gaps all open from the quick strip and
+the summary rail now. Leaving a second stacked copy down the left of the page was the
+same content twice, and the second copy was what made the page endless. Four sections
+and their four render functions removed.
+
+**Before you send stays on the page.** It is the only part of a result that is an
+instruction rather than a record, so it should not be behind a click.
+
+## A build check that runs
+
+`node tools/verify.mjs [path/to/previous/index.html]`
+
+Every check in it exists because the thing it looks for actually shipped broken at least
+once in this build:
+
+- the inline script parses
+- no duplicate element ids
+- no duplicate function names, because the later one silently wins and the earlier one
+  stops running with no error anywhere
+- the script does not reach for elements that no longer exist
+- no anchor points nowhere
+- no em or en dashes, no banned words
+- exactly ten categories in the page, in `api/_schema.js` and in `ALL_CATS`
+- the header's register count matches the board
+- every board register has a reference entry
+- a declaration diff against the previous build, which is how the two silent breakages
+  in this session were both caught
+
+It knows the difference between a trust score in our own copy, which fails, and the same
+words inside a verbatim quote from a reputation service, which is the product working.
+
 ## Run manual
 
 `4orm KBYS Run Manual.pdf` is in the 4orm KBYS folder. Eight pages covering

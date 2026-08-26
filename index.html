@@ -65,7 +65,7 @@ a{color:inherit;text-decoration:none}
 svg{display:block}
 ::selection{background:var(--blue-deep);color:#fff}
 
-.wrap{max-width:1320px;margin:0 auto;padding:0 26px}
+.wrap{max-width:1560px;margin:0 auto;padding:0 34px}
 .mono{font-family:var(--mono)}
 .tnum{font-variant-numeric:tabular-nums}
 .lbl{
@@ -437,6 +437,84 @@ body[data-stage="console"] .console{padding-top:112px}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
+/* ---- the waiting screen. A check takes a minute or two. The page goes quiet,
+       a bar fills, and the wait is spent on the two things a reader needs:
+       what this is not, and what is actually happening to people. ---- */
+.waitscrim{position:fixed;inset:0;z-index:400;background:rgba(4,7,12,.86);
+  backdrop-filter:blur(10px) saturate(55%);opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
+.waitscrim.on{opacity:1;pointer-events:auto}
+.waitbox{position:fixed;z-index:401;top:50%;left:50%;transform:translate(-50%,-48%) scale(.99);
+  width:min(760px,93vw);max-height:88vh;display:flex;flex-direction:column;opacity:0;pointer-events:none;
+  background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);
+  box-shadow:var(--sh-xl);overflow:hidden;transition:opacity .45s var(--ease),transform .55s var(--spring)}
+.waitbox.on{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+.waithd{display:flex;align-items:center;gap:16px;padding:17px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.waitq{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--tx-2);letter-spacing:.03em;
+  max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.waitprog{padding:18px 24px 0}
+.waitbar{height:7px;border-radius:4px;background:var(--surface-4);overflow:hidden}
+.waitbar i{display:block;height:100%;width:0;border-radius:4px;
+  background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt),var(--gold));
+  background-size:240px 100%;box-shadow:0 0 14px rgba(76,135,255,.6);
+  transition:width .7s var(--ease);animation:topshim 1.5s linear infinite}
+.waitmeta{display:flex;justify-content:space-between;margin-top:9px;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--tx-3)}
+.waitmeta span:last-child{color:var(--gold)}
+.waitbody{overflow-y:auto;overscroll-behavior:contain;padding:20px 24px 24px}
+.edu{border:1px solid var(--border-strong);border-radius:var(--r);background:var(--bg-2);
+  padding:20px 22px;min-height:132px;transition:opacity .5s var(--ease)}
+.edu.fade{opacity:0}
+.edu .ek{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:var(--gold)}
+.edu .ev{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--tx);letter-spacing:-.02em;margin-top:12px;display:block}
+.edu .et{font-size:15px;font-weight:700;color:var(--tx);letter-spacing:-.018em;margin-top:12px;line-height:1.3}
+.edu .ex{font-size:13px;color:var(--tx-2);line-height:1.62;margin-top:8px;max-width:70ch}
+.edudots{display:flex;gap:5px;margin-top:14px;justify-content:center}
+.edudots i{width:5px;height:5px;border-radius:50%;background:var(--border-lit);transition:all .3s var(--ease)}
+.edudots i.on{background:var(--gold);width:16px;border-radius:3px}
+.waitdisc{margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.waitdisc .wdh{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx-4);margin-bottom:11px}
+.waitdisc p{font-size:12.5px;color:var(--tx-3);line-height:1.62;margin-bottom:10px;max-width:74ch}
+.waitdisc p b{color:var(--tx-2)}
+.wdhelp{margin-top:12px;padding:14px 16px;border-radius:var(--r-sm);border:1px solid var(--warn-br);
+  background:var(--warn-bg);font-size:12.5px;color:var(--tx-2);line-height:1.6}
+.wdhelp b{color:var(--warn)}
+.wdhelp .ghmore{margin-top:11px}
+.waitfoot{padding:16px 24px;border-top:1px solid var(--border);background:var(--bg-2);
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.waitfine{font-size:12px;color:var(--tx-4)}
+.waitfoot .gateok:disabled{opacity:.4;pointer-events:none}
+.waitfoot .gateok{margin-left:auto}
+@media(max-width:640px){.waitbox{inset:0;top:0;left:0;transform:none;width:100%;max-height:100%;border-radius:0;border:none}
+  .waitbox.on{transform:none}.waitq{display:none}}
+/* ---- the summary band. The answer on the left, the three things a reader
+       opens first stacked on the right, no wasted column. ---- */
+.summaryband{display:none;grid-template-columns:minmax(0,1fr) minmax(300px,.62fr);gap:18px;
+  align-items:start;margin-top:20px}
+body[data-stage="console"] .summaryband.on{display:grid}
+.sbleft .verdictwrap{display:block;margin:0}
+.sbright{display:grid;gap:12px}
+.sbcard{text-align:left;width:100%;padding:17px 19px;border-radius:var(--r-lg);
+  border:1px solid var(--border-strong);background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  transition:all .28s var(--ease)}
+.sbcard:hover{border-color:var(--border-lit);transform:translateY(-1px);box-shadow:var(--sh)}
+.sbtop{display:flex;align-items:baseline;gap:12px}
+.sbtop .n{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--tx-3)}
+.sbtop .v{margin-left:auto;font-family:var(--mono);font-size:20px;font-weight:700;color:var(--tx);letter-spacing:-.02em}
+.sbcard[data-t="bad"] .sbtop .v{color:var(--bad)}
+.sbcard[data-t="warn"] .sbtop .v{color:var(--warn)}
+.sbcard[data-t="ok"] .sbtop .v{color:var(--ok)}
+.sbx{font-size:12.5px;color:var(--tx-3);line-height:1.55;margin-top:8px}
+.sbdots{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.sbdots i{width:100%;max-width:26px;height:5px;border-radius:3px;background:var(--nul);opacity:.35;flex:1}
+.sbdots i[data-s="RED"]{background:var(--bad);opacity:1;box-shadow:0 0 7px var(--bad)}
+.sbdots i[data-s="YELLOW"]{background:var(--warn);opacity:1;box-shadow:0 0 7px var(--warn)}
+.sbdots i[data-s="GREEN"]{background:var(--ok);opacity:1}
+.sbbar{height:5px;border-radius:3px;background:var(--surface-4);overflow:hidden;margin-top:12px}
+.sbbar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt));
+  transition:width .8s var(--spring)}
+@media(max-width:1080px){.summaryband{grid-template-columns:1fr}}
 /* ---- rules as colour, not as paragraphs ---- */
 .rulelist{display:grid;gap:2px;background:var(--border);border:1px solid var(--border);
   border-radius:var(--r);overflow:hidden;margin-top:4px}
@@ -601,7 +679,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
    runs in two columns: what the check concluded on the left, the ten
    checks and their registers on the right. The right column sticks, so
    the category index stays in view while the assessment is read. */
-.split{max-width:1220px;margin:0 auto;padding:0 28px;
+.split{max-width:1560px;margin:0 auto;padding:0 34px;
   display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:34px;align-items:start}
 .split .wrap{max-width:none;padding:0;margin:0}
 .split .sec{padding:44px 0}
@@ -1096,11 +1174,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
           <div class="lbl gold landing-only" style="letter-spacing:.22em">Know before you send</div>
           <h1 class="cbh1"><span class="console-only">Check who you're dealing with <span class="dim">before the money leaves.</span></span><span class="landing-only">Check before you send.</span></h1>
           <p class="cbsub landing-only">Share a name, a business, a website, an email, a phone number or a wallet address. One is enough to start.</p>
-          <div class="hls">
-            <span class="hl"><i></i>A regulator outranks a forum post</span>
-            <span class="hl"><i></i>Every gap we cannot reach is published</span>
-            <span class="hl"><i></i>Green never means we guarantee anyone</span>
-          </div>
         </div>
 
         <form class="searchbox" id="kbForm" autocomplete="off">
@@ -1120,7 +1193,11 @@ body[data-stage="console"] .verdictwrap.on{display:block}
           </div>
         </div>
 
-        <div class="verdictwrap console-only" id="verdictWrap">
+        <div class="statstrip" id="statstrip"></div>
+
+        <div class="summaryband console-only" id="summaryBand">
+          <div class="sbleft">
+          <div class="verdictwrap" id="verdictWrap">
       <div class="verdict kb-rv" id="kbVerdict" data-v="RED">
         <div class="vtop">
           <div><div class="vname" id="kbName">-</div><div class="vdom" id="kbDom">-</div></div>
@@ -1134,9 +1211,11 @@ body[data-stage="console"] .verdictwrap.on{display:block}
       </div>
         </div>
 
-        <div class="quickrow console-only" id="quickRow"></div>
+          </div>
+          <div class="sbright" id="sbRight"></div>
+        </div>
 
-        <div class="statstrip" id="statstrip"></div>
+        <div class="quickrow console-only" id="quickRow"></div>
 
         <div class="boardwrap">
           <div class="board">
@@ -1253,36 +1332,8 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 <main class="res" id="kbRes">
   <div class="wrap">
 
-    <section class="sec tight" id="kbRevSec">
-      <div class="sechead kb-rv">
-        <div>
-          <div class="lbl gold">Consumer experience</div>
-          <h2>The one-star reviews, read first.</h2>
-          <p>Positive reviews are cheap to manufacture. Negative ones are not - nobody is paid to write a one-star review. So we read those first, cluster them by what was actually done to the person, and count platforms rather than volume.</p>
-        </div>
-      </div>
-      <div class="rcard kb-rv" id="kbRev"></div>
-    </section>
 
-    <section class="sec tight" id="kbClaimSec">
-      <div class="sechead kb-rv">
-        <div>
-          <div class="lbl gold">Cross-examination</div>
-          <h2>What doesn't match.</h2>
-          <p>Every claim, bound to the record that adjudicates it, and the two reconciled. This is the part a search engine cannot do for you.</p>
-        </div>
-      </div>
-      <div class="claims kb-rv" id="kbClaims">
-        <div class="claimhead"><span>Claim</span><span>Checked against</span><span>What the record says</span><span style="text-align:right">Result</span></div>
-      </div>
-    </section>
 
-    <section class="sec tight" id="kbIssueSec">
-      <div class="sechead kb-rv">
-        <div><div class="lbl gold">Findings</div><h2 id="kbIssueH">Material issues found.</h2></div>
-      </div>
-      <div class="issues kb-rv" id="kbIssues"></div>
-    </section>
 
     <section class="sec tight">
       <div class="bys kb-rv">
@@ -1296,17 +1347,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
       </div>
     </section>
 
-    <section class="sec tight" id="kbGapSec">
-      <div class="sechead kb-rv">
-        <div>
-          <div class="lbl gold">Published, not hidden</div>
-          <h2 id="kbGapH">What we could not check, and why.</h2>
-          <p id="kbGapP">A report that shows only what it found is a report that lies by omission. Every source that should have been reached and was not is listed here.</p>
-        </div>
-      </div>
-      <div class="gaps kb-rv" id="kbGaps"></div>
-      <p class="disc kb-rv" id="kbDisc"></p>
-    </section>
   </div>
 </main>
   </div>
@@ -1345,57 +1385,44 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   <div class="arbody" id="arBody"></div>
 </div>
 
-<div class="gatescrim" id="gateScrim"></div>
-<div class="gatebox" id="gateBox" role="dialog" aria-modal="true" aria-labelledby="gateH">
-  <div class="gatehd">
+<div class="waitscrim" id="waitScrim"></div>
+<div class="waitbox" id="waitBox" role="dialog" aria-modal="true" aria-label="Running the check">
+  <div class="waithd">
     <span class="led"><i></i><span class="lbl gold">Know before you send</span></span>
+    <span class="waitq" id="waitQ"></span>
   </div>
-  <div class="gatebody">
-    <h2 id="gateH">Before you use this, please read.</h2>
 
-    <p><b>4orm IQ is a research tool, not advice.</b> It reports what public records show
-    about a party, with the source and the date beside every finding, so that you can open
-    those sources and judge for yourself. It does not tell you whether to send money.</p>
+  <div class="waitprog">
+    <div class="waitbar"><i id="waitBar"></i></div>
+    <div class="waitmeta"><span id="waitPhase">Starting the sweep</span><span id="waitPct">0%</span></div>
+  </div>
 
-    <p><b>Nothing here is financial, investment, legal or tax advice</b>, and using it does
-    not create a professional relationship of any kind. A green result never means 4orm has
-    certified, endorsed, approved or guaranteed anyone. A red result means contradictions
-    were found in the records we checked. It is not a legal finding, an accusation, or a
-    determination that any person has done anything wrong.</p>
+  <div class="waitbody">
+    <div class="edu" id="eduCard"></div>
 
-    <p><b>Records are incomplete and they change.</b> Some registers are unreachable, some
-    are out of date, and a check made today can be wrong tomorrow. Every source we could not
-    reach is published in the result rather than hidden, but an absence in a register is
-    never proof that something does not exist. The decision, and the responsibility for it,
-    stays with you.</p>
-
-    <div class="gatehelp">
-      <div class="gh">If money has already gone, do these two things first</div>
-      <div class="ghrow">
-        <div class="ghcard">
-          <div class="ght">Call the bank or card issuer that sent it</div>
-          <div class="ghx">Use the number on the back of your card, not one you were given.
-          Ask for the fraud team, ask them to attempt a recall, and ask for a case number
-          before you hang up. Every payment route has a clock and it is already running.</div>
-        </div>
-        <div class="ghcard">
-          <div class="ght">Report it and get a file number</div>
-          <div class="ghx">Canadian Anti-Fraud Centre
-            <a class="ghtel" href="tel:18884958501">1-888-495-8501</a>.
-            In the United States, the FBI Internet Crime Complaint Center at ic3.gov.
-            Your bank, your card issuer and any lawyer will ask for that number first.</div>
-        </div>
+    <div class="waitdisc">
+      <div class="wdh">While this runs, the part that matters</div>
+      <p><b>This is a research tool, not advice.</b> It reports what public records show,
+      with the source and the date beside every finding, so you can open them and judge for
+      yourself. It does not tell you whether to send money. Nothing here is financial,
+      investment, legal or tax advice.</p>
+      <p><b>Records are incomplete and they change.</b> Every source we could not reach is
+      published in the result rather than hidden, but an absence in a register is never proof
+      that something does not exist. Green never means 4orm has certified, endorsed or
+      guaranteed anyone. The decision, and the responsibility for it, stay with you.</p>
+      <div class="wdhelp">
+        <b>If money has already gone:</b> call the bank or card issuer that sent it, using the
+        number on the back of your card, and ask for a case number. Then report it.
+        Canadian Anti-Fraud Centre <a class="ghtel" href="tel:18884958501">1-888-495-8501</a>.
+        In the United States, ic3.gov.
+        <button class="ghmore" type="button" data-dir="open"><span class="hi">&#9873;</span> Find support near you</button>
       </div>
-      <button class="ghmore" type="button" data-dir="open"><span class="hi">&#9873;</span> Find support near you</button>
     </div>
-
-    <p class="gatefine">By continuing you confirm that you understand the above, that you
-    will not treat anything on this page as advice, and that any decision you make after
-    using it is your own. If you need advice about your situation, speak to a lawyer or a
-    licensed professional.</p>
   </div>
-  <div class="gatefoot">
-    <button class="gateok" type="button" id="gateOk">I understand, continue</button>
+
+  <div class="waitfoot">
+    <span class="waitfine" id="waitFine">Still working. You can read while you wait.</span>
+    <button class="gateok" type="button" id="waitOk">I understand</button>
   </div>
 </div>
 
@@ -2712,6 +2739,40 @@ function renderQuick(d){
   w.classList.add("on");
 }
 
+/* The three things a reader opens first, stacked beside the answer. */
+function renderSummaryRail(d){
+  var w=id("sbRight"); w.innerHTML="";
+  if(!d || !d.cats) return;
+  var red=0; CATS.forEach(function(c){ var r=d.cats[c.key]; if(r&&r.state==="RED") red++; });
+  var b=d.board||{}, reached=0;
+  SOURCES.forEach(function(g){ g.items.forEach(function(n){ if(b[n]&&b[n]!=="unreached") reached++; }); });
+  var rev=d.reviews, led=d.ledger||[];
+  var revN = rev?(rev.reports||0):led.reduce(function(n,p){return n+(p.pages||0);},0);
+  var revP = rev?(rev.carrying||0):led.filter(function(p){return p.pages>0;}).length;
+
+  var cards=[
+    ["The ten checks", String(red)+" adverse", red?"bad":"ok",
+     '<div class="sbdots">'+CATS.map(function(c){
+        var r=d.cats[c.key]; return '<i data-s="'+esc(r?r.state:"GREY")+'" title="'+esc(c.name)+'"></i>';
+      }).join('')+'</div>', red? red+" of "+CATS.length+" checks came back against them" : "Nothing adverse in the checks that completed",
+     snapChecks],
+    ["Reviews", String(revN)+" read", revN?"warn":"nul",
+     '', revP? revP+" platforms carried negative reports" : "No platform carried a negative report",
+     snapReviews],
+    ["Source board", reached+" of "+TOTAL_SOURCES, reached?"ok":"nul",
+     '<div class="sbbar"><i style="width:'+Math.round(reached/TOTAL_SOURCES*100)+'%"></i></div>',
+     (TOTAL_SOURCES-reached)+" could not be reached, and every one is named",
+     snapSources]
+  ];
+  cards.forEach(function(c){
+    var b2=el("button","sbcard"); b2.type="button"; b2.setAttribute("data-t",c[2]);
+    b2.innerHTML='<span class="sbtop"><span class="n">'+esc(c[0])+'</span><span class="v">'+esc(c[1])+'</span></span>'+
+                 c[3]+'<div class="sbx">'+esc(c[4])+'</div>';
+    b2.addEventListener("click",c[5]);
+    w.appendChild(b2);
+  });
+}
+
 /* ---- a category tile ---- */
 function toggleDrill(key){
   var c=null; for(var i=0;i<CATS.length;i++) if(CATS[i].key===key) c=CATS[i];
@@ -2803,7 +2864,7 @@ function onLiveEvent(ev){
               : "";
     id("modeLbl").textContent = v.label + extra;
     id("boardT").textContent = v.label;
-    if(PHASE_PCT[v.step]) topBar(PHASE_PCT[v.step]);
+    if(PHASE_PCT[v.step]){ topBar(PHASE_PCT[v.step]); waitProgress(PHASE_PCT[v.step], v.label); }
   }
   else if(ev.t==="partial"){
     /* Real lights, from real retrieval, while the reasoning call still runs. */
@@ -2817,6 +2878,7 @@ function onLiveEvent(ev){
     var c2=ev.v.counts||{};
     id("modeLbl").textContent = "Read "+(c2.registers_reached||0)+" registers and "+(c2.pages||0)+" pages. Cross-examining.";
     topBar(80);
+    waitProgress(80, (c2.registers_reached||0)+" registers and "+(c2.pages||0)+" pages read");
   }
 }
 
@@ -2847,7 +2909,7 @@ function runScan(board, done){
   PARTIAL=null;
   topBar(0);
   id("auditRow").classList.remove("on");
-  id("verdictWrap").classList.remove("on");
+  id("summaryBand").classList.remove("on");
   id("quickRow").classList.remove("on");
   id("boardBar").style.width="0%";
   id("boardC").textContent="0 of "+TOTAL_SOURCES+" reached";
@@ -2878,7 +2940,10 @@ function runScan(board, done){
       var lb = (LIVE && PARTIAL && PARTIAL.board) ? PARTIAL.board : null;
       if(c) c.setAttribute("data-s", (lb && lb[n]) || (board && board[n]) || "unreached");
       boardCount();
-      if(!LIVE) topBar(Math.round((i+1)/order.length*100));
+      if(!LIVE){
+        var pc=Math.round((i+1)/order.length*100);
+        topBar(pc); waitProgress(pc, "Reading the registers");
+      }
     }, step*i + (reduce?10:340)));
   });
 
@@ -2892,28 +2957,6 @@ function runScan(board, done){
 }
 
 /* ---- result blocks ---- */
-function renderClaims(list){
-  var w=id("kbClaims"), keep=w.querySelector(".claimhead");
-  w.innerHTML=""; w.appendChild(keep);
-  list.forEach(function(c){
-    var r=el("div","claimrow");
-    r.innerHTML='<span class="cq">'+esc(c.q)+'</span><span class="cs">'+esc(c.s)+'</span>'+
-      '<span class="cr">'+esc(c.r)+'</span><span class="cv" data-s="'+esc(c.v)+'">'+esc(c.v)+'</span>';
-    w.appendChild(r);
-  });
-}
-function renderIssues(list){
-  var w=id("kbIssues"); w.innerHTML="";
-  list.forEach(function(is,i){
-    var b=el("div","issue");
-    b.innerHTML='<span class="n">'+(i<9?"0":"")+(i+1)+'</span><span class="b">'+
-      '<span class="t">'+esc(is.t)+'</span><span class="x">'+esc(is.x)+'</span>'+
-      '<span class="m"><span class="sev" data-s="'+esc(is.sev)+'">'+esc(is.sev)+'</span>'+
-      '<span class="tier" data-t="'+esc(is.tier)+'">Tier '+esc(is.tier)+'</span></span></span>';
-    w.appendChild(b);
-  });
-  id("kbIssueH").textContent=list.length+" material issue"+(list.length===1?"":"s")+" found.";
-}
 function renderBys(list){
   var w=id("kbBys"); w.innerHTML="";
   list.forEach(function(t,i){
@@ -2922,16 +2965,6 @@ function renderBys(list){
     w.appendChild(r);
   });
 }
-function renderGaps(list){
-  var w=id("kbGaps"); w.innerHTML="";
-  list.forEach(function(g){
-    var c=el("div","gap");
-    c.innerHTML='<div class="s">'+esc(g[0])+'</div><div class="r">'+esc(g[1])+'</div>';
-    w.appendChild(c);
-  });
-}
-
-/* ---- negative review report card ---- */
 var NARR_LABEL = {
   "withdrawal-refused":"WITHDRAWAL REFUSED","release-fee-demanded":"RELEASE FEE DEMANDED",
   "account-frozen-after-deposit":"ACCOUNT FROZEN","verification-loop":"VERIFICATION LOOP",
@@ -2939,6 +2972,7 @@ var NARR_LABEL = {
   "balance-not-real":"BALANCE NOT REAL","recovery-approach":"RECOVERY APPROACH",
   "terms-changed":"TERMS CHANGED","other":"OTHER"
 };
+
 function ledgerHTML(ledger){
   if(!ledger || !ledger.length) return '';
   var swept=0, hit=0, pages=0;
@@ -2958,58 +2992,6 @@ function ledgerHTML(ledger){
     '<span><b>'+pages+'</b> pages read</span></div>';
 }
 
-function renderReviews(r, ledger){
-  var w=id("kbRev");
-  if(!r){
-    w.innerHTML='<div class="rcempty">No review sweep was run for this party.</div>'+ledgerHTML(ledger);
-    return;
-  }
-  var maxPf=1; r.rows.forEach(function(n){ if(n.pf>maxPf) maxPf=n.pf; });
-  var h='<div class="rchd"><span class="lbl">Negative review report card</span>'+
-        '<span class="corpus" data-c="'+esc(r.state)+'">'+esc(stateWord(r.state))+'</span></div>'+
-        '<div class="rcstats">'+
-        '<div class="rcstat"><div class="v tnum">'+esc(r.checked)+'</div><div class="l">Platforms swept</div></div>'+
-        '<div class="rcstat"><div class="v tnum">'+esc(r.carrying)+'</div><div class="l">Carrying negative reports</div></div>'+
-        '<div class="rcstat"><div class="v tnum">'+esc(r.reports)+'</div><div class="l">One and two star accounts read</div></div>'+
-        '</div>';
-  if(r.note) h+='<div class="rcnote"><span class="k"></span><span class="x">'+esc(r.note)+'</span></div>';
-
-  if(!r.rows.length){
-    h+='<div class="rcempty">No mechanic converged across platforms, so there is no report card to draw. '+
-       'That is not the same as a clean record - it means the corpus this check would read has not been produced yet, '+
-       'or was not reachable on this run.</div>';
-  } else {
-    h+='<div class="narrs">';
-    r.rows.forEach(function(n){
-      var sev = n.pf>=4 ? "hi" : (n.pf>=2 ? "mid" : "lo");
-      h+='<div class="narr">'+
-        '<div class="ntop">'+
-          '<span class="nid">'+esc(NARR_LABEL[n.id]||n.id)+'</span>'+
-          '<span class="nlab">'+esc(n.label)+'</span>'+
-          '<span class="ncount">'+esc(n.pf)+'<small>platforms</small></span>'+
-          '<span class="ncount">'+esc(n.n)+'<small>accounts</small></span>'+
-        '</div>'+
-        '<div class="nbar"><i data-s="'+sev+'"></i></div>'+
-        (n.quote?'<div class="nquote">&ldquo;'+esc(n.quote)+'&rdquo;</div>':'')+
-        '<div class="nmeta">'+
-          n.names.map(function(x){return '<span class="npf">'+esc(x)+'</span>';}).join('')+
-          (n.period?'<span class="nper">'+esc(n.period)+'</span>':'')+
-        '</div></div>';
-    });
-    h+='</div>';
-  }
-  h+='<div class="rcfoot">Community intelligence, not verified fact. A negative review is an allegation: some come from competitors, some from people who lost money in a legitimate market. '+
-     'The signal is not volume, it is the same mechanic described in different people\'s own words on platforms that do not share a user base. '+
-     'Tier C and D material never turns a category red on its own.</div>';
-  h+=ledgerHTML(ledger);
-  w.innerHTML=h;
-  var bars=w.querySelectorAll(".nbar i");
-  r.rows.forEach(function(n,i){
-    if(bars[i]) setTimeout(function(){ bars[i].style.width=Math.round(n.pf/maxPf*100)+"%"; },120);
-  });
-}
-
-/* ---- modes ---- */
 function toIdle(){
   MODE="idle"; CURRENT=null;
   id("modeLbl").textContent="Standing by";
@@ -3041,8 +3023,9 @@ function toResult(d,label){
   setReads(d.reads); setBars(d.bars,d.barFoot);
   if(d.stats) setStats(d.stats);
   id("auditRow").classList.toggle("on", !!d.cats);
-  id("verdictWrap").classList.add("on");
+  id("summaryBand").classList.add("on");
   renderQuick(d);
+  renderSummaryRail(d);
   topBar(100);
 
   id("kbName").textContent=d.name||label;
@@ -3061,23 +3044,13 @@ function toResult(d,label){
     : "Nothing resolved for this party. The tiles below still show which regulators and registries sit behind each check.";
 
   var hasLedger = !!(d.ledger && d.ledger.length);
-  ["kbClaimSec","kbIssueSec"].forEach(function(x){ id(x).style.display = full?"":"none"; });
-  /* The platform sweep is worth showing even on a grey result: knowing which
-     platforms were looked at is exactly what a grey verdict leaves open. */
-  id("kbRevSec").style.display = (full||hasLedger) ? "" : "none";
+  /* Reviews, cross-examination, issues and gaps all open from the quick strip and
+     the summary rail now. Keeping a second stacked copy down the page was the same
+     content twice, and the second copy was what made the page endless. Before you
+     send stays: it is the only part of a result that is an instruction rather than
+     a record, so it belongs on the page rather than behind a click. */
   id("kbBys").closest(".sec").style.display = full?"":"none";
-  if(full){
-    renderClaims(d.claims); renderIssues(d.issues); renderBys(d.bys); renderGaps(d.gaps);
-    renderReviews(d.reviews, d.ledger);
-    id("kbGapH").textContent="What we could not check, and why.";
-    id("kbGapP").textContent="A report that shows only what it found is a report that lies by omission. Every source that should have been reached and was not is listed here.";
-    id("kbDisc").textContent="4orm reports what public records show. A red result means material contradictions were found in the records checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person.";
-  } else {
-    renderClaims([]); renderIssues([]); renderBys([]); renderGaps([]); renderReviews(null, d.ledger);
-    id("kbGapH").textContent="Why this came back grey.";
-    id("kbGapP").textContent="Grey is a real result, not a failure. It means the console does not have enough of the picture to say anything honest yet.";
-    id("kbDisc").textContent=d.note;
-  }
+  renderBys(full ? d.bys : []);
 
   /* Repaint the board from the result. In live mode the scan animation runs
      before the payload exists, so every light was drawn dark. Without this the
@@ -3172,6 +3145,8 @@ function liveCheck(q, onEvent){
 function check(q){
   var key=(q||"").trim().toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
 
+  waitOpen(q);
+
   if(LIVE){
     var pending = liveCheck(q, onLiveEvent);
     /* Handlers are attached when the scan animation finishes, seconds later.
@@ -3180,8 +3155,8 @@ function check(q){
        being handled properly. This absorbs the flag; the real handler still runs. */
     pending.catch(function(){});
     runScan(null, function(){
-      pending.then(function(d){ toResult(d,q); })
-             .catch(function(e){ toResult(errorResult(q, e.message), q); });
+      pending.then(function(d){ waitFinish(function(){ toResult(d,q); }); })
+             .catch(function(e){ waitFinish(function(){ toResult(errorResult(q, e.message), q); }); });
     });
     return;
   }
@@ -3191,7 +3166,7 @@ function check(q){
     d = {}; for(var k in GREY) d[k]=GREY[k];
     d.name=q.trim().toUpperCase(); d.domain=detect(q)||"Unidentified";
   }
-  runScan(d.board || null, function(){ toResult(d,q); });
+  runScan(d.board || null, function(){ waitFinish(function(){ toResult(d,q); }); });
 }
 
 id("kbForm").addEventListener("submit",function(e){
@@ -3749,18 +3724,106 @@ if(/[?&]debug=1\b/.test(window.location.search)){
                     check:check, liveCheck:liveCheck, current:function(){return CURRENT;} };
 }
 
-/* The gate. It is answered once per visit, it does not time out, and nothing
-   behind it can be operated until it is. A disclaimer that fades away on its
-   own was never read, which is the same as not having one. */
-(function(){
-  var sc=id("gateScrim"), bx=id("gateBox");
+/* ------------------------------------------------------------------ *
+ * THE WAITING SCREEN
+ *
+ * A check takes a minute or two. The page goes quiet behind a scrim, a bar
+ * fills against real phases rather than a guess, and the wait carries the two
+ * things a reader actually needs: what this tool is not, and what is happening
+ * to people who did not check.
+ *
+ * The result is not revealed until the reader has acknowledged the first part.
+ * A disclaimer that can be scrolled past is a disclaimer nobody read.
+ * ------------------------------------------------------------------ */
+var EDU = [
+  {k:"Why this exists", v:"$16.6bn",
+   t:"Reported to the FBI in one year, in the United States alone",
+   x:"The Internet Crime Complaint Center recorded $16.6 billion in reported losses in 2024, up a third on the year before. Reported is the operative word. Most of it is never reported at all."},
+  {k:"Why this exists", v:"$638m",
+   t:"Reported to the Canadian Anti-Fraud Centre in 2024",
+   x:"And the Centre's own estimate is that it sees between five and ten per cent of what actually happens. The real figure is measured in billions, from a population of forty million."},
+  {k:"What we do", v:"10",
+   t:"Checks, on every single search",
+   x:"Identity, licensing, enforcement, people, courts, infrastructure, consumer experience, payment, our own corpus, and whether the dates in their story fit inside the record. Each one returns evidence or a published gap."},
+  {k:"Where we look", v:"64",
+   t:"Named registers, across 130 or more jurisdictions",
+   x:"Corporate registries, securities regulators, caution and sanctions lists, court dockets, bankruptcy claims, domain and certificate records, and fifteen consumer platforms. We name every one we reached and every one we did not."},
+  {k:"How we help", v:"A regulator",
+   t:"Outranks a forum post, every time",
+   x:"Government, regulator, court and registry records can carry a finding on their own. Reviews and community posts are read for pattern, never for volume, and never turn a check red by themselves."},
+  {k:"How we help", v:"Every gap",
+   t:"We cannot reach is published, not hidden",
+   x:"A report that shows only what it found is a report that lies by omission. A dark light means we could not get an answer out of that source. It never means the source came back clean."},
+  {k:"How we help", v:"Green",
+   t:"Never means we guarantee anyone",
+   x:"It means nothing adverse was found in the checks that completed, and that enough of the evidence was reached for that absence to carry weight. It is not a certification, and we will never sell one."},
+  {k:"What actually works", v:"The date",
+   t:"A story cannot start before the domain did",
+   x:"A site claiming results from 2025 on a domain created in 2026 is not a matter of opinion. It is arithmetic between two records, and it is the single fastest way to catch an operation that has not been caught yet."},
+  {k:"What actually works", v:"One question",
+   t:"Ask for the registration number, then check it yourself",
+   x:"Not the regulator's name. The number. Then look it up in that regulator's own register rather than a link they send you. If nobody will give you a number, you already have your answer."},
+  {k:"The hardest part", v:"Absence",
+   t:"Nothing found is not the same as nothing there",
+   x:"No entry on a warning list means that list had no entry on the day we checked. Most operations are caught long after the money has gone, which is exactly why we show you the gaps instead of smoothing them over."}
+];
+
+var waitScrim=id("waitScrim"), waitBox=id("waitBox");
+var eduI=0, eduT=null, waitDone=false, waitAck=false, waitPayload=null, waitRender=null;
+
+function eduPaint(){
+  var e=EDU[eduI % EDU.length], c=id("eduCard");
+  c.classList.add("fade");
+  setTimeout(function(){
+    c.innerHTML='<div class="ek">'+esc(e.k)+'</div><span class="ev">'+esc(e.v)+'</span>'+
+      '<div class="et">'+esc(e.t)+'</div><div class="ex">'+esc(e.x)+'</div>'+
+      '<div class="edudots">'+EDU.map(function(_,i){
+        return '<i class="'+(i===(eduI%EDU.length)?"on":"")+'"></i>';
+      }).join('')+'</div>';
+    c.classList.remove("fade");
+  }, 260);
+}
+function waitOpen(q){
+  waitDone=false; waitAck=false; waitPayload=null; eduI=0;
+  id("waitQ").textContent=q;
+  id("waitPhase").textContent="Starting the sweep";
+  id("waitPct").textContent="0%";
+  id("waitBar").style.width="2%";
+  id("waitFine").textContent="Still working. You can read while you wait.";
+  var ok=id("waitOk"); ok.disabled=false; ok.textContent="I understand";
+  eduPaint();
+  clearInterval(eduT); eduT=setInterval(function(){ eduI++; eduPaint(); }, 7000);
+  waitScrim.classList.add("on"); waitBox.classList.add("on");
   document.body.style.overflow="hidden";
-  id("gateOk").addEventListener("click",function(){
-    sc.classList.add("gone"); bx.classList.add("gone");
-    document.body.style.overflow="";
-    setTimeout(function(){ sc.style.display="none"; bx.style.display="none"; input.focus(); },500);
-  });
-})();
+}
+function waitProgress(pct, label){
+  var p=Math.max(2,Math.min(100,Math.round(pct)));
+  id("waitBar").style.width=p+"%";
+  id("waitPct").textContent=p+"%";
+  if(label) id("waitPhase").textContent=label;
+}
+function waitFinish(render){
+  waitDone=true; waitRender=render;
+  waitProgress(100,"Assessment ready");
+  var ok=id("waitOk");
+  id("waitFine").textContent = waitAck ? "Done." : "Done. Read the two paragraphs above, then continue.";
+  ok.disabled=false; ok.textContent="Show the result";
+  if(waitAck) waitClose();
+}
+function waitClose(){
+  clearInterval(eduT);
+  waitScrim.classList.remove("on"); waitBox.classList.remove("on");
+  document.body.style.overflow="";
+  if(waitRender){ var r=waitRender; waitRender=null; setTimeout(r,240); }
+}
+id("waitOk").addEventListener("click",function(){
+  waitAck=true;
+  if(waitDone){ waitClose(); return; }
+  /* Acknowledged while the sweep is still running. It closes itself the moment
+     the assessment lands, so nobody has to come back to this screen. */
+  this.disabled=true; this.textContent="Understood";
+  id("waitFine").textContent="Understood. This will open by itself when the sweep finishes.";
+});
 
 document.body.setAttribute("data-stage","landing");
 toIdle();
