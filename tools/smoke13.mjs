@@ -15,8 +15,10 @@ await new Promise(r=>setTimeout(r,900));
 console.log('the six identifier chips sit under the bar:',
   [...doc.querySelectorAll('#kbIds .idchip')].map(c=>c.textContent).join(', '));
 console.log('seeded example row gone:', !doc.querySelector('.tryrow') && !doc.querySelector('.try'));
-console.log('chips come before the five figures:',
-  doc.querySelector('.metarow').compareDocumentPosition(doc.getElementById('statstrip')) & 4 ? true : false);
+console.log('chips sit above the bar, figures below:',
+  (doc.getElementById('kbIds').compareDocumentPosition(doc.getElementById('kbForm')) & 4 ? true : false),
+  '|',
+  (doc.getElementById('kbForm').compareDocumentPosition(doc.getElementById('statstrip')) & 4 ? true : false));
 
 console.log('\npage order:', [...doc.querySelectorAll('#network,#categories,#kbRes')].map(x=>x.id).join(' -> '));
 console.log('split gone:', !doc.querySelector('.split'));

@@ -179,10 +179,13 @@ function toRenderShape(a, meta) {
       [String(missed), '', 'Sources not reached', pct(missed, universe), 'n',
         missed ? 'every one named further down this page' : 'nothing was left unchecked']
     ],
+    /* Plain words, the same ones the reader sees everywhere else. A tier
+       letter means nothing to somebody checking who is about to take their
+       money, and the console stopped printing them months ago. */
     bars: [
-      ['Tier A, authoritative', s.tier_a_records || 0, 'a'],
-      ['Tier B, structured',    s.tier_b_records || 0, 'b'],
-      ['Tier D, open web',      s.tier_d_records || 0, 'c'],
+      ['Official records',      s.tier_a_records || 0, 'a'],
+      ['Verified data',         s.tier_b_records || 0, 'b'],
+      ['Public chatter',        s.tier_d_records || 0, 'c'],
       ['Sources not reached',   missed, 'n'],
       ['Claims cross-examined', claims.length, 'a'],
       ['Material issues',       issues.length, 'a']
