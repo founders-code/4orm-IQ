@@ -1,0 +1,2210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Know Before You Send &middot; 4orm Control Centre</title>
+<meta name="description" content="The verification control centre. Check who you are dealing with before you send money, sign an agreement, or share sensitive information.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070B; --bg-2:#090D14; --bg-3:#0E131C;
+  --surface:#0B1017; --surface-2:#101722; --surface-3:#17202D; --surface-4:#1E2937;
+  --border:#1A2330; --border-strong:#2A3646; --border-lit:#38485C;
+
+  --tx:#EDF2FA; --tx-2:#9DABC0; --tx-3:#6A7990; --tx-4:#4A566B;
+
+  --blue:#4C86FF; --blue-lt:#84ABFF; --blue-dp:#2E6BF2; --blue-deep:#1B4ABE;
+  --blue-50:#0D1526; --blue-100:#14223D;
+  --gold:#E7C76C; --gold-dp:#C49A3A; --gold-50:#1B1607;
+
+  --ok:#2FD08A; --ok-bg:#07201700; --ok-br:#1B5A41;
+  --warn:#F2BC55; --warn-bg:#1E180A; --warn-br:#5A4516;
+  --bad:#FF5F76; --bad-bg:#200C12; --bad-br:#661F2C;
+  --nul:#7E8CA2; --nul-bg:#10161F; --nul-br:#28323F;
+
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --r-sm:10px; --r:16px; --r-lg:22px; --r-xl:30px;
+  --sh:0 10px 34px rgba(0,0,0,.55);
+  --sh-lg:0 28px 70px rgba(0,0,0,.62);
+  --hair:inset 0 1px 0 rgba(255,255,255,.045);
+
+  --spring:cubic-bezier(.32,.72,0,1);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --pop:cubic-bezier(.34,1.42,.5,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:90px}
+body{
+  background:var(--bg);color:var(--tx);font-family:var(--sans);
+  font-size:15px;line-height:1.6;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left}
+input{font:inherit;color:inherit;background:none;border:none;outline:none}
+a{color:inherit;text-decoration:none}
+svg{display:block}
+::selection{background:var(--blue-deep);color:#fff}
+
+.wrap{max-width:1320px;margin:0 auto;padding:0 26px}
+.mono{font-family:var(--mono)}
+.tnum{font-variant-numeric:tabular-nums}
+.lbl{
+  font-family:var(--mono);font-size:9px;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--tx-3);
+}
+.lbl.gold{color:var(--gold)}
+.lbl.blue{color:var(--blue-lt)}
+
+.kb-rv{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--spring)}
+.kb-rv.kb-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .kb-rv{opacity:1;transform:none;transition:none}
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+
+/* ================= nav ================= */
+.nav{position:fixed;top:16px;left:0;right:0;z-index:90;pointer-events:none}
+.navpill{
+  pointer-events:auto;display:flex;align-items:center;gap:20px;
+  margin:0 auto;width:fit-content;max-width:calc(100% - 36px);
+  padding:8px 10px 8px 18px;border-radius:999px;
+  background:rgba(13,18,26,.86);border:1px solid var(--border-strong);
+  box-shadow:var(--sh),var(--hair);backdrop-filter:blur(20px) saturate(150%);
+}
+.navpill img{height:18px;width:auto}
+.navlinks{display:flex;gap:18px}
+.navlinks a{
+  font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--tx-2);transition:color .25s var(--ease);
+}
+.navlinks a:hover{color:var(--tx)}
+.navcta{
+  padding:8px 15px;border-radius:999px;background:var(--blue);
+  font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:#fff;transition:transform .3s var(--pop),background .25s var(--ease);
+}
+.navcta:hover{background:var(--blue-lt);transform:translateY(-1px)}
+@media(max-width:860px){.navlinks{display:none}}
+
+/* ================= control bar ================= */
+.console{position:relative;padding:112px 0 0;overflow:hidden}
+.console::before{
+  content:"";position:absolute;inset:-26% -14% auto -14%;height:720px;pointer-events:none;
+  background:
+    radial-gradient(52% 46% at 50% 0%,rgba(76,134,255,.17),transparent 70%),
+    radial-gradient(34% 36% at 84% 8%,rgba(231,199,108,.07),transparent 72%);
+}
+.console .wrap{position:relative;z-index:2}
+
+.cbar{
+  border:1px solid var(--border-strong);border-radius:var(--r-xl);
+  background:linear-gradient(168deg,var(--surface-2),var(--surface));
+  box-shadow:var(--sh-lg),var(--hair);overflow:hidden;
+}
+.cbtop{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  padding:14px 22px;border-bottom:1px solid var(--border);background:rgba(5,7,11,.4);
+}
+.cbtop .l{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.led{display:inline-flex;align-items:center;gap:8px}
+.led i{
+  width:7px;height:7px;border-radius:50%;background:var(--ok);
+  box-shadow:0 0 10px var(--ok);animation:pulse 2.6s var(--ease) infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.cbtop .r{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cbtop .r span{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3)}
+.cbtop .r b{color:var(--tx-2);font-weight:700}
+
+.cbmain{padding:26px 22px 22px}
+.cbhero{display:flex;justify-content:space-between;align-items:flex-end;gap:26px;flex-wrap:wrap}
+.cbh1{font-size:clamp(21px,2.5vw,30px);font-weight:800;letter-spacing:-.035em;line-height:1.12;max-width:22ch;text-wrap:balance}
+.cbh1 .dim{color:var(--tx-3)}
+.cbsub{margin-top:11px;color:var(--tx-2);font-size:13px;line-height:1.55;max-width:52ch}
+
+.hls{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
+.hl{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--border-strong);background:var(--bg-2);
+  font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tx-2);white-space:nowrap;
+}
+.hl i{width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none}
+@media(max-width:900px){.hls{justify-content:flex-start}}
+
+.statstrip{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:22px;
+  border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--border);
+}
+@media(max-width:1100px){.statstrip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:620px){.statstrip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.statstrip{grid-template-columns:1fr}}
+.scell{background:var(--bg-2);padding:15px 17px 14px}
+.scell .sv{font-size:25px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.scell .sv small{font-size:13px;font-weight:700;color:var(--tx-3);letter-spacing:0;margin-left:2px}
+.scell .sl{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3);margin-top:8px;line-height:1.5}
+.scell .sp{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:11px}
+.scell .sp i{display:block;height:100%;width:0%;border-radius:3px;transition:width 1.1s var(--spring)}
+.scell .sp i[data-c="a"]{background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt))}
+.scell .sp i[data-c="c"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.scell .sp i[data-c="n"]{background:linear-gradient(90deg,#2B3646,#5A6880)}
+.scell .sc{font-size:11px;color:var(--tx-4);margin-top:8px;line-height:1.45}
+
+.wavestrip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:2px;
+  border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);
+  overflow:hidden;background:var(--border);
+}
+@media(max-width:820px){.wavestrip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.wavestrip{grid-template-columns:1fr}}
+.wcell{background:var(--surface);padding:14px 17px 13px;transition:background .4s var(--ease)}
+.wcell.run{background:var(--surface-2)}
+.wtop{display:flex;align-items:center;gap:9px}
+.wtop .wi{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--tx-4)}
+.wcell.run .wtop .wi,.wcell.done .wtop .wi{color:var(--blue-lt)}
+.wtop .wtm{margin-left:auto;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx-4)}
+.wcell.done .wtop .wtm{color:var(--ok)}
+.wt{font-size:12px;color:var(--tx-2);line-height:1.45;margin-top:8px;min-height:34px}
+.wcell.run .wt,.wcell.done .wt{color:var(--tx)}
+.wp{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:10px}
+.wp i{display:block;height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt));transition:width .42s var(--ease)}
+.wnow{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--tx-4);margin-top:8px;min-height:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wcell.run .wnow{color:var(--blue-lt)}
+
+.searchbox{
+  display:flex;align-items:center;gap:12px;margin-top:24px;
+  padding:7px 7px 7px 20px;border-radius:999px;background:var(--bg);
+  border:1px solid var(--border-lit);box-shadow:inset 0 2px 10px rgba(0,0,0,.5);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
+}
+.searchbox:focus-within{border-color:var(--blue);box-shadow:inset 0 2px 10px rgba(0,0,0,.5),0 0 0 4px rgba(76,134,255,.13)}
+.searchbox .pfx{font-family:var(--mono);font-size:13px;color:var(--blue);flex:none;user-select:none}
+.searchbox input{flex:1;min-width:0;padding:15px 0;font-size:16.5px;letter-spacing:-.01em}
+.searchbox input::placeholder{color:var(--tx-4)}
+.gobtn{
+  flex:none;padding:13px 24px;border-radius:999px;background:var(--blue);color:#fff;text-align:center;
+  font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  transition:background .25s var(--ease),transform .3s var(--pop),opacity .25s var(--ease);
+}
+.gobtn:hover:not(:disabled){background:var(--blue-lt);transform:translateY(-1px)}
+.gobtn:disabled{opacity:.35;cursor:not-allowed}
+
+.metarow{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:16px;align-items:center}
+.idrow{display:flex;flex-wrap:wrap;gap:6px}
+.idchip{
+  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+  padding:5px 10px;border-radius:999px;color:var(--tx-4);
+  border:1px solid var(--border);background:var(--bg-2);transition:all .32s var(--ease);
+}
+.idchip.on{color:var(--bg);background:var(--gold);border-color:var(--gold);box-shadow:0 0 20px rgba(231,199,108,.26)}
+.tryrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.try{
+  font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--border-strong);background:var(--bg-2);color:var(--tx-2);
+  transition:all .28s var(--ease);
+}
+.try:hover{color:var(--tx);border-color:var(--blue);background:var(--blue-50)}
+.upnote{margin-top:18px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:70ch}
+.upnote b{color:var(--tx-2);font-weight:600}
+
+@media(max-width:640px){.cbmain{padding:24px 16px 20px}.cbtop{padding:12px 16px}}
+
+/* ================= support directory ================= */
+.helpbtn{
+  display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;
+  border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold);
+  font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+  transition:all .28s var(--ease);white-space:nowrap;
+}
+.helpbtn:hover{background:#2A2109;border-color:var(--gold);transform:translateY(-1px)}
+.helpbtn .hi{font-size:12px;line-height:1}
+
+.dirscrim{
+  position:fixed;inset:0;z-index:200;background:rgba(3,5,9,.86);backdrop-filter:blur(7px);
+  opacity:0;pointer-events:none;transition:opacity .4s var(--ease);
+}
+.dirscrim.on{opacity:1;pointer-events:auto}
+.dirbox{
+  position:fixed;inset:3vh 3vw;z-index:201;display:flex;flex-direction:column;
+  border:1px solid var(--border-strong);border-radius:var(--r-xl);overflow:hidden;
+  background:var(--surface);box-shadow:0 60px 130px rgba(0,0,0,.8),var(--hair);
+  opacity:0;transform:translateY(18px) scale(.99);pointer-events:none;
+  transition:opacity .42s var(--ease),transform .5s var(--spring);
+}
+.dirbox.on{opacity:1;transform:none;pointer-events:auto}
+@media(max-width:760px){.dirbox{inset:0;border-radius:0;border:none}}
+
+.dirhd{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 24px;
+  border-bottom:1px solid var(--border);background:var(--bg-2);flex:none;
+}
+.dirhd .dt{font-size:16px;font-weight:800;letter-spacing:-.025em}
+.dirhd .dx{font-size:12.5px;color:var(--tx-3);line-height:1.5;flex:1;min-width:200px}
+.dirback,.dirclose{
+  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tx-3);border:1px solid var(--border-strong);border-radius:999px;padding:7px 13px;
+  transition:all .25s var(--ease);white-space:nowrap;
+}
+.dirback:hover,.dirclose:hover{color:var(--tx);border-color:var(--border-lit)}
+.dirback{display:none}
+.dirbox.deep .dirback{display:inline-block}
+
+.dirbody{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.dirgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border)}
+@media(max-width:1180px){.dirgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:840px){.dirgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.dirgrid{grid-template-columns:1fr}}
+.folder{
+  background:var(--surface);padding:22px 20px 18px;display:flex;flex-direction:column;gap:10px;
+  width:100%;min-height:186px;position:relative;transition:background .3s var(--ease);
+}
+.folder:hover{background:var(--surface-2)}
+.folder .tab{
+  width:38px;height:7px;border-radius:3px 3px 0 0;background:var(--border-lit);
+  transition:background .3s var(--ease);
+}
+.folder:hover .tab{background:var(--gold)}
+.folder .fbody{
+  border-top:1px solid var(--border-lit);padding-top:13px;flex:1;display:flex;flex-direction:column;gap:9px;
+  transition:border-color .3s var(--ease);
+}
+.folder:hover .fbody{border-color:var(--border-lit)}
+.folder .fix{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--tx-4)}
+.folder .fn{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.folder .fx{font-size:12.5px;color:var(--tx-3);line-height:1.5;flex:1}
+.folder .ff{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.folder .fc{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--tx-4)}
+.folder .fo{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);opacity:.5;transition:opacity .3s var(--ease),transform .3s var(--spring)}
+.folder:hover .fo{opacity:1;transform:translateX(3px)}
+
+.dirintro{padding:22px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:78ch}
+.entries{display:grid;gap:2px;background:var(--border)}
+.entry{background:var(--surface);padding:20px 24px;display:flex;gap:20px;flex-wrap:wrap}
+.entry .eleft{flex:1;min-width:min(100%,300px)}
+.entry .en{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
+.entry .ew{font-size:13px;color:var(--tx-2);line-height:1.6;margin-top:7px}
+.entry .eright{flex:none;display:grid;gap:7px;align-content:start;min-width:268px}
+.contact{
+  display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:var(--r-sm);
+  border:1px solid var(--border-strong);background:var(--bg-2);
+}
+.contact .ck{font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-4);flex:none;width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.contact .cv{font-family:var(--mono);font-size:12px;color:var(--tx);word-break:break-all}
+.contact a.cv{border-bottom:1px solid var(--border-lit);transition:color .2s var(--ease),border-color .2s var(--ease)}
+.contact a.cv:hover{color:var(--blue-lt);border-color:var(--blue-lt)}
+.contact.tel .cv{font-size:13.5px;font-weight:700;letter-spacing:.02em}
+.enote{margin-top:10px;font-size:12px;color:var(--tx-4);line-height:1.55}
+.step{background:var(--surface);padding:20px 24px;display:flex;gap:18px}
+.step .sn{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--gold);flex:none;width:22px;padding-top:3px;letter-spacing:.08em}
+.step .sb{flex:1;min-width:0}
+.step .st{font-size:14.5px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
+.step .sx{font-size:13px;color:var(--tx-2);line-height:1.62;margin-top:7px}
+.dirfoot{padding:18px 24px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.65}
+.hint{
+  margin:2px 0 0;padding:20px 24px;background:var(--bg-3);border-top:1px solid var(--border);
+  display:flex;gap:16px;align-items:flex-start;
+}
+.hint .hk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:30px}
+.hint .hx{font-size:13px;color:var(--tx-2);line-height:1.65;max-width:74ch}
+.hint .hx b{color:var(--tx);font-weight:600}
+
+/* ================= instrument deck ================= */
+.deck{padding:24px 0 0}
+.deckgrid{
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:stretch;
+}
+@media(max-width:1060px){.deckgrid{grid-template-columns:1fr}}
+
+.panel{
+  border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);
+  box-shadow:var(--hair);overflow:hidden;display:flex;flex-direction:column;
+}
+.panelhd{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:13px 20px;border-bottom:1px solid var(--border);background:var(--bg-2);
+}
+.panelhd .mode{
+  font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+  padding:3px 9px;border-radius:5px;border:1px solid var(--border-strong);color:var(--tx-3);
+}
+.panelhd .mode.live{color:var(--blue-lt);border-color:#26385E;background:var(--blue-100)}
+.panelbd{padding:24px 20px;flex:1}
+
+/* dials */
+.dials{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.dials{grid-template-columns:1fr;gap:6px}.dialwrap{max-width:158px}.dialcap .x{font-size:11px}}
+.dial{text-align:center}
+.dialwrap{position:relative;width:100%;max-width:196px;margin:0 auto}
+.dial svg{width:100%;height:auto;overflow:visible}
+.dialtrack{fill:none;stroke:var(--surface-3);stroke-width:11;stroke-linecap:round}
+.dialval{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset 1.2s var(--spring),stroke .5s var(--ease)}
+.dial.b .dialval{stroke:url(#gB)}
+.dial.g .dialval{stroke:url(#gG)}
+.dialtick{stroke:var(--border-lit);stroke-width:1.5}
+.dialtick.maj{stroke:var(--tx-4);stroke-width:2}
+.dialnum{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  pointer-events:none;padding-top:6px;
+}
+.dialnum .v{font-size:clamp(28px,4vw,38px);font-weight:800;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+.dialnum .u{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.16em;color:var(--tx-4);margin-top:6px}
+.dialcap{margin-top:6px}
+.dialcap .t{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-2)}
+.dialcap .x{font-size:11.5px;color:var(--tx-3);margin-top:6px;line-height:1.5;max-width:26ch;margin-inline:auto}
+
+/* readouts */
+.reads{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--border);border-top:1px solid var(--border)}
+.read{background:var(--surface);padding:16px 20px}
+.read .v{font-size:23px;font-weight:800;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+.read .v small{font-size:12px;font-weight:700;color:var(--tx-3);letter-spacing:0;margin-left:3px}
+.read .t{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3);margin-top:7px;line-height:1.5}
+@media(max-width:420px){.reads{grid-template-columns:1fr}}
+
+/* stat bars */
+.bars{display:grid;gap:13px}
+.bar .bt{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+.bar .bn{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-2)}
+.bar .bv{font-family:var(--mono);font-size:10.5px;font-weight:800;color:var(--tx);font-variant-numeric:tabular-nums}
+.bar .bg{height:7px;border-radius:4px;background:var(--surface-3);overflow:hidden}
+.bar .bg i{display:block;height:100%;width:0%;border-radius:4px;transition:width 1.1s var(--spring)}
+.bar .bg i[data-c="a"]{background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt))}
+.bar .bg i[data-c="b"]{background:linear-gradient(90deg,#2B3F5E,#5A7398)}
+.bar .bg i[data-c="c"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.bar .bg i[data-c="n"]{background:linear-gradient(90deg,#2B3646,#4A566B)}
+.barfoot{margin-top:18px;padding-top:15px;border-top:1px solid var(--border);font-size:12px;color:var(--tx-3);line-height:1.6}
+
+/* ================= category tiles ================= */
+.sec{padding:64px 0}
+.sec.tight{padding-top:8px}
+.sechead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.sechead h2{font-size:clamp(22px,3vw,33px);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-top:10px;text-wrap:balance}
+.sechead p{margin-top:10px;color:var(--tx-2);max-width:62ch;font-size:14px;line-height:1.6}
+
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
+@media(max-width:980px){.tiles{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.tiles{grid-template-columns:1fr}}
+.tile{
+  background:var(--surface);padding:20px 20px 18px;display:flex;flex-direction:column;gap:11px;
+  transition:background .3s var(--ease);position:relative;width:100%;min-height:172px;
+}
+.tile:hover{background:var(--surface-2)}
+.tile.sel{background:var(--surface-2)}
+.tile.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue)}
+.tiletop{display:flex;align-items:center;gap:10px}
+.tileix{font-family:var(--mono);font-size:9.5px;font-weight:800;color:var(--tx-4);letter-spacing:.1em}
+.tiledot{width:8px;height:8px;border-radius:50%;flex:none;margin-left:auto}
+.tiledot[data-s="RED"]{background:var(--bad);box-shadow:0 0 11px rgba(255,95,118,.75)}
+.tiledot[data-s="YELLOW"]{background:var(--warn);box-shadow:0 0 11px rgba(242,188,85,.65)}
+.tiledot[data-s="GREEN"]{background:var(--ok);box-shadow:0 0 11px rgba(47,208,138,.65)}
+.tiledot[data-s="GREY"]{background:var(--nul)}
+.tiledot[data-s="IDLE"]{background:var(--border-lit)}
+.tilest{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.14em;color:var(--tx-4)}
+.tilest[data-s="RED"]{color:var(--bad)}
+.tilest[data-s="YELLOW"]{color:var(--warn)}
+.tilest[data-s="GREEN"]{color:var(--ok)}
+.tilest[data-s="GREY"]{color:var(--nul)}
+.tilenm{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.tilex{font-size:12.5px;color:var(--tx-3);line-height:1.5;flex:1}
+.tilebar{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.tilebar i{display:block;height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt));transition:width 1s var(--spring)}
+.tilefoot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tilecount{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--tx-4)}
+.tileopen{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-lt);opacity:.42;transition:opacity .3s var(--ease),transform .3s var(--spring)}
+.tile:hover .tileopen,.tile.sel .tileopen{opacity:1;transform:translateX(3px)}
+
+/* ================= drill panel ================= */
+.drill{
+  margin-top:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;
+  background:var(--surface);max-height:0;transition:max-height .6s var(--spring),margin-top .4s var(--ease);
+}
+.drill.on{max-height:4200px;margin-top:18px}
+.drillhd{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  padding:22px 24px;border-bottom:1px solid var(--border);background:var(--bg-2);
+}
+.drillhd .n{font-size:19px;font-weight:800;letter-spacing:-.03em;margin-top:9px;line-height:1.2}
+.drillhd .q{font-size:13.5px;color:var(--tx-2);margin-top:8px;max-width:64ch;line-height:1.6}
+.drillx{
+  flex:none;font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tx-3);border:1px solid var(--border-strong);border-radius:999px;padding:7px 13px;
+  transition:all .25s var(--ease);
+}
+.drillx:hover{color:var(--tx);border-color:var(--border-lit)}
+
+.rule{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg-3);display:flex;gap:14px;align-items:flex-start}
+.rule .rk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:34px}
+.rule .rx{font-size:13px;color:var(--tx-2);line-height:1.62}
+.rule .rx b{color:var(--tx);font-weight:600}
+
+.srcscroll{overflow-x:auto}
+.srctbl{width:100%;border-collapse:collapse;min-width:720px}
+.srctbl th{
+  text-align:left;padding:11px 14px;font-family:var(--mono);font-size:8.5px;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--tx-4);border-bottom:1px solid var(--border);
+  background:var(--bg-2);white-space:nowrap;
+}
+.srctbl td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top;line-height:1.5}
+.srctbl tr:last-child td{border-bottom:none}
+.srctbl tbody tr:hover{background:var(--surface-2)}
+.srctbl .sname{color:var(--tx);font-weight:500}
+.srctbl .sname a{border-bottom:1px solid var(--border-lit);transition:border-color .2s var(--ease),color .2s var(--ease)}
+.srctbl .sname a:hover{color:var(--blue-lt);border-color:var(--blue-lt)}
+.srctbl .sj{font-family:var(--mono);font-size:10.5px;color:var(--tx-3);white-space:nowrap}
+.srctbl .sm{font-family:var(--mono);font-size:10px;color:var(--tx-3);white-space:nowrap}
+.tier{
+  font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.13em;
+  padding:3px 7px;border-radius:5px;text-transform:uppercase;white-space:nowrap;display:inline-block;
+}
+.tier[data-t="A"]{background:var(--blue-100);color:var(--blue-lt);border:1px solid #26385E}
+.tier[data-t="B"]{background:var(--surface-3);color:var(--tx-2);border:1px solid var(--border-strong)}
+.tier[data-t="C"],.tier[data-t="D"]{background:var(--gold-50);color:var(--gold);border:1px solid #3A3011}
+.tier[data-t="4orm"]{background:#101C16;color:var(--ok);border:1px solid var(--ok-br)}
+.use{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.use[data-u="open"]{color:var(--ok)}
+.use[data-u="restricted"]{color:var(--warn)}
+.use[data-u="licence"]{color:var(--gold)}
+.use[data-u="mixed"]{color:var(--warn)}
+.use[data-u="unknown"]{color:var(--tx-4)}
+.drillfoot{padding:16px 24px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-3);line-height:1.6}
+
+/* ================= negative review report card ================= */
+.rcard{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
+.rchd{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:16px 22px;border-bottom:1px solid var(--border);background:var(--bg-2);
+}
+.corpus{
+  font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+  padding:4px 10px;border-radius:5px;border:1px solid;white-space:nowrap;
+}
+.corpus[data-c="organic"]{color:var(--ok);border-color:var(--ok-br);background:#07201A}
+.corpus[data-c="manufactured"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.corpus[data-c="mixed"]{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+.corpus[data-c="absent"]{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
+
+.rcstats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border-bottom:1px solid var(--border)}
+@media(max-width:560px){.rcstats{grid-template-columns:1fr}}
+.rcstat{background:var(--bg-2);padding:14px 20px}
+.rcstat .v{font-size:21px;font-weight:800;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+.rcstat .l{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3);margin-top:7px}
+
+.rcnote{padding:16px 22px;border-bottom:1px solid var(--border);background:var(--bg-3);display:flex;gap:14px;align-items:flex-start}
+.rcnote .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:26px}
+.rcnote .x{font-size:13px;color:var(--tx-2);line-height:1.62;max-width:80ch}
+
+.narrs{display:grid;gap:2px;background:var(--border)}
+.narr{background:var(--surface);padding:18px 22px;display:grid;gap:10px}
+.ntop{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.nlab{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;flex:1;min-width:min(100%,220px)}
+.nid{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.13em;color:var(--tx-4);padding:3px 8px;border-radius:5px;border:1px solid var(--border-strong);white-space:nowrap}
+.ncount{font-family:var(--mono);font-size:11px;font-weight:800;color:var(--tx);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ncount small{color:var(--tx-4);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:5px}
+.nbar{height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.nbar i{display:block;height:100%;width:0%;border-radius:3px;transition:width 1s var(--spring)}
+.nbar i[data-s="hi"]{background:linear-gradient(90deg,#7A2233,var(--bad))}
+.nbar i[data-s="mid"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.nbar i[data-s="lo"]{background:linear-gradient(90deg,#2B3646,#5A6880)}
+.nquote{
+  padding:10px 13px;border-left:2px solid var(--border-lit);background:var(--bg-2);
+  font-size:12.5px;line-height:1.6;color:var(--tx-2);border-radius:0 8px 8px 0;font-style:italic;max-width:84ch;
+}
+.nmeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.npf{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--tx-4);padding:3px 8px;border-radius:999px;border:1px solid var(--border)}
+.nper{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx-4);margin-left:auto}
+.rcempty{padding:26px 22px;font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
+.rcfoot{padding:15px 22px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.6}
+
+/* ================= result blocks ================= */
+.res{display:none}
+.res.on{display:block}
+.verdict{
+  position:relative;border-radius:var(--r-xl);padding:34px 34px 30px;
+  border:1px solid var(--border-strong);background:var(--surface);box-shadow:var(--sh-lg),var(--hair);overflow:hidden;
+}
+.verdict::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55}
+.verdict[data-v="RED"]::before{background:radial-gradient(66% 88% at 0% 0%,rgba(255,95,118,.13),transparent 62%)}
+.verdict[data-v="YELLOW"]::before{background:radial-gradient(66% 88% at 0% 0%,rgba(242,188,85,.12),transparent 62%)}
+.verdict[data-v="GREEN"]::before{background:radial-gradient(66% 88% at 0% 0%,rgba(47,208,138,.12),transparent 62%)}
+.verdict[data-v="GREY"]::before{background:radial-gradient(66% 88% at 0% 0%,rgba(126,140,162,.11),transparent 62%)}
+.verdict>*{position:relative}
+.vtop{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.vname{font-size:clamp(25px,3.8vw,40px);font-weight:800;letter-spacing:-.035em;line-height:1.05}
+.vdom{font-family:var(--mono);font-size:12.5px;color:var(--tx-3);margin-top:7px;word-break:break-all}
+.vbadge{
+  display:inline-flex;align-items:center;gap:9px;padding:10px 18px;border-radius:999px;
+  font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  border:1px solid;white-space:nowrap;
+}
+.vbadge .bd{width:8px;height:8px;border-radius:50%;flex:none}
+.vbadge[data-v="RED"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.vbadge[data-v="RED"] .bd{background:var(--bad);box-shadow:0 0 13px var(--bad)}
+.vbadge[data-v="YELLOW"]{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+.vbadge[data-v="YELLOW"] .bd{background:var(--warn);box-shadow:0 0 13px var(--warn)}
+.vbadge[data-v="GREEN"]{color:var(--ok);border-color:var(--ok-br);background:#07201A}
+.vbadge[data-v="GREEN"] .bd{background:var(--ok);box-shadow:0 0 13px var(--ok)}
+.vbadge[data-v="GREY"]{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
+.vbadge[data-v="GREY"] .bd{background:var(--nul)}
+.vstate{margin-top:20px;font-size:clamp(16px,2vw,20px);line-height:1.42;letter-spacing:-.02em;max-width:64ch;font-weight:500;text-wrap:balance}
+@media(max-width:640px){.verdict{padding:24px 20px 22px}}
+
+.evgrid{display:grid;gap:11px;margin-top:2px}
+.ev{border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;background:var(--bg-2)}
+.evtop{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:8px}
+.evsrc{font-family:var(--mono);font-size:10px;color:var(--tx-2);font-weight:500;flex:1;min-width:0}
+.evwhen{font-family:var(--mono);font-size:9px;color:var(--tx-4);letter-spacing:.1em;flex:none}
+.evfind{font-size:13.5px;color:var(--tx);line-height:1.55}
+.evquote{
+  margin-top:9px;padding:10px 12px;border-left:2px solid var(--blue-deep);background:var(--surface);
+  font-family:var(--mono);font-size:10.5px;line-height:1.62;color:var(--tx-2);border-radius:0 8px 8px 0;
+  word-break:break-word;max-width:84ch;
+}
+.evlink{
+  display:inline-block;margin-top:9px;font-family:var(--mono);font-size:9px;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--blue-lt);border-bottom:1px solid #22345A;padding-bottom:2px;
+}
+.evlink:hover{border-color:var(--blue-lt)}
+.evnone{font-size:13px;color:var(--tx-3);line-height:1.6}
+
+.claims{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
+.claimhead,.claimrow{display:grid;grid-template-columns:1.15fr 1fr 1.35fr 70px;gap:20px;padding:14px 22px;align-items:start}
+.claimhead{
+  background:var(--bg-2);border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-4);
+}
+.claimrow{border-bottom:1px solid var(--border);font-size:13.5px;line-height:1.5}
+.claimrow:last-child{border-bottom:none}
+.claimrow .cq{color:var(--tx);font-weight:500}
+.claimrow .cs{color:var(--tx-3);font-family:var(--mono);font-size:10.5px;line-height:1.55}
+.claimrow .cr{color:var(--tx-2)}
+.claimrow .cv{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;text-align:right}
+.claimrow .cv[data-s="RED"]{color:var(--bad)}
+.claimrow .cv[data-s="YELLOW"]{color:var(--warn)}
+.claimrow .cv[data-s="GREEN"]{color:var(--ok)}
+@media(max-width:880px){
+  .claimhead{display:none}
+  .claimrow{grid-template-columns:1fr;gap:7px;padding:17px}
+  .claimrow .cv{text-align:left}
+}
+
+.issues{display:grid;gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
+.issue{display:flex;gap:18px;padding:20px 22px;background:var(--surface)}
+.issue .n{font-family:var(--mono);font-size:10.5px;font-weight:800;color:var(--tx-4);flex:none;width:24px;padding-top:2px;font-variant-numeric:tabular-nums}
+.issue .b{flex:1;min-width:0}
+.issue .t{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.35;display:block;text-wrap:balance}
+.issue .x{margin-top:6px;font-size:13.5px;color:var(--tx-2);line-height:1.6;display:block}
+.issue .m{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.sev{font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;padding:3px 7px;border-radius:5px;border:1px solid}
+.sev[data-s="critical"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.sev[data-s="high"]{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+
+.bys{border-radius:var(--r-xl);padding:36px;border:1px solid var(--border-strong);background:linear-gradient(160deg,var(--surface-2),var(--surface));box-shadow:var(--sh-lg),var(--hair)}
+.bys h3{font-size:clamp(20px,2.6vw,29px);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-top:10px}
+.byslist{margin-top:24px;display:grid;gap:2px;border-radius:var(--r);overflow:hidden;background:var(--border)}
+.bysitem{display:flex;gap:16px;padding:18px 20px;background:var(--bg-2)}
+.bysitem .n{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.1em;color:var(--gold);flex:none;width:20px;padding-top:3px}
+.bysitem .t{font-size:13.5px;line-height:1.6;color:var(--tx)}
+@media(max-width:640px){.bys{padding:24px 18px}}
+
+.gaps{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
+.gap{padding:15px 18px;background:var(--surface)}
+.gap .s{font-size:12.5px;color:var(--tx);line-height:1.45}
+.gap .r{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx-4);margin-top:6px}
+.disc{margin-top:22px;padding:17px 20px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg-2);font-size:12px;line-height:1.65;color:var(--tx-3)}
+
+/* ================= explain ================= */
+.divide{height:1px;background:linear-gradient(90deg,transparent,var(--border-strong),transparent)}
+.ladder{display:grid;gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
+.rung{display:flex;gap:20px;align-items:flex-start;padding:20px 22px;background:var(--surface)}
+.rung .rt{flex:none;width:150px}
+.rung .rt .rn{font-size:13px;color:var(--tx);margin-top:8px;font-weight:600}
+.rung .rx{flex:1;min-width:0;font-size:13px;color:var(--tx-2);line-height:1.6}
+.rung .rp{flex:none;font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;padding:4px 9px;border-radius:6px;border:1px solid var(--border-strong);color:var(--tx-3);white-space:nowrap}
+.rung .rp.yes{color:var(--blue-lt);border-color:#26385E;background:var(--blue-100)}
+@media(max-width:760px){.rung{flex-wrap:wrap;gap:9px}.rung .rt{width:auto}.rung .rx{flex:1 1 100%;order:9}}
+
+.twobox{display:grid;grid-template-columns:1fr 1fr;gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
+.tb{padding:28px 26px;background:var(--surface)}
+.tb.bad{background:var(--bg-2)}
+.tb .th{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
+.tb.bad .th{color:var(--bad)}
+.tb.good .th{color:var(--ok)}
+.tb .tv{font-size:clamp(22px,3vw,31px);font-weight:800;letter-spacing:-.035em;margin-top:12px;line-height:1.1}
+.tb .tx{font-size:13px;color:var(--tx-2);margin-top:11px;line-height:1.62}
+@media(max-width:720px){.twobox{grid-template-columns:1fr}}
+
+.foot{border-top:1px solid var(--border);padding:46px 0 56px;margin-top:16px}
+.footin{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.footin .fl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);line-height:2}
+.footin a.fl:hover{color:var(--tx-2)}
+.foot .note{margin-top:26px;font-size:11.5px;color:var(--tx-4);line-height:1.7;max-width:82ch}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="navpill">
+    <span class="navbrand"><img src="assets/logo.png?v=20260826" alt="4orm" onerror="this.closest('.navbrand').style.display='none'"></span>
+    <span class="navlinks">
+      <a href="#network">Source network</a>
+      <a href="#categories">Categories</a>
+      <a href="#scoring">Scoring</a>
+    </span>
+    <a class="navcta" href="#console">Run a check</a>
+  </div>
+</nav>
+
+<header class="console" id="console">
+  <div class="wrap">
+    <div class="cbar kb-rv kb-in">
+      <div class="cbtop">
+        <div class="l">
+          <span class="led"><i></i><span class="lbl gold">Know before you send</span></span>
+          <span class="lbl" id="modeLbl">Standing by</span>
+          <span class="mode" id="liveLbl" style="display:none">Live</span>
+        </div>
+        <div class="r">
+          <span>Categories <b>9</b></span>
+          <span>Connectors <b>34</b></span>
+          <span>Jurisdictions <b>130+</b></span>
+          <span id="clock">--:--:-- UTC</span>
+        </div>
+      </div>
+
+      <div class="cbmain">
+        <div class="cbhero">
+          <div>
+            <h1 class="cbh1">Check who you're dealing with <span class="dim">before the money leaves.</span></h1>
+            <p class="cbsub">One identifier is enough. We query the registers, read the records, cross-examine the claims against them, and publish every source we used and every one we could not reach.</p>
+          </div>
+          <div class="hls">
+            <span class="hl"><i></i>A regulator outranks a forum post</span>
+            <span class="hl"><i></i>Every gap we cannot reach is published</span>
+            <span class="hl"><i></i>Green never means we guarantee anyone</span>
+          </div>
+        </div>
+
+        <div class="statstrip" id="statstrip"></div>
+        <div class="wavestrip" id="wavestrip"></div>
+
+        <form class="searchbox" id="kbForm" autocomplete="off">
+          <span class="pfx">&gt;</span>
+          <input id="kbInput" type="text" placeholder="Company, person, website, email, phone or wallet" aria-label="Enter a company, person, website, email, phone or wallet">
+          <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
+        </form>
+
+        <div class="metarow">
+          <div class="idrow" id="kbIds" aria-live="polite"></div>
+          <div class="tryrow">
+            <span class="lbl">Try</span>
+            <button class="try" type="button" data-seed="investhelm.com">investhelm.com</button>
+            <button class="try" type="button" data-seed="nexlares.com">nexlares.com</button>
+            <button class="try" type="button" data-seed="atlanticglobalwealth.com">atlanticglobalwealth.com</button>
+            <button class="try" type="button" data-seed="Northbank Capital Partners">Northbank Capital Partners</button>
+          </div>
+        </div>
+
+        <div class="metarow" style="margin-top:18px">
+          <button class="helpbtn" type="button" data-dir="open"><span class="hi">&#9873;</span> Help me find support</button>
+          <span class="lbl" style="color:var(--tx-4)">Regulators, ombudsmen, credit bureaus, legal referral. Real numbers, checked today.</span>
+        </div>
+
+        <p class="upnote"><b>Uploading a document or screenshot</b> lets us read the payment instructions and check whether the beneficiary matches the company you are being asked to trust. That is the check that saves the money. It is not enabled in this build.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="deck" id="network">
+  <div class="wrap">
+    <div class="deckgrid">
+
+      <div class="panel kb-rv">
+        <div class="panelhd">
+          <span class="lbl" id="dialPanelT">Source network</span>
+          <span class="mode" id="dialMode">Idle</span>
+        </div>
+        <div class="panelbd">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+            <linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1B4ABE"/><stop offset="100%" stop-color="#84ABFF"/>
+            </linearGradient>
+            <linearGradient id="gG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#C49A3A"/><stop offset="100%" stop-color="#E7C76C"/>
+            </linearGradient>
+          </defs></svg>
+
+          <div class="dials">
+            <div class="dial b">
+              <div class="dialwrap">
+                <svg viewBox="0 0 200 200" role="img" aria-labelledby="d1t">
+                  <g id="ticks1"></g>
+                  <path class="dialtrack" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                  <path class="dialval" id="dial1" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                </svg>
+                <div class="dialnum"><span class="v tnum" id="dial1v">0%</span><span class="u" id="dial1u">of 34</span></div>
+              </div>
+              <div class="dialcap">
+                <div class="t" id="d1t">Tier A density</div>
+                <div class="x" id="dial1x">Authoritative sources as a share of the connector set.</div>
+              </div>
+            </div>
+
+            <div class="dial g">
+              <div class="dialwrap">
+                <svg viewBox="0 0 200 200" role="img" aria-labelledby="d2t">
+                  <g id="ticks2"></g>
+                  <path class="dialtrack" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                  <path class="dialval" id="dial2" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                </svg>
+                <div class="dialnum"><span class="v tnum" id="dial2v">0%</span><span class="u" id="dial2u">of 34</span></div>
+              </div>
+              <div class="dialcap">
+                <div class="t" id="d2t">Direct feed</div>
+                <div class="x" id="dial2x">Connectors with a documented API or structured feed.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="reads" id="reads"></div>
+      </div>
+
+      <div class="panel kb-rv">
+        <div class="panelhd">
+          <span class="lbl" id="barPanelT">Connector distribution</span>
+          <span class="mode" id="barMode">MVP set</span>
+        </div>
+        <div class="panelbd">
+          <div class="bars" id="bars"></div>
+          <p class="barfoot" id="barFoot"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="categories">
+  <div class="wrap">
+    <div class="sechead kb-rv">
+      <div>
+        <div class="lbl gold">The nine checks</div>
+        <h2 id="catH2">Every category, and the registers behind it.</h2>
+        <p id="catP">Open any tile to read which regulators, registries and databases sit underneath that check, what each one is allowed to prove, and whether its terms permit commercial use.</p>
+      </div>
+    </div>
+    <div class="tiles kb-rv" id="tiles"></div>
+    <div class="drill" id="drill" aria-live="polite"></div>
+  </div>
+</section>
+
+<main class="res" id="kbRes">
+  <div class="wrap">
+    <section class="sec tight">
+      <div class="verdict kb-rv" id="kbVerdict" data-v="RED">
+        <div class="vtop">
+          <div><div class="vname" id="kbName">-</div><div class="vdom" id="kbDom">-</div></div>
+          <div class="vbadge" id="kbBadge" data-v="RED"><span class="bd"></span><span id="kbBadgeT">-</span></div>
+        </div>
+        <p class="vstate" id="kbStatement">-</p>
+        <div class="rcnote" id="kbSpecimen" style="display:none;margin-top:22px;border:1px solid var(--warn-br);border-radius:var(--r);background:var(--warn-bg);padding:15px 18px">
+          <span class="k" style="background:var(--warn)"></span>
+          <span class="x" style="color:var(--warn)"><b>Specimen.</b> Atlantic Global Wealth does not exist. Every name, figure, quote and date on this result is invented, and it is here only to show what a fully populated assessment looks like. It is not a finding about anybody.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tight" id="kbRevSec">
+      <div class="sechead kb-rv">
+        <div>
+          <div class="lbl gold">Consumer experience</div>
+          <h2>The one-star reviews, read first.</h2>
+          <p>Positive reviews are cheap to manufacture. Negative ones are not - nobody is paid to write a one-star review. So we read those first, cluster them by what was actually done to the person, and count platforms rather than volume.</p>
+        </div>
+      </div>
+      <div class="rcard kb-rv" id="kbRev"></div>
+    </section>
+
+    <section class="sec tight" id="kbClaimSec">
+      <div class="sechead kb-rv">
+        <div>
+          <div class="lbl gold">Cross-examination</div>
+          <h2>What doesn't match.</h2>
+          <p>Every claim, bound to the record that adjudicates it, and the two reconciled. This is the part a search engine cannot do for you.</p>
+        </div>
+      </div>
+      <div class="claims kb-rv" id="kbClaims">
+        <div class="claimhead"><span>Claim</span><span>Checked against</span><span>What the record says</span><span style="text-align:right">Result</span></div>
+      </div>
+    </section>
+
+    <section class="sec tight" id="kbIssueSec">
+      <div class="sechead kb-rv">
+        <div><div class="lbl gold">Findings</div><h2 id="kbIssueH">Material issues found.</h2></div>
+      </div>
+      <div class="issues kb-rv" id="kbIssues"></div>
+    </section>
+
+    <section class="sec tight">
+      <div class="bys kb-rv">
+        <div class="lbl gold">Before you send</div>
+        <h3 id="kbBysH">Do these three things first.</h3>
+        <div class="byslist" id="kbBys"></div>
+        <div style="margin-top:22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+          <button class="helpbtn" type="button" data-dir="open"><span class="hi">&#9873;</span> Help me find support</button>
+          <span class="lbl" style="color:var(--tx-4)">Who to call, in what order, and what to say</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tight" id="kbGapSec">
+      <div class="sechead kb-rv">
+        <div>
+          <div class="lbl gold">Published, not hidden</div>
+          <h2 id="kbGapH">What we could not check, and why.</h2>
+          <p id="kbGapP">A report that shows only what it found is a report that lies by omission. Every source that should have been reached and was not is listed here.</p>
+        </div>
+      </div>
+      <div class="gaps kb-rv" id="kbGaps"></div>
+      <p class="disc kb-rv" id="kbDisc"></p>
+    </section>
+  </div>
+</main>
+
+<div class="divide"></div>
+
+<section class="sec" id="scoring">
+  <div class="wrap">
+    <div class="sechead kb-rv">
+      <div>
+        <div class="lbl gold">Source authority</div>
+        <h2>A forum post never outweighs a regulator.</h2>
+        <p>Every record carries a tier, and the tier decides what that record is allowed to do. Fifty angry reviews cannot turn a category red on their own. One registry entry can.</p>
+      </div>
+    </div>
+    <div class="ladder kb-rv">
+      <div class="rung">
+        <div class="rt"><span class="tier" data-t="A">Tier A</span><div class="rn">Authoritative</div></div>
+        <div class="rx">Government, regulator, court, official registry, sanctions list, the domain registry itself. 25 of the 34 connectors in the opening set.</div>
+        <span class="rp yes">Can carry red alone</span>
+      </div>
+      <div class="rung">
+        <div class="rt"><span class="tier" data-t="B">Tier B</span><div class="rn">Independent structured</div></div>
+        <div class="rx">Security vendors, threat feeds, certificate transparency, recognised business databases, blockchain analytics.</div>
+        <span class="rp">Needs two independent</span>
+      </div>
+      <div class="rung">
+        <div class="rt"><span class="tier" data-t="C">Tier C</span><div class="rn">Consumer evidence</div></div>
+        <div class="rx">Complaint boards, review platforms, scam trackers. Read for pattern, never for volume.</div>
+        <span class="rp">Corroborates only</span>
+      </div>
+      <div class="rung">
+        <div class="rt"><span class="tier" data-t="D">Tier D</span><div class="rn">Open web</div></div>
+        <div class="rx">News, forums, blogs, social. Labelled community intelligence, never verified fact.</div>
+        <span class="rp">Context only</span>
+      </div>
+      <div class="rung">
+        <div class="rt"><span class="tier" data-t="4orm">4orm</span><div class="rn">Proprietary</div></div>
+        <div class="rx">Shared infrastructure, reused beneficiaries, cloned sites, recycled documents, claim drift. Built from what every previous check learned.</div>
+        <span class="rp yes">Two signals can</span>
+      </div>
+    </div>
+
+    <div class="sechead kb-rv" style="margin-top:56px">
+      <div>
+        <div class="lbl gold">Scoring</div>
+        <h2>There is no trust score, and there never will be.</h2>
+        <p>A single number out of a hundred gets read as permission. So the console carries two dials that say what they actually measure, and states the conclusion in words.</p>
+      </div>
+    </div>
+    <div class="twobox kb-rv">
+      <div class="tb bad">
+        <div class="th">What we refuse to show</div>
+        <div class="tv">Trust score 81/100</div>
+        <div class="tx">Nobody reads that as "eighty-one per cent of our checks completed cleanly". Everybody reads it as "4orm says they're fine". A number that gets misread as an endorsement is worse than no number at all.</div>
+      </div>
+      <div class="tb good">
+        <div class="th">What the dials show instead</div>
+        <div class="tv">Identity confidence<br>Evidence coverage</div>
+        <div class="tx">One says how sure we are it is the same party. The other says how much of the picture we actually reached. Then the verdict is a sentence, not a score. Green never means 4orm guarantees anyone.</div>
+      </div>
+    </div>
+    <div class="disc kb-rv" style="margin-top:2px;border-radius:0 0 var(--r-lg) var(--r-lg);border-top:none">
+      Below fifty per cent coverage the console will not conclude green. But coverage never buries a finding: a regulator caution listing produces a red result at forty-five per cent coverage exactly as it does at ninety-five. Thin evidence cannot clear anyone. It can still condemn.
+    </div>
+  </div>
+</section>
+
+<div class="dirscrim" id="dirScrim"></div>
+<div class="dirbox" id="dirBox" role="dialog" aria-modal="true" aria-label="Support directory">
+  <div class="dirhd">
+    <button class="dirback" type="button" id="dirBack">&larr; All folders</button>
+    <div>
+      <div class="dt" id="dirTitle">Help me find support</div>
+    </div>
+    <div class="dx" id="dirSub">Every number below was checked against the organisation's own published page today. Nothing here is a paid referral.</div>
+    <button class="dirclose" type="button" id="dirClose">Close</button>
+  </div>
+  <div class="dirbody" id="dirBody"></div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="footin">
+      <div><div class="lbl gold">4orm Finance</div><div class="fl" style="margin-top:9px">Know before you send</div></div>
+      <div>
+        <a class="fl" href="#network" style="display:block">Source network</a>
+        <a class="fl" href="#categories" style="display:block">Categories</a>
+        <a class="fl" href="#scoring" style="display:block">Scoring</a>
+      </div>
+      <div><a class="fl" href="#console" style="display:block">Run a check</a></div>
+    </div>
+    <p class="note">4orm reports what public records show. A red result means material contradictions were found in the records we checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person. Green never means 4orm certifies, endorses or guarantees anyone. Every record in a result carries its source, its date and the words it actually says, so you can check it yourself. Counts on this console describe the opening connector set and the categories it covers, not a live production system.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================ network state ============================ */
+var NET = {
+  connectors: 34,
+  tierA: 25, tierB: 4, tierC: 5,
+  directFeed: 14,
+  reads: [
+    ["46,466", "Alerts in IOSCO I-SCAN, retrieved 25 Aug 2026"],
+    ["130", "Jurisdictions in the IOSCO network", "+"],
+    ["9", "Verification categories"],
+    ["90", "National authorities contributing to I-SCAN", "+"]
+  ],
+  stats: [
+    ["34","","Connectors in the opening set",74,"a","25 of them authoritative"],
+    ["14","","Direct feeds","41","a","documented API or structured feed"],
+    ["130","+","Jurisdictions reachable",99,"a","99% of world securities markets, via IOSCO"],
+    ["46,466","","Regulator alerts searchable",100,"c","IOSCO I-SCAN, 90+ national authorities"],
+    ["9","","Checks run on every search",100,"a","each returns evidence or a published gap"]
+  ],
+  bars: [
+    ["Canada", 11, "a"],
+    ["United States", 5, "a"],
+    ["Web and cyber", 5, "b"],
+    ["Consumer evidence", 5, "c"],
+    ["Sanctions", 4, "a"],
+    ["United Kingdom", 3, "a"],
+    ["Global regulatory", 1, "a"]
+  ],
+  foot: "The opening set is 34 connectors: 25 authoritative, 4 independent structured, 5 consumer. It expands through the IOSCO member network rather than an invented country list. The hard problem is permissions, not engineering. Every connector carries its commercial-use terms from the day it is registered."
+};
+
+/* ======================= the nine categories ======================= */
+var CATS = [
+  {id:"01", key:"C1", name:"Identity & existence",
+   q:"Does this company or person actually exist, and are we looking at the right one?",
+   blurb:"Corporate registries and beneficial ownership, home jurisdiction first.",
+   rule:"No registry record anywhere for a party soliciting money is <b>red</b>. A record that is dissolved, struck off or in default is <b>red</b>. A record found but not attributable with 85% confidence is <b>grey</b>, never green. Same-name entities in different countries are never silently merged.",
+   src:[
+    ["Corporations Canada / Canada's Business Registries","CA","A","Web","open","https://ised-isde.canada.ca/cc/lgcy/fdrlCrpSrch.html"],
+    ["Federal beneficial ownership / Individuals with Significant Control","CA","A","Web","open",""],
+    ["Ontario Business Registry","CA-ON","A","Web","open",""],
+    ["BC Registry Services","CA-BC","A","Web","open",""],
+    ["Alberta Corporate Registry","CA-AB","A","Web","restricted",""],
+    ["Registraire des entreprises du Quebec","CA-QC","A","Web","open",""],
+    ["SEC EDGAR","US","A","REST API","open","https://www.sec.gov/edgar/search/"],
+    ["US Secretaries of State, 50 registries","US","A","Web","unknown",""],
+    ["UK Companies House","UK","A","API","open","https://find-and-update.company-information.service.gov.uk/"],
+    ["ASIC company registers","AU","A","Web","restricted",""],
+    ["ACRA","SG","A","Web","licence",""],
+    ["Hong Kong Companies Registry","HK","A","Web","licence",""],
+    ["New Zealand Companies Office","NZ","A","API","open",""],
+    ["Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones","OFFSHORE","A","Mixed","unknown",""]
+   ]},
+
+  {id:"02", key:"C2", name:"Registration & licensing",
+   q:"Are they permitted to do the specific thing they are offering?",
+   blurb:"The activity decides the register. Securities, payments, mortgage, insurance, real estate.",
+   rule:"A claimed licence number that the register does not return, or returns against a different legal name, is <b>red</b>. A claim of regulation with <b>no regulator named and no number given</b> is also <b>red</b>: an unfalsifiable claim of authorisation from a party soliciting funds is a finding in itself, not a gap.",
+   src:[
+    ["CSA National Registration Search","CA","A","Web","open","https://www.securities-administrators.ca/nrs/"],
+    ["CSA Disciplined Persons List","CA","A","Web","open",""],
+    ["CIRO AdvisorReport","CA","A","Web","restricted","https://www.ciro.ca/investors/advisorreport"],
+    ["FINTRAC MSB Registry and foreign MSB Registry","CA","A","Web","open","https://www.fintrac-canafe.canada.ca/msb-esm/msb-eng"],
+    ["Bank of Canada PSP Registry, applicants and enforcement","CA","A","Web","open","https://www.bankofcanada.ca/core-functions/retail-payments-supervision/"],
+    ["FSRA Ontario, mortgage and insurance licences","CA-ON","A","Web","open",""],
+    ["BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators","CA","A","Web","mixed",""],
+    ["RECO real estate register","CA-ON","A","Web","restricted",""],
+    ["FINRA BrokerCheck","US","A","Web","restricted","https://brokercheck.finra.org/"],
+    ["SEC Investment Adviser Public Disclosure","US","A","Web","open","https://adviserinfo.sec.gov/"],
+    ["CFTC RED List","US","A","Web","open","https://www.cftc.gov/check"],
+    ["NFA BASIC","US","A","Web","open","https://www.nfa.futures.org/basicnet/"],
+    ["NMLS Consumer Access","US","A","Web","restricted","https://www.nmlsconsumeraccess.org/"],
+    ["FinCEN MSB registration","US","A","Feed","open",""],
+    ["FCA Financial Services Register","UK","A","API","open","https://register.fca.org.uk/"],
+    ["ASIC Professional Registers","AU","A","Web","restricted",""],
+    ["MAS Financial Institutions Directory","SG","A","Web","open",""]
+   ]},
+
+  {id:"03", key:"C3", name:"Regulatory & enforcement",
+   q:"Has an authority already said something about them?",
+   blurb:"Caution lists, warning lists, enforcement, sanctions. The highest-yield check in the engine.",
+   rule:"A sanctions hit is <b>red, critical</b>, and the assessment stops being advisory. Naming on any regulator warning or caution list is <b>red</b>. Prior enforcement, a revoked licence or a cease-trade order is <b>red</b>. Clean across the lists actually queried is <b>green</b>, worded as no matching entry found in the lists checked.",
+   src:[
+    ["IOSCO I-SCAN, 46,466 alerts from 90+ authorities","GLOBAL","A","Web","open","https://www.iosco.org/i-scan/"],
+    ["CSA Investor Alerts","CA","A","Web","open","https://www.securities-administrators.ca/investor-alerts/"],
+    ["BCSC Investment Caution List","CA-BC","A","Web","open","https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list"],
+    ["ASC Investment Caution List","CA-AB","A","Web","open","https://www.asc.ca/en/enforcement/investment-caution-list"],
+    ["OSC investor warnings and alerts","CA-ON","A","Web","open","https://www.osc.ca/"],
+    ["AMF, FCNB, NSSC, MSC, FCAA and the territories","CA","A","Web","mixed",""],
+    ["CIRO Investor Alerts and disciplinary decisions","CA","A","Web","restricted",""],
+    ["FCA Warning List","UK","A","API","open","https://www.fca.org.uk/consumers/warning-list-unauthorised-firms"],
+    ["ASIC Investor Alert List","AU","A","JSON","open",""],
+    ["MAS Investor Alert List","SG","A","Web","open",""],
+    ["SEC and CFTC enforcement actions and investor alerts","US","A","Feed","open",""],
+    ["OFAC Specially Designated Nationals","US","A","Feed","open","https://sanctionssearch.ofac.treas.gov/"],
+    ["UN Security Council Consolidated List","GLOBAL","A","XML","open",""],
+    ["Canadian Consolidated Autonomous Sanctions List","CA","A","XML","open",""],
+    ["UK Sanctions List","UK","A","Feed","open",""],
+    ["Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts","CA / US","A","Feed","open",""]
+   ]},
+
+  {id:"04", key:"C4", name:"People & ownership",
+   q:"Who is actually behind it, and do the people the marketing names appear in any official record?",
+   blurb:"Directors, beneficial owners, disqualifications, registered individuals.",
+   rule:"A named executive with no corporate record and no verifiable public existence is <b>yellow</b> at minimum, and <b>red</b> when combined with a licensing failure. A director on a disqualification register is <b>red</b>. No people named at all by a party soliciting funds is <b>yellow</b>, signal <b>anonymous-operator</b>.",
+   src:[
+    ["Corporate registry officers and directors, all jurisdictions","GLOBAL","A","Mixed","mixed",""],
+    ["Corporations Canada, Individuals with Significant Control","CA","A","Web","open",""],
+    ["CSA Disciplined Persons List","CA","A","Web","open",""],
+    ["CIRO AdvisorReport, individual records","CA","A","Web","restricted",""],
+    ["UK Companies House, persons with significant control","UK","A","API","open",""],
+    ["UK disqualified directors register","UK","A","API","open",""],
+    ["ASIC banned and disqualified persons","AU","A","Web","restricted",""],
+    ["FINRA BrokerCheck, individual records","US","A","Web","restricted",""],
+    ["SEC IAPD, individual advisers","US","A","Web","open",""],
+    ["Professional directories and stated employment history","GLOBAL","D","Web","unknown",""]
+   ]},
+
+  {id:"05", key:"C5", name:"Legal & financial",
+   q:"Is there litigation, insolvency, or a public order, against the company or its directors personally?",
+   blurb:"Courts, tribunals, bankruptcy and insolvency registers.",
+   rule:"Open insolvency, a judgment or a public order is <b>red</b>. Litigation consistent with normal trading is <b>yellow</b> with context. Search the entity, its trading names, <b>and its directors personally</b>: the director history is where a fifteen-year operating claim usually breaks.",
+   src:[
+    ["CanLII, cases, legislation and commentary across jurisdictions","CA","A","Web","restricted","https://www.canlii.org/"],
+    ["Supreme Court of Canada and Federal Court","CA","A","Web","open",""],
+    ["Provincial courts and tribunals","CA","A","Web","mixed",""],
+    ["Securities tribunals and the Competition Tribunal","CA","A","Web","open",""],
+    ["Office of the Superintendent of Bankruptcy","CA","A","Web","restricted",""],
+    ["CCAA proceedings and Licensed Insolvency Trustee records","CA","A","Web","open",""],
+    ["PACER","US","A","API","licence","https://pacer.uscourts.gov/"],
+    ["CourtListener","US","B","API","open","https://www.courtlistener.com/"],
+    ["US bankruptcy courts","US","A","Web","licence",""],
+    ["UK Insolvency Service and Companies House insolvency","UK","A","API","open",""],
+    ["ASIC insolvency notices","AU","A","Web","restricted",""]
+   ]},
+
+  {id:"06", key:"C6", name:"Web & digital identity",
+   q:"What does the infrastructure say that the marketing does not?",
+   blurb:"Domain registry, hosting, certificates, mail configuration, threat feeds, clone detection.",
+   rule:"<b>Domain age below claimed operating history is red</b>, and it is stated in the consumer's language: they say twelve years, the domain was registered forty-three days ago. A domain under 180 days on a party soliciting funds is <b>yellow</b> baseline. Three or more independent threat feeds is <b>red</b>. A shared nameserver or IP with an entity already assessed red is <b>red</b>.",
+   src:[
+    ["ICANN RDAP, the definitive source for gTLD registration since 2025","GLOBAL","A","API","open","https://lookup.icann.org/"],
+    ["Registrar records, DNS history, nameserver and IP attribution","GLOBAL","A","API","open",""],
+    ["Certificate transparency logs","GLOBAL","B","Feed","open",""],
+    ["Google Web Risk, the commercial path; free Safe Browsing is non-commercial","GLOBAL","B","API","licence","https://cloud.google.com/web-risk"],
+    ["VirusTotal URL analysis","GLOBAL","B","API","licence","https://www.virustotal.com/"],
+    ["urlscan.io scan, result and historical search","GLOBAL","B","API","licence","https://urlscan.io/"],
+    ["PhishTank, OpenPhish, URLhaus, Spamhaus, AbuseIPDB","GLOBAL","B","Feed","mixed",""],
+    ["Censys, Shodan, SecurityTrails","GLOBAL","B","API","licence",""],
+    ["SPF, DKIM, DMARC and MX configuration","GLOBAL","A","DNS","open",""],
+    ["HTML and favicon similarity against the 4orm corpus","4orm","4orm","Internal","open",""]
+   ]},
+
+  {id:"07", key:"C7", name:"Consumer experience",
+   q:"What are people saying, and is it real?",
+   blurb:"One-star reviews first. Cluster by mechanic, count platforms, never volume.",
+   rule:"<b>Read the negatives first.</b> Positive reviews are cheap to manufacture; negative ones are not, because nobody is paid to write one. Cluster the accounts by the <b>mechanic</b> - what was actually done to the person - and count <b>independent platforms</b>, not reviews. Three or more platforms carrying the same named mechanic is <b>red</b> on combination with any Tier A or B adverse record, <b>yellow</b> standing alone. A manufactured positive corpus is <b>yellow</b> minimum. A thin or absent corpus is <b>grey</b>, never green.",
+   src:[
+    ["Trustpilot","GLOBAL","C","API","licence",""],
+    ["Sitejabber","GLOBAL","C","Web","unknown",""],
+    ["BBB business profiles and BBB Scam Tracker","US / CA","C","Web","licence","https://www.bbb.org/scamtracker"],
+    ["Google Reviews, including the suspicious-review-activity flag","GLOBAL","B","API","licence",""],
+    ["ComplaintsBoard, Ripoff Report, PissedConsumer","GLOBAL","C","Web","unknown",""],
+    ["Reviews.io, ResellerRatings, Feefo, TrustBurn, Yelp","GLOBAL","C","Mixed","unknown",""],
+    ["Forex Peace Army, including investigated and blacklisted","GLOBAL","C","Web","unknown",""],
+    ["WikiFX, FXEmpire, BrokersView, DailyForex, Myfxbook","GLOBAL","C","Web","unknown",""],
+    ["Cryptwerk and Bitcointalk scam accusations","GLOBAL","D","Web","unknown",""],
+    ["ScamAdviser, ScamDoc, Scam Detector","GLOBAL","C","API","licence",""],
+    ["Chainabuse and CryptoScamDB","GLOBAL","C","API","open","https://www.chainabuse.com/"],
+    ["California DFPI Crypto Scam Tracker and state equivalents","US","A","Web","open","https://dfpi.ca.gov/consumers/crypto/crypto-scam-tracker/"],
+    ["CFPB Consumer Complaint Database","US","C","API","open","https://www.consumerfinance.gov/data-research/consumer-complaints/"],
+    ["FTC public fraud datasets","US","C","Feed","open",""],
+    ["Canadian Anti-Fraud Centre material","CA","C","Web","open","https://antifraudcentre-centreantifraude.ca/"],
+    ["Action Fraud UK, Scamwatch AU, econsumer.gov","UK / AU / GLOBAL","C","Web","open",""],
+    ["Reddit: r/Scams, r/Forex, r/CryptoCurrency, national finance subs","GLOBAL","D","API","restricted",""],
+    ["Bogleheads, Quora, trade forums, public Telegram and Discord","GLOBAL","D","Web","unknown",""],
+    ["Glassdoor and Indeed - does this company have any staff at all?","GLOBAL","C","Web","restricted",""]
+   ]},
+  {id:"08", key:"C8", name:"Transaction & payment",
+   q:"Does the money go where the consumer thinks it goes?",
+   blurb:"Beneficiary, bank, jurisdiction, wallet. Runs only when payment instructions are supplied.",
+   rule:"<b>Beneficiary legal name not equal to the entity being verified is red, critical, regardless of every other category being green.</b> This is the finding that saves the money. A third-party or personal-name beneficiary is <b>red</b>. A wallet labelled high risk is reported as a label held by a third party, never as a verdict.",
+   src:[
+    ["Beneficiary legal name against the entity being verified","4orm","4orm","Internal","open",""],
+    ["IBAN and SWIFT country validation against claimed jurisdiction","GLOBAL","A","API","open",""],
+    ["Intermediary banks and named third-party processors","GLOBAL","B","Manual","unknown",""],
+    ["Chainabuse","GLOBAL","C","API","open","https://www.chainabuse.com/"],
+    ["Etherscan and chain explorers, first-seen and address reuse","GLOBAL","B","API","licence",""],
+    ["Chainalysis, TRM Labs, Elliptic, Scorechain","GLOBAL","B","API","licence",""]
+   ]},
+
+  {id:"09", key:"C9", name:"4orm intelligence",
+   q:"What can only 4orm see?",
+   blurb:"Proprietary, privacy-protected patterns. The reason this is a business and not a search wrapper.",
+   rule:"These signals corroborate, and they rarely stand alone. <b>beneficiary-reuse</b> and <b>infrastructure-cluster</b> against an entity already assessed red are the two that can carry red on their own strength. Every run writes back: check <i>n</i> is better than check <i>n-1</i> because check <i>n-1</i> happened.",
+   src:[
+    ["search-velocity: a significant rise in independent verifications of this party","4orm","4orm","Internal","open",""],
+    ["identifier-reuse: one phone, email, wallet or address across differently-named entities","4orm","4orm","Internal","open",""],
+    ["beneficiary-reuse: independently submitted documents naming the same receiving party","4orm","4orm","Internal","open",""],
+    ["site-cloning: structural or favicon similarity to previously assessed entities","4orm","4orm","Internal","open",""],
+    ["document-fingerprint: the same proposal uploaded under other brand names","4orm","4orm","Internal","open",""],
+    ["identity-mutation: the entity previously operated under another name or domain","4orm","4orm","Internal","open",""],
+    ["claim-drift: licence number, address or founding year changed since the last check","4orm","4orm","Internal","open",""],
+    ["infrastructure-cluster: shared nameservers, IP, ASN or registrar with prior red entities","4orm","4orm","Internal","open",""]
+   ]}
+];
+
+/* ==================== seeded corpus, retrieved 25 Aug 2026 ==================== */
+var CORPUS = {
+"investhelm.com": {
+  name:"INVESTHELM", domain:"investhelm.com", verdict:"RED", headline:"High risk",
+  statement:"Material adverse information and serious contradictions were identified. Do not send money to this party.",
+  idc:96, cov:45,
+  reads:[["14","Sources checked"],["5","Jurisdictions touched"],["21","Verified facts"],["7","Concerns"]],
+  stats:[
+    ["14","","Sources returning a result",61,"a","of 23 that should have applied"],
+    ["7","","Authoritative records",50,"a","two regulator listings, four registry records, one central bank"],
+    ["8","","Claims cross-examined",100,"a","every one contradicted by the record"],
+    ["7","","Material issues",100,"c","two critical, five high"],
+    ["9","","Sources not reached",39,"n","all nine named further down this page"]
+  ],
+  bars:[["Tier A, authoritative",7,"a"],["Tier B, structured",3,"b"],["Tier D, open web",4,"c"],["Sources not reached",9,"n"],["Claims cross-examined",8,"a"],["Material issues",7,"a"]],
+  barFoot:"Fourteen sources returned a definitive result. Seven are authoritative: two regulator listings, four registry records and one statement from a central bank. Nine sources that should have been reached were not, and every one of them is named further down this page.",
+  cats:{
+    C1:{state:"RED",sum:"No legal entity is named anywhere. There is nothing to look up.",
+      ev:[{t:"B",src:"investhelm.com, the site's own published claims",when:"25 Aug 2026",
+        find:"No legal entity, registration number, registered office, phone or email is published anywhere on the site.",
+        quote:"operates under full regulatory oversight; 85% Accuracy; Bank-Level Security; Major credit cards, bank transfers, and PayPal; (c) 2026 Investhelm",url:"https://investhelm.com"}]},
+    C2:{state:"RED",sum:"Claims regulatory oversight. Names no regulator, gives no licence number. Not registered.",
+      ev:[{t:"A",src:"BC Securities Commission, Investment Caution List",when:"25 Aug 2026",
+        find:"Listed on the Investment Caution List, added 14 July 2026.",
+        quote:"This company is not registered with the BC Securities Commission.",url:"https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list/2026/investhelm"}]},
+    C3:{state:"RED",sum:"On a Canadian securities regulator's caution list, and carried nationally.",
+      ev:[{t:"A",src:"BC Securities Commission, Investment Caution List",when:"25 Aug 2026",
+        find:"Added to the Investment Caution List on 14 July 2026.",
+        quote:"This company is not registered with the BC Securities Commission. If you have been approached by, or referred to, this entity, you should proceed with extreme caution and be aware of the risk before handing over any money.",url:"https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list/2026/investhelm"},
+       {t:"A",src:"Canadian Securities Administrators, Investor Alerts",when:"25 Aug 2026",
+        find:"National investor alert published 15 July 2026. Issuing regulator: BCSC.",
+        quote:"Investhelm - https://investhelm.com - British Columbia Securities Commission - July 15, 2026",url:"https://www.autorites-valeurs-mobilieres.ca/investor-alerts/investhelm/"}]},
+    C4:{state:"RED",sum:"No director, officer or founder is named. The only people attached to it are impersonated.",
+      ev:[{t:"A",src:"Bank of Canada, media relations",when:"25 Aug 2026",
+        find:"The Bank of Canada states the investment video featuring its Governor is fake.",
+        quote:"This video is fake. To help Canadians avoid these kinds of scams, we encourage people to check the Bank's official channels on social media as well as our website for genuine information from the Bank.",url:"https://www.thecanadianpressnews.ca/fact_checking/ad-for-investment-platform-featuring-bank-of-canada-governor-tiff-macklem-is-fake/article_7ef558ec-3a69-5494-8528-dba3f6102b5a.html"}]},
+    C5:{state:"GREY",sum:"Not assessable. Court and insolvency registers key on a legal entity name, and none exists.",ev:[]},
+    C6:{state:"RED",sum:"Domain 184 days old. 13 of 29 security sources report warnings. Randomised nameservers.",
+      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+        find:"Domain created 22 February 2026. 184 days old at the time of this check.",
+        quote:"registration 2026-02-22T18:15:58Z; last changed 2026-04-04T08:07:34Z; expiration 2027-02-22T18:15:58Z; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; client transfer prohibited",url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"},
+       {t:"B",src:"Threat aggregation across 29 security sources",when:"25 Aug 2026",
+        find:"13 of 29 sources report a warning. Phishing signals present. Certificate valid for a 90 day window.",
+        quote:"Trust score 1/100; 13 blacklist detections and phishing-related signals; hosting Private Layer INC, Bellinzona, Switzerland; IP 179.43.182.250; SSL valid June 4 to September 2, 2026; Do not enter passwords or payment data",url:"https://gridinsoft.com/online-virus-scanner/url/investhelm-com"}]},
+    C7:{state:"RED",sum:"The favourable review material is manufactured, and the same template runs under four brand names.",
+      ev:[{t:"D",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
+        find:"An identical review template promotes Investhelm, Nexlares, Bay Assetholm and Cedar Assetgrove. Community intelligence, not verified fact. Promoted to a red result only because Tier A registry records corroborate the cluster.",
+        quote:"Tiff Macklem Investhelm Review, Scam or Legit? | Tiff Macklem Bay Assetholm Review, Scam or Legit? | Tiff Macklem Nexlares Review, Scam or Legit? | Tiff Macklem Cedar Assetgrove Review, Scam or Legit?",url:""},
+       {t:"D",src:"Promotional review page",when:"25 Aug 2026",
+        find:"The source of the impossible operating history claims and the fabricated endorsement narrative.",
+        quote:"$350 to get started; average investor takes home between $2,800 and $4,500 per month; users collectively earned over $1.35 billion; 400,000 Canadians are already using; the platform is legal, it operates in Canada",url:""}]},
+    C8:{state:"GREY",sum:"Not run. No payment instructions were supplied.",ev:[]},
+    C9:{state:"RED",sum:"Shares all three nameservers and the registrar with a second brand running the same playbook.",
+      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+        find:"nexlares.com shares all three nameservers and the registrar with investhelm.com. Two brands, one operator.",
+        quote:"creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM",url:"https://rdap.verisign.com/com/v1/domain/nexlares.com"},
+       {t:"B",src:"nexlares.com, the sibling brand's published claims",when:"25 Aug 2026",
+        find:"The sibling brand repeats the same unfalsifiable registration claim, with no number and no regulator named.",
+        quote:"Nexlares is an officially registered company in Canada; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",url:"https://nexlares.com"}]}
+  },
+  claims:[
+    {q:"400,000 Canadians are already using the platform",s:"ICANN RDAP, Verisign registry",r:"Domain investhelm.com was created 22 February 2026",v:"RED"},
+    {q:"Users collectively earned over $1.35 billion in 2025",s:"ICANN RDAP, Verisign registry",r:"The domain did not exist at any point during 2025",v:"RED"},
+    {q:"Operates under full regulatory oversight",s:"BC Securities Commission",r:"Not registered with the BC Securities Commission. Listed 14 July 2026",v:"RED"},
+    {q:"The platform is legal, it operates in Canada",s:"Canadian Securities Administrators",r:"Investor alert published 15 July 2026, issuing regulator BCSC",v:"RED"},
+    {q:"The Governor of the Bank of Canada discussed the platform on air",s:"Bank of Canada, media relations",r:"This video is fake, per the Bank's Director of Media Relations",v:"RED"},
+    {q:"Bank-level security, SSL encryption",s:"Certificate record, 29 source threat feed",r:"90 day certificate window; 13 of 29 sources report phishing signals",v:"RED"},
+    {q:"Operates as an identifiable business in Canada",s:"The site's own pages",r:"No legal entity, registration number, address, phone or email published",v:"RED"},
+    {q:"Independent reviews attest to the platform",s:"Domain dates against publication dates",r:"Favourable content appears within days of registration, under a template reused for three other brands",v:"RED"}
+  ],
+  issues:[
+    {t:"A Canadian securities regulator has already warned about this party.",x:"The BC Securities Commission added Investhelm to its Investment Caution List on 14 July 2026, and the Canadian Securities Administrators carried it nationally the following day.",sev:"critical",tier:"A"},
+    {t:"The operating history is impossible.",x:"Claimed 2025 earnings of $1.35 billion and 400,000 existing Canadian users, against a domain created on 22 February 2026. The platform is claiming a payout history from a year in which it did not exist.",sev:"critical",tier:"A"},
+    {t:"The regulatory claim is unfalsifiable by design.",x:"Operates under full regulatory oversight names no regulator and gives no licence number. A party soliciting deposits that will not say who authorises it has told you something.",sev:"high",tier:"A"},
+    {t:"The endorsement is fabricated, and the Bank of Canada has said so.",x:"Promotional material stages a confrontation between the Governor of the Bank of Canada and a well known television investor over this platform. The Bank's media relations director: this video is fake.",sev:"high",tier:"A"},
+    {t:"There is no legal person behind it.",x:"No entity name, registration number, registered office, officers, phone or email, while accepting credit cards, bank transfers and PayPal.",sev:"high",tier:"B"},
+    {t:"The infrastructure is disposable, and it is shared.",x:"nexlares.com runs on the identical three nameservers through the identical registrar, and repeats the same unfalsifiable claim shape. Two brands, one operator.",sev:"high",tier:"A"},
+    {t:"The reputation was manufactured before there was anything to review.",x:"The same review template promotes four brands, each within days of its own domain registration.",sev:"high",tier:"C"}
+  ],
+  bys:[
+    "Confirm the warning yourself. Go to bcsc.bc.ca, open the Investment Caution List and search Investhelm. It is there, added 14 July 2026. Two minutes, and you do not have to take our word for any of this.",
+    "Ask them three questions in writing. What is your legal entity name and registration number? Which regulator authorises you, and what is your licence number? What name will appear on the receiving account? A real firm answers all three in one email.",
+    "If you have already paid, move today. Credit card and PayPal dispute windows close. Bank transfer and crypto have no recovery path. Report it to the Canadian Anti-Fraud Centre and call your bank."
+  ],
+  reviews:{checked:0,carrying:0,reports:0,state:"manufactured",
+    note:"No organic negative corpus exists for this party. The only review content found is manufactured: the same template promoting four different brand names, each published within days of its own domain registration. On a domain 184 days old that is what you would expect - complainants have not surfaced yet. Read it as an absence of evidence, not as a clean record. None of the nineteen review platforms behind this check were individually queried on this run; every one of them is listed in the coverage gaps below.",
+    rows:[]},
+  gaps:[
+    ["CSA National Registration Search","No machine readable endpoint"],
+    ["CIRO AdvisorReport and Investor Alerts","Not queried this run"],
+    ["IOSCO I-SCAN","Not queried this run"],
+    ["OFAC, UN, Canadian and UK sanctions","Not queried this run"],
+    ["Corporate registries, Canada and international","No legal entity name to query with"],
+    ["CanLII, courts, insolvency registers","No legal entity name to query with"],
+    ["FCA, ASIC, MAS, SEC, FINRA, CFTC, NFA","No foreign regulator was claimed"],
+    ["BBB, Trustpilot, Forex Peace Army, Google Places","Not queried this run"],
+    ["Wallet and beneficiary analytics","No payment instructions supplied"]
+  ]
+},
+
+"nexlares.com": {
+  name:"NEXLARES", domain:"nexlares.com", verdict:"RED", headline:"High risk",
+  statement:"Material contradictions were identified, and this party shares infrastructure with an entity already on a Canadian regulator's caution list.",
+  idc:92, cov:31,
+  reads:[["7","Sources checked"],["4","Jurisdictions touched"],["9","Verified facts"],["4","Concerns"]],
+  stats:[
+    ["7","","Sources returning a result",44,"a","of 16 that should have applied"],
+    ["3","","Authoritative records",43,"a","all three from the domain registry"],
+    ["4","","Claims cross-examined",100,"a","every one contradicted by the record"],
+    ["4","","Material issues",100,"c","one critical, three high"],
+    ["9","","Sources not reached",56,"n","all nine named further down this page"]
+  ],
+  bars:[["Tier A, authoritative",3,"a"],["Tier B, structured",2,"b"],["Tier D, open web",2,"c"],["Sources not reached",9,"n"],["Claims cross-examined",4,"a"],["Material issues",4,"a"]],
+  barFoot:"Seven sources returned a definitive result. The decisive one is a registry record: all three nameservers and the registrar match a brand already on the BC Securities Commission caution list. Nine sources that should have been reached were not.",
+  cats:{
+    C1:{state:"RED",sum:"Claims to be a registered company in Canada. Gives no name, no number, no address.",
+      ev:[{t:"B",src:"nexlares.com, the site's own published claims",when:"25 Aug 2026",
+        find:"Claims Canadian registration without a legal entity name, a registration number, a regulator or a physical address.",
+        quote:"Nexlares is an officially registered company in Canada; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",url:"https://nexlares.com"}]},
+    C2:{state:"RED",sum:"An unfalsifiable registration claim: no registry named, no number given.",
+      ev:[{t:"B",src:"nexlares.com, the site's own published claims",when:"25 Aug 2026",
+        find:"An officially registered company in Canada, with nothing supplied that any register could confirm or refute.",
+        quote:"Nexlares is an officially registered company in Canada",url:"https://nexlares.com"}]},
+    C3:{state:"GREY",sum:"No caution listing found under this name. Most warning lists were not reached this run.",ev:[]},
+    C4:{state:"RED",sum:"Nobody named. Promoted using the same fabricated Bank of Canada endorsement.",
+      ev:[{t:"A",src:"Bank of Canada, media relations",when:"25 Aug 2026",
+        find:"The Bank of Canada states the investment video featuring its Governor is fake. The same template promotes this brand.",
+        quote:"This video is fake. To help Canadians avoid these kinds of scams, we encourage people to check the Bank's official channels on social media as well as our website for genuine information from the Bank.",url:"https://www.thecanadianpressnews.ca/fact_checking/ad-for-investment-platform-featuring-bank-of-canada-governor-tiff-macklem-is-fake/article_7ef558ec-3a69-5494-8528-dba3f6102b5a.html"}]},
+    C5:{state:"GREY",sum:"Not assessable. No legal entity name to query with.",ev:[]},
+    C6:{state:"RED",sum:"Domain 218 days old, on randomised nameservers shared with a caution-listed brand.",
+      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+        find:"Domain created 19 January 2026, on the same three nameservers and the same registrar as investhelm.com.",
+        quote:"creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; client transfer prohibited",url:"https://rdap.verisign.com/com/v1/domain/nexlares.com"}]},
+    C7:{state:"YELLOW",sum:"Promoted by the same manufactured review template as three other brands.",
+      ev:[{t:"D",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
+        find:"The identical review template promotes this brand alongside Investhelm, Bay Assetholm and Cedar Assetgrove. Community intelligence, not verified fact.",
+        quote:"Tiff Macklem Nexlares Review, Scam or Legit? | Tiff Macklem Investhelm Review, Scam or Legit?",url:""}]},
+    C8:{state:"GREY",sum:"Not run. No payment instructions were supplied.",ev:[]},
+    C9:{state:"RED",sum:"Infrastructure cluster with investhelm.com, which is already on the BCSC caution list.",
+      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+        find:"All three nameservers and the registrar match investhelm.com, added to the BC Securities Commission Investment Caution List on 14 July 2026.",
+        quote:"NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; registrar NETIM SAS (IANA 1519)",url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"}]}
+  },
+  claims:[
+    {q:"Nexlares is an officially registered company in Canada",s:"The site's own pages",r:"No entity name, registration number, registry or regulator is given",v:"RED"},
+    {q:"An established trading platform",s:"ICANN RDAP, Verisign registry",r:"Domain created 19 January 2026",v:"RED"},
+    {q:"An independent business",s:"ICANN RDAP, Verisign registry",r:"Shares all three nameservers and the registrar with a caution-listed brand",v:"RED"},
+    {q:"Endorsed by recognisable Canadian figures",s:"Bank of Canada, media relations",r:"This video is fake, per the Bank's Director of Media Relations",v:"RED"}
+  ],
+  issues:[
+    {t:"It shares infrastructure with a brand already on a regulator's caution list.",x:"All three nameservers and the registrar match investhelm.com, added to the BC Securities Commission Investment Caution List on 14 July 2026. Two brands, one operator.",sev:"critical",tier:"A"},
+    {t:"The registration claim cannot be checked, which is the point of it.",x:"An officially registered company in Canada, with no entity name, no number and no registry named. Nothing is supplied that any register could confirm or refute.",sev:"high",tier:"B"},
+    {t:"The domain is seven months old.",x:"Created 19 January 2026, on randomised nameservers with no branding, through a registrar shared with the sibling brand.",sev:"high",tier:"A"},
+    {t:"The promotion reuses a fabricated endorsement the Bank of Canada has publicly denied.",x:"The same review template runs under four brand names, all of them staging the Governor of the Bank of Canada.",sev:"high",tier:"C"}
+  ],
+  bys:[
+    "Ask for the legal entity name and the registration number, in writing. An officially registered company can produce both in one line. If they cannot, the claim was never true.",
+    "Search the BC Securities Commission Investment Caution List for its sibling, Investhelm. Same nameservers, same registrar, same promotional template, and it is already listed.",
+    "Do not send by bank transfer or crypto. Neither has a recovery path, and this party has given you nothing a regulator could be asked to stand behind."
+  ],
+  reviews:{checked:0,carrying:0,reports:0,state:"manufactured",
+    note:"No organic negative corpus. The same promotional review template runs under this brand and three others, each within days of its own domain registration. Seven months old, no complainants yet. That is a timing fact, not a clean record.",
+    rows:[]},
+  gaps:[
+    ["BCSC, ASC, OSC and provincial caution lists","Not queried this run"],
+    ["IOSCO I-SCAN","Not queried this run"],
+    ["CSA National Registration Search","No machine readable endpoint"],
+    ["Sanctions lists","Not queried this run"],
+    ["Corporate registries","No legal entity name to query with"],
+    ["Courts and insolvency registers","No legal entity name to query with"],
+    ["Threat feeds and certificate history","Not queried this run"],
+    ["Consumer complaint platforms","Not queried this run"],
+    ["Wallet and beneficiary analytics","No payment instructions supplied"]
+  ]
+}
+};
+
+/* ------------------------------------------------------------------ *
+ * SPECIMEN. Atlantic Global Wealth does not exist. Every name, figure,
+ * quote and date below is invented, and the page says so on screen. It
+ * is here to show what a populated report card looks like, because the
+ * two real entities in this corpus are too young to have produced one.
+ * Never present it as a finding about anybody.
+ * ------------------------------------------------------------------ */
+var SPECIMEN = {
+  name:"ATLANTIC GLOBAL WEALTH", domain:"atlanticglobalwealth.com", specimen:true,
+  verdict:"RED", headline:"High risk",
+  statement:"Material adverse information and serious contradictions were identified. Do not send money to this party.",
+  idc:91, cov:84,
+  reads:[["73","Sources checked"],["11","Jurisdictions touched"],["18","Verified facts"],["4","Concerns"]],
+  stats:[
+    ["73","","Sources returning a result",84,"a","of 87 that should have applied"],
+    ["31","","Authoritative records",42,"a","government, regulator, court or registry"],
+    ["6","","Claims cross-examined",100,"a","five contradicted by the record"],
+    ["4","","Material issues",100,"c","two critical, two high"],
+    ["14","","Sources not reached",16,"n","every one named further down this page"]
+  ],
+  bars:[["Tier A, authoritative",31,"a"],["Tier B, structured",18,"b"],["Tier C, consumer",19,"c"],["Tier D, open web",5,"c"],["Sources not reached",14,"n"],["Material issues",4,"a"]],
+  barFoot:"Seventy-three sources returned a definitive result across eleven jurisdictions. The decisive combination is a licensing mismatch, a domain younger than the claimed operating history, a beneficiary that is not the company being verified, and forty-three independent accounts describing the same withdrawal mechanic.",
+  cats:{
+    C1:{state:"GREEN",sum:"Company record found and the legal entity is verified.",ev:[]},
+    C2:{state:"RED",sum:"Claimed UK authorisation could not be verified against the register.",ev:[]},
+    C3:{state:"GREEN",sum:"No matching enforcement action or public warning found in the lists checked.",ev:[]},
+    C4:{state:"YELLOW",sum:"Two directors identified. One marketed executive not independently verified.",ev:[]},
+    C5:{state:"GREEN",sum:"No insolvency, judgment or public order identified.",ev:[]},
+    C6:{state:"RED",sum:"Domain registered 43 days ago against a claimed twelve year operating history.",ev:[]},
+    C7:{state:"RED",sum:"Forty-three independent accounts across five platforms describing the same withdrawal mechanic.",ev:[]},
+    C8:{state:"RED",sum:"Beneficiary name on the wire does not match the company being verified.",ev:[]},
+    C9:{state:"YELLOW",sum:"Unusual recent verification activity against this identifier.",ev:[]}
+  },
+  claims:[
+    {q:"Operating since 2012",s:"ICANN RDAP, domain registry",r:"Domain registered 43 days ago",v:"RED"},
+    {q:"FCA regulated, reference 827381",s:"FCA Financial Services Register",r:"Reference does not correspond to this legal entity",v:"RED"},
+    {q:"Office in London",s:"Corporate record and address checks",r:"Address is a virtual office shared with 340 companies",v:"YELLOW"},
+    {q:"John Smith, Chief Executive",s:"Corporate records and regulator individual records",r:"No filing or registration under that name for this entity",v:"YELLOW"},
+    {q:"Funds held by Atlantic Global Wealth",s:"Wire instructions supplied by the consumer",r:"Beneficiary is XYZ Holdings Ltd, a different legal entity",v:"RED"},
+    {q:"Canadian clients accepted",s:"CSA National Registration Search",r:"Not registered in any Canadian jurisdiction",v:"RED"}
+  ],
+  issues:[
+    {t:"The payment beneficiary is a different legal entity.",x:"The wire instructions name XYZ Holdings Ltd. The company you are dealing with is Atlantic Global Wealth Ltd. Nothing else on this page matters as much as that line.",sev:"critical",tier:"A"},
+    {t:"The licensing claim could not be verified.",x:"Reference 827381 does not correspond to Atlantic Global Wealth Ltd on the FCA register.",sev:"critical",tier:"A"},
+    {t:"Website history contradicts the operating-history claim.",x:"Twelve years of trading claimed on a domain registered 43 days ago.",sev:"high",tier:"A"},
+    {t:"Forty-three people describe the same withdrawal mechanic.",x:"Across five platforms that do not share a user base, in their own words, over five months.",sev:"high",tier:"C"}
+  ],
+  bys:[
+    "Call the FCA on 0800 111 6768 and ask them to confirm whether reference 827381 belongs to Atlantic Global Wealth Ltd. Two minutes, and it settles the whole question.",
+    "Ask in writing why the receiving account is in the name of XYZ Holdings Ltd rather than the company you are contracting with. There is no ordinary answer to that question.",
+    "Do not send by wire. If you have already sent one today, call your bank's fraud line now and ask for a recall before it settles."
+  ],
+  gaps:[["Cayman General Registry","Licence required"],["Two beneficial ownership registers","No public access"],["Three consumer platforms","Rate limited this run"]],
+  reviews:{
+    checked:11, carrying:5, reports:43, state:"organic",
+    note:"Eleven platforms swept, five carrying negative reports, forty-three accounts read. Positive reviews on the two largest platforms cluster in a single week and are treated as unverified. The negative corpus does not: it spans five months and five platforms that do not share a user base.",
+    rows:[
+      {id:"withdrawal-refused",label:"Deposits clear instantly. Withdrawals never complete.",pf:5,names:["Trustpilot","Sitejabber","Forex Peace Army","Reddit r/Scams","ComplaintsBoard"],n:31,quote:"Depositing took four seconds. I have been waiting nine weeks for a withdrawal and every time I ask it goes back to processing.",period:"Apr to Aug 2026"},
+      {id:"release-fee-demanded",label:"A fee demanded before the money can be released.",pf:4,names:["Trustpilot","Forex Peace Army","Reddit r/Scams","BBB Scam Tracker"],n:19,quote:"They told me I had to pay a 15% withholding tax up front before they could release my balance. I paid it. Then there was another one.",period:"May to Aug 2026"},
+      {id:"handler-vanished",label:"The account manager stopped replying at the withdrawal request.",pf:3,names:["Trustpilot","Sitejabber","Reddit r/Scams"],n:14,quote:"Marcus called me twice a week for two months. The day I asked to take money out he stopped answering and my emails bounced.",period:"Mar to Aug 2026"},
+      {id:"pressured-to-deposit-more",label:"Told a further deposit is needed to unlock the account.",pf:3,names:["Trustpilot","Forex Peace Army","ComplaintsBoard"],n:11,quote:"To upgrade to the tier that allows withdrawals I needed another eight thousand. That was when I understood.",period:"Apr to Jul 2026"},
+      {id:"recovery-approach",label:"Contacted afterwards by someone offering to recover the loss for a fee.",pf:2,names:["Reddit r/Scams","BBB Scam Tracker"],n:6,quote:"Three weeks after I posted about it, someone messaged me saying they were a recovery specialist and needed a retainer.",period:"Jun to Aug 2026"}
+    ]
+  }
+};
+
+var GREY = {
+  verdict:"GREY", headline:"Insufficient information",
+  statement:"We cannot reliably assess this party yet. Nothing was found that identifies it, and that is not the same as nothing being wrong.",
+  idc:0, cov:0,
+  reads:[["0","Sources checked"],["0","Jurisdictions touched"],["0","Verified facts"],["1","Unresolved question"]],
+  stats:[
+    ["0","","Sources returning a result",0,"a","nothing identified this party"],
+    ["0","","Authoritative records",0,"a","no registry record retrieved"],
+    ["0","","Claims cross-examined",0,"a","no claims could be bound to a source"],
+    ["0","","Material issues",0,"c","absence of evidence is not evidence of absence"],
+    ["9","","Categories unresolved",100,"n","grey is a result, not a failure"]
+  ],
+  bars:[["Tier A, authoritative",0,"a"],["Tier B, structured",0,"b"],["Tier D, open web",0,"c"],["Sources not reached",0,"n"],["Categories unresolved",9,"n"]],
+  reviews:{checked:0,carrying:0,reports:0,state:"absent",note:"No review corpus was reached, because nothing identified this party in the first place.",rows:[]},
+  barFoot:"Nothing resolved. Grey is a real result, not a failure: it means the console does not have enough of the picture to say anything honest yet.",
+  note:"This build carries a seeded evidence corpus of two entities, both retrieved from live public records on 25 August 2026. Anything outside that corpus returns grey, because inventing a result is the one thing this product must never do. Try investhelm.com or nexlares.com to see a full assessment."
+};
+
+var WAVES = [
+  {t:"Domain registry, threat feeds, corporate records, IOSCO I-SCAN, sanctions", tm:"Parallel, ~3s",
+   steps:["Resolving identifiers","Domain registry and certificates","Corporate registries and ownership","Regulator warning and caution lists","Sanctions and prohibited persons"]},
+  {t:"Licence registers, courts and insolvency, people and disqualifications, complaints, payment", tm:"Parallel, ~6s",
+   steps:["Licence and registration registers","Courts, insolvency and public orders","People and disqualifications","Consumer complaints and reviews","Threat feeds and phishing intelligence"]},
+  {t:"Claim extraction, cross-examination, proprietary signal match, scoring", tm:"~4s",
+   steps:["Extracting checkable claims","Binding claims to adjudicating sources","4orm proprietary signal match","Scoring and verdict"]},
+  {t:"Assemble the record, write the evidence store, update the entity graph", tm:"~2s",
+   steps:["Assembling the record","Writing the evidence store"]}
+];
+
+/* ======================= support directory ======================= */
+/* Every telephone number below was read from the organisation's own    */
+/* published contact page on 25 August 2026. No individual lawyers or   */
+/* firms are named: referral services are the responsible route.        */
+var DIR = [
+{ix:"01", n:"Report it", x:"Where a report actually goes on a record, and in what order to make them.",
+ intro:"Report before you chase. A report creates a file number, and a file number is what every later step - your bank, your card issuer, a lawyer - will ask you for. Reporting costs nothing and takes about fifteen minutes.",
+ items:[
+  {n:"Canadian Anti-Fraud Centre", w:"The national collection point for fraud reports in Canada. Report even if you did not lose money and even if you are not sure it was a fraud. They do not investigate your case individually, but the report feeds law enforcement and the caution lists.",
+   c:[["Phone","1-888-495-8501","tel"],["Hours","Mon to Fri, 10:00 to 16:45 Eastern"],["Web","https://antifraudcentre-centreantifraude.ca/report-signalez-eng.htm"]],
+   note:"Report to your local police as well. The Centre collects, police investigate."},
+  {n:"Your local police service", w:"File a report in the jurisdiction where you live. Ask for the file or occurrence number in writing before you hang up.",
+   c:[["Web","Search your municipality's police service online reporting page"]],
+   note:"Banks and card issuers routinely ask for a police file number before they will act on a dispute."},
+  {n:"Federal Trade Commission, United States", w:"For a party operating from or targeting the United States.",
+   c:[["Web","https://reportfraud.ftc.gov/"]]},
+  {n:"FBI Internet Crime Complaint Center", w:"For online investment fraud with a United States connection, especially where cryptocurrency is involved.",
+   c:[["Web","https://www.ic3.gov/"]]}
+ ]},
+
+{ix:"02", n:"Canadian securities regulators", x:"Who to tell when the party was selling an investment, and who can confirm registration.",
+ intro:"If somebody offered you an investment, the securities regulator in your province is the right authority. They can tell you whether the party is registered, and a complaint from you can put a party on a caution list where the next person will see it.",
+ items:[
+  {n:"Canadian Securities Administrators", w:"The umbrella body. Two tools matter: the National Registration Search, which tells you whether a party is registered anywhere in Canada, and the Investor Alerts list, which carries every province's warnings in one place.",
+   c:[["Search","https://www.securities-administrators.ca/nrs/"],["Alerts","https://www.securities-administrators.ca/investor-alerts/"]],
+   note:"Check registration first. It takes under a minute and settles most questions."},
+  {n:"BC Securities Commission", w:"For British Columbia. Runs the Investment Caution List and takes complaints online.",
+   c:[["Phone","1-800-373-6393","tel"],["Local","604-899-6854","tel"],["Email","inquiries@bcsc.bc.ca"],["Web","https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list"]],
+   note:"Whistleblower line: 1-866-227-2847."},
+  {n:"Alberta Securities Commission", w:"For Alberta. Runs its own Investment Caution List and publishes investor alerts.",
+   c:[["Phone","403-297-6454","tel"],["Web","https://www.asc.ca/en/enforcement/investment-caution-list"]]},
+  {n:"Ontario Securities Commission", w:"For Ontario. The Inquiries and Contact Centre answers registration questions and takes complaints from the public.",
+   c:[["Phone","1-877-785-1555","tel"],["Local","416-593-8314","tel"],["Hours","Mon to Fri, 08:30 to 17:00 Eastern"],["Web","https://www.osc.ca/en/about-us/contact-us"]]},
+  {n:"Canadian Investment Regulatory Organization", w:"For complaints about an investment dealer or a registered adviser. Also publishes AdvisorReport, which shows an individual's registration and disciplinary history.",
+   c:[["Phone","1-877-442-4322","tel"],["Report","https://www.ciro.ca/investors/advisorreport"],["Complaint","https://www.ciro.ca/office-investor/how-make-complaint"]]},
+  {n:"Other provinces and territories", w:"Quebec is the AMF. New Brunswick is FCNB. Saskatchewan is FCAA. Nova Scotia, Manitoba, Newfoundland and Labrador, Prince Edward Island, Yukon, Northwest Territories and Nunavut each have their own commission.",
+   c:[["Directory","https://www.securities-administrators.ca/about/contact-us/"]]}
+ ]},
+
+{ix:"03", n:"Banking, payments and money movement", x:"When the dispute is with a bank, a payment company or a money transfer business.",
+ intro:"A bank complaint has a required order: the firm first, then its internal ombudsman, then the external one. Skipping a step usually means being sent back to it.",
+ items:[
+  {n:"Ombudsman for Banking Services and Investments", w:"Independent, impartial, and free to consumers. Handles disputes with banks and investment firms after the firm's own complaint process has run its course. Works informally and confidentially.",
+   c:[["Phone","1-888-451-4519","tel"],["Email","ombudsman@obsi.ca"],["Web","https://www.obsi.ca/en/"]],
+   note:"Go to the firm first and get its final response in writing. OBSI will ask for it."},
+  {n:"Financial Consumer Agency of Canada", w:"Oversees federally regulated financial institutions and answers questions about your rights. It does not resolve individual complaints, but it will tell you where yours belongs.",
+   c:[["Phone","1-866-461-3222","tel"],["Francais","1-866-461-2232","tel"],["Web","https://www.canada.ca/en/financial-consumer-agency.html"]]},
+  {n:"FINTRAC money services business registry", w:"Anyone in the business of moving money or exchanging currency toward Canada must be registered. Search the name before you send.",
+   c:[["Search","https://www.fintrac-canafe.canada.ca/msb-esm/msb-eng"]],
+   note:"A money transfer business that is not on this registry is operating outside the law."},
+  {n:"Bank of Canada retail payments registry", w:"Payment service providers that hold end-user funds must be registered with the Bank of Canada. The registry also publishes applicants and enforcement information.",
+   c:[["Web","https://www.bankofcanada.ca/core-functions/retail-payments-supervision/"]]}
+ ]},
+
+{ix:"04", n:"If the money has already gone", x:"The recovery paths that still exist, ranked by how much time you have left.",
+ intro:"Recovery depends almost entirely on how you paid, and every route has a clock. Work down this list in order, today. Do not wait for a report to be actioned before starting a dispute.",
+ items:[
+  {n:"Credit card chargeback", w:"The strongest consumer protection that exists. Call the number on the back of the card and use the word chargeback. Card scheme rules generally give you a window measured from the transaction or from when the service was due, and the window closes.",
+   c:[["Do","Call your card issuer today"]],
+   note:"Ask the issuer to state the deadline for your specific dispute, in writing."},
+  {n:"PayPal dispute", w:"Open a dispute in the Resolution Centre. PayPal's buyer protection has its own time limit from the transaction date.",
+   c:[["Web","https://www.paypal.com/ca/smarthelp/home"]]},
+  {n:"Bank wire or e-transfer recall", w:"Call your branch immediately and ask for a recall or a fraud hold. A wire that has not yet settled at the receiving bank can sometimes be stopped. Once it settles, the odds fall sharply.",
+   c:[["Do","Call your bank's fraud line, not the general line"]],
+   note:"Hours matter here more than anywhere else on this page."},
+  {n:"Cryptocurrency", w:"There is no chargeback and no recall. A transaction confirmed on a public chain is final. Report the wallet address so it can be labelled, and treat anyone who contacts you offering to recover the funds for a fee as a second fraud.",
+   c:[["Report","https://www.chainabuse.com/"]],
+   note:"Recovery services that ask for an upfront fee are the most common follow-up fraud there is."},
+  {n:"Place a fraud alert on your credit file", w:"If you handed over identity documents, a date of birth, or a social insurance number, put an alert on both credit files. It is free and it makes new credit harder to open in your name.",
+   c:[["Equifax","1-800-465-7166","tel"],["TransUnion","1-800-663-9980","tel"]],
+   note:"Do both. They do not talk to each other."}
+ ]},
+
+{ix:"05", n:"Finding a lawyer", x:"How to get real legal advice without guessing at a name, and what it should cost.",
+ intro:"No directory should hand you the name of a lawyer it has not vetted, and this one will not. The responsible route is a law society referral service: they are run by the regulator of the profession, they match you to somebody who actually practises in the area, and the first consultation is short and cheap or free.",
+ items:[
+  {n:"British Columbia, Legal Referral Service", w:"Operated by Access Pro Bono. Connects you with a lawyer, notary or designated paralegal for an initial consultation of fifteen to thirty minutes.",
+   c:[["Phone","604-687-3221","tel"],["Web","https://www.accessprobono.ca/our-programs/legal-referral-service"]],
+   note:"A booking fee applies if you self-book online or if your household income was over $100,000 last year."},
+  {n:"Alberta, Find a Lawyer", w:"The Law Society of Alberta maintains a public lawyer directory searchable by name and location.",
+   c:[["Web","https://www.lawsociety.ab.ca/public/findalawyer/"]]},
+  {n:"Ontario, Law Society Referral Service", w:"The Law Society of Ontario runs a referral service for the public.",
+   c:[["Web","https://lso.ca/public-resources/finding-a-lawyer-or-paralegal"]]},
+  {n:"What to ask in the first call", w:"Have you handled recovery against an unregistered offshore party before? Realistically, what is recoverable and what is not? What will this cost me before we know whether recovery is possible? Is there a limitation period I am close to?",
+   c:[["Bring","Your report file numbers, the payment record, and every message"]],
+   note:"A lawyer who tells you recovery is likely before seeing where the money went is telling you what you want to hear."}
+ ]},
+
+{ix:"06", n:"International regulators", x:"When the party claims to be authorised somewhere other than Canada.",
+ intro:"A claimed foreign authorisation is checkable in about two minutes, and a great many of them do not survive the check. Each of these regulators publishes both a register of who is authorised and a warning list of who is not.",
+ items:[
+  {n:"United Kingdom, Financial Conduct Authority", w:"The Financial Services Register shows who is authorised. The Warning List names firms operating without authorisation. The consumer helpline will confirm a reference number over the phone.",
+   c:[["Phone","0800 111 6768","tel"],["Register","https://register.fca.org.uk/"],["Warnings","https://www.fca.org.uk/consumers/warning-list-unauthorised-firms"]],
+   note:"A licence number that does not match the legal name on the register is the single most common tell."},
+  {n:"United States, SEC and FINRA", w:"Investment Adviser Public Disclosure covers advisers. BrokerCheck covers brokers and includes disciplinary history. The CFTC RED List names foreign entities that appear to require registration and do not have it.",
+   c:[["Advisers","https://adviserinfo.sec.gov/"],["Brokers","https://brokercheck.finra.org/"],["RED List","https://www.cftc.gov/check"]]},
+  {n:"Australia, ASIC", w:"Professional registers plus an Investor Alert List of entities to avoid.",
+   c:[["Web","https://asic.gov.au/"]]},
+  {n:"Singapore, MAS", w:"The Financial Institutions Directory and the Investor Alert List.",
+   c:[["Web","https://www.mas.gov.sg/"]]},
+  {n:"Everywhere else, IOSCO I-SCAN", w:"One search across warnings submitted by regulators in more than 130 jurisdictions. It currently holds over 46,000 alerts.",
+   c:[["Web","https://www.iosco.org/i-scan/"]],
+   note:"Start here when you do not know which country's regulator to ask."}
+ ]},
+
+{ix:"07", n:"Search a registry yourself", x:"How to do the check properly, and what each kind of register can and cannot prove.",
+ intro:"Anyone can run these searches. The reason they get done badly is not difficulty, it is method. Six habits separate a search that settles the question from one that feels reassuring and proves nothing.",
+ steps:[
+  {t:"Search the legal name, not the brand.", x:"Registers index legal entities. Atlantic Global Wealth may trade under a name that appears nowhere in any filing. Ask them for the legal entity name and the registration number in writing, and search that. Refusal to provide it is itself the answer."},
+  {t:"Try at least four spellings.", x:"Registers do not match loosely. Drop the suffix, add the suffix, try Ltd and Limited and Inc, fold accents, and try the name without spaces. A nil result on one spelling is not a nil result."},
+  {t:"Match the register to the activity, not to the industry.", x:"A company can be validly incorporated and still have no permission to sell you an investment. Existence and authorisation are two different registers, and passing one says nothing about the other."},
+  {t:"Check the jurisdiction they claim, and the one they operate from.", x:"A firm claiming a London office, incorporated in Belize, banking in Cyprus and hosting in Switzerland is not necessarily fraudulent, but every one of those four is checkable and they should agree."},
+  {t:"Read the date on the record, not just the result.", x:"A registration that lapsed in 2023 still appears in some search results. So does a company that has been struck off. Look for status and last-filing date, not just the presence of a name."},
+  {t:"Check the domain age against the operating-history claim.", x:"Look up the domain at lookup.icann.org. A company claiming twelve years of trading on a domain registered six months ago has told you something no reference letter will undo. This is the fastest and most decisive check on this list."}
+ ],
+ foot:"None of these searches costs anything. Between them they answer most of the question, and the two that fail most often are licensing and payment destination."},
+
+{ix:"08", n:"Build your own evidence trail", x:"How to preserve what you have so it still counts in three months.",
+ intro:"Most people lose their case on evidence, not on merits. Screenshots without a URL and a timestamp are close to worthless, deleted messages cannot be recovered from the other side, and a website that made a claim last week will not be making it next week. Preserve first, argue later.",
+ steps:[
+  {t:"Capture the page, not the picture.", x:"Every screenshot must show the full URL bar and a visible date. Better still, print the page to PDF: the URL and the capture date get written into the footer automatically, and that is much harder to dispute."},
+  {t:"Keep the original email, with its headers.", x:"Do not forward it and do not paste it into a document. Save the original message file. The headers carry the true sending server, and they are the part that survives cross-examination."},
+  {t:"Save the registry record the day you look at it.", x:"Domain records, register entries and caution listings all change. Save each one as a PDF with the date you retrieved it, and note the exact URL you retrieved it from."},
+  {t:"Write down the payment instructions exactly as given.", x:"Beneficiary name, bank, account or IBAN, SWIFT, intermediary bank, wallet address, and the date you received them. If they changed the instructions partway through, that change is one of the most significant facts you have. Keep both versions."},
+  {t:"Keep a dated log in your own words.", x:"One line per event: what happened, when, who said what, and where the record of it is. Contemporaneous notes carry real weight, and memory reconstructed six months later does not."},
+  {t:"Do not delete anything, including your own messages.", x:"Not the chat, not the calls, not the messages you regret sending. A gap in the record is the first thing anyone on the other side will point at."}
+ ],
+ hint:"This is exactly the record 4orm keeps for you. Every check writes a timestamped evidence file with the source, the retrieval date and the words the record actually used, and it exports as a single document you can hand to a bank, a regulator or a lawyer. You can build the same trail by hand with the six steps above, and for one transaction that is often the right call.",
+ foot:"Nothing in this folder requires 4orm. The steps work on their own."}
+];
+
+/* ============================== engine ============================== */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function el(t,c,h){var n=document.createElement(t);if(c)n.className=c;if(h!==undefined)n.innerHTML=h;return n;}
+function id(x){return document.getElementById(x);}
+var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var ARC = 367.6;
+var MODE = "idle";
+var CURRENT = null;
+var OPEN = null;
+
+/* ---- clock ---- */
+(function(){
+  var c=id("clock");
+  function tick(){
+    var d=new Date();
+    function p(n){return (n<10?"0":"")+n;}
+    c.textContent=p(d.getUTCHours())+":"+p(d.getUTCMinutes())+":"+p(d.getUTCSeconds())+" UTC";
+  }
+  tick(); setInterval(tick,1000);
+})();
+
+/* ---- dial ticks ---- */
+(function(){
+  ["ticks1","ticks2"].forEach(function(gid){
+    var g=id(gid), ns="http://www.w3.org/2000/svg";
+    for(var i=0;i<=20;i++){
+      var maj = i%5===0;
+      var a=(135+i*13.5)*Math.PI/180;
+      var r1=maj?90:91, r2=maj?82:85;
+      var ln=document.createElementNS(ns,"line");
+      ln.setAttribute("x1",(100+r1*Math.cos(a)).toFixed(2));
+      ln.setAttribute("y1",(100+r1*Math.sin(a)).toFixed(2));
+      ln.setAttribute("x2",(100+r2*Math.cos(a)).toFixed(2));
+      ln.setAttribute("y2",(100+r2*Math.sin(a)).toFixed(2));
+      ln.setAttribute("class","dialtick"+(maj?" maj":""));
+      g.appendChild(ln);
+    }
+  });
+  [1,2].forEach(function(n){
+    var p=id("dial"+n);
+    p.style.strokeDasharray=ARC; p.style.strokeDashoffset=ARC;
+  });
+})();
+
+function countUp(node,to,suffix){
+  if(reduce){node.textContent=to+(suffix||"");return;}
+  var start=null,dur=1000,from=parseFloat(node.textContent)||0;
+  function f(ts){
+    if(!start)start=ts;
+    var p=Math.min(1,(ts-start)/dur), e=1-Math.pow(1-p,3);
+    node.textContent=Math.round(from+(to-from)*e)+(suffix||"");
+    if(p<1)requestAnimationFrame(f);
+  }
+  requestAnimationFrame(f);
+}
+function setDial(n,pct,unit,title,note){
+  id("dial"+n+"u").textContent=unit;
+  id("d"+n+"t").textContent=title;
+  id("dial"+n+"x").textContent=note;
+  countUp(id("dial"+n+"v"),pct,"%");
+  setTimeout(function(){ id("dial"+n).style.strokeDashoffset = ARC*(1-pct/100); },60);
+}
+function setReads(list){
+  var w=id("reads"); w.innerHTML="";
+  list.forEach(function(r){
+    var c=el("div","read");
+    c.innerHTML='<div class="v tnum">'+esc(r[0])+(r[2]?'<small>'+esc(r[2])+'</small>':'')+'</div><div class="t">'+esc(r[1])+'</div>';
+    w.appendChild(c);
+  });
+}
+function setStats(list){
+  var w=id("statstrip"); w.innerHTML="";
+  list.forEach(function(st){
+    var c=el("div","scell");
+    c.innerHTML='<div class="sv tnum">'+esc(st[0])+(st[1]?'<small>'+esc(st[1])+'</small>':'')+'</div>'+
+      '<div class="sl">'+esc(st[2])+'</div>'+
+      '<div class="sp"><i data-c="'+esc(st[4])+'"></i></div>'+
+      '<div class="sc">'+esc(st[5])+'</div>';
+    w.appendChild(c);
+    var i=c.querySelector(".sp i");
+    setTimeout(function(){ i.style.width=Math.max(0,Math.min(100,parseFloat(st[3])||0))+"%"; },90);
+  });
+}
+function renderWaves(){
+  var w=id("wavestrip"); w.innerHTML="";
+  WAVES.forEach(function(v,n){
+    var c=el("div","wcell");
+    c.setAttribute("data-w",n);
+    c.innerHTML='<div class="wtop"><span class="wi">0'+(n+1)+'</span><span class="wtm">'+esc(v.tm)+'</span></div>'+
+      '<div class="wt">'+esc(v.t)+'</div>'+
+      '<div class="wp"><i></i></div>'+
+      '<div class="wnow"></div>';
+    w.appendChild(c);
+  });
+}
+function setBars(list,foot){
+  var w=id("bars"); w.innerHTML="";
+  var max=Math.max.apply(null,list.map(function(b){return b[1];}))||1;
+  list.forEach(function(b){
+    var r=el("div","bar");
+    r.innerHTML='<div class="bt"><span class="bn">'+esc(b[0])+'</span><span class="bv">'+esc(b[1])+'</span></div>'+
+                '<div class="bg"><i data-c="'+esc(b[2])+'"></i></div>';
+    w.appendChild(r);
+    var i=r.querySelector("i");
+    setTimeout(function(){ i.style.width=Math.round(b[1]/max*100)+"%"; },80);
+  });
+  id("barFoot").textContent=foot;
+}
+
+/* ---- tiles ---- */
+function renderTiles(){
+  var w=id("tiles"); w.innerHTML="";
+  CATS.forEach(function(c){
+    var res = CURRENT && CURRENT.cats ? CURRENT.cats[c.key] : null;
+    var state = res ? res.state : "IDLE";
+    var b=el("button","tile");
+    b.type="button"; b.setAttribute("data-key",c.key);
+    b.setAttribute("aria-expanded", OPEN===c.key ? "true":"false");
+    if(OPEN===c.key) b.classList.add("sel");
+    var line = res ? res.sum : c.blurb;
+    var count = res ? ((res.ev.length||0)+(res.ev.length===1?" record":" records")) : (c.src.length+" registers");
+    var maxEv = 1;
+    if(CURRENT && CURRENT.cats){ for(var k in CURRENT.cats){ if(CURRENT.cats[k].ev.length>maxEv) maxEv=CURRENT.cats[k].ev.length; } }
+    var pct = res ? Math.round(res.ev.length/maxEv*100) : Math.min(100,Math.round(c.src.length/17*100));
+    b.innerHTML =
+      '<span class="tiletop"><span class="tileix">'+esc(c.id)+'</span>'+
+        '<span class="tilest" data-s="'+esc(state)+'">'+(state==="IDLE"?"READY":esc(state))+'</span>'+
+        '<span class="tiledot" data-s="'+esc(state)+'"></span></span>'+
+      '<span class="tilenm">'+esc(c.name)+'</span>'+
+      '<span class="tilex">'+esc(line)+'</span>'+
+      '<span class="tilebar"><i></i></span>'+
+      '<span class="tilefoot"><span class="tilecount">'+esc(count)+'</span><span class="tileopen">Open &rarr;</span></span>';
+    w.appendChild(b);
+    var bar=b.querySelector(".tilebar i");
+    setTimeout(function(){ bar.style.width=pct+"%"; },120);
+    b.addEventListener("click",function(){ toggleDrill(c.key); });
+  });
+}
+
+/* ---- drill ---- */
+function toggleDrill(key){
+  if(OPEN===key){ OPEN=null; id("drill").classList.remove("on"); id("drill").innerHTML=""; renderTiles(); return; }
+  OPEN=key; renderTiles(); renderDrill(key);
+}
+function renderDrill(key){
+  var c=null; for(var i=0;i<CATS.length;i++) if(CATS[i].key===key) c=CATS[i];
+  var res = CURRENT && CURRENT.cats ? CURRENT.cats[key] : null;
+  var d=id("drill");
+  var head =
+    '<div class="drillhd"><div>'+
+      '<div class="lbl gold">Category '+esc(c.id)+(res?' &middot; '+esc(res.state):'')+'</div>'+
+      '<div class="n">'+esc(c.name)+'</div>'+
+      '<div class="q">'+esc(c.q)+'</div>'+
+    '</div><button class="drillx" type="button" id="drillClose">Close</button></div>'+
+    '<div class="rule"><span class="rk"></span><span class="rx"><b>Decision rule.</b> '+c.rule+'</span></div>';
+
+  var body;
+  if(res){
+    body='<div style="padding:20px 24px"><div class="lbl" style="margin-bottom:14px">Evidence retrieved for this party</div><div class="evgrid">';
+    if(!res.ev.length){
+      body+='<div class="evnone">No evidence was retrieved for this category on this run. It is reported grey, not green, and it appears in the coverage gaps below.</div>';
+    } else {
+      res.ev.forEach(function(e){
+        body+='<div class="ev"><div class="evtop">'+
+          '<span class="tier" data-t="'+esc(e.t)+'">Tier '+esc(e.t)+'</span>'+
+          '<span class="evsrc">'+esc(e.src)+'</span>'+
+          '<span class="evwhen">'+esc(e.when)+'</span></div>'+
+          '<div class="evfind">'+esc(e.find)+'</div>'+
+          (e.quote?'<div class="evquote">'+esc(e.quote)+'</div>':'')+
+          (e.url?'<a class="evlink" href="'+esc(e.url)+'" target="_blank" rel="noopener noreferrer">Open the source record</a>':'')+
+        '</div>';
+      });
+    }
+    body+='</div><div class="lbl" style="margin:26px 0 14px">The registers behind this check</div></div>';
+  } else {
+    body='';
+  }
+
+  var rows='';
+  c.src.forEach(function(s){
+    var nm = s[5] ? '<a href="'+esc(s[5])+'" target="_blank" rel="noopener noreferrer">'+esc(s[0])+'</a>' : esc(s[0]);
+    rows+='<tr><td class="sname">'+nm+'</td>'+
+      '<td class="sj">'+esc(s[1])+'</td>'+
+      '<td><span class="tier" data-t="'+esc(s[2])+'">'+(s[2]==="4orm"?"4orm":"Tier "+esc(s[2]))+'</span></td>'+
+      '<td class="sm">'+esc(s[3])+'</td>'+
+      '<td><span class="use" data-u="'+esc(s[4])+'">'+esc(s[4])+'</span></td></tr>';
+  });
+  var table='<div class="srcscroll"><table class="srctbl"><thead><tr>'+
+    '<th>Source</th><th>Jurisdiction</th><th>Authority</th><th>Access</th><th>Commercial use</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+
+  var foot='<div class="drillfoot">Commercial use is recorded when a connector is registered, not when it is queried. Some public registers permit private, non-commercial search only, and those need a licence or a partnership rather than a scraper. That distinction is tracked per source from day one.</div>';
+
+  d.innerHTML=head+body+table+foot;
+  d.classList.add("on");
+  id("drillClose").addEventListener("click",function(){ toggleDrill(key); });
+  var top=d.getBoundingClientRect().top+window.pageYOffset-96;
+  if(d.getBoundingClientRect().top<80) window.scrollTo({top:top,behavior:reduce?"auto":"smooth"});
+}
+
+/* ---- identifier detection ---- */
+var ID_TYPES=["Company","Person","Website","Email","Phone","Wallet"];
+function detect(v){
+  v=(v||"").trim(); if(!v) return null;
+  if(/^(0x[a-fA-F0-9]{40}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{20,}|T[A-Za-z0-9]{33})$/.test(v)) return "Wallet";
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return "Email";
+  if(/^[+()\d][\d\s().-]{6,}$/.test(v)) return "Phone";
+  if(/^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(v)) return "Website";
+  var w=v.split(/\s+/);
+  if(w.length>=2&&w.length<=3&&/^[A-Z][a-z]+$/.test(w[0])&&/^[A-Z][a-z'-]+$/.test(w[w.length-1])) return "Person";
+  return "Company";
+}
+var idsEl=id("kbIds");
+ID_TYPES.forEach(function(t){var c=el("span","idchip",esc(t));c.setAttribute("data-t",t);idsEl.appendChild(c);});
+function paintIds(t){
+  var chips=idsEl.querySelectorAll(".idchip");
+  for(var i=0;i<chips.length;i++) chips[i].classList.toggle("on",chips[i].getAttribute("data-t")===t);
+}
+var input=id("kbInput"), go=id("kbGo");
+(function(){
+  var wide="Company, person, website, email, phone or wallet", narrow="Name, website, email or wallet";
+  function ph(){ input.placeholder = window.innerWidth<640 ? narrow : wide; }
+  ph(); window.addEventListener("resize",ph,{passive:true});
+})();
+input.addEventListener("input",function(){ paintIds(detect(input.value)); go.disabled=!input.value.trim(); });
+
+/* ---- scan ---- */
+var timers=[];
+function runScan(done){
+  timers.forEach(clearTimeout); timers=[];
+  renderWaves();
+  id("modeLbl").textContent="Sweeping";
+  var cells=id("wavestrip").querySelectorAll(".wcell");
+  var per = reduce ? 26 : 165;
+  var t = 0;
+  WAVES.forEach(function(v,n){
+    var cell=cells[n], bar=cell.querySelector(".wp i"), now=cell.querySelector(".wnow"), tm=cell.querySelector(".wtm");
+    v.steps.forEach(function(st,k){
+      t++;
+      (function(cell,bar,now,tm,st,k,total){
+        timers.push(setTimeout(function(){
+          cell.classList.add("run");
+          now.textContent=st;
+          bar.style.width=Math.round((k+1)/total*100)+"%";
+          if(k+1===total){
+            timers.push(setTimeout(function(){
+              cell.classList.remove("run"); cell.classList.add("done");
+              now.textContent=total+" of "+total+" complete";
+              tm.textContent="done";
+            }, reduce?10:220));
+          }
+        }, per*t));
+      })(cell,bar,now,tm,st,k,v.steps.length);
+    });
+  });
+  timers.push(setTimeout(done, per*(t+1)+(reduce?10:340)));
+}
+
+/* ---- result blocks ---- */
+function renderClaims(list){
+  var w=id("kbClaims"), keep=w.querySelector(".claimhead");
+  w.innerHTML=""; w.appendChild(keep);
+  list.forEach(function(c){
+    var r=el("div","claimrow");
+    r.innerHTML='<span class="cq">'+esc(c.q)+'</span><span class="cs">'+esc(c.s)+'</span>'+
+      '<span class="cr">'+esc(c.r)+'</span><span class="cv" data-s="'+esc(c.v)+'">'+esc(c.v)+'</span>';
+    w.appendChild(r);
+  });
+}
+function renderIssues(list){
+  var w=id("kbIssues"); w.innerHTML="";
+  list.forEach(function(is,i){
+    var b=el("div","issue");
+    b.innerHTML='<span class="n">'+(i<9?"0":"")+(i+1)+'</span><span class="b">'+
+      '<span class="t">'+esc(is.t)+'</span><span class="x">'+esc(is.x)+'</span>'+
+      '<span class="m"><span class="sev" data-s="'+esc(is.sev)+'">'+esc(is.sev)+'</span>'+
+      '<span class="tier" data-t="'+esc(is.tier)+'">Tier '+esc(is.tier)+'</span></span></span>';
+    w.appendChild(b);
+  });
+  id("kbIssueH").textContent=list.length+" material issue"+(list.length===1?"":"s")+" found.";
+}
+function renderBys(list){
+  var w=id("kbBys"); w.innerHTML="";
+  list.forEach(function(t,i){
+    var r=el("div","bysitem");
+    r.innerHTML='<span class="n">0'+(i+1)+'</span><span class="t">'+esc(t)+'</span>';
+    w.appendChild(r);
+  });
+}
+function renderGaps(list){
+  var w=id("kbGaps"); w.innerHTML="";
+  list.forEach(function(g){
+    var c=el("div","gap");
+    c.innerHTML='<div class="s">'+esc(g[0])+'</div><div class="r">'+esc(g[1])+'</div>';
+    w.appendChild(c);
+  });
+}
+
+/* ---- negative review report card ---- */
+var NARR_LABEL = {
+  "withdrawal-refused":"WITHDRAWAL REFUSED","release-fee-demanded":"RELEASE FEE DEMANDED",
+  "account-frozen-after-deposit":"ACCOUNT FROZEN","verification-loop":"VERIFICATION LOOP",
+  "handler-vanished":"HANDLER VANISHED","pressured-to-deposit-more":"PRESSURED TO DEPOSIT",
+  "balance-not-real":"BALANCE NOT REAL","recovery-approach":"RECOVERY APPROACH",
+  "terms-changed":"TERMS CHANGED","other":"OTHER"
+};
+function renderReviews(r){
+  var w=id("kbRev");
+  if(!r){ w.innerHTML='<div class="rcempty">No review sweep was run for this party.</div>'; return; }
+  var maxPf=1; r.rows.forEach(function(n){ if(n.pf>maxPf) maxPf=n.pf; });
+  var h='<div class="rchd"><span class="lbl">Negative review report card</span>'+
+        '<span class="corpus" data-c="'+esc(r.state)+'">Corpus: '+esc(r.state)+'</span></div>'+
+        '<div class="rcstats">'+
+        '<div class="rcstat"><div class="v tnum">'+esc(r.checked)+'</div><div class="l">Platforms swept</div></div>'+
+        '<div class="rcstat"><div class="v tnum">'+esc(r.carrying)+'</div><div class="l">Carrying negative reports</div></div>'+
+        '<div class="rcstat"><div class="v tnum">'+esc(r.reports)+'</div><div class="l">One and two star accounts read</div></div>'+
+        '</div>';
+  if(r.note) h+='<div class="rcnote"><span class="k"></span><span class="x">'+esc(r.note)+'</span></div>';
+
+  if(!r.rows.length){
+    h+='<div class="rcempty">No mechanic converged across platforms, so there is no report card to draw. '+
+       'That is not the same as a clean record - it means the corpus this check would read has not been produced yet, '+
+       'or was not reachable on this run.</div>';
+  } else {
+    h+='<div class="narrs">';
+    r.rows.forEach(function(n){
+      var sev = n.pf>=4 ? "hi" : (n.pf>=2 ? "mid" : "lo");
+      h+='<div class="narr">'+
+        '<div class="ntop">'+
+          '<span class="nid">'+esc(NARR_LABEL[n.id]||n.id)+'</span>'+
+          '<span class="nlab">'+esc(n.label)+'</span>'+
+          '<span class="ncount">'+esc(n.pf)+'<small>platforms</small></span>'+
+          '<span class="ncount">'+esc(n.n)+'<small>accounts</small></span>'+
+        '</div>'+
+        '<div class="nbar"><i data-s="'+sev+'"></i></div>'+
+        (n.quote?'<div class="nquote">&ldquo;'+esc(n.quote)+'&rdquo;</div>':'')+
+        '<div class="nmeta">'+
+          n.names.map(function(x){return '<span class="npf">'+esc(x)+'</span>';}).join('')+
+          (n.period?'<span class="nper">'+esc(n.period)+'</span>':'')+
+        '</div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div class="rcfoot">Community intelligence, not verified fact. A negative review is an allegation: some come from competitors, some from people who lost money in a legitimate market. '+
+     'The signal is not volume, it is the same mechanic described in different people\'s own words on platforms that do not share a user base. '+
+     'Tier C and D material never turns a category red on its own.</div>';
+  w.innerHTML=h;
+  var bars=w.querySelectorAll(".nbar i");
+  r.rows.forEach(function(n,i){
+    if(bars[i]) setTimeout(function(){ bars[i].style.width=Math.round(n.pf/maxPf*100)+"%"; },120);
+  });
+}
+
+/* ---- modes ---- */
+function toIdle(){
+  MODE="idle"; CURRENT=null;
+  id("modeLbl").textContent="Standing by";
+  id("dialPanelT").textContent="Source network";
+  id("dialMode").textContent="Idle"; id("dialMode").classList.remove("live");
+  id("barPanelT").textContent="Connector distribution";
+  id("barMode").textContent="MVP set";
+  setDial(1,Math.round(NET.tierA/NET.connectors*100),"of 34","Tier A density","Authoritative sources as a share of the connector set.");
+  setDial(2,Math.round(NET.directFeed/NET.connectors*100),"of 34","Direct feed","Connectors with a documented API or structured feed.");
+  setReads(NET.reads); setBars(NET.bars,NET.foot);
+  setStats(NET.stats); renderWaves();
+  id("catH2").textContent="Every category, and the registers behind it.";
+  id("catP").textContent="Open any tile to read which regulators, registries and databases sit underneath that check, what each one is allowed to prove, and whether its terms permit commercial use.";
+  id("kbRes").classList.remove("on");
+  OPEN=null; id("drill").classList.remove("on"); id("drill").innerHTML="";
+  renderTiles();
+}
+function toResult(d,label){
+  MODE="result"; CURRENT=d;
+  id("modeLbl").textContent="Assessment loaded";
+  id("dialPanelT").textContent="Assessment";
+  id("dialMode").textContent=d.verdict; id("dialMode").classList.add("live");
+  id("barPanelT").textContent="Evidence composition";
+  id("barMode").textContent="This check";
+  setDial(1,d.idc,"confidence","Identity confidence","How sure we are that every record used describes the same party.");
+  setDial(2,d.cov,"coverage","Evidence coverage","How much of the verification universe was actually reached.");
+  setReads(d.reads); setBars(d.bars,d.barFoot);
+  if(d.stats) setStats(d.stats);
+
+  id("kbName").textContent=d.name||label;
+  id("kbDom").textContent=d.domain||label;
+  id("kbVerdict").setAttribute("data-v",d.verdict);
+  id("kbBadge").setAttribute("data-v",d.verdict);
+  id("kbBadgeT").textContent=d.headline;
+  id("kbStatement").textContent=d.statement;
+  var spec=id("kbSpecimen");
+  spec.style.display = d.specimen ? "flex" : "none";
+
+  var full=!!d.cats;
+  id("catH2").textContent = full ? "Nine checks, nine results." : "Every category, and the registers behind it.";
+  id("catP").textContent = full
+    ? "Open any tile to read the records themselves, with the source, the tier, the date it was retrieved and the words it actually says, then the full register list behind that check."
+    : "Nothing resolved for this party. The tiles below still show which regulators and registries sit behind each check.";
+
+  ["kbClaimSec","kbIssueSec","kbRevSec"].forEach(function(x){ id(x).style.display = full?"":"none"; });
+  id("kbBys").closest(".sec").style.display = full?"":"none";
+  if(full){
+    renderClaims(d.claims); renderIssues(d.issues); renderBys(d.bys); renderGaps(d.gaps);
+    renderReviews(d.reviews);
+    id("kbGapH").textContent="What we could not check, and why.";
+    id("kbGapP").textContent="A report that shows only what it found is a report that lies by omission. Every source that should have been reached and was not is listed here.";
+    id("kbDisc").textContent="4orm reports what public records show. A red result means material contradictions were found in the records checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person.";
+  } else {
+    renderClaims([]); renderIssues([]); renderBys([]); renderGaps([]); renderReviews(null);
+    id("kbGapH").textContent="Why this came back grey.";
+    id("kbGapP").textContent="Grey is a real result, not a failure. It means the console does not have enough of the picture to say anything honest yet.";
+    id("kbDisc").textContent=d.note;
+  }
+
+  OPEN=null; id("drill").classList.remove("on"); id("drill").innerHTML="";
+  renderTiles();
+  id("kbRes").classList.add("on");
+  sweep();
+  var t=id("network").getBoundingClientRect().top+window.pageYOffset-84;
+  window.scrollTo({top:t,behavior:reduce?"auto":"smooth"});
+}
+
+/* ------------------------------------------------------------------ *
+ * LIVE MODE
+ * Off by default. Add ?live=1 to the URL and the console posts the
+ * identifier to /api/check instead of reading the seeded corpus.
+ * The endpoint returns the same render payload, so nothing else here
+ * changes. With no ANTHROPIC_API_KEY set it answers 503 and the console
+ * says so plainly rather than falling back to something that looks real.
+ * ------------------------------------------------------------------ */
+var LIVE = /[?&]live=1\b/.test(window.location.search);
+
+function errorResult(q, msg){
+  var g={}; for(var k in GREY) g[k]=GREY[k];
+  g.name=q.trim().toUpperCase();
+  g.domain=detect(q)||"Unidentified";
+  g.headline="Check did not complete";
+  g.statement=msg;
+  g.note="Nothing has been guessed at. When a check cannot complete, the console reports that it could not complete. It does not produce an assessment anyway.";
+  return g;
+}
+
+function liveCheck(q){
+  return fetch("/api/check",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({q:q})
+  }).then(function(r){
+    return r.json().then(function(j){
+      if(!r.ok) throw new Error(j.message || ("The check failed with status "+r.status+"."));
+      return j;
+    });
+  });
+}
+
+function check(q){
+  var key=(q||"").trim().toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
+
+  if(LIVE){
+    var pending = liveCheck(q);
+    runScan(function(){
+      pending.then(function(d){ toResult(d,q); })
+             .catch(function(e){ toResult(errorResult(q, e.message), q); });
+    });
+    return;
+  }
+
+  runScan(function(){
+    var d = key==="atlanticglobalwealth.com" ? SPECIMEN : CORPUS[key];
+    if(d) toResult(d,q);
+    else {
+      var g={}; for(var k in GREY) g[k]=GREY[k];
+      g.name=q.trim().toUpperCase(); g.domain=detect(q)||"Unidentified";
+      toResult(g,q);
+    }
+  });
+}
+
+id("kbForm").addEventListener("submit",function(e){
+  e.preventDefault(); if(!input.value.trim()) return; check(input.value);
+});
+var tries=document.querySelectorAll(".try");
+for(var ti=0;ti<tries.length;ti++){
+  tries[ti].addEventListener("click",function(){
+    input.value=this.getAttribute("data-seed");
+    paintIds(detect(input.value)); go.disabled=false; check(input.value);
+  });
+}
+
+/* ---- support directory ---- */
+var dirScrim=id("dirScrim"), dirBox=id("dirBox"), dirBody=id("dirBody"),
+    dirTitle=id("dirTitle"), dirSub=id("dirSub"), lastFocus=null;
+
+function dirGrid(){
+  dirBox.classList.remove("deep");
+  dirTitle.textContent="Help me find support";
+  dirSub.textContent="Every number below was read from the organisation's own published contact page on 25 August 2026. Nothing here is a paid referral, and no individual lawyer or firm is named.";
+  var h='<div class="dirgrid">';
+  DIR.forEach(function(f,i){
+    var count = f.items ? f.items.length+(f.items.length===1?" contact":" contacts")
+                        : f.steps.length+" steps";
+    h+='<button class="folder" type="button" data-f="'+i+'">'+
+       '<span class="tab"></span>'+
+       '<span class="fbody">'+
+         '<span class="fix">'+esc(f.ix)+'</span>'+
+         '<span class="fn">'+esc(f.n)+'</span>'+
+         '<span class="fx">'+esc(f.x)+'</span>'+
+         '<span class="ff"><span class="fc">'+esc(count)+'</span><span class="fo">Open &rarr;</span></span>'+
+       '</span></button>';
+  });
+  h+='</div>';
+  h+='<div class="hint"><span class="hk"></span><span class="hx">'+
+     '<b>How this directory is built.</b> Only organisations that publish their own contact details appear here, and every telephone number was read off that organisation\'s own page. '+
+     'No individual lawyer, firm or recovery service is named anywhere in it, and nobody pays to be listed. Where the responsible answer is a referral service rather than a name, that is what you get. '+
+     'If a number has changed since it was checked, the web address beside it is the authority.'+
+     '</span></div>';
+  h+='<div class="dirfoot">Folders 07 and 08 contain no contacts. They are the two things you can do yourself, today, at no cost: run the registry checks properly, and preserve what you already have.</div>';
+  dirBody.innerHTML=h;
+  dirBody.scrollTop=0;
+  var fs=dirBody.querySelectorAll(".folder");
+  for(var i=0;i<fs.length;i++){
+    fs[i].addEventListener("click",function(){ dirFolder(parseInt(this.getAttribute("data-f"),10)); });
+  }
+}
+
+function dirFolder(n){
+  var f=DIR[n];
+  dirBox.classList.add("deep");
+  dirTitle.textContent=f.n;
+  dirSub.textContent=f.x;
+  var h='<div class="dirintro"><div class="di">'+esc(f.intro)+'</div></div><div class="entries">';
+
+  if(f.items){
+    f.items.forEach(function(it){
+      h+='<div class="entry"><div class="eleft">'+
+         '<div class="en">'+esc(it.n)+'</div>'+
+         '<div class="ew">'+esc(it.w)+'</div>'+
+         (it.note?'<div class="enote">'+esc(it.note)+'</div>':'')+
+         '</div><div class="eright">';
+      it.c.forEach(function(c){
+        var isTel = c[2]==="tel";
+        var isUrl = /^https?:\/\//.test(c[1]);
+        var val = isUrl
+          ? '<a class="cv" href="'+esc(c[1])+'" target="_blank" rel="noopener noreferrer">'+esc(c[1].replace(/^https?:\/\//,"").replace(/\/$/,""))+'</a>'
+          : (isTel ? '<a class="cv" href="tel:'+esc(c[1].replace(/[^\d+]/g,""))+'">'+esc(c[1])+'</a>'
+                   : '<span class="cv">'+esc(c[1])+'</span>');
+        h+='<div class="contact'+(isTel?" tel":"")+'"><span class="ck">'+esc(c[0])+'</span>'+val+'</div>';
+      });
+      h+='</div></div>';
+    });
+  } else {
+    f.steps.forEach(function(st,i){
+      h+='<div class="step"><span class="sn">0'+(i+1)+'</span><span class="sb">'+
+         '<span class="st" style="display:block">'+esc(st.t)+'</span>'+
+         '<span class="sx" style="display:block">'+esc(st.x)+'</span></span></div>';
+    });
+  }
+  h+='</div>';
+  if(f.hint) h+='<div class="hint"><span class="hk"></span><span class="hx">'+esc(f.hint)+'</span></div>';
+  if(f.foot) h+='<div class="dirfoot">'+esc(f.foot)+'</div>';
+  else h+='<div class="dirfoot">Contact details are published by the organisations themselves and can change. If a number does not connect, use the web address beside it.</div>';
+  dirBody.innerHTML=h;
+  dirBody.scrollTop=0;
+}
+
+function dirOpen(){
+  lastFocus=document.activeElement;
+  dirGrid();
+  dirScrim.classList.add("on"); dirBox.classList.add("on");
+  document.body.style.overflow="hidden";
+  id("dirClose").focus();
+}
+function dirClose(){
+  dirScrim.classList.remove("on"); dirBox.classList.remove("on");
+  document.body.style.overflow="";
+  if(lastFocus&&lastFocus.focus) lastFocus.focus();
+}
+var openers=document.querySelectorAll('[data-dir="open"]');
+for(var oi=0;oi<openers.length;oi++) openers[oi].addEventListener("click",dirOpen);
+id("dirClose").addEventListener("click",dirClose);
+dirScrim.addEventListener("click",dirClose);
+id("dirBack").addEventListener("click",dirGrid);
+
+/* ---- reveals ---- */
+function sweep(){
+  var n=document.querySelectorAll(".kb-rv");
+  for(var i=0;i<n.length;i++){
+    var r=n[i].getBoundingClientRect();
+    if(r.top<window.innerHeight-30&&r.bottom>0) n[i].classList.add("kb-in");
+  }
+}
+if("IntersectionObserver" in window){
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting) e.target.classList.add("kb-in"); });
+  },{rootMargin:"0px 0px -30px 0px"});
+  document.querySelectorAll(".kb-rv").forEach(function(n){io.observe(n);});
+}
+var ticking=false;
+window.addEventListener("scroll",function(){
+  if(ticking)return; ticking=true;
+  requestAnimationFrame(function(){sweep();ticking=false;});
+},{passive:true});
+window.addEventListener("keydown",function(e){
+  if(e.key!=="Escape") return;
+  if(dirBox.classList.contains("on")){
+    if(dirBox.classList.contains("deep")) dirGrid(); else dirClose();
+    return;
+  }
+  if(OPEN) toggleDrill(OPEN);
+});
+
+if(LIVE){
+  var ll=id("liveLbl");
+  ll.style.display=""; ll.classList.add("live"); ll.textContent="Live checking";
+  id("kbInput").placeholder="Any company, person, website, email, phone or wallet";
+  document.querySelector(".upnote").innerHTML=
+    "<b>Live checking is on.</b> Every identifier you type runs a real sweep against public records. "+
+    "Nothing is read from a stored corpus, and nothing is invented: if the sweep cannot complete, the console says so.";
+}
+
+toIdle();
+paintIds(null);
+sweep();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "4orm-iq",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "4orm - Know Before You Send. Verification control centre.",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0"
+  }
+}

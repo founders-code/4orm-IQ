@@ -1,0 +1,600 @@
+{
+  "cue_version": "1.0",
+  "run_id": "run_001_investhelm_20260825",
+  "query": {
+    "raw_input": "investhelm.com",
+    "detected_type": "domain",
+    "seeds": [
+      "investhelm.com",
+      "Investhelm"
+    ],
+    "derived_seeds": [
+      "nexlares.com",
+      "bayassetholm.com",
+      "cedarassetgrove.com",
+      "Tiff Macklem",
+      "Kevin O'Leary"
+    ]
+  },
+  "entity": {
+    "display_name": "INVESTHELM",
+    "domain": "investhelm.com",
+    "legal_entity": null,
+    "registration_number": null,
+    "jurisdiction_claimed": "CA",
+    "activity_claimed": [
+      "crypto_trading",
+      "forex",
+      "copy_trading",
+      "fractional_shares"
+    ]
+  },
+  "verdict": {
+    "state": "RED",
+    "headline": "HIGH RISK",
+    "statement": "Material adverse information and serious contradictions were identified. Do not send money to this party."
+  },
+  "scores": {
+    "identity_confidence": 96,
+    "evidence_coverage": 45,
+    "sources_checked": 14,
+    "jurisdictions": 5,
+    "verified_facts": 21,
+    "concerns": 7,
+    "unresolved_questions": 4
+  },
+  "categories": [
+    {
+      "id": "C1",
+      "label": "Identity & Existence",
+      "state": "RED",
+      "summary": "No legal entity is named anywhere - not on the site, not in the promotional material, not in either regulator listing. There is nothing to look up.",
+      "evidence": [
+        "ev_site_claims",
+        "ev_bcsc_caution",
+        "ev_csa_alert"
+      ]
+    },
+    {
+      "id": "C2",
+      "label": "Registration & Licensing",
+      "state": "RED",
+      "summary": "Claims it \"operates under full regulatory oversight\". No regulator named, no licence number given. BCSC: not registered.",
+      "evidence": [
+        "ev_bcsc_caution",
+        "ev_site_claims"
+      ],
+      "signal": "unverifiable-regulatory-claim"
+    },
+    {
+      "id": "C3",
+      "label": "Regulatory & Enforcement",
+      "state": "RED",
+      "summary": "On the BCSC Investment Caution List since 14 July 2026, carried nationally by the CSA investor alert of 15 July 2026.",
+      "evidence": [
+        "ev_bcsc_caution",
+        "ev_csa_alert"
+      ],
+      "signal": "regulator-caution-listing"
+    },
+    {
+      "id": "C4",
+      "label": "People & Ownership",
+      "state": "RED",
+      "summary": "No director, officer or founder is named. The only individuals attached to it are impersonated public figures.",
+      "evidence": [
+        "ev_site_claims",
+        "ev_promo_hackmd",
+        "ev_boc_denial"
+      ],
+      "signal": "anonymous-operator"
+    },
+    {
+      "id": "C5",
+      "label": "Legal & Financial",
+      "state": "GREY",
+      "summary": "Not assessable. Courts and insolvency registers key on legal entity name; no legal entity name exists to query.",
+      "evidence": []
+    },
+    {
+      "id": "C6",
+      "label": "Web & Digital Identity",
+      "state": "RED",
+      "summary": "Domain registered 22 February 2026 - 184 days old. 13 of 29 security sources report phishing warnings. Randomised nameservers, 90-day certificate.",
+      "evidence": [
+        "ev_rdap_investhelm",
+        "ev_threat_agg"
+      ],
+      "signal": "history-contradiction,disposable-infrastructure"
+    },
+    {
+      "id": "C7",
+      "label": "Consumer Experience",
+      "state": "RED",
+      "summary": "The favourable review material is manufactured, and the same template runs under at least four brand names.",
+      "evidence": [
+        "ev_promo_hackmd",
+        "ev_promo_cluster",
+        "ev_rdap_nexlares"
+      ],
+      "signal": "synthetic-review-network"
+    },
+    {
+      "id": "C8",
+      "label": "Transaction & Payment",
+      "state": "GREY",
+      "summary": "Not run - no payment instructions were supplied. Upload the wire sheet or invoice and this category activates.",
+      "evidence": []
+    },
+    {
+      "id": "C9",
+      "label": "4orm Intelligence",
+      "state": "RED",
+      "summary": "investhelm.com and nexlares.com share all three nameservers and the same registrar, and are promoted by the same fabricated-endorsement template.",
+      "evidence": [
+        "ev_rdap_investhelm",
+        "ev_rdap_nexlares",
+        "ev_promo_cluster",
+        "ev_nexlares_site"
+      ],
+      "signal": "infrastructure-cluster,document-fingerprint"
+    }
+  ],
+  "claims": [
+    {
+      "claim": "400,000 Canadians are already using the platform",
+      "adjudicating_source": "ICANN RDAP / Verisign registry",
+      "record_says": "Domain investhelm.com created 22 February 2026",
+      "result": "RED"
+    },
+    {
+      "claim": "Users collectively earned over $1.35 billion in 2025",
+      "adjudicating_source": "ICANN RDAP / Verisign registry",
+      "record_says": "The domain did not exist at any point during 2025",
+      "result": "RED"
+    },
+    {
+      "claim": "Operates under full regulatory oversight",
+      "adjudicating_source": "BC Securities Commission",
+      "record_says": "This company is not registered with the BC Securities Commission. Listed 14 July 2026",
+      "result": "RED"
+    },
+    {
+      "claim": "The platform is legal, it operates in Canada",
+      "adjudicating_source": "Canadian Securities Administrators investor alerts",
+      "record_says": "Investor alert published 15 July 2026, issuing regulator BCSC",
+      "result": "RED"
+    },
+    {
+      "claim": "Bank of Canada Governor Tiff Macklem discussed the platform on air",
+      "adjudicating_source": "Bank of Canada, media relations",
+      "record_says": "This video is fake. - Paul Badertscher, Director of Media Relations",
+      "result": "RED"
+    },
+    {
+      "claim": "Bank-Level Security, SSL encryption",
+      "adjudicating_source": "Certificate record; 29-source threat aggregation",
+      "record_says": "Certificate valid 4 June - 2 September 2026 (90 days); 13 of 29 sources report phishing signals",
+      "result": "RED"
+    },
+    {
+      "claim": "Operates as an identifiable business in Canada",
+      "adjudicating_source": "The subject's own website",
+      "record_says": "No legal entity, registration number, address, phone or email published",
+      "result": "RED"
+    },
+    {
+      "claim": "Independent reviews attest to the platform",
+      "adjudicating_source": "Domain creation dates vs promotional publication dates",
+      "record_says": "Favourable content appears within days of registration, under a template reused for nexlares, bayassetholm and cedarassetgrove",
+      "result": "RED"
+    }
+  ],
+  "material_issues": [
+    {
+      "rank": 1,
+      "title": "A Canadian securities regulator has already warned about this party",
+      "explanation": "BCSC added Investhelm to its Investment Caution List on 14 July 2026; the CSA carried it nationally the next day.",
+      "severity": "critical",
+      "tier": "A",
+      "evidence_ids": [
+        "ev_bcsc_caution",
+        "ev_csa_alert"
+      ]
+    },
+    {
+      "rank": 2,
+      "title": "The operating history is impossible",
+      "explanation": "Claimed 2025 earnings of $1.35 billion and 400,000 existing Canadian users, against a domain created 22 February 2026.",
+      "severity": "critical",
+      "tier": "A",
+      "evidence_ids": [
+        "ev_rdap_investhelm",
+        "ev_promo_hackmd"
+      ]
+    },
+    {
+      "rank": 3,
+      "title": "The regulatory claim is unfalsifiable by design",
+      "explanation": "\"Full regulatory oversight\" names no regulator and gives no licence number.",
+      "severity": "high",
+      "tier": "A",
+      "evidence_ids": [
+        "ev_site_claims",
+        "ev_bcsc_caution"
+      ]
+    },
+    {
+      "rank": 4,
+      "title": "The endorsement is fabricated, and the Bank of Canada has said so",
+      "explanation": "Promotional material stages a confrontation between the Governor of the Bank of Canada and Kevin O'Leary over this platform.",
+      "severity": "high",
+      "tier": "A",
+      "evidence_ids": [
+        "ev_promo_hackmd",
+        "ev_boc_denial"
+      ]
+    },
+    {
+      "rank": 5,
+      "title": "There is no legal person behind it",
+      "explanation": "No entity name, registration number, registered office, officers, phone or email - while accepting credit cards, bank transfers and PayPal.",
+      "severity": "high",
+      "tier": "B",
+      "evidence_ids": [
+        "ev_site_claims"
+      ]
+    },
+    {
+      "rank": 6,
+      "title": "The infrastructure is disposable, and it is shared",
+      "explanation": "nexlares.com runs on the identical three nameservers through the identical registrar, and repeats the same unfalsifiable claim - 'an officially registered company in Canada' with no number and no regulator. Two brands, one operator.",
+      "severity": "high",
+      "tier": "A",
+      "evidence_ids": [
+        "ev_rdap_investhelm",
+        "ev_rdap_nexlares",
+        "ev_nexlares_site"
+      ]
+    },
+    {
+      "rank": 7,
+      "title": "The reputation was manufactured before there was anything to review",
+      "explanation": "The same review template promotes four brands, each within days of its domain registration.",
+      "severity": "high",
+      "tier": "C",
+      "promoted_by": "Tier A registry corroboration",
+      "evidence_ids": [
+        "ev_promo_cluster",
+        "ev_rdap_nexlares"
+      ]
+    }
+  ],
+  "before_you_send": [
+    "Confirm the warning yourself. Go to bcsc.bc.ca, open the Investment Caution List, search Investhelm. It is there, added 14 July 2026. Two minutes.",
+    "Ask three questions in writing: legal entity name and registration number; which regulator authorises you and under what licence number; what name will appear on the receiving account. A real firm answers all three in one email.",
+    "If you have already paid, move today. Credit card and PayPal dispute windows close. Bank transfer and crypto have no recovery path - report to the Canadian Anti-Fraud Centre and your bank immediately."
+  ],
+  "coverage_gaps": [
+    {
+      "source": "CSA National Registration Search",
+      "category": "C2",
+      "reason": "no_api"
+    },
+    {
+      "source": "CIRO AdvisorReport / Investor Alerts",
+      "category": "C2,C3",
+      "reason": "unreachable"
+    },
+    {
+      "source": "IOSCO I-SCAN",
+      "category": "C3",
+      "reason": "unreachable"
+    },
+    {
+      "source": "OFAC / UN / Canadian / UK sanctions",
+      "category": "C3",
+      "reason": "unreachable"
+    },
+    {
+      "source": "Corporate registries (CA, international)",
+      "category": "C1,C4",
+      "reason": "no_match_key"
+    },
+    {
+      "source": "CanLII, courts, insolvency registers",
+      "category": "C5",
+      "reason": "no_match_key"
+    },
+    {
+      "source": "FCA / ASIC / MAS / SEC / FINRA / CFTC / NFA",
+      "category": "C2,C3",
+      "reason": "not_applicable_no_foreign_claim"
+    },
+    {
+      "source": "BBB, Trustpilot, Forex Peace Army, Google Places",
+      "category": "C7",
+      "reason": "unreachable"
+    },
+    {
+      "source": "CSA alert page, English mirror",
+      "category": "C3",
+      "reason": "unreachable"
+    },
+    {
+      "source": "rdap.org aggregator",
+      "category": "C6",
+      "reason": "unreachable"
+    },
+    {
+      "source": "Wallet / beneficiary analytics",
+      "category": "C8",
+      "reason": "no_match_key"
+    }
+  ],
+  "unresolved_questions": [
+    "Who is the registrant behind the privacy shield at NETIM SAS?",
+    "How many further brands share the RT9UE7 / QJ5TK1 / DE34U7 nameserver set?",
+    "Where do deposits actually land - which beneficiary, which bank, which country?",
+    "Are bayassetholm.com and cedarassetgrove.com the same operator, or a different crew running the same playbook?"
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev_bcsc_caution",
+      "category": "C3",
+      "source": {
+        "name": "BC Securities Commission - Investment Caution List",
+        "jurisdiction": "CA-BC",
+        "tier": "A",
+        "url": "https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list/2026/investhelm",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "permitted"
+      },
+      "match": {
+        "matched_value": "Investhelm",
+        "match_confidence": 98,
+        "matched_on": [
+          "legal_name",
+          "domain"
+        ]
+      },
+      "status": "found",
+      "finding": "Listed on the Investment Caution List, added 14 July 2026.",
+      "raw_excerpt": "This company is not registered with the BC Securities Commission.",
+      "signal": "regulator-caution-listing",
+      "severity": "critical"
+    },
+    {
+      "evidence_id": "ev_csa_alert",
+      "category": "C3",
+      "source": {
+        "name": "Canadian Securities Administrators - Investor Alerts",
+        "jurisdiction": "CA",
+        "tier": "A",
+        "url": "https://www.autorites-valeurs-mobilieres.ca/investor-alerts/investhelm/",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "permitted"
+      },
+      "match": {
+        "matched_value": "Investhelm",
+        "match_confidence": 98,
+        "matched_on": [
+          "legal_name",
+          "domain"
+        ]
+      },
+      "status": "found",
+      "finding": "National investor alert published 15 July 2026; issuing regulator BCSC.",
+      "raw_excerpt": "Investhelm - https://investhelm.com - British Columbia Securities Commission - July 15, 2026",
+      "signal": "regulator-caution-listing",
+      "severity": "critical"
+    },
+    {
+      "evidence_id": "ev_rdap_investhelm",
+      "category": "C6",
+      "source": {
+        "name": "ICANN RDAP via Verisign",
+        "jurisdiction": "GLOBAL",
+        "tier": "A",
+        "url": "https://rdap.verisign.com/com/v1/domain/investhelm.com",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "api",
+        "commercial_use": "permitted"
+      },
+      "match": {
+        "matched_value": "investhelm.com",
+        "match_confidence": 100,
+        "matched_on": [
+          "domain"
+        ]
+      },
+      "status": "found",
+      "finding": "Domain created 22 February 2026 - 184 days old at run time.",
+      "raw_excerpt": "registration 2026-02-22T18:15:58Z; last changed 2026-04-04T08:07:34Z; expiration 2027-02-22T18:15:58Z; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; client transfer prohibited",
+      "signal": "history-contradiction",
+      "severity": "critical"
+    },
+    {
+      "evidence_id": "ev_rdap_nexlares",
+      "category": "C9",
+      "source": {
+        "name": "ICANN RDAP via Verisign",
+        "jurisdiction": "GLOBAL",
+        "tier": "A",
+        "url": "https://rdap.verisign.com/com/v1/domain/nexlares.com",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "api",
+        "commercial_use": "permitted"
+      },
+      "match": {
+        "matched_value": "nexlares.com",
+        "match_confidence": 100,
+        "matched_on": [
+          "nameserver",
+          "registrar"
+        ]
+      },
+      "status": "found",
+      "finding": "Shares all three nameservers and the registrar with investhelm.com.",
+      "raw_excerpt": "creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM",
+      "signal": "infrastructure-cluster",
+      "severity": "high"
+    },
+    {
+      "evidence_id": "ev_boc_denial",
+      "category": "C4",
+      "source": {
+        "name": "Bank of Canada - media relations, via The Canadian Press fact check",
+        "jurisdiction": "CA",
+        "tier": "A",
+        "url": "https://www.thecanadianpressnews.ca/fact_checking/ad-for-investment-platform-featuring-bank-of-canada-governor-tiff-macklem-is-fake/article_7ef558ec-3a69-5494-8528-dba3f6102b5a.html",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "licence_required"
+      },
+      "match": {
+        "matched_value": "Tiff Macklem investment platform video",
+        "match_confidence": 80,
+        "matched_on": [
+          "person",
+          "claim_pattern"
+        ]
+      },
+      "status": "found",
+      "finding": "The Bank of Canada states the Macklem investment video is fake.",
+      "raw_excerpt": "This video is fake. To help Canadians avoid these kinds of scams, we encourage people to check the Bank's official channels ... as well as our website for genuine information from the Bank.",
+      "signal": "fabricated-endorsement",
+      "severity": "high"
+    },
+    {
+      "evidence_id": "ev_threat_agg",
+      "category": "C6",
+      "source": {
+        "name": "Multi-source threat aggregation (29 security sources)",
+        "jurisdiction": "GLOBAL",
+        "tier": "B",
+        "url": "https://gridinsoft.com/online-virus-scanner/url/investhelm-com",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "licence_required"
+      },
+      "match": {
+        "matched_value": "investhelm.com",
+        "match_confidence": 100,
+        "matched_on": [
+          "domain"
+        ]
+      },
+      "status": "found",
+      "finding": "13 of 29 security sources report a warning; phishing signals present.",
+      "raw_excerpt": "Trust score 1/100; 13 blacklist detections and phishing-related signals; registrar NETIM; hosting Private Layer INC, Bellinzona, Switzerland; IP 179.43.182.250; SSL valid June 4 - September 2, 2026; Do not enter passwords or payment data",
+      "signal": "threat-feed-consensus",
+      "severity": "high"
+    },
+    {
+      "evidence_id": "ev_site_claims",
+      "category": "C1",
+      "source": {
+        "name": "investhelm.com - subject's own published claims",
+        "jurisdiction": "CA",
+        "tier": "B",
+        "url": "https://investhelm.com",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "permitted"
+      },
+      "match": {
+        "matched_value": "Investhelm",
+        "match_confidence": 100,
+        "matched_on": [
+          "domain"
+        ]
+      },
+      "status": "found",
+      "finding": "No legal entity, registration number, address, phone or email published. Claims regulatory oversight without naming a regulator.",
+      "raw_excerpt": "operates under full regulatory oversight; 85% Accuracy; Advanced AI Algorithms; Bank-Level Security; Major credit cards, bank transfers, and PayPal; (c) 2026 Investhelm",
+      "signal": "anonymous-operator,unverifiable-regulatory-claim",
+      "severity": "high"
+    },
+    {
+      "evidence_id": "ev_promo_hackmd",
+      "category": "C7",
+      "source": {
+        "name": "Promotional review page",
+        "jurisdiction": "GLOBAL",
+        "tier": "D",
+        "url": "https://hackmd.io/@investhelm-3/tiff-macklem-investhelm-review-scam-or-legit",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "unknown"
+      },
+      "match": {
+        "matched_value": "Investhelm",
+        "match_confidence": 95,
+        "matched_on": [
+          "brand_name"
+        ]
+      },
+      "status": "found",
+      "finding": "Source of the impossible operating-history claims and the fabricated endorsement narrative.",
+      "raw_excerpt": "$350 to get started; average investor takes home between $2,800 and $4,500 per month; users collectively earned over $1.35 billion; 400,000 Canadians are already using; the platform is legal, it operates in Canada",
+      "signal": "history-contradiction,fabricated-endorsement",
+      "severity": "high"
+    },
+    {
+      "evidence_id": "ev_promo_cluster",
+      "category": "C9",
+      "source": {
+        "name": "Open-web sweep - promotional template reuse",
+        "jurisdiction": "GLOBAL",
+        "tier": "D",
+        "url": "https://www.google.com/search?q=%22Tiff+Macklem%22+review+scam+or+legit",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "unknown"
+      },
+      "match": {
+        "matched_value": "Tiff Macklem [BRAND] Review - Scam or Legit?",
+        "match_confidence": 90,
+        "matched_on": [
+          "template"
+        ]
+      },
+      "status": "found",
+      "finding": "Identical template promotes Investhelm, Nexlares, Bay Assetholm and Cedar Assetgrove.",
+      "raw_excerpt": "Tiff Macklem Investhelm Review - Scam or Legit? | Tiff Macklem Bay Assetholm Review - Scam or Legit? | Tiff Macklem Nexlares Review - Scam or Legit? | Tiff Macklem Cedar Assetgrove Review - Scam or Legit?",
+      "signal": "synthetic-review-network,document-fingerprint",
+      "severity": "high"
+    },
+    {
+      "evidence_id": "ev_nexlares_site",
+      "category": "C9",
+      "source": {
+        "name": "nexlares.com - sibling brand's published claims",
+        "jurisdiction": "CA",
+        "tier": "B",
+        "url": "https://nexlares.com",
+        "retrieved_at": "2026-08-25T00:00:00Z",
+        "method": "web",
+        "commercial_use": "permitted"
+      },
+      "match": {
+        "matched_value": "Nexlares",
+        "match_confidence": 92,
+        "matched_on": [
+          "nameserver",
+          "registrar",
+          "claim_template"
+        ]
+      },
+      "status": "found",
+      "finding": "Sibling brand on shared infrastructure sells the same product using the same unfalsifiable registration claim.",
+      "raw_excerpt": "Nexlares is an officially registered company in Canada; AI-powered trading platform; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",
+      "signal": "infrastructure-cluster,claim-template-reuse",
+      "severity": "high"
+    }
+  ],
+  "disclaimer": "4orm reports what public records show. A RED assessment means material contradictions were found in the records checked - it is not a legal finding, an accusation, or a determination of wrongdoing by any person."
+}
