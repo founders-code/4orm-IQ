@@ -169,7 +169,7 @@ body[data-stage="console"] .console{padding-top:112px}
 }
 .cbtop{
   display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
-  padding:14px 22px;border-bottom:1px solid var(--border);background:rgba(247,249,252,.7);
+  padding:14px 22px;border-bottom:1px solid var(--border);background:rgba(11,15,23,.72);
 }
 .cbtop .l{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .led{display:inline-flex;align-items:center;gap:8px}
@@ -291,8 +291,13 @@ body[data-stage="console"] .console{padding-top:112px}
 .src[data-s="caution"] i{background:var(--warn);box-shadow:0 0 9px var(--warn)}
 .src[data-s="adverse"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
 .src[data-s="adverse"] i{background:var(--bad);box-shadow:0 0 10px var(--bad)}
-.src[data-s="unreached"]{color:var(--tx-4);opacity:.5}
-.src[data-s="unreached"] i{background:var(--nul-br)}
+.src[data-s="ready"]{color:var(--tx-3);border-color:var(--border-strong);background:var(--surface-2)}
+.src[data-s="ready"] i{background:var(--border-lit);box-shadow:0 0 4px rgba(63,84,112,.7)}
+/* Whatever a check reached keeps its light. A register only goes dark when the
+   run finished and that register was not reached, and dark never means clean. */
+.src[data-s="clear"],.src[data-s="caution"],.src[data-s="adverse"]{font-weight:700}
+.src[data-s="unreached"]{color:var(--tx-4);opacity:.42;background:transparent;border-color:var(--border)}
+.src[data-s="unreached"] i{background:var(--nul-br);box-shadow:none;opacity:.5}
 @media(max-width:640px){.brow{flex-direction:column;gap:7px}.brow .bl{width:auto;padding-top:0}}
 
 /* the legend, outside the border */
@@ -430,48 +435,6 @@ body[data-stage="console"] .console{padding-top:112px}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
-/* ================= check selection switches =================
-   A real switch: a track, a throw, and a position you can read from across
-   the room. Everything ships armed. Dropping a switch does not soften the
-   result, it removes the check, and the report says the check was not run. */
-.switchpanel{margin-top:18px;border:1px solid var(--border);border-radius:var(--r-lg);
-  background:var(--bg-2);overflow:hidden}
-.swhd{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;
-  padding:13px 18px;border-bottom:1px solid var(--border);background:var(--surface)}
-.swhd .swx{font-size:12px;color:var(--tx-3);line-height:1.55}
-.swhd .swcount{margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
-.swall{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--tx-2);border:1px solid var(--border-strong);
-  background:var(--surface-2);padding:6px 12px;border-radius:999px;transition:all .25s var(--ease)}
-.swall:hover{color:var(--tx);border-color:var(--border-lit);background:var(--surface-3)}
-.swrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:1px;background:var(--border)}
-.sw{background:var(--bg-2);padding:12px 14px;display:flex;align-items:center;gap:12px;
-  text-align:left;transition:background .25s var(--ease)}
-.sw:hover{background:var(--surface-2)}
-.swtrack{position:relative;flex:none;width:30px;height:54px;border-radius:9px;
-  background:linear-gradient(180deg,var(--surface-4),var(--surface-2));
-  border:1px solid var(--border-strong);box-shadow:inset 0 2px 6px rgba(0,0,0,.55)}
-.swtrack::after{content:"";position:absolute;left:50%;transform:translateX(-50%);
-  top:6px;bottom:6px;width:2px;border-radius:2px;background:rgba(0,0,0,.4)}
-.swlever{position:absolute;left:3px;right:3px;height:24px;border-radius:6px;
-  background:linear-gradient(180deg,#4A5A70,#2B3646);border:1px solid #55677F;
-  box-shadow:0 2px 5px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.16);
-  transition:top .28s var(--spring),background .28s var(--ease);top:25px;z-index:1}
-.sw[aria-pressed="true"] .swlever{top:3px;background:linear-gradient(180deg,#6E829C,#3C4C61)}
-.swled{position:absolute;left:50%;transform:translateX(-50%);bottom:-13px;width:6px;height:6px;
-  border-radius:50%;background:var(--nul);opacity:.35;transition:all .3s var(--ease)}
-.sw[aria-pressed="true"] .swled{background:var(--ok);opacity:1;box-shadow:0 0 9px var(--ok)}
-.swb{min-width:0}
-.swix{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--tx-4)}
-.swn{font-size:12.5px;font-weight:650;letter-spacing:-.012em;color:var(--tx-2);line-height:1.3;margin-top:3px}
-.sw[aria-pressed="true"] .swn{color:var(--tx)}
-.sw[aria-pressed="true"] .swix{color:var(--gold)}
-.swst{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--tx-4);margin-top:5px}
-.sw[aria-pressed="true"] .swst{color:var(--ok)}
-.swpanel-off{opacity:.55}
-@media(prefers-reduced-motion:reduce){.swlever{transition:none}}
 /* ================= the split, below the search bar =================
    The search bar keeps the full width at the top. Everything under it
    runs in two columns: what the check concluded on the left, the nine
@@ -983,16 +946,6 @@ body[data-stage="console"] .console{padding-top:112px}
           <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
         </form>
 
-        <div class="switchpanel console-only" id="swPanel">
-          <div class="swhd">
-            <span class="lbl">Check selection</span>
-            <span class="swx">Everything is armed. Drop a switch and that check is not run, not guessed at.</span>
-            <span class="swcount" id="swCount">9 of 9 armed</span>
-            <button class="swall" type="button" id="swAll">Arm all</button>
-          </div>
-          <div class="swrow" id="swRow"></div>
-        </div>
-
         <div class="metarow">
           <div class="idrow" id="kbIds" aria-live="polite"></div>
           <div class="tryrow">
@@ -1018,14 +971,14 @@ body[data-stage="console"] .console{padding-top:112px}
           <aside class="legend">
             <div class="lt">Legend</div>
             <ul>
-              <li><b style="background:var(--border-lit)"></b>Ready</li>
-              <li><b style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></b>Checking</li>
-              <li><b style="background:var(--ok);box-shadow:0 0 8px var(--ok)"></b>Clear</li>
-              <li><b style="background:var(--warn);box-shadow:0 0 8px var(--warn)"></b>Caution</li>
-              <li><b style="background:var(--bad);box-shadow:0 0 8px var(--bad)"></b>Adverse</li>
-              <li><b style="background:var(--nul-br)"></b>Not reached</li>
+              <li><b style="background:var(--border-lit)"></b>Waiting to run</li>
+              <li><b style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></b>Reading it now</li>
+              <li><b style="background:var(--ok);box-shadow:0 0 8px var(--ok)"></b>Nothing found here</li>
+              <li><b style="background:var(--warn);box-shadow:0 0 8px var(--warn)"></b>Worth a look</li>
+              <li><b style="background:var(--bad);box-shadow:0 0 8px var(--bad)"></b>Something against them</li>
+              <li><b style="background:var(--nul-br)"></b>Could not reach it</li>
             </ul>
-            <p class="lx">A dark light is a source we did not reach. It is never a source that came back clean.</p>
+            <p class="lx">A dark light means we could not get an answer out of that source. It never means the source came back clean.</p>
           </aside>
         </div>
 
@@ -2081,7 +2034,7 @@ function renderDrill(key){
   var d=id("drill");
   var head =
     '<div class="drillhd"><div>'+
-      '<div class="lbl gold">Category '+esc(c.id)+(res?' &middot; '+esc(res.state):'')+'</div>'+
+      '<div class="lbl gold">Category '+esc(c.id)+(res?' &middot; '+esc(stateWord(res.state)):'')+'</div>'+
       '<div class="n">'+esc(c.name)+'</div>'+
       '<div class="q">'+esc(c.q)+'</div>'+
     '</div><button class="drillx" type="button" id="drillClose">Close</button></div>'+
@@ -2155,65 +2108,12 @@ var input=id("kbInput"), go=id("kbGo");
   function ph(){ input.placeholder = window.innerWidth<640 ? narrow : wide; }
   ph(); window.addEventListener("resize",ph,{passive:true});
 })();
-input.addEventListener("input",function(){
-  paintIds(detect(input.value));
-  go.disabled = !input.value.trim() || enabledChecks().length===0;
-});
+input.addEventListener("input",function(){ paintIds(detect(input.value)); go.disabled=!input.value.trim(); });
 
-/* ------------------------------------------------------------------ *
- * CHECK SELECTION
- *
- * Nine switches, one per category, all armed on load. A dropped switch is
- * not a softer check: the retrieval for that category never runs, the
- * category comes back grey, and the coverage figure falls to match. That is
- * the honest behaviour, and it is why the switch reads OFF rather than
- * anything that could be mistaken for a clean pass.
- * ------------------------------------------------------------------ */
-var CHECK_STATE = {};
-CATS.forEach(function(c){ CHECK_STATE[c.key]=true; });
-
-function enabledChecks(){
-  return CATS.map(function(c){ return c.key; }).filter(function(k){ return CHECK_STATE[k]; });
-}
-
-function paintSwitches(){
-  var n=enabledChecks().length, total=CATS.length;
-  id("swCount").textContent = n+" of "+total+" armed";
-  id("swCount").style.color = n===total ? "var(--gold)" : (n===0 ? "var(--bad)" : "var(--warn)");
-  id("swPanel").classList.toggle("swpanel-off", n<total);
-  id("swAll").textContent = n===total ? "Clear all" : "Arm all";
-  var b=id("swRow").children;
-  for(var i=0;i<b.length;i++){
-    var k=b[i].getAttribute("data-k"), onx=!!CHECK_STATE[k];
-    b[i].setAttribute("aria-pressed", onx?"true":"false");
-    b[i].querySelector(".swst").textContent = onx ? "Armed" : "Off";
-  }
-  go.disabled = !input.value.trim() || n===0;
-}
-
-function buildSwitches(){
-  var w=id("swRow"); w.innerHTML="";
-  CATS.forEach(function(c){
-    var b=el("button","sw"); b.type="button"; b.setAttribute("data-k",c.key);
-    b.setAttribute("aria-pressed","true");
-    b.setAttribute("title", c.q);
-    b.innerHTML='<span class="swtrack"><span class="swlever"></span><span class="swled"></span></span>'+
-      '<span class="swb"><span class="swix">'+esc(c.id)+'</span>'+
-      '<div class="swn">'+esc(c.name)+'</div><div class="swst">Armed</div></span>';
-    b.addEventListener("click",function(){
-      var k=this.getAttribute("data-k");
-      CHECK_STATE[k]=!CHECK_STATE[k];
-      paintSwitches();
-    });
-    w.appendChild(b);
-  });
-  id("swAll").addEventListener("click",function(){
-    var arm = enabledChecks().length < CATS.length;
-    CATS.forEach(function(c){ CHECK_STATE[c.key]=arm; });
-    paintSwitches();
-  });
-  paintSwitches();
-}
+/* Every check runs on every search. enabledChecks stays as the single place
+   that answers "which categories is this run allowed to use", so the request
+   body, the sweep order and the API contract all keep one source of truth. */
+function enabledChecks(){ return CATS.map(function(c){ return c.key; }); }
 
 /* ---- scan ---- */
 var timers=[];
@@ -2340,7 +2240,7 @@ function renderReviews(r, ledger){
   }
   var maxPf=1; r.rows.forEach(function(n){ if(n.pf>maxPf) maxPf=n.pf; });
   var h='<div class="rchd"><span class="lbl">Negative review report card</span>'+
-        '<span class="corpus" data-c="'+esc(r.state)+'">Corpus: '+esc(r.state)+'</span></div>'+
+        '<span class="corpus" data-c="'+esc(r.state)+'">'+esc(stateWord(r.state))+'</span></div>'+
         '<div class="rcstats">'+
         '<div class="rcstat"><div class="v tnum">'+esc(r.checked)+'</div><div class="l">Platforms swept</div></div>'+
         '<div class="rcstat"><div class="v tnum">'+esc(r.carrying)+'</div><div class="l">Carrying negative reports</div></div>'+
@@ -2558,6 +2458,20 @@ for(var ti=0;ti<tries.length;ti++){
 var arScrim=id("arScrim"), arBox=id("arBox"), arBody=id("arBody");
 var CATNAME={}; CATS.forEach(function(c){ CATNAME[c.key]=c.id+" "+c.name; });
 
+/* Internal state keys are for the code. These are the words a reader sees.
+   "Clear" was the worst of the old set: it reads as a clean bill of health when
+   all it ever meant was that nothing turned up in that particular source. */
+var STATE_WORD = {
+  ready:"Waiting to run", check:"Reading it now", clear:"Nothing found here",
+  caution:"Worth a look", adverse:"Something against them", unreached:"Could not reach it",
+  organic:"Written by real customers", manufactured:"Looks manufactured",
+  mixed:"Some of each", absent:"None found"
+};
+function stateWord(v){
+  var k=String(v||"").toLowerCase();
+  return STATE_WORD[k] || String(v||"");
+}
+
 function evBlock(e){
   return '<div class="ev"><div class="evtop">'+
     '<span class="tier" data-t="'+esc(e.t)+'">Tier '+esc(e.t)+'</span>'+
@@ -2600,7 +2514,7 @@ function buildAudit(d){
   /* 2. the source board */
   var lit=0, tot=0;
   h+='<div class="arsec"><div class="lbl gold">Section 02</div><div class="arh">Every source, and what each one returned.</div>'+
-     '<div class="arp">A dark light is a source that was not reached. It is never a source that came back clean.</div>'+
+     '<div class="arp">A dark light means no answer came out of that source on this run. It never means the source came back clean.</div>'+
      '<div class="arboard">';
   SOURCES.forEach(function(g){
     var chips='';
@@ -2622,7 +2536,7 @@ function buildAudit(d){
        '<span class="catdot" data-s="'+esc(r.state)+'"></span>'+
        '<span class="cn">'+esc(CATNAME[c.key])+'</span>'+
        '<span class="cs">'+esc(r.sum)+'</span>'+
-       '<span class="catstate" data-s="'+esc(r.state)+'">'+esc(r.state)+'</span></div>'+
+       '<span class="catstate" data-s="'+esc(r.state)+'">'+esc(stateWord(r.state))+'</span></div>'+
        '<div class="arcatb">'+
        (r.ev.length? r.ev.map(evBlock).join('')
          : '<div class="arnone">No record was retrieved for this check. It is reported grey, and it appears in the coverage gaps.</div>')+
@@ -3066,8 +2980,6 @@ if(/[?&]debug=1\b/.test(window.location.search)){
   window.__KBYS__={ toResult:toResult, buildAudit:buildAudit, errorResult:errorResult,
                     check:check, liveCheck:liveCheck, current:function(){return CURRENT;} };
 }
-
-buildSwitches();
 
 document.body.setAttribute("data-stage","landing");
 toIdle();

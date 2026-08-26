@@ -121,6 +121,27 @@ Clearing every switch disables the Check button.
 Below it: the assessment, the evidence composition and what to do next on the
 left, the nine checks and their registers on the right, sticky.
 
+## Latest changes
+
+**The switches are gone.** Every check runs on every search again. `enabledChecks()`
+survives as the one place that answers which categories a run may use, so the request
+body, the sweep order and the API contract keep a single source of truth. The endpoint
+still accepts a `checks` list and still defaults to all nine when it is absent, so
+nothing about the search behaviour changed.
+
+**The top bar is readable.** It was still carrying a pale fill left over from the white
+theme, which put light text on a light ground.
+
+**The board reads as an instrument.** A register waiting to run now has a visible light
+rather than a dimmed one, whatever a check reached keeps its light and its weight, and
+only a register that a finished run failed to reach goes dark.
+
+**The legend says what the lights mean in plain words.** "Clear" was the worst of the old
+set: it reads as a clean bill of health when all it ever meant was that nothing turned up
+in that one source. The states now read: waiting to run, reading it now, nothing found
+here, worth a look, something against them, could not reach it. One `stateWord()` map
+drives every place a state is shown to a reader.
+
 ## Run manual
 
 `4orm KBYS Run Manual.pdf` is in the 4orm KBYS folder. Eight pages covering
