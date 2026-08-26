@@ -105,3 +105,42 @@ carries the professional register, the banned persons list and the investor aler
 suspension lamp rather than EDGAR. `registersServedBy(host)` is deliberately broader and
 answers a different question: when a domain was pinned on a search that ran, every register
 that host serves was asked, and the board says so.
+
+---
+
+## The one page summary
+
+Two buttons under the result. **Summary, one page** is what somebody prints, takes to
+their bank, or puts in front of the relative who was about to send the money. **Open audit
+report** is the whole record.
+
+The summary is a different document with different rules. It has to be readable in ninety
+seconds by somebody who is upset, and it has to be true in black and white, because it
+gets printed.
+
+It carries, in this order: the party and the website, the verdict, the date the records
+were read; the check in eight figures; the party and every date on the record, including
+the website registration date; the names found in the records; the main hits, most serious
+first; what they claim against what the record says; what other people are saying with the
+counts; identifiers shared with other parties, and any that sit on an entity a regulator
+warned about; the three things to do before sending anything; and the emergency numbers
+for Canada and the United States.
+
+Three rules it holds to:
+
+1. **Every figure is pulled from the payload.** Nothing is written on the summary that is
+   not already established somewhere in the result.
+2. **A missing fact says so.** Blank fields read as "fine" on a printed page, so an
+   unfound fact prints *not found in the records reached*.
+3. **A role is not a name.** Chief Executive and Persons With Significant Control both
+   match a name-shaped pattern and neither is a person. They are filtered out, because a
+   made-up name on a page somebody takes to their bank is the kind of small lie that
+   costs trust.
+
+**Print** uses the browser's own print dialogue, which is also how somebody saves it as a
+PDF. The print stylesheet hides the entire application and prints the sheet alone, in
+black on white, at 10.5pt.
+
+**Download** saves a standalone HTML file, `4orm-summary-<party>-<date>.html`, with the
+styles inlined and its own print rules. A stylesheet that lives on our server is a
+stylesheet that is missing the moment they open the file offline.
