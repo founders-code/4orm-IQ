@@ -71,7 +71,7 @@ export const PAYLOAD_SCHEMA = {
           summary: { type: 'string', description: 'One sentence a consumer understands. No jargon.' },
           evidence: {
             type: 'array',
-            description: 'Empty only when the category was genuinely unreachable or not applicable.',
+            description: 'Empty only when the category was unreachable or does not apply.',
             items: {
               type: 'object',
               required: ['tier', 'source', 'retrieved', 'finding'],
@@ -166,7 +166,7 @@ export const PAYLOAD_SCHEMA = {
                 enum: ['withdrawal-refused', 'release-fee-demanded', 'account-frozen-after-deposit',
                        'verification-loop', 'handler-vanished', 'pressured-to-deposit-more',
                        'balance-not-real', 'recovery-approach', 'terms-changed', 'other'],
-                description: 'Use the catalogue. Only use other when the mechanic genuinely does not fit one.'
+                description: 'Use the catalogue. Reach for other only when no listed mechanic fits.'
               },
               label:          { type: 'string', description: 'The mechanic in plain words, as a consumer would say it.' },
               platforms:      { type: 'integer', minimum: 0, description: 'Number of INDEPENDENT platforms carrying this mechanic. This is the signal, not the report count.' },

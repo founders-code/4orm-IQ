@@ -386,7 +386,7 @@ wrapper. Signals:
 | `identifier-reuse` | Same phone, email, wallet, or address across differently-named entities |
 | `beneficiary-reuse` | Independently submitted documents naming the same receiving party |
 | `site-cloning` | Structural or favicon similarity to previously assessed entities |
-| `document-fingerprint` | Substantially similar proposal uploaded under other brand names |
+| `document-fingerprint` | A near-identical proposal uploaded under other brand names |
 | `identity-mutation` | Entity previously operated under a different name or domain |
 | `claim-drift` | Licence number, address, or founding year changed since last verification |
 | `infrastructure-cluster` | Shared nameservers, IP, ASN, registrar pattern with prior RED entities |

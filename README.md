@@ -153,6 +153,35 @@ These are not style preferences. They are the reason it can be trusted.
 
 ---
 
+## What the console shows
+
+**Standing by.** The instruments read the network: how many registers the engine
+reaches for, how many are authoritative, how many answer machines directly. The
+source board sits dark, every light ready.
+
+**During a check.** The board lights source by source in three waves, and the
+counter climbs. A dark light is a source that was not reached. It is never a
+source that came back clean, and the legend says so.
+
+**When it finishes.** A green light appears: **Open audit report.** That is the
+whole record in one scrollable document - the finding, both measures, every
+source and what each returned, all nine checks with the verbatim records
+underneath, the cross-examination table, the negative review report card, the
+ranked issues, what to do before sending, and every gap.
+
+## Find support
+
+Top right of the navigation, and again under the result. It opens a directory
+that leads with triage rather than taxonomy: **what has already happened?** Five
+routes, each landing in the right folder with a line of context. A persistent
+rail on the left switches category in one click, and the filter at the top
+searches every contact, number and step at once.
+
+**One rule in there does not bend.** No individual lawyer, firm or recovery
+service is ever named, and every telephone number was read off that
+organisation's own published contact page. Where the responsible answer is a
+referral service rather than a name, that is what it gives.
+
 ## Editing the console
 
 `index.html` is one file. The parts you will touch:
@@ -161,7 +190,9 @@ These are not style preferences. They are the reason it can be trusted.
 - `NET` - the idle-state instrument readings.
 - `CATS` - the nine categories and the registers behind each one.
 - `CORPUS` - the seeded entities.
-- `DIR` - the Help me find support directory.
+- `DIR` - the Find support directory.
+- `SOURCES` - the source board, grouped by the check each register serves.
+- `TRIAGE` - the five situation routes at the top of the directory.
 
 **The support directory has one rule that does not bend:** no individual lawyer,
 firm or recovery service is ever named, and every telephone number in it was

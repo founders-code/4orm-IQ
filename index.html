@@ -84,6 +84,23 @@ svg{display:block}
   text-transform:uppercase;color:var(--tx-2);transition:color .25s var(--ease);
 }
 .navlinks a:hover{color:var(--tx)}
+.helpbtn{
+  display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;
+  border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold);
+  font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+  transition:all .28s var(--ease);white-space:nowrap;
+}
+.helpbtn:hover{background:#2A2109;border-color:var(--gold);transform:translateY(-1px)}
+.helpbtn .hi{font-size:12px;line-height:1}
+.navhelp{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 15px;border-radius:999px;
+  border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold);
+  font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  transition:all .28s var(--ease);white-space:nowrap;
+}
+.navhelp:hover{background:#2A2109;border-color:var(--gold);transform:translateY(-1px)}
+.navhelp .hi{font-size:11px;line-height:1}
+@media(max-width:620px){.navhelp span:last-child{display:none}.navhelp{padding:8px 11px}}
 .navcta{
   padding:8px 15px;border-radius:999px;background:var(--blue);
   font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.14em;
@@ -122,11 +139,11 @@ svg{display:block}
 .cbtop .r span{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3)}
 .cbtop .r b{color:var(--tx-2);font-weight:700}
 
-.cbmain{padding:26px 22px 22px}
-.cbhero{display:flex;justify-content:space-between;align-items:flex-end;gap:26px;flex-wrap:wrap}
-.cbh1{font-size:clamp(21px,2.5vw,30px);font-weight:800;letter-spacing:-.035em;line-height:1.12;max-width:22ch;text-wrap:balance}
+.cbmain{padding:24px 22px 20px}
+.cbtitle{display:flex;justify-content:space-between;align-items:baseline;gap:26px;flex-wrap:wrap;margin-bottom:20px}
+.cbh1{font-size:clamp(20px,2.4vw,29px);font-weight:800;letter-spacing:-.035em;line-height:1.15;white-space:nowrap}
 .cbh1 .dim{color:var(--tx-3)}
-.cbsub{margin-top:11px;color:var(--tx-2);font-size:13px;line-height:1.55;max-width:52ch}
+@media(max-width:1080px){.cbh1{white-space:normal}}
 
 .hls{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
 .hl{
@@ -136,8 +153,51 @@ svg{display:block}
   text-transform:uppercase;color:var(--tx-2);white-space:nowrap;
 }
 .hl i{width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none}
-@media(max-width:900px){.hls{justify-content:flex-start}}
+@media(max-width:980px){.hls{justify-content:flex-start}}
 
+/* the search bar, taller */
+.searchbox{
+  display:flex;align-items:center;gap:14px;
+  padding:9px 9px 9px 24px;border-radius:999px;background:var(--bg);
+  border:1px solid var(--border-lit);box-shadow:inset 0 2px 12px rgba(0,0,0,.55);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
+}
+.searchbox:focus-within{border-color:var(--blue);box-shadow:inset 0 2px 12px rgba(0,0,0,.55),0 0 0 4px rgba(76,134,255,.13)}
+.searchbox .pfx{font-family:var(--mono);font-size:15px;color:var(--blue);flex:none;user-select:none}
+.searchbox input{flex:1;min-width:0;padding:21px 0;font-size:18px;letter-spacing:-.012em}
+.searchbox input::placeholder{color:var(--tx-4)}
+.gobtn{
+  flex:none;padding:18px 30px;border-radius:999px;background:var(--blue);color:#fff;text-align:center;
+  font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.17em;text-transform:uppercase;
+  transition:background .25s var(--ease),transform .3s var(--pop),opacity .25s var(--ease);
+}
+.gobtn:hover:not(:disabled){background:var(--blue-lt);transform:translateY(-1px)}
+.gobtn:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:560px){
+  .searchbox{padding-left:18px}
+  .searchbox input{padding:17px 0;font-size:16px}
+  .gobtn{padding:15px 20px}
+}
+
+.metarow{display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:15px;align-items:center}
+.idrow{display:flex;flex-wrap:wrap;gap:6px}
+.idchip{
+  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
+  padding:5px 10px;border-radius:999px;color:var(--tx-4);
+  border:1px solid var(--border);background:var(--bg-2);transition:all .32s var(--ease);
+}
+.idchip.on{color:var(--bg);background:var(--gold);border-color:var(--gold);box-shadow:0 0 20px rgba(231,199,108,.26)}
+.tryrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.try{
+  font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--border-strong);background:var(--bg-2);color:var(--tx-2);
+  transition:all .28s var(--ease);
+}
+.try:hover{color:var(--tx);border-color:var(--blue);background:var(--blue-50)}
+.upnote{margin-top:16px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:74ch}
+.upnote b{color:var(--tx-2);font-weight:600}
+
+/* stat strip */
 .statstrip{
   display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:22px;
   border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--border);
@@ -156,75 +216,99 @@ svg{display:block}
 .scell .sp i[data-c="n"]{background:linear-gradient(90deg,#2B3646,#5A6880)}
 .scell .sc{font-size:11px;color:var(--tx-4);margin-top:8px;line-height:1.45}
 
-.wavestrip{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:2px;
-  border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);
-  overflow:hidden;background:var(--border);
-}
-@media(max-width:820px){.wavestrip{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:440px){.wavestrip{grid-template-columns:1fr}}
-.wcell{background:var(--surface);padding:14px 17px 13px;transition:background .4s var(--ease)}
-.wcell.run{background:var(--surface-2)}
-.wtop{display:flex;align-items:center;gap:9px}
-.wtop .wi{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--tx-4)}
-.wcell.run .wtop .wi,.wcell.done .wtop .wi{color:var(--blue-lt)}
-.wtop .wtm{margin-left:auto;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx-4)}
-.wcell.done .wtop .wtm{color:var(--ok)}
-.wt{font-size:12px;color:var(--tx-2);line-height:1.45;margin-top:8px;min-height:34px}
-.wcell.run .wt,.wcell.done .wt{color:var(--tx)}
-.wp{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:10px}
-.wp i{display:block;height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt));transition:width .42s var(--ease)}
-.wnow{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--tx-4);margin-top:8px;min-height:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wcell.run .wnow{color:var(--blue-lt)}
+/* ---------------- source board ---------------- */
+.boardwrap{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:20px;margin-top:2px;align-items:start}
+@media(max-width:900px){.boardwrap{grid-template-columns:1fr;gap:14px}}
 
-.searchbox{
-  display:flex;align-items:center;gap:12px;margin-top:24px;
-  padding:7px 7px 7px 20px;border-radius:999px;background:var(--bg);
-  border:1px solid var(--border-lit);box-shadow:inset 0 2px 10px rgba(0,0,0,.5);
-  transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
+.board{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden;background:var(--surface)}
+.boardhd{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.boardhd .bc{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.14em;color:var(--tx-3);font-variant-numeric:tabular-nums}
+.boardprog{height:2px;background:var(--surface-3)}
+.boardprog i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt));transition:width .35s var(--ease)}
+.brows{display:grid;gap:1px;background:var(--border)}
+.brow{display:flex;gap:14px;align-items:flex-start;padding:9px 18px;background:var(--surface)}
+.brow .bl{
+  flex:none;width:104px;font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tx-4);padding-top:5px;
 }
-.searchbox:focus-within{border-color:var(--blue);box-shadow:inset 0 2px 10px rgba(0,0,0,.5),0 0 0 4px rgba(76,134,255,.13)}
-.searchbox .pfx{font-family:var(--mono);font-size:13px;color:var(--blue);flex:none;user-select:none}
-.searchbox input{flex:1;min-width:0;padding:15px 0;font-size:16.5px;letter-spacing:-.01em}
-.searchbox input::placeholder{color:var(--tx-4)}
-.gobtn{
-  flex:none;padding:13px 24px;border-radius:999px;background:var(--blue);color:#fff;text-align:center;
+.bchips{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px}
+.src{
+  display:inline-flex;align-items:center;gap:7px;padding:4px 9px;border-radius:5px;
+  border:1px solid var(--border);background:var(--bg-2);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;color:var(--tx-4);
+  transition:all .4s var(--ease);white-space:nowrap;
+}
+.src i{width:5px;height:5px;border-radius:50%;background:var(--border-lit);flex:none;transition:all .4s var(--ease)}
+.src[data-s="check"]{color:var(--blue-lt);border-color:#26385E;background:var(--blue-100)}
+.src[data-s="check"] i{background:var(--blue);box-shadow:0 0 9px var(--blue);animation:blip .9s var(--ease) infinite}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.25}}
+.src[data-s="clear"]{color:var(--ok);border-color:var(--ok-br);background:#07201A}
+.src[data-s="clear"] i{background:var(--ok);box-shadow:0 0 9px var(--ok)}
+.src[data-s="caution"]{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+.src[data-s="caution"] i{background:var(--warn);box-shadow:0 0 9px var(--warn)}
+.src[data-s="adverse"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.src[data-s="adverse"] i{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+.src[data-s="unreached"]{color:var(--tx-4);opacity:.5}
+.src[data-s="unreached"] i{background:var(--nul-br)}
+@media(max-width:640px){.brow{flex-direction:column;gap:7px}.brow .bl{width:auto;padding-top:0}}
+
+/* the legend, outside the border */
+.legend{padding-top:34px}
+.legend .lt{font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-4);margin-bottom:11px}
+.legend ul{list-style:none;display:grid;gap:8px}
+.legend li{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--tx-3);line-height:1.3}
+.legend li b{width:6px;height:6px;border-radius:50%;flex:none;display:block}
+.legend .lx{margin-top:13px;font-size:10px;color:var(--tx-4);line-height:1.5;font-family:var(--sans)}
+@media(max-width:900px){
+  .legend{padding-top:0;border-top:1px solid var(--border);padding-top:14px}
+  .legend ul{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+}
+
+/* the audit light */
+.auditrow{margin-top:20px;display:none;align-items:center;gap:16px;flex-wrap:wrap}
+.auditrow.on{display:flex}
+.auditbtn{
+  display:inline-flex;align-items:center;gap:11px;padding:13px 22px;border-radius:999px;
+  border:1px solid var(--ok-br);background:#07231B;color:var(--ok);
   font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-  transition:background .25s var(--ease),transform .3s var(--pop),opacity .25s var(--ease);
-}
-.gobtn:hover:not(:disabled){background:var(--blue-lt);transform:translateY(-1px)}
-.gobtn:disabled{opacity:.35;cursor:not-allowed}
-
-.metarow{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:16px;align-items:center}
-.idrow{display:flex;flex-wrap:wrap;gap:6px}
-.idchip{
-  font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
-  padding:5px 10px;border-radius:999px;color:var(--tx-4);
-  border:1px solid var(--border);background:var(--bg-2);transition:all .32s var(--ease);
-}
-.idchip.on{color:var(--bg);background:var(--gold);border-color:var(--gold);box-shadow:0 0 20px rgba(231,199,108,.26)}
-.tryrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
-.try{
-  font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:999px;
-  border:1px solid var(--border-strong);background:var(--bg-2);color:var(--tx-2);
   transition:all .28s var(--ease);
 }
-.try:hover{color:var(--tx);border-color:var(--blue);background:var(--blue-50)}
-.upnote{margin-top:18px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:70ch}
-.upnote b{color:var(--tx-2);font-weight:600}
+.auditbtn:hover{background:#0A3026;border-color:var(--ok);transform:translateY(-1px)}
+.auditbtn i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 12px var(--ok);flex:none;animation:pulse 2.4s var(--ease) infinite}
 
-@media(max-width:640px){.cbmain{padding:24px 16px 20px}.cbtop{padding:12px 16px}}
+/* ================= audit report ================= */
+.arbox{
+  position:fixed;inset:3vh 3vw;z-index:201;display:flex;flex-direction:column;
+  border:1px solid var(--border-strong);border-radius:var(--r-xl);overflow:hidden;
+  background:var(--surface);box-shadow:0 60px 130px rgba(0,0,0,.8),var(--hair);
+  opacity:0;transform:translateY(18px) scale(.99);pointer-events:none;
+  transition:opacity .42s var(--ease),transform .5s var(--spring);
+}
+.arbox.on{opacity:1;transform:none;pointer-events:auto}
+@media(max-width:760px){.arbox{inset:0;border-radius:0;border:none}}
+.arhd{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:15px 24px;border-bottom:1px solid var(--border);background:var(--bg-2);flex:none}
+.arhd .an{font-size:16px;font-weight:800;letter-spacing:-.025em;margin-top:5px}
+.arhd .ad{font-family:var(--mono);font-size:9.5px;color:var(--tx-4);letter-spacing:.08em}
+.arbody{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.arsec{padding:26px 26px 30px;border-bottom:1px solid var(--border)}
+.arsec:last-child{border-bottom:none}
+.arh{font-size:17px;font-weight:800;letter-spacing:-.03em;margin-top:10px;line-height:1.25;text-wrap:balance}
+.arp{font-size:13.5px;color:var(--tx-2);line-height:1.65;margin-top:10px;max-width:82ch}
+.armeters{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:22px;max-width:600px}
+@media(max-width:560px){.armeters{grid-template-columns:1fr}}
+.armeter .m1{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3)}
+.armeter .m2{font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1;margin-top:8px;font-variant-numeric:tabular-nums}
+.armeter .m3{height:4px;background:var(--surface-3);border-radius:3px;margin-top:11px;overflow:hidden}
+.armeter .m3 i{display:block;height:100%;border-radius:3px}
+.arcat{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:14px}
+.arcath{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--bg-2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.arcath .cn{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;flex:none;color:var(--tx)}
+.arcath .cs{flex:1;min-width:min(100%,220px);font-size:13px;color:var(--tx-2);line-height:1.5}
+.arcatb{padding:14px 18px;display:grid;gap:11px;background:var(--surface)}
+.arboard{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:16px}
+.arnone{font-size:13px;color:var(--tx-4);line-height:1.6}
 
 /* ================= support directory ================= */
-.helpbtn{
-  display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;
-  border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold);
-  font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;
-  transition:all .28s var(--ease);white-space:nowrap;
-}
-.helpbtn:hover{background:#2A2109;border-color:var(--gold);transform:translateY(-1px)}
-.helpbtn .hi{font-size:12px;line-height:1}
-
 .dirscrim{
   position:fixed;inset:0;z-index:200;background:rgba(3,5,9,.86);backdrop-filter:blur(7px);
   opacity:0;pointer-events:none;transition:opacity .4s var(--ease);
@@ -240,61 +324,76 @@ svg{display:block}
 .dirbox.on{opacity:1;transform:none;pointer-events:auto}
 @media(max-width:760px){.dirbox{inset:0;border-radius:0;border:none}}
 
-.dirhd{
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 24px;
-  border-bottom:1px solid var(--border);background:var(--bg-2);flex:none;
+.dirhd{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--bg-2);flex:none}
+.dirhd .dt{font-size:15px;font-weight:800;letter-spacing:-.025em;margin-top:4px;white-space:nowrap}
+.dirfilter{
+  flex:1;min-width:min(100%,260px);display:flex;align-items:center;gap:10px;
+  padding:9px 16px;border-radius:999px;background:var(--bg);border:1px solid var(--border-lit);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
 }
-.dirhd .dt{font-size:16px;font-weight:800;letter-spacing:-.025em}
-.dirhd .dx{font-size:12.5px;color:var(--tx-3);line-height:1.5;flex:1;min-width:200px}
-.dirback,.dirclose{
+.dirfilter:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(231,199,108,.12)}
+.dirfilter span{font-family:var(--mono);font-size:12px;color:var(--gold);flex:none}
+.dirfilter input{flex:1;min-width:0;font-size:14px}
+.dirfilter input::placeholder{color:var(--tx-4)}
+.dirclose{
   font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--tx-3);border:1px solid var(--border-strong);border-radius:999px;padding:7px 13px;
-  transition:all .25s var(--ease);white-space:nowrap;
+  color:var(--tx-3);border:1px solid var(--border-strong);border-radius:999px;padding:8px 14px;
+  transition:all .25s var(--ease);white-space:nowrap;flex:none;
 }
-.dirback:hover,.dirclose:hover{color:var(--tx);border-color:var(--border-lit)}
-.dirback{display:none}
-.dirbox.deep .dirback{display:inline-block}
+.dirclose:hover{color:var(--tx);border-color:var(--border-lit)}
 
-.dirbody{flex:1;overflow-y:auto;overscroll-behavior:contain}
-.dirgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border)}
-@media(max-width:1180px){.dirgrid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:840px){.dirgrid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.dirgrid{grid-template-columns:1fr}}
-.folder{
-  background:var(--surface);padding:22px 20px 18px;display:flex;flex-direction:column;gap:10px;
-  width:100%;min-height:186px;position:relative;transition:background .3s var(--ease);
-}
-.folder:hover{background:var(--surface-2)}
-.folder .tab{
-  width:38px;height:7px;border-radius:3px 3px 0 0;background:var(--border-lit);
-  transition:background .3s var(--ease);
-}
-.folder:hover .tab{background:var(--gold)}
-.folder .fbody{
-  border-top:1px solid var(--border-lit);padding-top:13px;flex:1;display:flex;flex-direction:column;gap:9px;
-  transition:border-color .3s var(--ease);
-}
-.folder:hover .fbody{border-color:var(--border-lit)}
-.folder .fix{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--tx-4)}
-.folder .fn{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
-.folder .fx{font-size:12.5px;color:var(--tx-3);line-height:1.5;flex:1}
-.folder .ff{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.folder .fc{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--tx-4)}
-.folder .fo{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);opacity:.5;transition:opacity .3s var(--ease),transform .3s var(--spring)}
-.folder:hover .fo{opacity:1;transform:translateX(3px)}
+.dirmain{flex:1;display:grid;grid-template-columns:216px minmax(0,1fr);overflow:hidden}
+@media(max-width:820px){.dirmain{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}}
 
-.dirintro{padding:22px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
-.dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:78ch}
+.rail{border-right:1px solid var(--border);background:var(--bg-2);overflow-y:auto;padding:10px 0}
+@media(max-width:820px){.rail{border-right:none;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:8px 10px;gap:6px}}
+.railitem{
+  display:flex;align-items:center;gap:11px;width:100%;padding:11px 18px;position:relative;
+  transition:background .25s var(--ease);
+}
+.railitem:hover{background:var(--surface-2)}
+.railitem.on{background:var(--surface-2)}
+.railitem.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.railitem .ri{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--tx-4);flex:none}
+.railitem.on .ri{color:var(--gold)}
+.railitem .rn{font-size:13px;font-weight:600;letter-spacing:-.01em;line-height:1.3;color:var(--tx-2)}
+.railitem.on .rn{color:var(--tx)}
+.railitem .rc{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--tx-4);flex:none}
+@media(max-width:820px){
+  .railitem{width:auto;white-space:nowrap;border-radius:999px;border:1px solid var(--border);padding:8px 13px}
+  .railitem.on::before{display:none}
+  .railitem.on{border-color:var(--gold)}
+  .railitem .rc{display:none}
+}
+
+.pane{overflow-y:auto;overscroll-behavior:contain}
+
+.triage{padding:22px 24px;border-bottom:1px solid var(--border);background:var(--bg-3)}
+.triage .tq{font-size:16px;font-weight:800;letter-spacing:-.025em;margin-top:9px}
+.trow{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.tbtn{
+  display:flex;flex-direction:column;gap:5px;padding:12px 16px;border-radius:var(--r-sm);
+  border:1px solid var(--border-strong);background:var(--surface);text-align:left;
+  transition:all .28s var(--ease);flex:1 1 210px;
+}
+.tbtn:hover{border-color:var(--gold);background:var(--surface-2);transform:translateY(-1px)}
+.tbtn .tt{font-size:13.5px;font-weight:600;color:var(--tx);line-height:1.35}
+.tbtn .tx{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--tx-4)}
+
+.ctxnote{padding:15px 24px;background:var(--gold-50);border-bottom:1px solid #3A3011;display:none;gap:13px;align-items:flex-start}
+.ctxnote.on{display:flex}
+.ctxnote .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:22px}
+.ctxnote .x{font-size:13px;color:var(--gold);line-height:1.6;max-width:80ch}
+
+.dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
 .entries{display:grid;gap:2px;background:var(--border)}
 .entry{background:var(--surface);padding:20px 24px;display:flex;gap:20px;flex-wrap:wrap}
-.entry .eleft{flex:1;min-width:min(100%,300px)}
+.entry .eleft{flex:1;min-width:min(100%,290px)}
 .entry .en{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .entry .ew{font-size:13px;color:var(--tx-2);line-height:1.6;margin-top:7px}
 .entry .eright{flex:none;display:grid;gap:7px;align-content:start;min-width:268px}
-.contact{
-  display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:var(--r-sm);
-  border:1px solid var(--border-strong);background:var(--bg-2);
-}
+.contact{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:var(--r-sm);border:1px solid var(--border-strong);background:var(--bg-2)}
 .contact .ck{font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-4);flex:none;width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .contact .cv{font-family:var(--mono);font-size:12px;color:var(--tx);word-break:break-all}
 .contact a.cv{border-bottom:1px solid var(--border-lit);transition:color .2s var(--ease),border-color .2s var(--ease)}
@@ -304,16 +403,15 @@ svg{display:block}
 .step{background:var(--surface);padding:20px 24px;display:flex;gap:18px}
 .step .sn{font-family:var(--mono);font-size:10px;font-weight:800;color:var(--gold);flex:none;width:22px;padding-top:3px;letter-spacing:.08em}
 .step .sb{flex:1;min-width:0}
-.step .st{font-size:14.5px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
-.step .sx{font-size:13px;color:var(--tx-2);line-height:1.62;margin-top:7px}
-.dirfoot{padding:18px 24px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.65}
-.hint{
-  margin:2px 0 0;padding:20px 24px;background:var(--bg-3);border-top:1px solid var(--border);
-  display:flex;gap:16px;align-items:flex-start;
-}
+.step .st{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
+.step .sx{display:block;font-size:13px;color:var(--tx-2);line-height:1.62;margin-top:7px}
+.dirfoot{padding:17px 24px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.65}
+.hint{padding:20px 24px;background:var(--bg-3);border-top:1px solid var(--border);display:flex;gap:16px;align-items:flex-start}
 .hint .hk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:30px}
 .hint .hx{font-size:13px;color:var(--tx-2);line-height:1.65;max-width:74ch}
 .hint .hx b{color:var(--tx);font-weight:600}
+.hitcat{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+.noresult{padding:30px 24px;font-size:14px;color:var(--tx-3);line-height:1.6}
 
 /* ================= instrument deck ================= */
 .deck{padding:24px 0 0}
@@ -656,6 +754,7 @@ svg{display:block}
       <a href="#categories">Categories</a>
       <a href="#scoring">Scoring</a>
     </span>
+    <button class="navhelp" type="button" data-dir="open"><span class="hi">&#9873;</span> Find support</button>
     <a class="navcta" href="#console">Run a check</a>
   </div>
 </nav>
@@ -671,27 +770,21 @@ svg{display:block}
         </div>
         <div class="r">
           <span>Categories <b>9</b></span>
-          <span>Connectors <b>34</b></span>
+          <span>Registers <b>48</b></span>
           <span>Jurisdictions <b>130+</b></span>
           <span id="clock">--:--:-- UTC</span>
         </div>
       </div>
 
       <div class="cbmain">
-        <div class="cbhero">
-          <div>
-            <h1 class="cbh1">Check who you're dealing with <span class="dim">before the money leaves.</span></h1>
-            <p class="cbsub">One identifier is enough. We query the registers, read the records, cross-examine the claims against them, and publish every source we used and every one we could not reach.</p>
-          </div>
+        <div class="cbtitle">
+          <h1 class="cbh1">Check who you're dealing with <span class="dim">before the money leaves.</span></h1>
           <div class="hls">
             <span class="hl"><i></i>A regulator outranks a forum post</span>
             <span class="hl"><i></i>Every gap we cannot reach is published</span>
             <span class="hl"><i></i>Green never means we guarantee anyone</span>
           </div>
         </div>
-
-        <div class="statstrip" id="statstrip"></div>
-        <div class="wavestrip" id="wavestrip"></div>
 
         <form class="searchbox" id="kbForm" autocomplete="off">
           <span class="pfx">&gt;</span>
@@ -710,9 +803,34 @@ svg{display:block}
           </div>
         </div>
 
-        <div class="metarow" style="margin-top:18px">
-          <button class="helpbtn" type="button" data-dir="open"><span class="hi">&#9873;</span> Help me find support</button>
-          <span class="lbl" style="color:var(--tx-4)">Regulators, ombudsmen, credit bureaus, legal referral. Real numbers, checked today.</span>
+        <div class="statstrip" id="statstrip"></div>
+
+        <div class="boardwrap">
+          <div class="board">
+            <div class="boardhd">
+              <span class="lbl" id="boardT">Source board</span><span class="lbl" style="color:var(--tx-4);text-transform:none;letter-spacing:.04em;font-weight:400">48 registers, drawn from the 34 connectors in the opening set</span>
+              <span class="bc" id="boardC">0 of 0 reached</span>
+            </div>
+            <div class="boardprog"><i id="boardBar"></i></div>
+            <div class="brows" id="brows"></div>
+          </div>
+          <aside class="legend">
+            <div class="lt">Legend</div>
+            <ul>
+              <li><b style="background:var(--border-lit)"></b>Ready</li>
+              <li><b style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></b>Checking</li>
+              <li><b style="background:var(--ok);box-shadow:0 0 8px var(--ok)"></b>Clear</li>
+              <li><b style="background:var(--warn);box-shadow:0 0 8px var(--warn)"></b>Caution</li>
+              <li><b style="background:var(--bad);box-shadow:0 0 8px var(--bad)"></b>Adverse</li>
+              <li><b style="background:var(--nul-br)"></b>Not reached</li>
+            </ul>
+            <p class="lx">A dark light is a source we did not reach. It is never a source that came back clean.</p>
+          </aside>
+        </div>
+
+        <div class="auditrow" id="auditRow">
+          <button class="auditbtn" type="button" id="auditOpen"><i></i> Open audit report</button>
+          <span class="lbl" style="color:var(--tx-4)">Every record, every source, every gap, in one document</span>
         </div>
 
         <p class="upnote"><b>Uploading a document or screenshot</b> lets us read the payment instructions and check whether the beneficiary matches the company you are being asked to trust. That is the check that saves the money. It is not enabled in this build.</p>
@@ -941,17 +1059,35 @@ svg{display:block}
   </div>
 </section>
 
-<div class="dirscrim" id="dirScrim"></div>
-<div class="dirbox" id="dirBox" role="dialog" aria-modal="true" aria-label="Support directory">
-  <div class="dirhd">
-    <button class="dirback" type="button" id="dirBack">&larr; All folders</button>
+
+<div class="dirscrim" id="arScrim"></div>
+<div class="arbox" id="arBox" role="dialog" aria-modal="true" aria-label="Audit report">
+  <div class="arhd">
     <div>
-      <div class="dt" id="dirTitle">Help me find support</div>
+      <div class="lbl gold">Audit report</div>
+      <div class="an" id="arName">-</div>
     </div>
-    <div class="dx" id="dirSub">Every number below was checked against the organisation's own published page today. Nothing here is a paid referral.</div>
+    <span class="vbadge" id="arBadge" data-v="RED"><span class="bd"></span><span id="arBadgeT">-</span></span>
+    <span class="ad" id="arDate"></span>
+    <button class="dirclose" type="button" id="arClose" style="margin-left:auto">Close</button>
+  </div>
+  <div class="arbody" id="arBody"></div>
+</div>
+
+<div class="dirscrim" id="dirScrim"></div>
+<div class="dirbox" id="dirBox" role="dialog" aria-modal="true" aria-label="Find support">
+  <div class="dirhd">
+    <div><div class="lbl gold">Find support</div><div class="dt" id="dirTitle">Who to call, and in what order</div></div>
+    <label class="dirfilter">
+      <span>&#9906;</span>
+      <input id="dirQ" type="text" placeholder="Search every contact, number and step" aria-label="Search the support directory">
+    </label>
     <button class="dirclose" type="button" id="dirClose">Close</button>
   </div>
-  <div class="dirbody" id="dirBody"></div>
+  <div class="dirmain">
+    <nav class="rail" id="dirRail" aria-label="Support categories"></nav>
+    <div class="pane" id="dirPane"></div>
+  </div>
 </div>
 
 <footer class="foot">
@@ -1263,6 +1399,9 @@ var CORPUS = {
     "Ask them three questions in writing. What is your legal entity name and registration number? Which regulator authorises you, and what is your licence number? What name will appear on the receiving account? A real firm answers all three in one email.",
     "If you have already paid, move today. Credit card and PayPal dispute windows close. Bank transfer and crypto have no recovery path. Report it to the Canadian Anti-Fraud Centre and call your bank."
   ],
+  board:{"BCSC Caution List":"adverse","CSA Alerts":"adverse","ICANN RDAP":"adverse",
+    "VirusTotal":"adverse","Certificate Log":"caution","Infrastructure Cluster":"adverse",
+    "Document Fingerprint":"caution"},
   reviews:{checked:0,carrying:0,reports:0,state:"manufactured",
     note:"No organic negative corpus exists for this party. The only review content found is manufactured: the same template promoting four different brand names, each published within days of its own domain registration. On a domain 184 days old that is what you would expect - complainants have not surfaced yet. Read it as an absence of evidence, not as a clean record. None of the nineteen review platforms behind this check were individually queried on this run; every one of them is listed in the coverage gaps below.",
     rows:[]},
@@ -1339,6 +1478,7 @@ var CORPUS = {
     "Search the BC Securities Commission Investment Caution List for its sibling, Investhelm. Same nameservers, same registrar, same promotional template, and it is already listed.",
     "Do not send by bank transfer or crypto. Neither has a recovery path, and this party has given you nothing a regulator could be asked to stand behind."
   ],
+  board:{"ICANN RDAP":"adverse","Infrastructure Cluster":"adverse","Document Fingerprint":"caution"},
   reviews:{checked:0,carrying:0,reports:0,state:"manufactured",
     note:"No organic negative corpus. The same promotional review template runs under this brand and three others, each within days of its own domain registration. Seven months old, no complainants yet. That is a timing fact, not a clean record.",
     rows:[]},
@@ -1379,15 +1519,48 @@ var SPECIMEN = {
   bars:[["Tier A, authoritative",31,"a"],["Tier B, structured",18,"b"],["Tier C, consumer",19,"c"],["Tier D, open web",5,"c"],["Sources not reached",14,"n"],["Material issues",4,"a"]],
   barFoot:"Seventy-three sources returned a definitive result across eleven jurisdictions. The decisive combination is a licensing mismatch, a domain younger than the claimed operating history, a beneficiary that is not the company being verified, and forty-three independent accounts describing the same withdrawal mechanic.",
   cats:{
-    C1:{state:"GREEN",sum:"Company record found and the legal entity is verified.",ev:[]},
-    C2:{state:"RED",sum:"Claimed UK authorisation could not be verified against the register.",ev:[]},
-    C3:{state:"GREEN",sum:"No matching enforcement action or public warning found in the lists checked.",ev:[]},
-    C4:{state:"YELLOW",sum:"Two directors identified. One marketed executive not independently verified.",ev:[]},
-    C5:{state:"GREEN",sum:"No insolvency, judgment or public order identified.",ev:[]},
-    C6:{state:"RED",sum:"Domain registered 43 days ago against a claimed twelve year operating history.",ev:[]},
-    C7:{state:"RED",sum:"Forty-three independent accounts across five platforms describing the same withdrawal mechanic.",ev:[]},
-    C8:{state:"RED",sum:"Beneficiary name on the wire does not match the company being verified.",ev:[]},
-    C9:{state:"YELLOW",sum:"Unusual recent verification activity against this identifier.",ev:[]}
+    C1:{state:"GREEN",sum:"Company record found and the legal entity is verified.",
+      ev:[{t:"A",src:"UK Companies House, company register",when:"26 Aug 2026",
+        find:"Atlantic Global Wealth Ltd is registered and active. Incorporated 11 June 2026.",
+        quote:"Company number 15482207. Incorporated on 11 June 2026. Company type: Private limited company. Company status: Active.",url:""}]},
+    C2:{state:"RED",sum:"Claimed UK authorisation could not be verified against the register.",
+      ev:[{t:"A",src:"FCA Financial Services Register",when:"26 Aug 2026",
+        find:"Reference 827381 does not correspond to Atlantic Global Wealth Ltd. It returns a different firm in a different category.",
+        quote:"No results found for Atlantic Global Wealth Ltd. Firm reference number 827381 is held by an unrelated firm.",url:""},
+       {t:"A",src:"CSA National Registration Search",when:"26 Aug 2026",
+        find:"Not registered in any Canadian jurisdiction, while accepting Canadian clients.",
+        quote:"No registrant found matching Atlantic Global Wealth.",url:""}]},
+    C3:{state:"GREEN",sum:"No matching enforcement action or public warning found in the lists checked.",
+      ev:[{t:"A",src:"IOSCO I-SCAN, 90+ contributing authorities",when:"26 Aug 2026",
+        find:"No matching alert in any contributing jurisdiction. Absence here is expected on a firm this new, and is not a clearance.",
+        quote:"0 results for Atlantic Global Wealth.",url:""}]},
+    C4:{state:"YELLOW",sum:"Two directors identified. One marketed executive not independently verified.",
+      ev:[{t:"A",src:"UK Companies House, persons with significant control",when:"26 Aug 2026",
+        find:"Two officers filed. Neither is the person the website names as Chief Executive.",
+        quote:"Officers: 2 active. No appointment recorded in the name John Smith.",url:""}]},
+    C5:{state:"GREEN",sum:"No insolvency, judgment or public order identified.",
+      ev:[{t:"A",src:"UK Insolvency Service and Companies House insolvency",when:"26 Aug 2026",
+        find:"No insolvency proceedings recorded against the entity or its two filed officers.",
+        quote:"No matching records.",url:""}]},
+    C6:{state:"RED",sum:"Domain registered 43 days ago against a claimed twelve year operating history.",
+      ev:[{t:"A",src:"ICANN RDAP, registry record",when:"26 Aug 2026",
+        find:"Domain created 14 July 2026. 43 days old. The site claims twelve years of trading.",
+        quote:"registration 2026-07-14T09:22:07Z; registrar privacy service; nameservers on a shared bulletproof range",url:""},
+       {t:"B",src:"Certificate transparency log",when:"26 Aug 2026",
+        find:"First certificate issued 16 July 2026, two days after registration. No earlier certificate exists for this name.",
+        quote:"Earliest entry 2026-07-16. Validity 90 days.",url:""}]},
+    C7:{state:"RED",sum:"Forty-three independent accounts across five platforms describing the same withdrawal mechanic.",
+      ev:[{t:"C",src:"Cross-platform negative review sweep",when:"26 Aug 2026",
+        find:"Five platforms carry the same mechanic in different people's words over five months. Community intelligence, promoted to red only because Tier A records corroborate.",
+        quote:"Depositing took four seconds. I have been waiting nine weeks for a withdrawal and every time I ask it goes back to processing.",url:""}]},
+    C8:{state:"RED",sum:"Beneficiary name on the wire does not match the company being verified.",
+      ev:[{t:"A",src:"Payment instructions supplied by the consumer",when:"26 Aug 2026",
+        find:"The wire names XYZ Holdings Ltd. The contracting party is Atlantic Global Wealth Ltd. The receiving bank is in a third country.",
+        quote:"Beneficiary: XYZ HOLDINGS LTD. Bank: [redacted], Cyprus. Reference: AGW-4471.",url:""}]},
+    C9:{state:"YELLOW",sum:"Unusual recent verification activity against this identifier.",
+      ev:[{t:"4orm",src:"4orm proprietary signal, search velocity",when:"26 Aug 2026",
+        find:"Independent verification requests against this identifier rose sharply in the last fourteen days, which usually means a marketing push is running.",
+        quote:"",url:""}]}
   },
   claims:[
     {q:"Operating since 2012",s:"ICANN RDAP, domain registry",r:"Domain registered 43 days ago",v:"RED"},
@@ -1409,6 +1582,21 @@ var SPECIMEN = {
     "Do not send by wire. If you have already sent one today, call your bank's fraud line now and ask for a recall before it settles."
   ],
   gaps:[["Cayman General Registry","Licence required"],["Two beneficial ownership registers","No public access"],["Three consumer platforms","Rate limited this run"]],
+  board:{
+    "Corporations Canada":"clear","Companies House":"clear","SEC EDGAR":"clear","Ontario Registry":"clear",
+    "CSA Registration":"adverse","FCA Register":"adverse","CIRO AdvisorReport":"unreached","BrokerCheck":"clear",
+    "FINTRAC MSB":"caution","Bank of Canada PSP":"clear","NFA BASIC":"clear",
+    "IOSCO I-SCAN":"clear","BCSC Caution List":"clear","ASC Caution List":"clear","OSC Alerts":"clear",
+    "CSA Alerts":"clear","FCA Warning List":"clear","OFAC":"clear","UN Consolidated":"clear",
+    "ISC Ownership":"caution","UK PSC Register":"caution","ASIC Banned":"clear","CSA Disciplined":"clear",
+    "CanLII":"clear","OSB Bankruptcy":"clear","CourtListener":"clear","UK Insolvency":"clear",
+    "ICANN RDAP":"adverse","Certificate Log":"caution","Google Web Risk":"clear","VirusTotal":"caution",
+    "urlscan.io":"clear","Mail Config":"caution",
+    "Trustpilot":"adverse","Sitejabber":"adverse","BBB Scam Tracker":"adverse","Forex Peace Army":"adverse",
+    "Reddit":"adverse","Glassdoor":"caution",
+    "Beneficiary Match":"adverse","IBAN and SWIFT":"adverse","Chainabuse":"unreached","Chain Analytics":"unreached",
+    "Infrastructure Cluster":"caution","Identifier Reuse":"unreached","Document Fingerprint":"unreached"
+  },
   reviews:{
     checked:11, carrying:5, reports:43, state:"organic",
     note:"Eleven platforms swept, five carrying negative reports, forty-three accounts read. Positive reviews on the two largest platforms cluster in a single week and are treated as unverified. The negative corpus does not: it spans five months and five platforms that do not share a user base.",
@@ -1440,16 +1628,22 @@ var GREY = {
   note:"This build carries a seeded evidence corpus of two entities, both retrieved from live public records on 25 August 2026. Anything outside that corpus returns grey, because inventing a result is the one thing this product must never do. Try investhelm.com or nexlares.com to see a full assessment."
 };
 
-var WAVES = [
-  {t:"Domain registry, threat feeds, corporate records, IOSCO I-SCAN, sanctions", tm:"Parallel, ~3s",
-   steps:["Resolving identifiers","Domain registry and certificates","Corporate registries and ownership","Regulator warning and caution lists","Sanctions and prohibited persons"]},
-  {t:"Licence registers, courts and insolvency, people and disqualifications, complaints, payment", tm:"Parallel, ~6s",
-   steps:["Licence and registration registers","Courts, insolvency and public orders","People and disqualifications","Consumer complaints and reviews","Threat feeds and phishing intelligence"]},
-  {t:"Claim extraction, cross-examination, proprietary signal match, scoring", tm:"~4s",
-   steps:["Extracting checkable claims","Binding claims to adjudicating sources","4orm proprietary signal match","Scoring and verdict"]},
-  {t:"Assemble the record, write the evidence store, update the entity graph", tm:"~2s",
-   steps:["Assembling the record","Writing the evidence store"]}
+/* The board. Every source the engine reaches for, grouped by the check it
+   serves. `w` is the wave it runs in, which is what makes the lights move in
+   the right order during a sweep. */
+var SOURCES = [
+ {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House"]},
+ {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC"]},
+ {c:"03 Enforcement", w:1, items:["IOSCO I-SCAN","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated"]},
+ {c:"04 People", w:2, items:["ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined"]},
+ {c:"05 Legal", w:2, items:["CanLII","OSB Bankruptcy","CourtListener","UK Insolvency"]},
+ {c:"06 Web", w:1, items:["ICANN RDAP","Certificate Log","Google Web Risk","VirusTotal","urlscan.io","Mail Config"]},
+ {c:"07 Reviews", w:2, items:["Trustpilot","Sitejabber","BBB Scam Tracker","Forex Peace Army","Reddit","Glassdoor"]},
+ {c:"08 Payment", w:2, items:["Beneficiary Match","IBAN and SWIFT","Chainabuse","Chain Analytics"]},
+ {c:"09 4orm", w:3, items:["Infrastructure Cluster","Identifier Reuse","Document Fingerprint"]}
 ];
+var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
+
 
 /* ======================= support directory ======================= */
 /* Every telephone number below was read from the organisation's own    */
@@ -1563,7 +1757,7 @@ var DIR = [
   {t:"Try at least four spellings.", x:"Registers do not match loosely. Drop the suffix, add the suffix, try Ltd and Limited and Inc, fold accents, and try the name without spaces. A nil result on one spelling is not a nil result."},
   {t:"Match the register to the activity, not to the industry.", x:"A company can be validly incorporated and still have no permission to sell you an investment. Existence and authorisation are two different registers, and passing one says nothing about the other."},
   {t:"Check the jurisdiction they claim, and the one they operate from.", x:"A firm claiming a London office, incorporated in Belize, banking in Cyprus and hosting in Switzerland is not necessarily fraudulent, but every one of those four is checkable and they should agree."},
-  {t:"Read the date on the record, not just the result.", x:"A registration that lapsed in 2023 still appears in some search results. So does a company that has been struck off. Look for status and last-filing date, not just the presence of a name."},
+  {t:"Read the date on the record, not only the result.", x:"A registration that lapsed in 2023 still shows up in some search results. So does a company that has been struck off. Look for the status and the last filing date. A name appearing is not the same as a name being current."},
   {t:"Check the domain age against the operating-history claim.", x:"Look up the domain at lookup.icann.org. A company claiming twelve years of trading on a domain registered six months ago has told you something no reference letter will undo. This is the fastest and most decisive check on this list."}
  ],
  foot:"None of these searches costs anything. Between them they answer most of the question, and the two that fail most often are licensing and payment destination."},
@@ -1665,18 +1859,26 @@ function setStats(list){
     setTimeout(function(){ i.style.width=Math.max(0,Math.min(100,parseFloat(st[3])||0))+"%"; },90);
   });
 }
-function renderWaves(){
-  var w=id("wavestrip"); w.innerHTML="";
-  WAVES.forEach(function(v,n){
-    var c=el("div","wcell");
-    c.setAttribute("data-w",n);
-    c.innerHTML='<div class="wtop"><span class="wi">0'+(n+1)+'</span><span class="wtm">'+esc(v.tm)+'</span></div>'+
-      '<div class="wt">'+esc(v.t)+'</div>'+
-      '<div class="wp"><i></i></div>'+
-      '<div class="wnow"></div>';
-    w.appendChild(c);
+function slug(x){ return x.toLowerCase().replace(/[^a-z0-9]+/g,"-"); }
+function renderBoard(status){
+  var w=id("brows"); w.innerHTML="";
+  SOURCES.forEach(function(g){
+    var r=el("div","brow");
+    var chips='';
+    g.items.forEach(function(n){
+      var st = status && status[n] ? status[n] : "ready";
+      chips+='<span class="src" data-s="'+esc(st)+'" data-n="'+esc(slug(n))+'"><i></i>'+esc(n)+'</span>';
+    });
+    r.innerHTML='<span class="bl">'+esc(g.c)+'</span><span class="bchips">'+chips+'</span>';
+    w.appendChild(r);
   });
 }
+function boardCount(){
+  var lit=id("brows").querySelectorAll('.src[data-s="clear"],.src[data-s="caution"],.src[data-s="adverse"]').length;
+  id("boardC").textContent = lit+" of "+TOTAL_SOURCES+" reached";
+  id("boardBar").style.width = Math.round(lit/TOTAL_SOURCES*100)+"%";
+}
+
 function setBars(list,foot){
   var w=id("bars"); w.innerHTML="";
   var max=Math.max.apply(null,list.map(function(b){return b[1];}))||1;
@@ -1810,34 +2012,38 @@ input.addEventListener("input",function(){ paintIds(detect(input.value)); go.dis
 
 /* ---- scan ---- */
 var timers=[];
-function runScan(done){
+function runScan(board, done){
   timers.forEach(clearTimeout); timers=[];
-  renderWaves();
+  renderBoard(null);
   id("modeLbl").textContent="Sweeping";
-  var cells=id("wavestrip").querySelectorAll(".wcell");
-  var per = reduce ? 26 : 165;
-  var t = 0;
-  WAVES.forEach(function(v,n){
-    var cell=cells[n], bar=cell.querySelector(".wp i"), now=cell.querySelector(".wnow"), tm=cell.querySelector(".wtm");
-    v.steps.forEach(function(st,k){
-      t++;
-      (function(cell,bar,now,tm,st,k,total){
-        timers.push(setTimeout(function(){
-          cell.classList.add("run");
-          now.textContent=st;
-          bar.style.width=Math.round((k+1)/total*100)+"%";
-          if(k+1===total){
-            timers.push(setTimeout(function(){
-              cell.classList.remove("run"); cell.classList.add("done");
-              now.textContent=total+" of "+total+" complete";
-              tm.textContent="done";
-            }, reduce?10:220));
-          }
-        }, per*t));
-      })(cell,bar,now,tm,st,k,v.steps.length);
-    });
+  id("boardT").textContent="Sweeping the source board";
+  id("auditRow").classList.remove("on");
+  id("boardBar").style.width="0%";
+  id("boardC").textContent="0 of "+TOTAL_SOURCES+" reached";
+
+  var order=[];
+  [1,2,3].forEach(function(wv){
+    SOURCES.forEach(function(g){ if(g.w===wv) g.items.forEach(function(n){ order.push(n); }); });
   });
-  timers.push(setTimeout(done, per*(t+1)+(reduce?10:340)));
+
+  var step = reduce ? 8 : 46;
+  order.forEach(function(n,i){
+    timers.push(setTimeout(function(){
+      var c=id("brows").querySelector('.src[data-n="'+slug(n)+'"]');
+      if(c) c.setAttribute("data-s","check");
+    }, step*i));
+    timers.push(setTimeout(function(){
+      var c=id("brows").querySelector('.src[data-n="'+slug(n)+'"]');
+      if(c) c.setAttribute("data-s", (board && board[n]) || "unreached");
+      boardCount();
+    }, step*i + (reduce?10:340)));
+  });
+
+  var total = step*order.length + (reduce?20:520);
+  timers.push(setTimeout(function(){
+    id("boardT").textContent="Source board";
+    done();
+  }, total));
 }
 
 /* ---- result blocks ---- */
@@ -1946,7 +2152,8 @@ function toIdle(){
   setDial(1,Math.round(NET.tierA/NET.connectors*100),"of 34","Tier A density","Authoritative sources as a share of the connector set.");
   setDial(2,Math.round(NET.directFeed/NET.connectors*100),"of 34","Direct feed","Connectors with a documented API or structured feed.");
   setReads(NET.reads); setBars(NET.bars,NET.foot);
-  setStats(NET.stats); renderWaves();
+  setStats(NET.stats); renderBoard(null); boardCount();
+  id("auditRow").classList.remove("on");
   id("catH2").textContent="Every category, and the registers behind it.";
   id("catP").textContent="Open any tile to read which regulators, registries and databases sit underneath that check, what each one is allowed to prove, and whether its terms permit commercial use.";
   id("kbRes").classList.remove("on");
@@ -1964,6 +2171,7 @@ function toResult(d,label){
   setDial(2,d.cov,"coverage","Evidence coverage","How much of the verification universe was actually reached.");
   setReads(d.reads); setBars(d.bars,d.barFoot);
   if(d.stats) setStats(d.stats);
+  id("auditRow").classList.toggle("on", !!d.cats);
 
   id("kbName").textContent=d.name||label;
   id("kbDom").textContent=d.domain||label;
@@ -2041,22 +2249,19 @@ function check(q){
 
   if(LIVE){
     var pending = liveCheck(q);
-    runScan(function(){
+    runScan(null, function(){
       pending.then(function(d){ toResult(d,q); })
              .catch(function(e){ toResult(errorResult(q, e.message), q); });
     });
     return;
   }
 
-  runScan(function(){
-    var d = key==="atlanticglobalwealth.com" ? SPECIMEN : CORPUS[key];
-    if(d) toResult(d,q);
-    else {
-      var g={}; for(var k in GREY) g[k]=GREY[k];
-      g.name=q.trim().toUpperCase(); g.domain=detect(q)||"Unidentified";
-      toResult(g,q);
-    }
-  });
+  var d = key==="atlanticglobalwealth.com" ? SPECIMEN : CORPUS[key];
+  if(!d){
+    d = {}; for(var k in GREY) d[k]=GREY[k];
+    d.name=q.trim().toUpperCase(); d.domain=detect(q)||"Unidentified";
+  }
+  runScan(d.board || null, function(){ toResult(d,q); });
 }
 
 id("kbForm").addEventListener("submit",function(e){
@@ -2070,85 +2275,302 @@ for(var ti=0;ti<tries.length;ti++){
   });
 }
 
-/* ---- support directory ---- */
-var dirScrim=id("dirScrim"), dirBox=id("dirBox"), dirBody=id("dirBody"),
-    dirTitle=id("dirTitle"), dirSub=id("dirSub"), lastFocus=null;
+/* ---- audit report ---- */
+var arScrim=id("arScrim"), arBox=id("arBox"), arBody=id("arBody");
+var CATNAME={}; CATS.forEach(function(c){ CATNAME[c.key]=c.id+" "+c.name; });
 
-function dirGrid(){
-  dirBox.classList.remove("deep");
-  dirTitle.textContent="Help me find support";
-  dirSub.textContent="Every number below was read from the organisation's own published contact page on 25 August 2026. Nothing here is a paid referral, and no individual lawyer or firm is named.";
-  var h='<div class="dirgrid">';
-  DIR.forEach(function(f,i){
-    var count = f.items ? f.items.length+(f.items.length===1?" contact":" contacts")
-                        : f.steps.length+" steps";
-    h+='<button class="folder" type="button" data-f="'+i+'">'+
-       '<span class="tab"></span>'+
-       '<span class="fbody">'+
-         '<span class="fix">'+esc(f.ix)+'</span>'+
-         '<span class="fn">'+esc(f.n)+'</span>'+
-         '<span class="fx">'+esc(f.x)+'</span>'+
-         '<span class="ff"><span class="fc">'+esc(count)+'</span><span class="fo">Open &rarr;</span></span>'+
-       '</span></button>';
+function evBlock(e){
+  return '<div class="ev"><div class="evtop">'+
+    '<span class="tier" data-t="'+esc(e.t)+'">Tier '+esc(e.t)+'</span>'+
+    '<span class="evsrc">'+esc(e.src)+'</span>'+
+    '<span class="evwhen">'+esc(e.when)+'</span></div>'+
+    '<div class="evfind">'+esc(e.find)+'</div>'+
+    (e.quote?'<div class="evquote">'+esc(e.quote)+'</div>':'')+
+    (e.url?'<a class="evlink" href="'+esc(e.url)+'" target="_blank" rel="noopener noreferrer">Open the source record</a>':'')+
+    '</div>';
+}
+
+function buildAudit(d){
+  id("arName").textContent = (d.name||"") + (d.domain? "  "+d.domain : "");
+  id("arBadge").setAttribute("data-v", d.verdict);
+  id("arBadgeT").textContent = d.headline;
+  id("arDate").textContent = "Compiled "+new Date().toLocaleDateString("en-CA",{day:"numeric",month:"short",year:"numeric"});
+
+  var h='';
+
+  /* 1. the finding */
+  h+='<div class="arsec"><div class="lbl gold">Section 01</div>'+
+     '<div class="arh">'+esc(d.statement)+'</div>'+
+     (d.specimen?'<div class="arp" style="color:var(--warn)"><b>Specimen.</b> This party does not exist. Every figure in this report is invented and it is here only to show the format.</div>':'')+
+     '<div class="armeters">'+
+       '<div class="armeter"><div class="m1">Identity confidence</div><div class="m2 tnum">'+esc(d.idc)+'%</div>'+
+         '<div class="m3"><i style="width:'+esc(d.idc)+'%;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt))"></i></div>'+
+         '<div class="arp" style="font-size:12px">How sure we are that every record used describes the same party you are dealing with.</div></div>'+
+       '<div class="armeter"><div class="m1">Evidence coverage</div><div class="m2 tnum">'+esc(d.cov)+'%</div>'+
+         '<div class="m3"><i style="width:'+esc(d.cov)+'%;background:linear-gradient(90deg,var(--gold-dp),var(--gold))"></i></div>'+
+         '<div class="arp" style="font-size:12px">How much of the verification universe was actually reached. What was missed is listed in section 08.</div></div>'+
+     '</div>'+
+     '<div class="statstrip" style="margin-top:24px">'+
+       (d.stats||[]).map(function(st){
+         return '<div class="scell"><div class="sv tnum">'+esc(st[0])+'</div><div class="sl">'+esc(st[2])+'</div>'+
+                '<div class="sp"><i data-c="'+esc(st[4])+'" style="width:'+esc(st[3])+'%"></i></div>'+
+                '<div class="sc">'+esc(st[5])+'</div></div>';
+       }).join('')+
+     '</div></div>';
+
+  /* 2. the source board */
+  var lit=0, tot=0;
+  h+='<div class="arsec"><div class="lbl gold">Section 02</div><div class="arh">Every source, and what each one returned.</div>'+
+     '<div class="arp">A dark light is a source that was not reached. It is never a source that came back clean.</div>'+
+     '<div class="arboard">';
+  SOURCES.forEach(function(g){
+    var chips='';
+    g.items.forEach(function(n){
+      tot++;
+      var st=(d.board&&d.board[n])||"unreached";
+      if(st!=="unreached") lit++;
+      chips+='<span class="src" data-s="'+esc(st)+'"><i></i>'+esc(n)+'</span>';
+    });
+    h+='<div class="brow"><span class="bl">'+esc(g.c)+'</span><span class="bchips">'+chips+'</span></div>';
+  });
+  h+='</div><div class="arp"><b>'+lit+' of '+tot+'</b> sources returned a result on this check.</div></div>';
+
+  /* 3. the nine checks */
+  h+='<div class="arsec"><div class="lbl gold">Section 03</div><div class="arh">The nine checks, and the records underneath them.</div>';
+  CATS.forEach(function(c){
+    var r=d.cats?d.cats[c.key]:null; if(!r) return;
+    h+='<div class="arcat"><div class="arcath">'+
+       '<span class="catdot" data-s="'+esc(r.state)+'"></span>'+
+       '<span class="cn">'+esc(CATNAME[c.key])+'</span>'+
+       '<span class="cs">'+esc(r.sum)+'</span>'+
+       '<span class="catstate" data-s="'+esc(r.state)+'">'+esc(r.state)+'</span></div>'+
+       '<div class="arcatb">'+
+       (r.ev.length? r.ev.map(evBlock).join('')
+         : '<div class="arnone">No record was retrieved for this check. It is reported grey, and it appears in the coverage gaps.</div>')+
+       '</div></div>';
   });
   h+='</div>';
-  h+='<div class="hint"><span class="hk"></span><span class="hx">'+
-     '<b>How this directory is built.</b> Only organisations that publish their own contact details appear here, and every telephone number was read off that organisation\'s own page. '+
-     'No individual lawyer, firm or recovery service is named anywhere in it, and nobody pays to be listed. Where the responsible answer is a referral service rather than a name, that is what you get. '+
-     'If a number has changed since it was checked, the web address beside it is the authority.'+
-     '</span></div>';
-  h+='<div class="dirfoot">Folders 07 and 08 contain no contacts. They are the two things you can do yourself, today, at no cost: run the registry checks properly, and preserve what you already have.</div>';
-  dirBody.innerHTML=h;
-  dirBody.scrollTop=0;
-  var fs=dirBody.querySelectorAll(".folder");
-  for(var i=0;i<fs.length;i++){
-    fs[i].addEventListener("click",function(){ dirFolder(parseInt(this.getAttribute("data-f"),10)); });
+
+  /* 4. cross-examination */
+  if(d.claims&&d.claims.length){
+    h+='<div class="arsec"><div class="lbl gold">Section 04</div><div class="arh">What the party claims, against what the record says.</div>'+
+       '<div class="claims" style="margin-top:16px"><div class="claimhead"><span>Claim</span><span>Checked against</span><span>What the record says</span><span style="text-align:right">Result</span></div>'+
+       d.claims.map(function(c){
+         return '<div class="claimrow"><span class="cq">'+esc(c.q)+'</span><span class="cs">'+esc(c.s)+'</span>'+
+                '<span class="cr">'+esc(c.r)+'</span><span class="cv" data-s="'+esc(c.v)+'">'+esc(c.v)+'</span></div>';
+       }).join('')+'</div></div>';
   }
-}
 
-function dirFolder(n){
-  var f=DIR[n];
-  dirBox.classList.add("deep");
-  dirTitle.textContent=f.n;
-  dirSub.textContent=f.x;
-  var h='<div class="dirintro"><div class="di">'+esc(f.intro)+'</div></div><div class="entries">';
+  /* 5. reviews */
+  if(d.reviews){
+    var r=d.reviews;
+    h+='<div class="arsec"><div class="lbl gold">Section 05</div><div class="arh">The one-star reviews, read first.</div>'+
+       '<div class="arp">Positive reviews are cheap to manufacture. Negative ones are not, because nobody is paid to write one. The signal is the same mechanic in different people\'s own words across platforms that do not share a user base.</div>'+
+       '<div class="rcard" style="margin-top:16px"><div class="rcstats">'+
+       '<div class="rcstat"><div class="v tnum">'+esc(r.checked)+'</div><div class="l">Platforms swept</div></div>'+
+       '<div class="rcstat"><div class="v tnum">'+esc(r.carrying)+'</div><div class="l">Carrying negative reports</div></div>'+
+       '<div class="rcstat"><div class="v tnum">'+esc(r.reports)+'</div><div class="l">Accounts read</div></div></div>';
+    if(r.note) h+='<div class="rcnote"><span class="k"></span><span class="x">'+esc(r.note)+'</span></div>';
+    if(r.rows.length){
+      h+='<div class="narrs">'+r.rows.map(function(n){
+        return '<div class="narr"><div class="ntop"><span class="nid">'+esc(NARR_LABEL[n.id]||n.id)+'</span>'+
+          '<span class="nlab">'+esc(n.label)+'</span>'+
+          '<span class="ncount">'+esc(n.pf)+'<small>platforms</small></span>'+
+          '<span class="ncount">'+esc(n.n)+'<small>accounts</small></span></div>'+
+          (n.quote?'<div class="nquote">&ldquo;'+esc(n.quote)+'&rdquo;</div>':'')+
+          '<div class="nmeta">'+n.names.map(function(x){return '<span class="npf">'+esc(x)+'</span>';}).join('')+
+          (n.period?'<span class="nper">'+esc(n.period)+'</span>':'')+'</div></div>';
+      }).join('')+'</div>';
+    } else {
+      h+='<div class="rcempty">No mechanic converged across platforms, so there is no report card to draw.</div>';
+    }
+    h+='</div></div>';
+  }
 
-  if(f.items){
-    f.items.forEach(function(it){
-      h+='<div class="entry"><div class="eleft">'+
-         '<div class="en">'+esc(it.n)+'</div>'+
-         '<div class="ew">'+esc(it.w)+'</div>'+
-         (it.note?'<div class="enote">'+esc(it.note)+'</div>':'')+
-         '</div><div class="eright">';
-      it.c.forEach(function(c){
-        var isTel = c[2]==="tel";
-        var isUrl = /^https?:\/\//.test(c[1]);
-        var val = isUrl
-          ? '<a class="cv" href="'+esc(c[1])+'" target="_blank" rel="noopener noreferrer">'+esc(c[1].replace(/^https?:\/\//,"").replace(/\/$/,""))+'</a>'
-          : (isTel ? '<a class="cv" href="tel:'+esc(c[1].replace(/[^\d+]/g,""))+'">'+esc(c[1])+'</a>'
-                   : '<span class="cv">'+esc(c[1])+'</span>');
-        h+='<div class="contact'+(isTel?" tel":"")+'"><span class="ck">'+esc(c[0])+'</span>'+val+'</div>';
-      });
-      h+='</div></div>';
-    });
-  } else {
-    f.steps.forEach(function(st,i){
-      h+='<div class="step"><span class="sn">0'+(i+1)+'</span><span class="sb">'+
-         '<span class="st" style="display:block">'+esc(st.t)+'</span>'+
-         '<span class="sx" style="display:block">'+esc(st.x)+'</span></span></div>';
-    });
+  /* 6. issues */
+  if(d.issues&&d.issues.length){
+    h+='<div class="arsec"><div class="lbl gold">Section 06</div><div class="arh">'+d.issues.length+' material issue'+(d.issues.length===1?'':'s')+' found, most serious first.</div>'+
+       '<div class="issues" style="margin-top:16px">'+d.issues.map(function(is,i){
+         return '<div class="issue"><span class="n">'+(i<9?"0":"")+(i+1)+'</span><span class="b">'+
+           '<span class="t">'+esc(is.t)+'</span><span class="x">'+esc(is.x)+'</span>'+
+           '<span class="m"><span class="sev" data-s="'+esc(is.sev)+'">'+esc(is.sev)+'</span>'+
+           '<span class="tier" data-t="'+esc(is.tier)+'">Tier '+esc(is.tier)+'</span></span></span></div>';
+       }).join('')+'</div></div>';
+  }
+
+  /* 7. before you send */
+  if(d.bys&&d.bys.length){
+    h+='<div class="arsec"><div class="lbl gold">Section 07</div><div class="arh">Do these things before you send anything.</div>'+
+       '<div class="byslist" style="margin-top:16px">'+d.bys.map(function(t,i){
+         return '<div class="bysitem"><span class="n">0'+(i+1)+'</span><span class="t">'+esc(t)+'</span></div>';
+       }).join('')+'</div></div>';
+  }
+
+  /* 8. gaps */
+  h+='<div class="arsec"><div class="lbl gold">Section 08</div><div class="arh">What we could not check, and why.</div>'+
+     '<div class="arp">A report showing only what it found lies by omission.</div>';
+  h+= (d.gaps&&d.gaps.length)
+    ? '<div class="gaps" style="margin-top:16px">'+d.gaps.map(function(g){
+        return '<div class="gap"><div class="s">'+esc(g[0])+'</div><div class="r">'+esc(g[1])+'</div></div>';
+      }).join('')+'</div>'
+    : '<div class="arnone" style="margin-top:12px">Nothing was left unchecked on this run.</div>';
+  if(d.unresolved&&d.unresolved.length){
+    h+='<div class="arh" style="margin-top:26px;font-size:14px">Unresolved questions</div><div class="byslist" style="margin-top:12px">'+
+       d.unresolved.map(function(t,i){return '<div class="bysitem"><span class="n">0'+(i+1)+'</span><span class="t">'+esc(t)+'</span></div>';}).join('')+'</div>';
   }
   h+='</div>';
-  if(f.hint) h+='<div class="hint"><span class="hk"></span><span class="hx">'+esc(f.hint)+'</span></div>';
-  if(f.foot) h+='<div class="dirfoot">'+esc(f.foot)+'</div>';
-  else h+='<div class="dirfoot">Contact details are published by the organisations themselves and can change. If a number does not connect, use the web address beside it.</div>';
-  dirBody.innerHTML=h;
-  dirBody.scrollTop=0;
+
+  /* 9. the record */
+  h+='<div class="arsec"><div class="lbl gold">Section 09</div><div class="arh">What this report is, and what it is not.</div>'+
+     '<div class="arp">4orm reports what public records show. A red result means material contradictions were found in the records checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person. Green never means 4orm certifies, endorses or guarantees anyone.</div>'+
+     '<div class="arp">Every record above carries its source, the date it was retrieved and the words it actually uses, so you can open it and check it yourself. Community material is labelled as such and never carries a finding on its own.</div>'+
+     '<div class="disc" style="margin-top:18px">Compiled '+esc(new Date().toISOString().slice(0,10))+' &middot; Search Cue v1.0 &middot; '+
+     esc(d.cov)+'% evidence coverage &middot; '+esc(d.idc)+'% identity confidence</div></div>';
+
+  arBody.innerHTML=h;
+  arBody.scrollTop=0;
 }
+
+function auditOpen(){
+  if(!CURRENT) return;
+  buildAudit(CURRENT);
+  arScrim.classList.add("on"); arBox.classList.add("on");
+  document.body.style.overflow="hidden";
+  id("arClose").focus();
+}
+function auditClose(){
+  arScrim.classList.remove("on"); arBox.classList.remove("on");
+  document.body.style.overflow="";
+}
+id("auditOpen").addEventListener("click",auditOpen);
+id("arClose").addEventListener("click",auditClose);
+arScrim.addEventListener("click",auditClose);
+
+/* ---- support directory ---- */
+var dirScrim=id("dirScrim"), dirBox=id("dirBox"), dirPane=id("dirPane"),
+    dirRail=id("dirRail"), dirQ=id("dirQ"), OPEN_F=-1, lastFocus=null;
+
+/* Triage. Somebody arriving here is stressed and does not want a taxonomy,
+   they want the answer to what has already happened. Each route lands them in
+   the right folder with a line of context. */
+var TRIAGE = [
+  {t:"I have not sent anything yet", x:"Check them first", f:6,
+   n:"Good. The checks below settle most questions in under ten minutes and cost nothing. The domain age check is the fastest and the most decisive."},
+  {t:"I sent money today", x:"Move now", f:3,
+   n:"Start at the top of this list and work down, today. Recovery depends almost entirely on how you paid, and every route has a clock that is already running."},
+  {t:"It has been weeks or months", x:"Report it", f:0,
+   n:"Recovery odds fall sharply after settlement, but reporting still matters. A file number is what your bank, your card issuer and any lawyer will ask you for first."},
+  {t:"They want another fee to release my funds", x:"Do not pay it", f:3,
+   n:"That is an advance-fee structure. Paying it does not release anything, and it identifies you as someone who pays. The money already sent is what you are trying to recover, not add to."},
+  {t:"I gave them my ID or my SIN", x:"Lock your credit", f:3,
+   n:"Put a fraud alert on both credit files today. Both, because they do not talk to each other. It is free and it makes new credit harder to open in your name."}
+];
+
+function contactHTML(c){
+  var isTel = c[2]==="tel", isUrl = /^https?:\/\//.test(c[1]);
+  var val = isUrl
+    ? '<a class="cv" href="'+esc(c[1])+'" target="_blank" rel="noopener noreferrer">'+esc(c[1].replace(/^https?:\/\//,"").replace(/\/$/,""))+'</a>'
+    : (isTel ? '<a class="cv" href="tel:'+esc(c[1].replace(/[^\d+]/g,""))+'">'+esc(c[1])+'</a>'
+             : '<span class="cv">'+esc(c[1])+'</span>');
+  return '<div class="contact'+(isTel?" tel":"")+'"><span class="ck">'+esc(c[0])+'</span>'+val+'</div>';
+}
+function entryHTML(it, cat){
+  return '<div class="entry"><div class="eleft">'+
+    (cat?'<div class="hitcat">'+esc(cat)+'</div>':'')+
+    '<div class="en">'+esc(it.n)+'</div><div class="ew">'+esc(it.w)+'</div>'+
+    (it.note?'<div class="enote">'+esc(it.note)+'</div>':'')+
+    '</div><div class="eright">'+it.c.map(contactHTML).join('')+'</div></div>';
+}
+function stepHTML(st, i, cat){
+  return '<div class="step"><span class="sn">'+(cat?"&bull;":"0"+(i+1))+'</span><span class="sb">'+
+    (cat?'<div class="hitcat">'+esc(cat)+'</div>':'')+
+    '<span class="st">'+esc(st.t)+'</span><span class="sx">'+esc(st.x)+'</span></span></div>';
+}
+
+function renderRail(){
+  dirRail.innerHTML="";
+  DIR.forEach(function(f,i){
+    var n = f.items ? f.items.length : f.steps.length;
+    var btn=el("button","railitem"+(i===OPEN_F?" on":""));
+    btn.type="button"; btn.setAttribute("data-f",i);
+    btn.innerHTML='<span class="ri">'+esc(f.ix)+'</span><span class="rn">'+esc(f.n)+'</span><span class="rc">'+n+'</span>';
+    btn.addEventListener("click",function(){ dirQ.value=""; openFolder(parseInt(this.getAttribute("data-f"),10)); });
+    dirRail.appendChild(btn);
+  });
+}
+
+function openFolder(n, ctx){
+  OPEN_F=n; renderRail();
+  var f=DIR[n];
+  id("dirTitle").textContent=f.n;
+  var h='';
+  if(ctx) h+='<div class="ctxnote on"><span class="k"></span><span class="x">'+esc(ctx)+'</span></div>';
+  h+='<div class="dirintro"><div class="di">'+esc(f.intro)+'</div></div><div class="entries">';
+  if(f.items) f.items.forEach(function(it){ h+=entryHTML(it); });
+  else f.steps.forEach(function(st,i){ h+=stepHTML(st,i); });
+  h+='</div>';
+  if(f.hint) h+='<div class="hint"><span class="hk"></span><span class="hx">'+esc(f.hint)+'</span></div>';
+  h+='<div class="dirfoot">'+esc(f.foot||"Contact details are published by the organisations themselves and can change. If a number does not connect, use the web address beside it.")+'</div>';
+  dirPane.innerHTML=h; dirPane.scrollTop=0;
+}
+
+function openHome(){
+  OPEN_F=-1; renderRail();
+  id("dirTitle").textContent="Who to call, and in what order";
+  var h='<div class="triage"><div class="lbl gold">Start here</div><div class="tq">What has already happened?</div><div class="trow">';
+  TRIAGE.forEach(function(t,i){
+    h+='<button class="tbtn" type="button" data-t="'+i+'"><span class="tx">'+esc(t.x)+'</span><span class="tt">'+esc(t.t)+'</span></button>';
+  });
+  h+='</div></div><div class="dirintro"><div class="di">Every telephone number here was read off that organisation\'s own published contact page. '+
+     'No individual lawyer, firm or recovery service is named anywhere in it, and nobody pays to be listed. '+
+     'Where the responsible answer is a referral service rather than a name, that is what you get. '+
+     'Pick a category on the left, or search across all of them at the top.</div></div>';
+  h+='<div class="entries">';
+  DIR.forEach(function(f,i){
+    h+='<div class="entry"><div class="eleft"><div class="hitcat">'+esc(f.ix)+'</div>'+
+       '<div class="en">'+esc(f.n)+'</div><div class="ew">'+esc(f.x)+'</div></div>'+
+       '<div class="eright"><button class="try" type="button" data-f="'+i+'" style="justify-self:start">Open &rarr;</button></div></div>';
+  });
+  h+='</div><div class="dirfoot">Two of these folders carry no contacts. They are the things you can do yourself, today, at no cost: run the registry checks properly, and preserve what you already have.</div>';
+  dirPane.innerHTML=h; dirPane.scrollTop=0;
+  dirPane.querySelectorAll(".tbtn").forEach(function(b){
+    b.addEventListener("click",function(){
+      var t=TRIAGE[parseInt(this.getAttribute("data-t"),10)];
+      openFolder(t.f, t.n);
+    });
+  });
+  dirPane.querySelectorAll("[data-f]").forEach(function(b){
+    b.addEventListener("click",function(){ openFolder(parseInt(this.getAttribute("data-f"),10)); });
+  });
+}
+
+function runFilter(q){
+  q=q.trim().toLowerCase();
+  if(!q){ openHome(); return; }
+  OPEN_F=-1; renderRail();
+  id("dirTitle").textContent='Results for "'+q+'"';
+  var hits=0, h='<div class="entries">';
+  DIR.forEach(function(f){
+    if(f.items) f.items.forEach(function(it){
+      var hay=(it.n+" "+it.w+" "+(it.note||"")+" "+f.n+" "+it.c.map(function(c){return c[0]+" "+c[1];}).join(" ")).toLowerCase();
+      if(hay.indexOf(q)>-1){ h+=entryHTML(it, f.ix+"  "+f.n); hits++; }
+    });
+    else f.steps.forEach(function(st,i){
+      var hay=(st.t+" "+st.x+" "+f.n).toLowerCase();
+      if(hay.indexOf(q)>-1){ h+=stepHTML(st,i,f.ix+"  "+f.n); hits++; }
+    });
+  });
+  h+='</div>';
+  dirPane.innerHTML = hits ? h
+    : '<div class="noresult">Nothing in the directory matches that. Try a shorter word, an organisation name, or clear the box to see every category.</div>';
+  dirPane.scrollTop=0;
+}
+
+dirQ.addEventListener("input",function(){ runFilter(this.value); });
 
 function dirOpen(){
   lastFocus=document.activeElement;
-  dirGrid();
+  dirQ.value=""; openHome();
   dirScrim.classList.add("on"); dirBox.classList.add("on");
   document.body.style.overflow="hidden";
   id("dirClose").focus();
@@ -2158,11 +2580,9 @@ function dirClose(){
   document.body.style.overflow="";
   if(lastFocus&&lastFocus.focus) lastFocus.focus();
 }
-var openers=document.querySelectorAll('[data-dir="open"]');
-for(var oi=0;oi<openers.length;oi++) openers[oi].addEventListener("click",dirOpen);
+document.querySelectorAll('[data-dir="open"]').forEach(function(b){ b.addEventListener("click",dirOpen); });
 id("dirClose").addEventListener("click",dirClose);
 dirScrim.addEventListener("click",dirClose);
-id("dirBack").addEventListener("click",dirGrid);
 
 /* ---- reveals ---- */
 function sweep(){
@@ -2185,8 +2605,11 @@ window.addEventListener("scroll",function(){
 },{passive:true});
 window.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;
+  if(arBox.classList.contains("on")){ auditClose(); return; }
   if(dirBox.classList.contains("on")){
-    if(dirBox.classList.contains("deep")) dirGrid(); else dirClose();
+    if(dirQ.value){ dirQ.value=""; openHome(); }
+    else if(OPEN_F>-1) openHome();
+    else dirClose();
     return;
   }
   if(OPEN) toggleDrill(OPEN);
