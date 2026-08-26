@@ -187,6 +187,39 @@ archive capture, a copyright line or a first press mention.
 **One environment variable to add:** `KBYS_MAX_ROUND2` = `6`. And raise
 `KBYS_MAX_SEARCHES` to `16`, because round one now carries sixteen searches.
 
+## The dashboard pass
+
+**The blur was a bug, not a design.** The detail modal sat at z-index 130 and the
+blurred scrim at 200, so every panel you opened was rendering behind the blur. Fixed.
+
+**A progress bar at the very top of the viewport.** Outside every panel, three pixels,
+running the width of the window while a check sweeps. The page now always answers
+whether something is happening without anyone hunting for a spinner inside a box.
+
+**A quick strip under the answer.** Six chips: the ten checks, reviews, the source
+board, cross-examination, material issues, gaps. Each carries its figure and opens a
+snapshot over the dashboard. Nothing scrolls the page, and closing puts you back exactly
+where you were.
+
+- **The ten checks** opens a summary of how many came back adverse, unresolved, nothing
+  found and not reached, then all ten as a list. Click any one and it opens that check.
+- **Reviews** opens with the numbers first: accounts read, platforms carrying negative
+  reports, platforms swept, and what the corpus looks like. Then the trending mechanics,
+  most repeated first, with the quote and which platforms carried it. Then where we
+  looked, platform by platform.
+- **Source board** opens all 64 registers sorted adverse first, and each one opens its
+  own reference.
+
+**The audit report is two thirds width, centred**, and it opens on a six figure grid:
+verdict, identity confidence, evidence coverage, checks adverse, registers reached,
+material issues. Eight passages of explanatory prose were cut.
+
+**Not financial advice**, on arrival, dismissible, and it fades on its own after
+twenty two seconds.
+
+**Categories, registers and jurisdictions** in the top bar now carry a border and a gold
+figure so they read as instruments rather than as small print.
+
 ## Run manual
 
 `4orm KBYS Run Manual.pdf` is in the 4orm KBYS folder. Eight pages covering
