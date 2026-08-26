@@ -662,6 +662,39 @@ body[data-stage="console"] .console{padding-top:112px}
 .npf{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--tx-4);padding:3px 8px;border-radius:999px;border:1px solid var(--border)}
 .nper{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx-4);margin-left:auto}
 .rcempty{padding:26px 22px;font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
+/* ---- review platform ledger: which platforms were swept, counted ---- */
+.pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:2px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-top:16px}
+.pf{background:var(--surface);padding:13px 15px;display:grid;gap:5px;align-content:start}
+.pf[data-hit="1"]{background:var(--surface-2)}
+.pftop{display:flex;align-items:center;gap:8px}
+.pfdot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:var(--nul);opacity:.34}
+.pf[data-hit="1"] .pfdot{background:var(--warn);opacity:1}
+.pf[data-searched="0"] .pfdot{background:var(--nul);opacity:.2}
+.pfn{font-size:12.5px;font-weight:650;color:var(--tx);letter-spacing:-.005em}
+.pfc{font-family:var(--mono);font-size:11px;color:var(--tx-3);letter-spacing:.03em}
+.pfs{font-size:11.5px;color:var(--tx-4);line-height:1.5}
+.pfsum{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.pfsum b{font-family:var(--mono);font-size:15px;color:var(--tx);font-weight:650}
+.pfsum span{font-size:12px;color:var(--tx-3)}
+/* ---- retrieved pages ---- */
+.rtgrp{margin-top:18px}
+.rtgrph{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.rtgrph .n{font-family:var(--mono);font-size:11px;color:var(--tx-4);letter-spacing:.06em;text-transform:uppercase}
+.rtgrph .h{font-size:13px;font-weight:650;color:var(--tx)}
+.rt{border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:6px;background:var(--surface)}
+.rttop{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:5px}
+.rthost{font-family:var(--mono);font-size:10.5px;color:var(--tx-3);letter-spacing:.03em;background:var(--surface-3);padding:2px 7px;border-radius:4px}
+.rtreg{font-family:var(--mono);font-size:10.5px;color:var(--blue-dp);letter-spacing:.03em}
+.rtdate{font-family:var(--mono);font-size:10.5px;color:var(--tx-4);margin-left:auto}
+.rtt{font-size:13px;font-weight:600;color:var(--tx);line-height:1.45;margin-bottom:4px}
+.rtsnip{font-size:12px;color:var(--tx-2);line-height:1.6}
+.rtlink{display:inline-block;margin-top:6px;font-size:11.5px;color:var(--blue-dp);text-decoration:none;border-bottom:1px solid var(--border-lit)}
+.rtlink:hover{border-bottom-color:var(--blue)}
+/* ---- pipeline diagnostics ---- */
+.pipe{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:2px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-top:14px}
+.pipec{background:var(--surface);padding:12px 14px}
+.pipec .v{font-family:var(--mono);font-size:15px;font-weight:650;color:var(--tx)}
+.pipec .l{font-size:11px;color:var(--tx-4);margin-top:3px;letter-spacing:.03em}
 .rcfoot{padding:15px 22px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.6}
 
 /* ================= result blocks ================= */
@@ -2147,9 +2180,31 @@ var NARR_LABEL = {
   "balance-not-real":"BALANCE NOT REAL","recovery-approach":"RECOVERY APPROACH",
   "terms-changed":"TERMS CHANGED","other":"OTHER"
 };
-function renderReviews(r){
+function ledgerHTML(ledger){
+  if(!ledger || !ledger.length) return '';
+  var swept=0, hit=0, pages=0;
+  ledger.forEach(function(p){ if(p.searched) swept++; if(p.pages>0) hit++; pages+=p.pages||0; });
+  return '<div class="rchd" style="margin-top:26px"><span class="lbl">Platform sweep</span>'+
+    '<span class="corpus" data-c="'+(hit?'organic':'absent')+'">'+hit+' of '+swept+' returned material</span></div>'+
+    '<div class="pfgrid">'+ledger.map(function(p){
+      return '<div class="pf" data-hit="'+(p.pages>0?1:0)+'" data-searched="'+(p.searched?1:0)+'">'+
+        '<div class="pftop"><span class="pfdot"></span><span class="pfn">'+esc(p.platform)+'</span></div>'+
+        '<div class="pfc">'+esc(p.host)+'</div>'+
+        '<div class="pfs">'+(p.searched
+           ? (p.pages>0 ? '<b>'+p.pages+'</b> page'+(p.pages===1?'':'s')+' returned' : 'searched, nothing returned')
+           : 'not in this sweep')+'</div></div>';
+    }).join('')+'</div>'+
+    '<div class="pfsum"><span><b>'+swept+'</b> platforms swept</span>'+
+    '<span><b>'+hit+'</b> returned material</span>'+
+    '<span><b>'+pages+'</b> pages read</span></div>';
+}
+
+function renderReviews(r, ledger){
   var w=id("kbRev");
-  if(!r){ w.innerHTML='<div class="rcempty">No review sweep was run for this party.</div>'; return; }
+  if(!r){
+    w.innerHTML='<div class="rcempty">No review sweep was run for this party.</div>'+ledgerHTML(ledger);
+    return;
+  }
   var maxPf=1; r.rows.forEach(function(n){ if(n.pf>maxPf) maxPf=n.pf; });
   var h='<div class="rchd"><span class="lbl">Negative review report card</span>'+
         '<span class="corpus" data-c="'+esc(r.state)+'">Corpus: '+esc(r.state)+'</span></div>'+
@@ -2187,6 +2242,7 @@ function renderReviews(r){
   h+='<div class="rcfoot">Community intelligence, not verified fact. A negative review is an allegation: some come from competitors, some from people who lost money in a legitimate market. '+
      'The signal is not volume, it is the same mechanic described in different people\'s own words on platforms that do not share a user base. '+
      'Tier C and D material never turns a category red on its own.</div>';
+  h+=ledgerHTML(ledger);
   w.innerHTML=h;
   var bars=w.querySelectorAll(".nbar i");
   r.rows.forEach(function(n,i){
@@ -2242,19 +2298,36 @@ function toResult(d,label){
     ? "Open any tile to read the records themselves, with the source, the tier, the date it was retrieved and the words it actually says, then the full register list behind that check."
     : "Nothing resolved for this party. The tiles below still show which regulators and registries sit behind each check.";
 
-  ["kbClaimSec","kbIssueSec","kbRevSec"].forEach(function(x){ id(x).style.display = full?"":"none"; });
+  var hasLedger = !!(d.ledger && d.ledger.length);
+  ["kbClaimSec","kbIssueSec"].forEach(function(x){ id(x).style.display = full?"":"none"; });
+  /* The platform sweep is worth showing even on a grey result: knowing which
+     platforms were looked at is exactly what a grey verdict leaves open. */
+  id("kbRevSec").style.display = (full||hasLedger) ? "" : "none";
   id("kbBys").closest(".sec").style.display = full?"":"none";
   if(full){
     renderClaims(d.claims); renderIssues(d.issues); renderBys(d.bys); renderGaps(d.gaps);
-    renderReviews(d.reviews);
+    renderReviews(d.reviews, d.ledger);
     id("kbGapH").textContent="What we could not check, and why.";
     id("kbGapP").textContent="A report that shows only what it found is a report that lies by omission. Every source that should have been reached and was not is listed here.";
     id("kbDisc").textContent="4orm reports what public records show. A red result means material contradictions were found in the records checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person.";
   } else {
-    renderClaims([]); renderIssues([]); renderBys([]); renderGaps([]); renderReviews(null);
+    renderClaims([]); renderIssues([]); renderBys([]); renderGaps([]); renderReviews(null, d.ledger);
     id("kbGapH").textContent="Why this came back grey.";
     id("kbGapP").textContent="Grey is a real result, not a failure. It means the console does not have enough of the picture to say anything honest yet.";
     id("kbDisc").textContent=d.note;
+  }
+
+  /* Repaint the board from the result. In live mode the scan animation runs
+     before the payload exists, so every light was drawn dark. Without this the
+     board reads "0 of 48 reached" on a check that reached plenty. */
+  if(d.board){
+    SOURCES.forEach(function(g){
+      g.items.forEach(function(n){
+        var c=id("brows").querySelector('.src[data-n="'+slug(n)+'"]');
+        if(c) c.setAttribute("data-s", d.board[n] || "unreached");
+      });
+    });
+    boardCount();
   }
 
   OPEN=null; id("drill").classList.remove("on"); id("drill").innerHTML="";
@@ -2291,10 +2364,24 @@ function liveCheck(q){
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({q:q})
   }).then(function(r){
-    return r.json().then(function(j){
-      if(!r.ok) throw new Error(j.message || ("The check failed with status "+r.status+"."));
+    /* Read the body as text first. A gateway timeout or a crashed function
+       answers with HTML, and parsing that as JSON would report a syntax error
+       instead of the thing that actually went wrong. */
+    return r.text().then(function(t){
+      var j=null;
+      try{ j=JSON.parse(t); }catch(e){ j=null; }
+      if(!r.ok){
+        var m = (j&&j.message) ? j.message
+              : (r.status===504 ? "The check ran past the time limit for a single request. The sweep did not finish."
+              : "The check failed with status "+r.status+".");
+        throw new Error(m+" [HTTP "+r.status+"]");
+      }
+      if(!j) throw new Error("The endpoint answered with something that is not a result. [HTTP "+r.status+"]");
       return j;
     });
+  }).catch(function(e){
+    if(e instanceof TypeError) throw new Error("The request never reached the endpoint. Check the deployment is live.");
+    throw e;
   });
 }
 
@@ -2416,8 +2503,8 @@ function buildAudit(d){
   }
 
   /* 5. reviews */
-  if(d.reviews){
-    var r=d.reviews;
+  if(d.reviews || (d.ledger && d.ledger.length)){
+    var r=d.reviews||{checked:0,carrying:0,reports:0,note:"",rows:[]};
     h+='<div class="arsec"><div class="lbl gold">Section 05</div><div class="arh">The one-star reviews, read first.</div>'+
        '<div class="arp">Positive reviews are cheap to manufacture. Negative ones are not, because nobody is paid to write one. The signal is the same mechanic in different people\'s own words across platforms that do not share a user base.</div>'+
        '<div class="rcard" style="margin-top:16px"><div class="rcstats">'+
@@ -2438,7 +2525,29 @@ function buildAudit(d){
     } else {
       h+='<div class="rcempty">No mechanic converged across platforms, so there is no report card to draw.</div>';
     }
-    h+='</div></div>';
+    h+='</div>';
+
+    /* The platform ledger. Counted from retrieval, not from judgment, so it
+       answers the question the report card cannot: was this platform actually
+       looked at, and did anything come back from it. */
+    if(d.ledger && d.ledger.length){
+      var swept=0, hit=0, pages=0;
+      d.ledger.forEach(function(p){ if(p.searched) swept++; if(p.pages>0) hit++; pages+=p.pages||0; });
+      h+='<div class="arh" style="margin-top:30px;font-size:15px">Which platforms were swept, and what came back.</div>'+
+         '<div class="arp">Counted from the pages retrieved on this run. A platform with nothing returned was still searched. It is reported as searched with nothing found, never as clean.</div>'+
+         '<div class="pfgrid">'+d.ledger.map(function(p){
+           return '<div class="pf" data-hit="'+(p.pages>0?1:0)+'" data-searched="'+(p.searched?1:0)+'">'+
+             '<div class="pftop"><span class="pfdot"></span><span class="pfn">'+esc(p.platform)+'</span></div>'+
+             '<div class="pfc">'+esc(p.host)+'</div>'+
+             '<div class="pfs">'+(p.searched
+                ? (p.pages>0 ? '<b>'+p.pages+'</b> page'+(p.pages===1?'':'s')+' returned' : 'searched, nothing returned')
+                : 'not in this sweep')+'</div></div>';
+         }).join('')+'</div>'+
+         '<div class="pfsum"><span><b>'+swept+'</b> platforms swept</span>'+
+         '<span><b>'+hit+'</b> returned material</span>'+
+         '<span><b>'+pages+'</b> pages read</span></div>';
+    }
+    h+='</div>';
   }
 
   /* 6. issues */
@@ -2474,11 +2583,62 @@ function buildAudit(d){
   }
   h+='</div>';
 
-  /* 9. the record */
-  h+='<div class="arsec"><div class="lbl gold">Section 09</div><div class="arh">What this report is, and what it is not.</div>'+
+  /* 9. every page retrieved */
+  if(d.retrieved && d.retrieved.length){
+    var byHost={};
+    d.retrieved.forEach(function(x){ var k=x.host||'unattributed'; (byHost[k]=byHost[k]||[]).push(x); });
+    var hosts=Object.keys(byHost).sort(function(a,b){ return byHost[b].length-byHost[a].length; });
+    h+='<div class="arsec"><div class="lbl gold">Section 09</div>'+
+       '<div class="arh">Every page this check actually read.</div>'+
+       '<div class="arp">'+d.retrieved.length+' page'+(d.retrieved.length===1?'':'s')+' across '+hosts.length+
+       ' host'+(hosts.length===1?'':'s')+'. Open any of them and check the finding yourself. Nothing in this report rests on a source that is not in this list.</div>';
+    hosts.forEach(function(hn){
+      var rows=byHost[hn];
+      var reg=(rows[0].reg&&rows[0].reg.length)?rows[0].reg.join(', '):'';
+      h+='<div class="rtgrp"><div class="rtgrph"><span class="n">'+rows.length+' page'+(rows.length===1?'':'s')+'</span>'+
+         '<span class="h">'+esc(hn)+'</span>'+(reg?'<span class="rtreg">'+esc(reg)+'</span>':'')+'</div>';
+      rows.slice(0,8).forEach(function(x){
+        h+='<div class="rt"><div class="rttop"><span class="rthost">'+esc(x.tier)+'</span>'+
+           (x.label?'<span class="rtreg">'+esc(x.label)+'</span>':'')+
+           (x.date?'<span class="rtdate">'+esc(x.date)+'</span>':'')+'</div>'+
+           (x.title?'<div class="rtt">'+esc(x.title)+'</div>':'')+
+           (x.snip?'<div class="rtsnip">'+esc(x.snip)+'</div>':'')+
+           '<a class="rtlink" href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">Open this page</a></div>';
+      });
+      if(rows.length>8) h+='<div class="arp" style="font-size:12px">'+(rows.length-8)+' further page'+((rows.length-8)===1?'':'s')+' from this host are in the stored record.</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+
+  /* 10. the record */
+  h+='<div class="arsec"><div class="lbl gold">Section 10</div><div class="arh">What this report is, and what it is not.</div>'+
      '<div class="arp">4orm reports what public records show. A red result means material contradictions were found in the records checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person. Green never means 4orm certifies, endorses or guarantees anyone.</div>'+
      '<div class="arp">Every record above carries its source, the date it was retrieved and the words it actually uses, so you can open it and check it yourself. Community material is labelled as such and never carries a finding on its own.</div>'+
-     '<div class="disc" style="margin-top:18px">Compiled '+esc(new Date().toISOString().slice(0,10))+' &middot; Search Cue v1.0 &middot; '+
+     '';
+  if(d.pipeline){
+    var pl=d.pipeline;
+    h+='<div class="arh" style="margin-top:26px;font-size:14px">How this check was run</div>'+
+       '<div class="arp">Published because a reader is entitled to know how much of an answer was retrieval and how much was judgment.</div>'+
+       '<div class="pipe">'+
+       '<div class="pipec"><div class="v">'+esc(((pl.exa&&pl.exa.ok)||0)+'/'+((pl.exa&&pl.exa.calls)||0))+'</div><div class="l">Exa searches returned</div></div>'+
+       '<div class="pipec"><div class="v">'+esc(((pl.parallel&&pl.parallel.ok)||0)+'/'+((pl.parallel&&pl.parallel.calls)||0))+'</div><div class="l">Parallel objectives returned</div></div>'+
+       '<div class="pipec"><div class="v">'+esc(((pl.exa&&pl.exa.results)||0)+((pl.parallel&&pl.parallel.results)||0))+'</div><div class="l">Pages retrieved</div></div>'+
+       '<div class="pipec"><div class="v">'+esc((pl.connectors&&pl.connectors.reached)||0)+'</div><div class="l">Direct connectors reached</div></div>'+
+       '<div class="pipec"><div class="v">'+esc((pl.connectors&&pl.connectors.siblings)||0)+'</div><div class="l">Infrastructure siblings</div></div>'+
+       '<div class="pipec"><div class="v">'+esc(Math.round(((pl.ms&&pl.ms.total)||0)/100)/10)+'s</div><div class="l">Total time</div></div>'+
+       '<div class="pipec"><div class="v">'+esc((pl.claude&&pl.claude.input_tokens)||0)+'</div><div class="l">Reasoning input tokens</div></div>'+
+       '<div class="pipec"><div class="v">'+esc((pl.claude&&pl.claude.output_tokens)||0)+'</div><div class="l">Reasoning output tokens</div></div>'+
+       '</div>';
+    if(pl.store){
+      h+='<div class="arp" style="font-size:12px;margin-top:10px">'+
+         (pl.store.stored
+           ? 'This run was written to the evidence record. Nothing is served back from it yet.'
+           : 'This run was not written to the evidence record ('+esc(pl.store.reason||'unknown')+'). The check itself is unaffected.')+
+         '</div>';
+    }
+  }
+  h+='<div class="disc" style="margin-top:18px">Compiled '+esc(new Date().toISOString().slice(0,10))+' &middot; Search Cue v1.0 &middot; '+
      esc(d.cov)+'% evidence coverage &middot; '+esc(d.idc)+'% identity confidence</div></div>';
 
   arBody.innerHTML=h;
@@ -2682,6 +2842,14 @@ if(LIVE){
   document.querySelector(".upnote").innerHTML=
     "<b>Live checking is on.</b> Every identifier you type runs a real sweep against public records. "+
     "Nothing is read from a stored corpus, and nothing is invented: if the sweep cannot complete, the console says so.";
+}
+
+/* Debug hook. Off unless ?debug=1 is in the URL, so it is inert in normal use.
+   With it on, the console's internals are reachable from the browser console,
+   which is how a failed live check gets diagnosed without guessing. */
+if(/[?&]debug=1\b/.test(window.location.search)){
+  window.__KBYS__={ toResult:toResult, buildAudit:buildAudit, errorResult:errorResult,
+                    check:check, liveCheck:liveCheck, current:function(){return CURRENT;} };
 }
 
 document.body.setAttribute("data-stage","landing");

@@ -22,12 +22,15 @@ import Anthropic from '@anthropic-ai/sdk';
 import { SEARCH_CUE, OUTPUT_INSTRUCTION } from './_cue.js';
 import { PAYLOAD_SCHEMA } from './_schema.js';
 import { runConnectors, siblingCheck } from './_connectors.js';
-import { exa, parallel, plan } from './_retrieval.js';
+import { exa, parallel, plan, REVIEW_HOSTS } from './_retrieval.js';
+import { retrievedSources, reachedBoard, overlayBoard, reviewLedger } from './_registers.js';
+import { recordRun } from './_store.js';
 
 export const config = { maxDuration: 300 };
 
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 const MAX_INPUT = 200;
+const MAX_SEARCHES = Math.max(3, Math.min(14, Number(process.env.KBYS_MAX_SEARCHES) || 10));
 const WINDOW_MS = 60_000;
 const PER_WINDOW = 5;
 
@@ -196,6 +199,17 @@ function toRenderShape(a, meta) {
     } : null,
 
     board: meta.board,
+
+    /* Everything retrieval actually reached, as served. The report lists these
+       so a reader can open each page and check the finding themselves, and so
+       an empty section reads as "nothing came back" rather than as silence. */
+    retrieved: (meta.sources || []).slice(0, 150).map(x => ({
+      tier: x.tier, label: x.label, url: x.url, title: x.title,
+      date: x.date, host: x.host, reg: x.registers || [],
+      snip: (x.snippet || '').slice(0, 340)
+    })),
+    ledger: meta.ledger || [],
+
     live: true,
     checked_at: new Date().toISOString(),
     pipeline: meta.pipeline
@@ -230,7 +244,7 @@ export default async function handler(req, res) {
     /* Tier 0 and Tier 1 run together. Nothing here depends on anything else. */
     const [conn, exaOut] = await Promise.all([
       runConnectors(domain),
-      Promise.all(p.exa.map(s => exa(s.query, s)))
+      Promise.all(p.exa.slice(0, MAX_SEARCHES).map(s => exa(s.query, s)))
     ]);
     const tExa = Date.now() - t0;
 
@@ -250,11 +264,12 @@ export default async function handler(req, res) {
     const parOut = await Promise.all(p.par.map(o => parallel(o.objective, o.queries, o)));
     const tRetrieval = Date.now() - t0;
 
-    /* Board status: green where a tier returned, dark where it did not. */
-    const board = {};
-    board['ICANN RDAP']  = subj?.status === 'found' ? 'clear' : 'unreached';
-    board['Mail Config'] = conn.records?.mail?.status === 'found' ? 'clear' : 'unreached';
-    if (siblings.length) board['Infrastructure Cluster'] = 'adverse';
+    /* Board, pass 1. Every URL that came back is attributed to the register it
+       belongs to, so a light means retrieval reached that register on this run.
+       Pass 2 runs after the assessment and carries adverse states onto it. */
+    const sources = retrievedSources(exaOut, parOut);
+    const board0  = reachedBoard(sources, conn, siblings);
+    const ledger  = reviewLedger(sources, REVIEW_HOSTS);
 
     /* Tier 3. One call. No search tool. Reasoning only. */
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -277,7 +292,13 @@ export default async function handler(req, res) {
           `brief, it was not reached, and it belongs in coverage_gaps as such - never as a ` +
           `clean result. Every quote field must be verbatim text that appears below.\n\n` +
           `No document or payment instruction was supplied, so C8 is GREY.\n\n` +
-          brief(q, domain, conn, exaOut, parOut, siblings)
+          brief(q, domain, conn, exaOut, parOut, siblings) +
+          '\n\n================ REVIEW PLATFORM LEDGER (COUNTED, NOT JUDGED) ================\n' +
+          'This ledger is counted from the retrieval above, not estimated. Your\n' +
+          'review_narratives block must agree with it. platforms_checked is the number\n' +
+          'marked searched. platforms_carrying_negatives can never exceed the number\n' +
+          'with pages returned, and a platform with zero pages was not read.\n' +
+          ledger.map(r => `  ${r.platform} (${r.host}): searched=${r.searched} pages_returned=${r.pages}`).join('\n')
       }]
     });
 
@@ -287,8 +308,11 @@ export default async function handler(req, res) {
       stop_reason: msg.stop_reason });
 
     const exaCost = exaOut.reduce((n, b) => n + (b.cost || 0), 0);
+    const board = overlayBoard(board0, call.input);
     const payload = toRenderShape(call.input, {
       board,
+      sources,
+      ledger,
       pipeline: {
         connectors: { reached: conn.reached, unreached: conn.unreached, siblings: siblings.length },
         exa:      { calls: exaOut.length, ok: exaOut.filter(b => b.status === 'found').length,
@@ -301,6 +325,17 @@ export default async function handler(req, res) {
         ms: { retrieval: tRetrieval, exa: tExa, total: Date.now() - t0 }
       }
     });
+
+    /* The write side. Storage can never break a check: recordRun swallows its
+       own failures and reports them, and the payload carries what happened. */
+    const stored = await recordRun({
+      identifier: q, domain, payload, pipeline: payload.pipeline,
+      sources, ledger, connectors: conn, siblings,
+      sourcesChecked: call.input?.scores?.sources_checked ?? null,
+      sourcesNotReached: call.input?.scores?.sources_not_reached ?? null,
+      briefChars: 0
+    }).catch(e => ({ stored: false, reason: e?.message || 'store threw' }));
+    payload.pipeline.store = stored;
 
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json(payload);

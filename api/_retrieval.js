@@ -31,11 +31,18 @@ export const DOMAINS = {
                   'find-and-update.company-information.service.gov.uk'],
   intl:          ['asic.gov.au','mas.gov.sg','iosco.org','sfc.hk','fma.govt.nz','cysec.gov.cy','mfsa.mt'],
   sanctions:     ['sanctionssearch.ofac.treas.gov','treasury.gov','un.org','international.gc.ca'],
-  reviews:       ['trustpilot.com','sitejabber.com','bbb.org','forexpeacearmy.com',
-                  'complaintsboard.com','ripoffreport.com','pissedconsumer.com',
-                  'scamadviser.com','reddit.com','glassdoor.com','indeed.com',
-                  'wikifx.com','fxempire.com','chainabuse.com','trustburn.com']
+  /* Review hosts are grouped so each group can be pinned separately.
+     DOMAINS.reviews stays as the union, because other callers use it. */
+  reviews_major:     ['trustpilot.com','sitejabber.com','bbb.org','scamadviser.com','trustburn.com'],
+  reviews_boards:    ['complaintsboard.com','ripoffreport.com','pissedconsumer.com'],
+  reviews_community: ['forexpeacearmy.com','reddit.com','glassdoor.com','indeed.com',
+                      'wikifx.com','fxempire.com','chainabuse.com']
 };
+DOMAINS.reviews = [...DOMAINS.reviews_major, ...DOMAINS.reviews_boards, ...DOMAINS.reviews_community];
+
+/* Every review host the plan pins a search to. The ledger uses this to say
+   "searched" honestly, rather than inferring it from whether anything came back. */
+export const REVIEW_HOSTS = DOMAINS.reviews;
 
 /* ------------------------------ EXA ------------------------------ */
 export async function exa(query, opts = {}) {
@@ -148,9 +155,21 @@ export function plan(q, domain) {
       { label:'C5 courts and insolvency', query:`${name} lawsuit judgment insolvency order`,
         includeDomains:[...D.ca_courts, 'sec.gov','gov.uk'], numResults:3 },
 
-      { label:'C7 negative reviews, pinned to review platforms',
-        query:`${name} scam withdrawal refused cannot withdraw complaints one star`,
-        includeDomains:D.reviews, numResults:8, fullText:true, maxChars:3000 },
+      /* The review sweep is split three ways on purpose. One search pinned to
+         fifteen hosts returns whatever ranks highest and can miss a platform
+         entirely. Three narrower pins force results out of each group, which
+         is what makes the platform ledger mean something. */
+      { label:'C7 review platforms',
+        query:`${name} review scam withdrawal refused cannot withdraw one star`,
+        includeDomains:D.reviews_major, numResults:6, fullText:true, maxChars:3000 },
+
+      { label:'C7 complaint boards',
+        query:`${name} complaint report ripoff refused refund`,
+        includeDomains:D.reviews_boards, numResults:5, fullText:true, maxChars:3000 },
+
+      { label:'C7 trading and workplace community',
+        query:`${name} scam warning account manager pressure deposit`,
+        includeDomains:D.reviews_community, numResults:6, fullText:true, maxChars:3000 },
 
       { label:'Open sweep, the subject’s own claims',
         query:`${name} ${d} about us regulated licensed years operating history`,
