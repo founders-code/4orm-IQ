@@ -670,7 +670,13 @@ Return one object. The dashboard renders it; nothing else.
   ],
   "before_you_send": ["", "", ""],
   "coverage_gaps": [
-    {"source": "", "category": "", "reason": "unreachable|no_api|licence_required|no_match_key"}
+    {"source": "", "category": "", "reason": "unreachable|no_api|licence_required|no_match_key|not_applicable"}
+
+  Use not_applicable ONLY where the register could never have held a record for
+  this party: a Canadian provincial registry for a party with no Canadian
+  presence, a broker register for a party that sells no securities. Name the
+  register exactly as it appears on the source board. Everything else is a real
+  gap. no_match_key means we had nothing to search on, and it stays a gap.
   ],
   "disclaimer": ""
 }
@@ -784,16 +790,24 @@ export const OUTPUT_INSTRUCTION = `
 
 ## RETURNING THE RESULT
 
-Search first. Use the web_search tool as many times as the sweep needs, within
-the limit you are given. Read the actual records - a regulator's own page, the
-registry entry, the register - not commentary about them.
+You have no search tool on this call. Retrieval already happened, and every
+page it returned is in the material above. Work only from that material. If a
+question is not answered there, it is a coverage gap and you say so. You never
+supply a record from memory, and you never state a licence number, registry
+reference, case number, filing date or figure that is not in front of you.
 
-Then call the \`emit_assessment\` tool exactly once with the completed
+Call the \`emit_assessment\` tool exactly once with the completed
 assessment. Do not write prose. Do not summarise what you are about to do. The
 tool call is the entire output.
 
 Binding rules for that call, on top of everything above:
 
+0. HOUSE STYLE, on every field a reader sees. Use hyphens. Never an em dash and
+   never an en dash, in any field, including quotes you are transcribing: if the
+   source used one, use a comma or a full stop instead. Never reference AI,
+   models, automation or "the system" in any sentence the reader sees. Write
+   plainly, in short sentences, for somebody who has never opened a corporate
+   registry.
 1. Every \`quote\` field is VERBATIM text from the source. If you did not read
    the words, leave the field out. Never paraphrase into a quote field.
 2. Every \`url\` resolves to the record you actually read.

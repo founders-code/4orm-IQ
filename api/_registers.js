@@ -102,7 +102,8 @@ const HOST_MAP = {
 
   /* 06 Web */
   'rdap.org':                   ['ICANN RDAP'],
-  'crt.sh':                     ['Certificate Log'],
+  /* crt.sh serves two registers and is declared once, below under check 10.
+     A second declaration here would silently lose whichever came first. */
   'virustotal.com':             ['VirusTotal'],
   'urlscan.io':                 ['urlscan.io'],
   'transparencyreport.google.com': ['Google Web Risk'],
@@ -204,9 +205,51 @@ export function reachedBoard(sources = [], conn = {}, siblings = []) {
   return board;
 }
 
+/* Pass 1b. A register that was actually queried and returned nothing is NOT
+   the same thing as a register we could not get into. Both leave the light
+   dark, and until this pass existed the board called both of them "could not
+   reach it", which is a lie about the second and an insult to the first.
+   searchedHosts is every domain that was pinned on a search that ran. */
+export function searchedBoard(board, searchedHosts = []) {
+  const out = { ...board };
+  new Set(searchedHosts).forEach(h => {
+    registersFor(String(h || '').toLowerCase().replace(/^www\./, ''))
+      .forEach(n => { if (!out[n]) out[n] = 'searched'; });
+  });
+  return out;
+}
+
+/* Pass 1c. A Canadian corporate registry has no record of a Florida company
+   and never will. Counting that against coverage makes the whole figure
+   meaningless. The assessment publishes not_applicable in coverage_gaps and
+   this carries it onto the board so the reader sees why the light is dark. */
+export function applicabilityBoard(board, assessment) {
+  const out = { ...board };
+  const names = Object.keys(board);
+  (assessment?.coverage_gaps || []).forEach(g => {
+    const reason = String(g.reason || '').toLowerCase().replace(/[\s-]+/g, '_');
+    /* not_applicable only. no_match_key means we had nothing to search on,
+       which is a hole in coverage and must stay counted as one. */
+    if (reason.indexOf('not_applicable') < 0) return;
+    const src = String(g.source || '').toLowerCase().trim();
+    /* A bare substring test lets an empty or two letter source claim every
+       register on the board, which would render the whole sweep "does not
+       apply here" and hide every real gap. Require a real name. */
+    if (src.length < 5) return;
+    names.forEach(nm => {
+      if (out[nm] && out[nm] !== 'searched') return;   /* never overwrite a real result */
+      const low = nm.toLowerCase();
+      if (src.includes(low) || (low.length >= 5 && low.includes(src))) out[nm] = 'na';
+    });
+  });
+  return out;
+}
+
 /* Pass 2. Carry the assessment's own verdict on a category onto the registers
-   it cited. Only downgrades: a register never becomes cleaner than pass 1. */
-const RANK = { unreached: 0, clear: 1, caution: 2, adverse: 3 };
+   it cited. Only downgrades: a register never becomes cleaner than pass 1.
+   searched and na are dark states: an assessment cannot cite a register that
+   returned nothing, so they are never upgraded here. */
+const RANK = { unreached: 0, searched: 0, na: 0, clear: 1, caution: 2, adverse: 3 };
 
 export function overlayBoard(board, assessment) {
   const out = { ...board };
@@ -223,8 +266,12 @@ export function overlayBoard(board, assessment) {
         if (String(e.source || '').toLowerCase().includes(n.toLowerCase())) names.add(n);
       });
       names.forEach(n => {
-        if (!out[n]) return;                       /* never light an unreached register */
-        if (RANK[st] > RANK[out[n]]) out[n] = st;
+        /* Only a register that answered can carry a finding, but once it has
+           one, a worse finding from another category must be able to escalate
+           it. Otherwise category order decides the colour of the light. */
+        const cur = out[n];
+        if (cur !== 'clear' && cur !== 'caution' && cur !== 'adverse') return;
+        if (RANK[st] > RANK[cur]) out[n] = st;
       });
     });
   });

@@ -23,7 +23,7 @@ import { SEARCH_CUE, OUTPUT_INSTRUCTION } from './_cue.js';
 import { PAYLOAD_SCHEMA } from './_schema.js';
 import { runConnectors, siblingCheck } from './_connectors.js';
 import { exa, parallel, plan, planRound2, extractSeeds, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
-import { retrievedSources, reachedBoard, overlayBoard, reviewLedger } from './_registers.js';
+import { retrievedSources, reachedBoard, searchedBoard, applicabilityBoard, overlayBoard, reviewLedger } from './_registers.js';
 import { recordRun } from './_store.js';
 
 export const config = { maxDuration: 300 };
@@ -312,10 +312,11 @@ export default async function handler(req, res) {
        This exists because the first real entity anybody checked was a company
        whose chief executive's name was in the results and never searched. */
     let seeds = { people: [], caseNumbers: [], relatedEntities: [], domains: [] };
-    let exa2 = [];
+    let exa2 = [], round2Plan = [];
     if (MAX_ROUND2 > 0) {
       seeds = extractSeeds(exaOut, [], domain, q);
       const r2 = planRound2(q, domain, seeds, checks).slice(0, MAX_ROUND2);
+      round2Plan = r2;
       if (r2.length) exa2 = await Promise.all(r2.map(x => exa(x.query, x)));
     }
     const exaAll = exaOut.concat(exa2);
@@ -331,7 +332,27 @@ export default async function handler(req, res) {
        belongs to, so a light means retrieval reached that register on this run.
        Pass 2 runs after the assessment and carries adverse states onto it. */
     const sources = retrievedSources(exaAll, parOut);
-    const board0  = reachedBoard(sources, conn, siblings);
+
+    /* Every domain that was pinned on a search that actually ran. A register in
+       here that still has no result was searched and came back empty, which is
+       a finding. A register that is not in here was never asked. The board is
+       allowed to say which is which, instead of stamping both "could not reach". */
+    const searchedHosts = [];
+    const round1Plan = p.exa.slice(0, MAX_SEARCHES);
+    const pinIf = (planned, out) => planned.forEach((x, i) => {
+      /* status found is the only outcome that means the register was actually
+         asked. not_configured, error and unreachable all mean the search never
+         happened, and pinning them would manufacture a negative result out of
+         an outage. This is the difference between "it came back empty" and
+         "our key was missing". */
+      if (!out || out[i]?.status !== 'found') return;
+      (x.includeDomains || x.domains || []).forEach(h => searchedHosts.push(h));
+    });
+    pinIf(round1Plan, exaOut);
+    pinIf(round2Plan, exa2);
+    pinIf(p.par, parOut);
+
+    const board0  = searchedBoard(reachedBoard(sources, conn, siblings), searchedHosts);
     const ledger  = reviewLedger(sources, REVIEW_HOSTS);
 
     /* Everything above is retrieval, and it is final. The board, the ledger and
@@ -344,7 +365,10 @@ export default async function handler(req, res) {
         date: x.date, host: x.host, reg: x.registers || [], snip: (x.snippet || '').slice(0, 340)
       })),
       counts: {
-        registers_reached: Object.values(board0).filter(v => v !== 'unreached').length,
+        /* The same test the console uses. searched and na are dark states: a
+           register that came back empty was not reached. */
+        registers_reached: Object.values(board0)
+          .filter(v => v === 'clear' || v === 'caution' || v === 'adverse').length,
         pages: sources.length,
         platforms_searched: ledger.filter(r => r.searched).length,
         platforms_returning: ledger.filter(r => r.pages > 0).length
@@ -397,7 +421,7 @@ export default async function handler(req, res) {
       stop_reason: msg.stop_reason });
 
     const exaCost = exaAll.reduce((n, b) => n + (b.cost || 0), 0);
-    const board = overlayBoard(board0, call.input);
+    const board = overlayBoard(applicabilityBoard(board0, call.input), call.input);
     const payload = toRenderShape(call.input, {
       board,
       sources,
