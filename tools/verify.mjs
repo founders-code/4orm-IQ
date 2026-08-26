@@ -245,6 +245,15 @@ if (!/class="iqmark" src="data:image\/png;base64,/.test(html))
   fails.push('the 4 in the headline lockup is not the real mark file');
 if (!/<span class="iqlock"/.test(html))
   fails.push('the headline no longer carries the 4ormIQ lockup');
+/* The "4orm" in the headline is the logo file with FINANCE masked off, so the
+   mark and the letterforms are the real ones. IQ is the only type in it, and
+   it is set at the weight of the logo's own strokes, not the headline's 800. */
+const iqRule = (styleBlock.match(/\.iqiq\{[^}]*\}/) || [''])[0];
+if (!/font-weight:\s*600/.test(iqRule))
+  fails.push('IQ in the headline lockup is not at the logo\'s stroke weight, so it will read as too heavy');
+const markRule = (styleBlock.match(/\.iqmark\{[^}]*\}/) || [''])[0];
+if (!/vertical-align:\s*baseline/.test(markRule))
+  fails.push('the headline mark is no longer anchored to the text baseline, which is what left it sitting low');
 /* The Finance logo is deliberately off geometric centre, because the blue mark
    carries almost no contrast on this ground and the white letters carry it all.
    Losing the nudge puts it back to looking pushed right. */
