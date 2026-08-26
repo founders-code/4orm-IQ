@@ -435,6 +435,46 @@ body[data-stage="console"] .console{padding-top:112px}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
+/* ---- the answer leads ----
+   Dashboard hierarchy: the highest level result sits top left, immediately
+   under the control that produced it, above the fold. The board and the
+   evidence composition are how the answer was reached and they come after it. */
+.verdictwrap{margin-top:20px;display:none}
+body[data-stage="console"] .verdictwrap.on{display:block}
+.verdictwrap .verdict{margin:0}
+/* ---- the detail modal, shared by a category tile and a register light ---- */
+.infobox{
+  position:fixed;z-index:130;inset:6vh 50% auto auto;transform:translateX(50%);
+  width:min(880px,94vw);max-height:88vh;display:none;flex-direction:column;
+  background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);
+  box-shadow:var(--sh-xl);overflow:hidden;
+}
+.infobox.on{display:flex}
+.infohd{display:flex;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.infohd .it{font-size:19px;font-weight:800;letter-spacing:-.028em;color:var(--tx);margin-top:4px}
+.infostate{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--border-strong);color:var(--tx-3)}
+.infostate[data-s="clear"]{color:var(--ok);border-color:var(--ok-br);background:var(--ok-bg)}
+.infostate[data-s="caution"]{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+.infostate[data-s="adverse"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.infostate[data-s="RED"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.infostate[data-s="YELLOW"]{color:var(--warn);border-color:var(--warn-br);background:var(--warn-bg)}
+.infostate[data-s="GREEN"]{color:var(--ok);border-color:var(--ok-br);background:var(--ok-bg)}
+.infobody{overflow-y:auto;overscroll-behavior:contain;padding:22px}
+.infoq{font-size:15px;font-weight:650;color:var(--tx);line-height:1.45;letter-spacing:-.015em}
+.infop{font-size:13.5px;color:var(--tx-2);line-height:1.65;margin-top:10px;max-width:84ch}
+.infometa{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:14px}
+.infochip{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface-2);color:var(--tx-3)}
+.infosec{margin-top:26px;padding-top:20px;border-top:1px solid var(--border)}
+.infosec:first-child{margin-top:0;padding-top:0;border-top:none}
+.infoh{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.infolink{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  color:var(--blue-lt);text-decoration:none;border-bottom:1px solid var(--border-lit)}
+.infolink:hover{border-bottom-color:var(--blue)}
+.src{cursor:pointer}
+.src:hover{border-color:var(--border-lit);transform:translateY(-1px)}
+@media(max-width:760px){.infobox{inset:0;transform:none;width:100%;max-height:100%;border-radius:0;border:none}}
 /* ================= the split, below the search bar =================
    The search bar keeps the full width at the top. Everything under it
    runs in two columns: what the check concluded on the left, the ten
@@ -957,6 +997,20 @@ body[data-stage="console"] .console{padding-top:112px}
           </div>
         </div>
 
+        <div class="verdictwrap console-only" id="verdictWrap">
+      <div class="verdict kb-rv" id="kbVerdict" data-v="RED">
+        <div class="vtop">
+          <div><div class="vname" id="kbName">-</div><div class="vdom" id="kbDom">-</div></div>
+          <div class="vbadge" id="kbBadge" data-v="RED"><span class="bd"></span><span id="kbBadgeT">-</span></div>
+        </div>
+        <p class="vstate" id="kbStatement">-</p>
+        <div class="rcnote" id="kbSpecimen" style="display:none;margin-top:22px;border:1px solid var(--warn-br);border-radius:var(--r);background:var(--warn-bg);padding:15px 18px">
+          <span class="k" style="background:var(--warn)"></span>
+          <span class="x" style="color:var(--warn)"><b>Specimen.</b> Atlantic Global Wealth does not exist. Every name, figure, quote and date on this result is invented, and it is here only to show what a fully populated assessment looks like. It is not a finding about anybody.</span>
+        </div>
+      </div>
+        </div>
+
         <div class="statstrip" id="statstrip"></div>
 
         <div class="boardwrap">
@@ -1073,19 +1127,6 @@ body[data-stage="console"] .console{padding-top:112px}
 </section>
 <main class="res" id="kbRes">
   <div class="wrap">
-    <section class="sec tight">
-      <div class="verdict kb-rv" id="kbVerdict" data-v="RED">
-        <div class="vtop">
-          <div><div class="vname" id="kbName">-</div><div class="vdom" id="kbDom">-</div></div>
-          <div class="vbadge" id="kbBadge" data-v="RED"><span class="bd"></span><span id="kbBadgeT">-</span></div>
-        </div>
-        <p class="vstate" id="kbStatement">-</p>
-        <div class="rcnote" id="kbSpecimen" style="display:none;margin-top:22px;border:1px solid var(--warn-br);border-radius:var(--r);background:var(--warn-bg);padding:15px 18px">
-          <span class="k" style="background:var(--warn)"></span>
-          <span class="x" style="color:var(--warn)"><b>Specimen.</b> Atlantic Global Wealth does not exist. Every name, figure, quote and date on this result is invented, and it is here only to show what a fully populated assessment looks like. It is not a finding about anybody.</span>
-        </div>
-      </div>
-    </section>
 
     <section class="sec tight" id="kbRevSec">
       <div class="sechead kb-rv">
@@ -1177,6 +1218,16 @@ body[data-stage="console"] .console{padding-top:112px}
     <button class="dirclose" type="button" id="arClose" style="margin-left:auto">Close</button>
   </div>
   <div class="arbody" id="arBody"></div>
+</div>
+
+<div class="dirscrim" id="infoScrim"></div>
+<div class="infobox" id="infoBox" role="dialog" aria-modal="true" aria-label="Detail">
+  <div class="infohd">
+    <div><div class="lbl gold" id="infoKind">Detail</div><div class="it" id="infoTitle">-</div></div>
+    <span class="infostate" id="infoState"></span>
+    <button class="dirclose" type="button" id="infoClose" style="margin-left:auto">Close</button>
+  </div>
+  <div class="infobody" id="infoBody"></div>
 </div>
 
 <div class="dirscrim" id="dirScrim"></div>
@@ -1440,7 +1491,7 @@ var CORPUS = {
     ["7","","Authoritative records",50,"a","two regulator listings, four registry records, one central bank"],
     ["8","","Claims cross-examined",100,"a","every one contradicted by the record"],
     ["7","","Material issues",100,"c","two critical, five high"],
-    ["9","","Sources not reached",39,"n","all ten named further down this page"]
+    ["9","","Sources not reached",39,"n","every one named further down this page"]
   ],
   bars:[["Tier A, authoritative",7,"a"],["Tier B, structured",3,"b"],["Tier D, open web",4,"c"],["Sources not reached",9,"n"],["Claims cross-examined",8,"a"],["Material issues",7,"a"]],
   barFoot:"Fourteen sources returned a definitive result. Seven are authoritative: two regulator listings, four registry records and one statement from a central bank. Nine sources that should have been reached were not, and every one of them is named further down this page.",
@@ -1552,7 +1603,7 @@ var CORPUS = {
     ["3","","Authoritative records",43,"a","all three from the domain registry"],
     ["4","","Claims cross-examined",100,"a","every one contradicted by the record"],
     ["4","","Material issues",100,"c","one critical, three high"],
-    ["9","","Sources not reached",56,"n","all ten named further down this page"]
+    ["9","","Sources not reached",56,"n","every one named further down this page"]
   ],
   bars:[["Tier A, authoritative",3,"a"],["Tier B, structured",2,"b"],["Tier D, open web",2,"c"],["Sources not reached",9,"n"],["Claims cross-examined",4,"a"],["Material issues",4,"a"]],
   barFoot:"Seven sources returned a definitive result. The decisive one is a registry record: all three nameservers and the registrar match a brand already on the BC Securities Commission caution list. Nine sources that should have been reached were not.",
@@ -1744,9 +1795,9 @@ var GREY = {
     ["0","","Authoritative records",0,"a","no registry record retrieved"],
     ["0","","Claims cross-examined",0,"a","no claims could be bound to a source"],
     ["0","","Material issues",0,"c","absence of evidence is not evidence of absence"],
-    ["9","","Categories unresolved",100,"n","grey is a result, not a failure"]
+    ["10","","Categories unresolved",100,"n","grey is a result, not a failure"]
   ],
-  bars:[["Tier A, authoritative",0,"a"],["Tier B, structured",0,"b"],["Tier D, open web",0,"c"],["Sources not reached",0,"n"],["Categories unresolved",9,"n"]],
+  bars:[["Tier A, authoritative",0,"a"],["Tier B, structured",0,"b"],["Tier D, open web",0,"c"],["Sources not reached",0,"n"],["Categories unresolved",10,"n"]],
   reviews:{checked:0,carrying:0,reports:0,state:"absent",note:"No review corpus was reached, because nothing identified this party in the first place.",rows:[]},
   barFoot:"Nothing resolved. Grey is a real result, not a failure: it means the console does not have enough of the picture to say anything honest yet.",
   note:"This build carries a seeded evidence corpus of two entities, both retrieved from live public records on 25 August 2026. Anything outside that corpus returns grey, because inventing a result is the one thing this product must never do. Try investhelm.com or nexlares.com to see a full assessment."
@@ -1767,6 +1818,93 @@ var SOURCES = [
  {c:"09 4orm", w:3, items:["Infrastructure Cluster","Identifier Reuse","Document Fingerprint"]},
  {c:"10 Claim dates", w:1, items:["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile"]}
 ];
+
+/* ------------------------------------------------------------------ *
+ * REGISTER REFERENCE
+ *
+ * One line per register on the board: what it is, whose it is, what tier
+ * it carries, and what a hit on it actually proves. Clicking a light opens
+ * this alongside whatever that register returned on the run.
+ *
+ * Progressive disclosure: the board answers "did we reach it", the popover
+ * answers "what is it and what did it say". Neither belongs in the other.
+ * ------------------------------------------------------------------ */
+var REGINFO = {
+"Corporations Canada":["CA","A","The federal corporate register. Confirms a federally incorporated company exists, its status, and its directors.","https://ised-isde.canada.ca/cc/lgcy/fdrlCrpSrch.html"],
+"Ontario Registry":["CA-ON","A","Ontario's business registry. Confirms provincial incorporation and standing.","https://www.ontario.ca/page/ontario-business-registry"],
+"BC Registry":["CA-BC","A","British Columbia corporate registry.","https://www.bcregistry.gov.bc.ca/"],
+"Alberta Registry":["CA-AB","A","Alberta corporate registry. Access is through authorised service providers.",""],
+"SEC EDGAR":["US","A","Every filing made to the Securities and Exchange Commission. Absence of a filing is meaningful for a party claiming to sell investments in the United States.","https://www.sec.gov/edgar/search/"],
+"Companies House":["UK","A","The United Kingdom register. Company number, officers, filing history and persons with significant control.","https://find-and-update.company-information.service.gov.uk/"],
+"Florida Sunbiz":["US-FL","A","Florida's corporate register. Incorporation date, registered agent, officers and annual reports.","https://search.sunbiz.org/"],
+"OpenCorporates":["GLOBAL","B","An aggregated view across many state and national registers. Useful for finding a record; the register itself is the authority.","https://opencorporates.com/"],
+
+"CSA Registration":["CA","A","The Canadian Securities Administrators National Registration Search. Answers whether a party may lawfully sell investments anywhere in Canada.","https://www.securities-administrators.ca/nrs/"],
+"CIRO AdvisorReport":["CA","A","Registration and disciplinary history for an individual adviser or dealer.","https://www.ciro.ca/investors/advisorreport"],
+"FINTRAC MSB":["CA","A","Canada's money services business register. Required for anyone exchanging or transmitting value as a business.","https://fintrac-canafe.canada.ca/msb-esm/msb-search-recherche-eng"],
+"Bank of Canada PSP":["CA","A","The payment service provider register under the Retail Payment Activities Act.","https://www.bankofcanada.ca/core-functions/retail-payments-supervision/"],
+"FCA Register":["UK","A","The Financial Conduct Authority register of authorised firms and individuals.","https://register.fca.org.uk/"],
+"BrokerCheck":["US","A","FINRA's record of brokers and firms, including disclosures and disciplinary events.","https://brokercheck.finra.org/"],
+"NFA BASIC":["US","A","National Futures Association background affiliation status. Covers futures and forex.","https://www.nfa.futures.org/basicnet/"],
+"FinCEN MSB":["US","A","The United States money services business register. The decisive check for anyone pooling funds and paying distributions.","https://www.fincen.gov/msb-registrant-search"],
+
+"IOSCO I-SCAN":["GLOBAL","A","The investor alerts portal carrying warnings from more than ninety national authorities in one place.","https://www.iosco.org/i-scan/"],
+"BCSC Caution List":["CA-BC","A","British Columbia's Investment Caution List.","https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list"],
+"ASC Caution List":["CA-AB","A","Alberta's Investment Caution List.","https://www.asc.ca/en/enforcement/investment-caution-list"],
+"OSC Alerts":["CA-ON","A","Ontario Securities Commission investor warnings.","https://www.osc.ca/en/investors/investor-warnings"],
+"CSA Alerts":["CA","A","Every province's investor alerts, collected.","https://www.securities-administrators.ca/investor-alerts/"],
+"FCA Warning List":["UK","A","Firms the Financial Conduct Authority has warned about.","https://www.fca.org.uk/consumers/warning-list-unauthorised-firms"],
+"OFAC":["US","A","The United States sanctions list. A match here stops the assessment being advisory.","https://sanctionssearch.ofac.treas.gov/"],
+"UN Consolidated":["GLOBAL","A","The United Nations Security Council consolidated sanctions list.","https://www.un.org/securitycouncil/content/un-sc-consolidated-list"],
+"DOJ Press":["US","A","Department of Justice announcements. Arrests, indictments, pleas and forfeitures are published here before anywhere else.","https://www.justice.gov/news"],
+"IRS-CI":["US","A","IRS Criminal Investigation. Publishes its own releases on financial crime cases it worked.","https://www.irs.gov/compliance/criminal-investigation"],
+"State AG":["US","A","State attorneys general and state securities regulators. Where a state acts before a federal authority does.",""],
+
+"ISC Ownership":["CA","A","Individuals with significant control. Who actually owns a Canadian company.",""],
+"UK PSC Register":["UK","A","Persons with significant control over a United Kingdom company.","https://find-and-update.company-information.service.gov.uk/"],
+"ASIC Banned":["AU","A","Australia's register of banned and disqualified persons.","https://asic.gov.au/online-services/search-asics-registers/banned-and-disqualified/"],
+"CSA Disciplined":["CA","A","The disciplined persons list maintained across Canadian securities regulators.","https://www.securities-administrators.ca/disciplined-persons-list/"],
+
+"CanLII":["CA","A","Canadian court and tribunal decisions.","https://www.canlii.org/"],
+"OSB Bankruptcy":["CA","A","The Office of the Superintendent of Bankruptcy insolvency records.","https://www.ic.gc.ca/app/scr/bsf-osb/ins/login.html"],
+"CourtListener":["US","B","A free archive of United States court opinions and dockets.","https://www.courtlistener.com/"],
+"UK Insolvency":["UK","A","The Insolvency Service register.","https://www.gov.uk/search-bankruptcy-insolvency-register"],
+"PACER":["US","A","Public access to federal court electronic records. The dockets themselves.","https://pacer.uscourts.gov/"],
+"Justia Dockets":["US","B","Docket aggregators. Fast to search; the court record is the authority.","https://dockets.justia.com/"],
+"Bankruptcy Claims":["US","B","Claims agent sites carrying the full docket, examinations and creditor claims for a bankruptcy or receivership.",""],
+
+"ICANN RDAP":["GLOBAL","A","The registry record for a domain. Registrar, nameservers, status and the creation date.","https://rdap.org/"],
+"Certificate Log":["GLOBAL","B","Certificate transparency. Every certificate ever issued for a host, with its date.","https://crt.sh/"],
+"Google Web Risk":["GLOBAL","B","Google's assessment of whether a site is known to be unsafe.","https://transparencyreport.google.com/safe-browsing/search"],
+"VirusTotal":["GLOBAL","B","Aggregated reputation across many security vendors.","https://www.virustotal.com/"],
+"urlscan.io":["GLOBAL","B","A recorded scan of what a page actually loads and where it sends data.","https://urlscan.io/"],
+"Mail Config":["GLOBAL","A","The domain's mail routing and sender policy. Shows whether a real mailbox exists on the domain.",""],
+
+"Trustpilot":["GLOBAL","C","A consumer review platform. Read for the one and two star accounts, never for the average.","https://www.trustpilot.com/"],
+"Sitejabber":["GLOBAL","C","A consumer review platform with a different user base from Trustpilot.","https://www.sitejabber.com/"],
+"BBB Scam Tracker":["US-CA","C","Better Business Bureau complaints and scam reports.","https://www.bbb.org/scamtracker"],
+"Forex Peace Army":["GLOBAL","C","Trading community reviews. Strong on withdrawal complaints specifically.","https://www.forexpeacearmy.com/"],
+"Reddit":["GLOBAL","D","Community intelligence. Never verified fact, and never a finding on its own.","https://www.reddit.com/r/CryptoScams/"],
+"Glassdoor":["GLOBAL","C","Employee accounts. Sometimes the earliest signal that an operation is not what it says.","https://www.glassdoor.com/"],
+
+"Beneficiary Match":["4orm","A","Does the name on the receiving account match the party you are dealing with. Needs a payment instruction from you.",""],
+"IBAN and SWIFT":["GLOBAL","B","Validates the account and identifies the receiving institution and country.",""],
+"Chainabuse":["GLOBAL","C","Community reported wallet addresses.","https://www.chainabuse.com/"],
+"Chain Analytics":["GLOBAL","B","On chain tracing of a wallet address and its counterparties.",""],
+
+"Infrastructure Cluster":["4orm","4orm","Other domains sharing nameservers, registrar or hosting with this one. Built from every previous check.",""],
+"Identifier Reuse":["4orm","4orm","The same phone, email, address or wallet appearing under a different brand name.",""],
+"Document Fingerprint":["4orm","4orm","A document matching one submitted under another party's name.",""],
+
+"ICANN RDAP Date":["GLOBAL","A","The domain creation date, from the registry record. The single most decisive date in the check, and never inferred from anything else.","https://rdap.org/"],
+"Wayback Machine":["GLOBAL","B","The first archived capture of the site. Establishes the earliest date the site was demonstrably being published.","https://web.archive.org/"],
+"First Certificate":["GLOBAL","B","The first certificate ever issued for this host. A certificate can post-date a site, so this is corroborating rather than decisive.","https://crt.sh/"],
+"Trademark Filing":["US","A","The filing date of the mark. A brand claiming a long history usually filed early.","https://tsdr.uspto.gov/"],
+"Domain History":["GLOBAL","B","Passive DNS and historical records for the domain, including previous owners and configurations.",""],
+"Incorporation Date":["VARIES","A","When the legal entity itself first existed, from its home registry. Nothing the company did can predate this.",""],
+"Public Profile":["GLOBAL","D","Stated tenure and history on public professional profiles. Self reported, and treated as such.",""]
+};
+
 var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
 
 
@@ -1992,10 +2130,16 @@ function renderBoard(status){
     var chips='';
     g.items.forEach(function(n){
       var st = status && status[n] ? status[n] : "ready";
-      chips+='<span class="src" data-s="'+esc(st)+'" data-n="'+esc(slug(n))+'"><i></i>'+esc(n)+'</span>';
+      chips+='<span class="src" role="button" tabindex="0" data-s="'+esc(st)+'" data-n="'+esc(slug(n))+'" data-reg="'+esc(n)+'" title="'+esc((REGINFO[n]&&REGINFO[n][2])||n)+'"><i></i>'+esc(n)+'</span>';
     });
     r.innerHTML='<span class="bl">'+esc(g.c)+'</span><span class="bchips">'+chips+'</span>';
     w.appendChild(r);
+    r.querySelectorAll(".src").forEach(function(chip){
+      chip.addEventListener("click",function(){ openRegister(this.getAttribute("data-reg")); });
+      chip.addEventListener("keydown",function(e){
+        if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openRegister(this.getAttribute("data-reg")); }
+      });
+    });
   });
 }
 function boardCount(){
@@ -2048,68 +2192,141 @@ function renderTiles(){
   });
 }
 
-/* ---- drill ---- */
-function toggleDrill(key){
-  if(OPEN===key){ OPEN=null; id("drill").classList.remove("on"); id("drill").innerHTML=""; renderTiles(); return; }
-  OPEN=key; renderTiles(); renderDrill(key);
-}
-function renderDrill(key){
-  var c=null; for(var i=0;i<CATS.length;i++) if(CATS[i].key===key) c=CATS[i];
-  var res = CURRENT && CURRENT.cats ? CURRENT.cats[key] : null;
-  var d=id("drill");
-  var head =
-    '<div class="drillhd"><div>'+
-      '<div class="lbl gold">Category '+esc(c.id)+(res?' &middot; '+esc(stateWord(res.state)):'')+'</div>'+
-      '<div class="n">'+esc(c.name)+'</div>'+
-      '<div class="q">'+esc(c.q)+'</div>'+
-    '</div><button class="drillx" type="button" id="drillClose">Close</button></div>'+
-    '<div class="rule"><span class="rk"></span><span class="rx"><b>Decision rule.</b> '+c.rule+'</span></div>';
+/* ------------------------------------------------------------------ *
+ * THE DETAIL MODAL
+ *
+ * One component, two callers. A category tile opens the check: the question
+ * it answers, the rule that decides it, every register behind it, and the
+ * records this run found. A light on the board opens the register: what it
+ * is, whose it is, what tier it carries, and what it returned.
+ *
+ * It is a modal rather than an inline panel because the right column is
+ * sticky, and a panel that expands inside a sticky column opens below the
+ * fold where nothing appears to have happened.
+ * ------------------------------------------------------------------ */
+var infoScrim=id("infoScrim"), infoBox=id("infoBox"), infoBody=id("infoBody");
 
-  var body;
-  if(res){
-    body='<div style="padding:20px 24px"><div class="lbl" style="margin-bottom:14px">Evidence retrieved for this party</div><div class="evgrid">';
-    if(!res.ev.length){
-      body+='<div class="evnone">No evidence was retrieved for this category on this run. It is reported grey, not green, and it appears in the coverage gaps below.</div>';
-    } else {
-      res.ev.forEach(function(e){
-        body+='<div class="ev"><div class="evtop">'+
-          '<span class="tier" data-t="'+esc(e.t)+'">Tier '+esc(e.t)+'</span>'+
-          '<span class="evsrc">'+esc(e.src)+'</span>'+
-          '<span class="evwhen">'+esc(e.when)+'</span></div>'+
-          '<div class="evfind">'+esc(e.find)+'</div>'+
-          (e.quote?'<div class="evquote">'+esc(e.quote)+'</div>':'')+
-          (e.url?'<a class="evlink" href="'+esc(e.url)+'" target="_blank" rel="noopener noreferrer">Open the source record</a>':'')+
-        '</div>';
-      });
-    }
-    body+='</div><div class="lbl" style="margin:26px 0 14px">The registers behind this check</div></div>';
+function infoOpen(kind, title, state, html){
+  id("infoKind").textContent = kind;
+  id("infoTitle").textContent = title;
+  var st=id("infoState");
+  if(state){ st.style.display=""; st.setAttribute("data-s", state); st.textContent = stateWord(state); }
+  else { st.style.display="none"; st.removeAttribute("data-s"); st.textContent=""; }
+  infoBody.innerHTML = html;
+  infoBody.scrollTop = 0;
+  infoScrim.classList.add("on"); infoBox.classList.add("on");
+  document.body.style.overflow="hidden";
+  id("infoClose").focus();
+}
+function infoClose(){
+  infoScrim.classList.remove("on"); infoBox.classList.remove("on");
+  document.body.style.overflow="";
+}
+id("infoClose").addEventListener("click",infoClose);
+infoScrim.addEventListener("click",infoClose);
+
+/* ---- a register light ---- */
+function openRegister(name){
+  var r = REGINFO[name];
+  var state = (CURRENT && CURRENT.board && CURRENT.board[name]) || "ready";
+  var group = "";
+  SOURCES.forEach(function(g){ if(g.items.indexOf(name)>-1) group=g.c; });
+
+  var h = '<div class="infosec">';
+  if(r){
+    h += '<div class="infop" style="margin-top:0">'+esc(r[2])+'</div>'+
+         '<div class="infometa">'+
+           '<span class="infochip">'+esc(group)+'</span>'+
+           '<span class="infochip">'+esc(r[0])+'</span>'+
+           '<span class="infochip">Tier '+esc(r[1])+'</span>'+
+         '</div>';
+    if(r[3]) h += '<a class="infolink" href="'+esc(r[3])+'" target="_blank" rel="noopener noreferrer">Open this register yourself</a>';
   } else {
-    body='';
+    h += '<div class="infop" style="margin-top:0">No reference entry for this register.</div>';
+  }
+  h += '</div>';
+
+  /* what it returned on this run */
+  h += '<div class="infosec"><div class="infoh">On this check</div>';
+  var msg = {
+    ready:"This check has not been run yet, so nothing has been asked of this register.",
+    check:"This register is being read right now.",
+    clear:"This register was reached and returned nothing about this party. That is not a clean bill of health; it means this particular source had no entry.",
+    caution:"This register returned something worth looking at.",
+    adverse:"This register returned something against this party.",
+    unreached:"We could not get an answer out of this register on this run. It is reported as not reached, and it is never reported as clean."
+  }[state] || "No result recorded.";
+  h += '<div class="infop" style="margin-top:0">'+esc(msg)+'</div>';
+
+  /* any record this run attributed to it */
+  /* Match a record to a register in either direction. A record whose source
+     reads "ICANN RDAP, via the Verisign registry" belongs to both the ICANN
+     RDAP light and the ICANN RDAP Date light, and neither string contains the
+     other whole. Compare the leading phrase of each instead. */
+  function norm(v){ return String(v||"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim(); }
+  function head(v){ return norm(String(v||"").split(",")[0]); }
+  var rn=norm(name), rh=head(name);
+  function belongs(src){
+    var sn=norm(src), sh=head(src);
+    if(!sn) return false;
+    return sn.indexOf(rn)>-1 || rn.indexOf(sh)>-1 || (sh.length>5 && rh.indexOf(sh)>-1) || (rh.length>5 && sh.indexOf(rh)>-1);
   }
 
-  var rows='';
-  c.src.forEach(function(s){
-    var nm = s[5] ? '<a href="'+esc(s[5])+'" target="_blank" rel="noopener noreferrer">'+esc(s[0])+'</a>' : esc(s[0]);
-    rows+='<tr><td class="sname">'+nm+'</td>'+
-      '<td class="sj">'+esc(s[1])+'</td>'+
-      '<td><span class="tier" data-t="'+esc(s[2])+'">'+(s[2]==="4orm"?"4orm":"Tier "+esc(s[2]))+'</span></td>'+
-      '<td class="sm">'+esc(s[3])+'</td>'+
-      '<td><span class="use" data-u="'+esc(s[4])+'">'+esc(s[4])+'</span></td></tr>';
-  });
-  var table='<div class="srcscroll"><table class="srctbl"><thead><tr>'+
-    '<th>Source</th><th>Jurisdiction</th><th>Authority</th><th>Access</th><th>Commercial use</th>'+
-    '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var hits=[];
+  if(CURRENT && CURRENT.cats){
+    for(var k in CURRENT.cats){
+      (CURRENT.cats[k].ev||[]).forEach(function(e){ if(belongs(e.src)) hits.push(e); });
+    }
+  }
+  if(CURRENT && CURRENT.retrieved){
+    CURRENT.retrieved.forEach(function(x){
+      if((x.reg||[]).indexOf(name)>-1) hits.push({t:"B",src:x.host,when:x.date||"",find:x.title||"",quote:x.snip||"",url:x.url});
+    });
+  }
+  if(hits.length){
+    h += '<div class="infoh" style="margin-top:22px">'+hits.length+' record'+(hits.length===1?'':'s')+' from this register</div>'+
+         hits.slice(0,8).map(evBlock).join('');
+  }
+  h += '</div>';
 
-  var foot='<div class="drillfoot">Commercial use is recorded when a connector is registered, not when it is queried. Some public registers permit private, non-commercial search only, and those need a licence or a partnership rather than a scraper. That distinction is tracked per source from day one.</div>';
-
-  d.innerHTML=head+body+table+foot;
-  d.classList.add("on");
-  id("drillClose").addEventListener("click",function(){ toggleDrill(key); });
-  var top=d.getBoundingClientRect().top+window.pageYOffset-96;
-  if(d.getBoundingClientRect().top<80) window.scrollTo({top:top,behavior:reduce?"auto":"smooth"});
+  infoOpen("Register", name, state==="ready"?null:state, h);
 }
 
-/* ---- identifier detection ---- */
+/* ---- a category tile ---- */
+function toggleDrill(key){
+  var c=null; for(var i=0;i<CATS.length;i++) if(CATS[i].key===key) c=CATS[i];
+  if(!c) return;
+  var res = CURRENT && CURRENT.cats ? CURRENT.cats[key] : null;
+
+  var h = '<div class="infosec">'+
+    '<div class="infoq">'+esc(c.q)+'</div>'+
+    '<div class="infop">'+esc(c.blurb)+'</div>'+
+    (res ? '<div class="infop"><b>On this check.</b> '+esc(res.sum)+'</div>' : '')+
+    '</div>';
+
+  h += '<div class="infosec"><div class="infoh">How this check is decided</div>'+
+       '<div class="infop" style="margin-top:0">'+c.rule+'</div></div>';
+
+  if(res && res.ev && res.ev.length){
+    h += '<div class="infosec"><div class="infoh">'+res.ev.length+' record'+(res.ev.length===1?'':'s')+' found</div>'+
+         res.ev.map(evBlock).join('')+'</div>';
+  } else if(res){
+    h += '<div class="infosec"><div class="infoh">Records found</div>'+
+         '<div class="infop" style="margin-top:0">No record was retrieved for this check. It is reported grey, and it appears in the coverage gaps.</div></div>';
+  }
+
+  h += '<div class="infosec"><div class="infoh">'+c.src.length+' registers behind this check</div>'+
+       '<div class="srcwrap"><table class="srctbl"><tr><th>Source</th><th>Where</th><th>Tier</th><th>Access</th><th>Terms</th></tr>'+
+       c.src.map(function(x){
+         var nm = x[5] ? '<a href="'+esc(x[5])+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue-lt)">'+esc(x[0])+'</a>' : esc(x[0]);
+         return '<tr><td>'+nm+'</td><td>'+esc(x[1])+'</td><td><span class="tier" data-t="'+esc(x[2])+'">'+esc(x[2])+'</span></td>'+
+                '<td>'+esc(x[3])+'</td><td>'+esc(x[4])+'</td></tr>';
+       }).join('')+'</table></div></div>';
+
+  infoOpen("Check "+c.id, c.name, res ? res.state : null, h);
+}
+/* renderDrill was the inline panel. The detail modal replaced it. */
+
 var ID_TYPES=["Company","Person","Website","Email","Phone","Wallet"];
 function detect(v){
   v=(v||"").trim(); if(!v) return null;
@@ -2153,6 +2370,7 @@ function runScan(board, done){
   id("boardT").textContent="Sweeping the source board";
   id("brows").classList.add("scanning");
   id("auditRow").classList.remove("on");
+  id("verdictWrap").classList.remove("on");
   id("boardBar").style.width="0%";
   id("boardC").textContent="0 of "+TOTAL_SOURCES+" reached";
 
@@ -2340,6 +2558,7 @@ function toResult(d,label){
   setReads(d.reads); setBars(d.bars,d.barFoot);
   if(d.stats) setStats(d.stats);
   id("auditRow").classList.toggle("on", !!d.cats);
+  id("verdictWrap").classList.add("on");
 
   id("kbName").textContent=d.name||label;
   id("kbDom").textContent=d.domain||label;
@@ -2980,6 +3199,7 @@ window.addEventListener("scroll",function(){
 },{passive:true});
 window.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;
+  if(infoBox.classList.contains("on")){ infoClose(); return; }
   if(arBox.classList.contains("on")){ auditClose(); return; }
   if(dirBox.classList.contains("on")){
     if(dirQ.value){ dirQ.value=""; runFilter(""); }
