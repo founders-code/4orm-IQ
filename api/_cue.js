@@ -797,6 +797,12 @@ Binding rules for that call, on top of everything above:
 1. Every \`quote\` field is VERBATIM text from the source. If you did not read
    the words, leave the field out. Never paraphrase into a quote field.
 2. Every \`url\` resolves to the record you actually read.
+3. Every evidence item carries \`plain\`: one sentence saying what THAT record means
+   for the reader and what to do about it, written for somebody who has never opened a
+   corporate registry. Not a restatement of \`finding\`. Where a record is ambiguous or
+   proves less than it appears to, say what it does not establish. Example: a company
+   registry search returning several similarly named companies means the reader must
+   confirm the exact legal name on the contract before relying on any of them.
 3. All ten categories appear, C1 through C10, in order. A category you could not
    reach is GREY with an empty evidence array and a matching entry in
    coverage_gaps. It is never GREEN.

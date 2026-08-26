@@ -103,12 +103,19 @@ svg{display:block}
 .navhelp{
   pointer-events:auto;display:inline-flex;align-items:center;gap:11px;
   padding:15px 26px;border-radius:999px;
-  border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold-dp);
+  border:1px solid var(--gold);background:#2C240F;color:var(--gold);
   font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
   box-shadow:var(--sh),var(--hair);backdrop-filter:blur(20px) saturate(150%);
   transition:all .28s var(--ease);white-space:nowrap;
 }
-.navhelp:hover{background:#2C240F;border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--sh-lg)}
+@keyframes helppulse{
+  0%,100%{box-shadow:var(--sh),var(--hair),0 0 0 0 rgba(231,199,108,.30)}
+  50%    {box-shadow:var(--sh),var(--hair),0 0 0 9px rgba(231,199,108,0)}
+}
+.navhelp{animation:helppulse 3.4s var(--ease) infinite}
+.navhelp .hi{color:var(--gold)}
+.navhelp:hover{background:#3A2F13;border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--sh-lg);animation:none}
+@media(prefers-reduced-motion:reduce){.navhelp{animation:none}}
 .navhelp .hi{font-size:14px;line-height:1}
 @media(max-width:620px){
   .nav{padding:0 12px}
@@ -153,7 +160,7 @@ body[data-stage="landing"] .console-only{display:none}
 body[data-stage="console"] .console{padding-top:112px}
 
 /* ================= control bar ================= */
-.console{position:relative;padding:112px 0 0;overflow:hidden}
+.console{position:relative;padding:64px 0 0;overflow:hidden}
 .console::before{
   content:"";position:absolute;inset:-26% -14% auto -14%;height:720px;pointer-events:none;
   background:
@@ -366,6 +373,7 @@ body[data-stage="console"] .console{padding-top:112px}
 .dirscrim.on{opacity:1;pointer-events:auto}
 .dirbox{
   position:fixed;inset:3vh 3vw;z-index:201;display:flex;flex-direction:column;
+  max-width:1080px;margin-left:auto;margin-right:auto;
   border:1px solid var(--border-strong);border-radius:var(--r-xl);overflow:hidden;
   background:var(--surface);box-shadow:0 60px 130px rgba(16,32,64,.26),var(--hair);
   opacity:0;transform:translateY(18px) scale(.99);pointer-events:none;
@@ -437,6 +445,50 @@ body[data-stage="console"] .console{padding-top:112px}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
+.statq{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;
+  border-radius:50%;border:1px solid var(--border-lit);color:var(--tx-4);
+  font-family:var(--mono);font-size:8px;font-weight:700;vertical-align:1px;margin-left:5px}
+.scell:hover .statq{border-color:var(--gold);color:var(--gold)}
+/* ---- three columns: the two numbers, the answer, everything else ---- */
+.summaryband{grid-template-columns:minmax(190px,.34fr) minmax(0,1fr) minmax(262px,.46fr)}
+.sbgauges{display:flex}
+.gaugepanel{width:100%;border:1px solid var(--border-strong);border-radius:var(--r-lg);
+  background:linear-gradient(160deg,var(--surface-2),var(--surface));overflow:hidden;
+  display:flex;flex-direction:column}
+.gaugepanel .panelhd{padding:11px 15px}
+.gaugepanel .panelbd{padding:14px 15px;flex:1}
+.gaugepanel .dials{grid-template-columns:1fr;gap:14px}
+.gaugepanel .dial svg{width:100%;max-width:112px;height:auto;margin:0 auto;display:block}
+.gaugepanel .dialnum .v{font-size:22px}
+.gaugepanel .dialnum .u{font-size:8.5px}
+.gaugepanel .dialcap .t{font-size:9px}
+.gaugepanel .dialcap .x{font-size:10.5px;line-height:1.4}
+.gaugepanel .reads{grid-template-columns:1fr 1fr;gap:1px}
+.gaugepanel .read{padding:9px 11px}
+.gaugepanel .read .v{font-size:14px}
+.gaugepanel .read .t{font-size:8px}
+@media(max-width:1180px){.summaryband{grid-template-columns:minmax(0,1fr) minmax(262px,.5fr)}
+  .sbgauges{grid-column:1 / -1}}
+@media(max-width:1080px){.summaryband{grid-template-columns:1fr}.sbgauges{grid-column:auto}}
+/* ---- the five figures open a brief ---- */
+.scell{cursor:pointer;transition:background .22s var(--ease)}
+.scell:hover{background:var(--surface-2)}
+/* ---- what a record means, in plain words ---- */
+.evplain{display:flex;gap:11px;margin-top:11px;padding:11px 13px;border-radius:var(--r-sm);
+  background:var(--blue-50);border:1px solid var(--blue-100)}
+.evplain .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--blue);min-height:18px}
+.evplain .x{font-size:12.5px;color:var(--tx-2);line-height:1.55}
+/* ---- how to read a register ---- */
+.readgrid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);
+  border-radius:var(--r-sm);overflow:hidden;margin-top:4px}
+.readrow{background:var(--surface);padding:10px 13px;display:flex;gap:13px;align-items:flex-start}
+.readrow .rl2{flex:none;width:104px;font-family:var(--mono);font-size:8px;font-weight:700;
+  letter-spacing:.11em;text-transform:uppercase;padding:3px 0;text-align:center;border-radius:3px;
+  border:1px solid var(--border-strong);color:var(--tx-3)}
+.readrow .rl2[data-k="hit"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
+.readrow .rl2[data-k="miss"]{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
+.readrow .rl2[data-k="look"]{color:var(--gold);border-color:var(--gold-br);background:var(--gold-50)}
+.readrow .rv2{font-size:12px;color:var(--tx-2);line-height:1.5}
 /* ---- the waiting screen. A check takes a minute or two. The page goes quiet,
        a bar fills, and the wait is spent on the two things a reader needs:
        what this is not, and what is actually happening to people. ---- */
@@ -489,40 +541,42 @@ body[data-stage="console"] .console{padding-top:112px}
   .waitbox.on{transform:none}.waitq{display:none}}
 /* ---- the summary band. The answer on the left, the three things a reader
        opens first stacked on the right, no wasted column. ---- */
-.summaryband{display:none;grid-template-columns:minmax(0,1fr) minmax(300px,.62fr);gap:18px;
-  align-items:start;margin-top:20px}
+.summaryband{display:none;grid-template-columns:minmax(0,1fr) minmax(272px,.5fr);gap:16px;
+  align-items:stretch;margin-top:18px}
 body[data-stage="console"] .summaryband.on{display:grid}
-.sbleft .verdictwrap{display:block;margin:0}
-.sbright{display:grid;gap:12px}
-.sbcard{text-align:left;width:100%;padding:17px 19px;border-radius:var(--r-lg);
+.sbleft{display:flex}
+.sbleft .verdictwrap{display:block;margin:0;width:100%}
+.sbleft .verdict{height:100%;display:flex;flex-direction:column;justify-content:center}
+.sbright{display:grid;gap:6px;align-content:stretch}
+.sbcard{text-align:left;width:100%;padding:10px 14px;border-radius:var(--r);
   border:1px solid var(--border-strong);background:linear-gradient(160deg,var(--surface-2),var(--surface));
-  transition:all .28s var(--ease)}
+  transition:all .24s var(--ease);display:flex;flex-direction:column;justify-content:center;min-height:0}
 .sbcard:hover{border-color:var(--border-lit);transform:translateY(-1px);box-shadow:var(--sh)}
 .sbtop{display:flex;align-items:baseline;gap:12px}
-.sbtop .n{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
+.sbtop .n{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx-3)}
-.sbtop .v{margin-left:auto;font-family:var(--mono);font-size:20px;font-weight:700;color:var(--tx);letter-spacing:-.02em}
+.sbtop .v{margin-left:auto;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--tx);letter-spacing:-.02em;white-space:nowrap}
 .sbcard[data-t="bad"] .sbtop .v{color:var(--bad)}
 .sbcard[data-t="warn"] .sbtop .v{color:var(--warn)}
 .sbcard[data-t="ok"] .sbtop .v{color:var(--ok)}
-.sbx{font-size:12.5px;color:var(--tx-3);line-height:1.55;margin-top:8px}
-.sbdots{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
-.sbdots i{width:100%;max-width:26px;height:5px;border-radius:3px;background:var(--nul);opacity:.35;flex:1}
+.sbx{font-size:11px;color:var(--tx-4);line-height:1.45;margin-top:5px}
+.sbdots{display:flex;flex-wrap:nowrap;gap:3px;margin-top:7px}
+.sbdots i{height:4px;border-radius:2px;background:var(--nul);opacity:.35;flex:1;min-width:0}
 .sbdots i[data-s="RED"]{background:var(--bad);opacity:1;box-shadow:0 0 7px var(--bad)}
 .sbdots i[data-s="YELLOW"]{background:var(--warn);opacity:1;box-shadow:0 0 7px var(--warn)}
 .sbdots i[data-s="GREEN"]{background:var(--ok);opacity:1}
-.sbbar{height:5px;border-radius:3px;background:var(--surface-4);overflow:hidden;margin-top:12px}
+.sbbar{height:4px;border-radius:2px;background:var(--surface-4);overflow:hidden;margin-top:7px}
 .sbbar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt));
   transition:width .8s var(--spring)}
 @media(max-width:1080px){.summaryband{grid-template-columns:1fr}}
 /* ---- rules as colour, not as paragraphs ---- */
-.rulelist{display:grid;gap:2px;background:var(--border);border:1px solid var(--border);
-  border-radius:var(--r);overflow:hidden;margin-top:4px}
-.rulerow{background:var(--surface);padding:11px 14px;display:flex;align-items:center;gap:14px}
-.rulerow .rk{flex:none;width:62px;font-family:var(--mono);font-size:9px;font-weight:700;
-  letter-spacing:.11em;text-transform:uppercase;padding:4px 0;text-align:center;
-  border-radius:4px;border:1px solid var(--border-strong);color:var(--tx-3)}
-.rulerow .rt{font-size:13px;color:var(--tx-2);line-height:1.5}
+.rulelist{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);
+  border-radius:var(--r-sm);overflow:hidden;margin-top:4px}
+.rulerow{background:var(--surface);padding:6px 12px;display:flex;align-items:center;gap:11px}
+.rulerow .rk{flex:none;width:50px;font-family:var(--mono);font-size:8px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:3px 0;text-align:center;
+  border-radius:3px;border:1px solid var(--border-strong);color:var(--tx-3)}
+.rulerow .rt{font-size:12px;color:var(--tx-2);line-height:1.4}
 .rulerow[data-v="RED"]{background:linear-gradient(90deg,var(--bad-bg),var(--surface) 42%)}
 .rulerow[data-v="RED"] .rk{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
 .rulerow[data-v="YELLOW"]{background:linear-gradient(90deg,var(--warn-bg),var(--surface) 42%)}
@@ -532,7 +586,7 @@ body[data-stage="console"] .summaryband.on{display:grid}
 .rulerow[data-v="GREY"] .rk{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
 .rulerow[data-v="NEVER"]{background:var(--bg-2)}
 .rulerow[data-v="NEVER"] .rk{color:var(--gold);border-color:var(--gold-br);background:var(--gold-50);font-size:8px}
-.rulerow[data-v="NEVER"] .rt{color:var(--tx-3);font-size:12.5px}
+.rulerow[data-v="NEVER"] .rt{color:var(--tx-3);font-size:11.5px}
 /* ---- the consent gate. Everything behind it is inert until it is answered. ---- */
 .gatescrim{position:fixed;inset:0;z-index:400;background:rgba(4,7,12,.82);backdrop-filter:blur(9px) saturate(60%);
   transition:opacity .45s var(--ease)}
@@ -569,18 +623,6 @@ body[data-stage="console"] .summaryband.on{display:grid}
   .gatebox.gone{transform:none}}
 /* ---- the quick strip. Everything the check produced, one row, one click.
        Nothing here scrolls the page; each opens a snapshot over it. ---- */
-.quickrow{display:none;flex-wrap:wrap;gap:8px;margin-top:16px}
-body[data-stage="console"] .quickrow.on{display:flex}
-.quick{display:inline-flex;align-items:center;gap:10px;padding:10px 15px;border-radius:999px;
-  border:1px solid var(--border-strong);background:var(--surface-2);color:var(--tx-2);
-  transition:all .25s var(--ease);white-space:nowrap}
-.quick:hover{border-color:var(--border-lit);background:var(--surface-3);color:var(--tx);transform:translateY(-1px)}
-.quick .qn{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
-.quick .qv{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--tx)}
-.quick[data-t="bad"] .qv{color:var(--bad)}
-.quick[data-t="warn"] .qv{color:var(--warn)}
-.quick[data-t="ok"] .qv{color:var(--ok)}
-.quick[data-t="nul"] .qv{color:var(--tx-3)}
 /* ---- snapshot internals ---- */
 .snapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
   background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-top:4px}
@@ -753,13 +795,13 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 }
 .entries{display:grid;gap:2px;background:var(--border)}
 .entry{background:var(--surface);padding:20px 24px;display:flex;gap:20px;flex-wrap:wrap}
-.entry .eleft{flex:1;min-width:min(100%,290px)}
+.entry .eleft{flex:1;min-width:min(100%,260px);max-width:62ch}
 .entry .en{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .entry .ew{font-size:13px;color:var(--tx-2);line-height:1.6;margin-top:7px}
-.entry .eright{flex:none;display:grid;gap:7px;align-content:start;min-width:268px}
+.entry .eright{flex:none;display:grid;gap:7px;align-content:start;min-width:250px;max-width:330px}
 .contact{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:var(--r-sm);border:1px solid var(--border-strong);background:var(--bg-2)}
 .contact .ck{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-4);flex:none;width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.contact .cv{font-family:var(--mono);font-size:12px;color:var(--tx);word-break:break-all}
+.contact .cv{font-family:var(--mono);font-size:12px;color:var(--tx);word-break:break-all;min-width:0;flex:1}
 .contact a.cv{border-bottom:1px solid var(--border-lit);transition:color .2s var(--ease),border-color .2s var(--ease)}
 .contact a.cv:hover{color:var(--blue-lt);border-color:var(--blue-lt)}
 .contact.tel .cv{font-size:13.5px;font-weight:700;letter-spacing:.02em}
@@ -1196,6 +1238,58 @@ body[data-stage="console"] .verdictwrap.on{display:block}
         <div class="statstrip" id="statstrip"></div>
 
         <div class="summaryband console-only" id="summaryBand">
+          <div class="sbgauges">
+      <div class="panel gaugepanel">
+        <div class="panelhd">
+          <span class="lbl" id="dialPanelT">Source network</span>
+          <span class="mode" id="dialMode">Idle</span>
+        </div>
+        <div class="panelbd">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+            <linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1B4ABE"/><stop offset="100%" stop-color="#5B8CFF"/>
+            </linearGradient>
+            <linearGradient id="gG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#C49A3A"/><stop offset="100%" stop-color="#C49A3A"/>
+            </linearGradient>
+          </defs></svg>
+
+          <div class="dials">
+            <div class="dial b">
+              <div class="dialwrap">
+                <svg viewBox="0 0 200 200" role="img" aria-labelledby="d1t">
+                  <g id="ticks1"></g>
+                  <path class="dialtrack" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                  <path class="dialval" id="dial1" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                </svg>
+                <div class="dialnum"><span class="v tnum" id="dial1v">0%</span><span class="u" id="dial1u">of 34</span></div>
+              </div>
+              <div class="dialcap">
+                <div class="t" id="d1t">Official records</div>
+                <div class="x" id="dial1x">Official records as a share of the connector set.</div>
+              </div>
+            </div>
+
+            <div class="dial g">
+              <div class="dialwrap">
+                <svg viewBox="0 0 200 200" role="img" aria-labelledby="d2t">
+                  <g id="ticks2"></g>
+                  <path class="dialtrack" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                  <path class="dialval" id="dial2" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
+                </svg>
+                <div class="dialnum"><span class="v tnum" id="dial2v">0%</span><span class="u" id="dial2u">of 34</span></div>
+              </div>
+              <div class="dialcap">
+                <div class="t" id="d2t">Direct feed</div>
+                <div class="x" id="dial2x">Connectors with a documented API or structured feed.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="reads" id="reads"></div>
+      </div>
+
+          </div>
           <div class="sbleft">
           <div class="verdictwrap" id="verdictWrap">
       <div class="verdict kb-rv" id="kbVerdict" data-v="RED">
@@ -1214,8 +1308,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
           </div>
           <div class="sbright" id="sbRight"></div>
         </div>
-
-        <div class="quickrow console-only" id="quickRow"></div>
 
         <div class="boardwrap">
           <div class="board">
@@ -1264,56 +1356,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 <section class="deck" id="network">
   <div class="wrap">
     <div class="deckgrid">
-
-      <div class="panel kb-rv">
-        <div class="panelhd">
-          <span class="lbl" id="dialPanelT">Source network</span>
-          <span class="mode" id="dialMode">Idle</span>
-        </div>
-        <div class="panelbd">
-          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-            <linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1B4ABE"/><stop offset="100%" stop-color="#5B8CFF"/>
-            </linearGradient>
-            <linearGradient id="gG" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#C49A3A"/><stop offset="100%" stop-color="#C49A3A"/>
-            </linearGradient>
-          </defs></svg>
-
-          <div class="dials">
-            <div class="dial b">
-              <div class="dialwrap">
-                <svg viewBox="0 0 200 200" role="img" aria-labelledby="d1t">
-                  <g id="ticks1"></g>
-                  <path class="dialtrack" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
-                  <path class="dialval" id="dial1" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
-                </svg>
-                <div class="dialnum"><span class="v tnum" id="dial1v">0%</span><span class="u" id="dial1u">of 34</span></div>
-              </div>
-              <div class="dialcap">
-                <div class="t" id="d1t">Tier A density</div>
-                <div class="x" id="dial1x">Authoritative sources as a share of the connector set.</div>
-              </div>
-            </div>
-
-            <div class="dial g">
-              <div class="dialwrap">
-                <svg viewBox="0 0 200 200" role="img" aria-labelledby="d2t">
-                  <g id="ticks2"></g>
-                  <path class="dialtrack" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
-                  <path class="dialval" id="dial2" d="M44.8 155.2 A78 78 0 1 1 155.2 155.2"/>
-                </svg>
-                <div class="dialnum"><span class="v tnum" id="dial2v">0%</span><span class="u" id="dial2u">of 34</span></div>
-              </div>
-              <div class="dialcap">
-                <div class="t" id="d2t">Direct feed</div>
-                <div class="x" id="dial2x">Connectors with a documented API or structured feed.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="reads" id="reads"></div>
-      </div>
 
       <div class="panel kb-rv">
         <div class="panelhd">
@@ -1621,7 +1663,7 @@ var CATS = [
   {id:"07", key:"C7", name:"Consumer experience",
    q:"What are people saying, and is it real?",
    blurb:"One-star reviews first. Cluster by mechanic, count platforms, never volume.",
-   rule:"<b>Read the negatives first.</b> Positive reviews are cheap to manufacture; negative ones are not, because nobody is paid to write one. Cluster the accounts by the <b>mechanic</b> - what was actually done to the person - and count <b>independent platforms</b>, not reviews. Three or more platforms carrying the same named mechanic is <b>red</b> on combination with any Tier A or B adverse record, <b>yellow</b> standing alone. A manufactured positive corpus is <b>yellow</b> minimum. A thin or absent corpus is <b>grey</b>, never green.",
+   rule:"<b>Read the negatives first.</b> Positive reviews are cheap to manufacture; negative ones are not, because nobody is paid to write one. Cluster the accounts by the <b>mechanic</b> - what was actually done to the person - and count <b>independent platforms</b>, not reviews. Three or more platforms carrying the same named mechanic is <b>red</b> only alongside an official record or verified data that says the same thing, <b>yellow</b> standing alone. A manufactured positive corpus is <b>yellow</b> minimum. A thin or absent corpus is <b>grey</b>, never green.",
    src:[
     ["Trustpilot","GLOBAL","C","API","licence",""],
     ["Sitejabber","GLOBAL","C","Web","unknown",""],
@@ -1673,7 +1715,7 @@ var CATS = [
   {id:"10", key:"C10", name:"Claim dates against the record",
    q:"Could the story this party tells have happened in the time the record allows?",
    blurb:"Every dated claim the party makes, against the independent record of when it first existed.",
-   rule:"A dated factual claim that predates the domain creation date or the entity's own registry record is a <b>material contradiction</b> and carries <b>red</b> on its own, because both sides are Tier A records and the conflict is arithmetic. A claim earlier than the first archived capture or the first certificate is <b>yellow</b>: an archive gap is an archive gap. A brand may legitimately predate its domain; what cannot stand is a trading history attributed to a period before the entity or the site existed. The domain creation date comes from the registry record only and is never inferred from an archive capture, a copyright line or a first press mention.",
+   rule:"A dated factual claim that predates the domain creation date or the entity's own registry record is a <b>material contradiction</b> and carries <b>red</b> on its own, because both sides are official records and the conflict is arithmetic. A claim earlier than the first archived capture or the first certificate is <b>yellow</b>: an archive gap is an archive gap. A brand may legitimately predate its domain; what cannot stand is a trading history attributed to a period before the entity or the site existed. The domain creation date comes from the registry record only and is never inferred from an archive capture, a copyright line or a first press mention.",
    src:[
     ["ICANN RDAP, domain creation date","GLOBAL","A","REST API","open","https://rdap.org/"],
     ["Home corporate registry, incorporation date","VARIES","A","Web","open",""],
@@ -1699,7 +1741,7 @@ var CORPUS = {
     ["7","","Material issues",100,"c","two critical, five high"],
     ["9","","Sources not reached",39,"n","every one named further down this page"]
   ],
-  bars:[["Tier A, authoritative",7,"a"],["Tier B, structured",3,"b"],["Tier D, open web",4,"c"],["Sources not reached",9,"n"],["Claims cross-examined",8,"a"],["Material issues",7,"a"]],
+  bars:[["Official records",7,"a"],["Verified data",3,"b"],["Public chatter",4,"c"],["Sources not reached",9,"n"],["Claims cross-examined",8,"a"],["Material issues",7,"a"]],
   barFoot:"Fourteen sources returned a definitive result. Seven are authoritative: two regulator listings, four registry records and one statement from a central bank. Nine sources that should have been reached were not, and every one of them is named further down this page.",
   cats:{
     C1:{state:"RED",sum:"No legal entity is named anywhere. There is nothing to look up.",
@@ -1731,7 +1773,7 @@ var CORPUS = {
         quote:"Trust score 1/100; 13 blacklist detections and phishing-related signals; hosting Private Layer INC, Bellinzona, Switzerland; IP 179.43.182.250; SSL valid June 4 to September 2, 2026; Do not enter passwords or payment data",url:"https://gridinsoft.com/online-virus-scanner/url/investhelm-com"}]},
     C7:{state:"RED",sum:"The favourable review material is manufactured, and the same template runs under four brand names.",
       ev:[{t:"D",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
-        find:"An identical review template promotes Investhelm, Nexlares, Bay Assetholm and Cedar Assetgrove. Community intelligence, not verified fact. Promoted to a red result only because Tier A registry records corroborate the cluster.",
+        find:"An identical review template promotes Investhelm, Nexlares, Bay Assetholm and Cedar Assetgrove. Community intelligence, not verified fact. Promoted to a red result only because official registry records corroborate the cluster.",
         quote:"Tiff Macklem Investhelm Review, Scam or Legit? | Tiff Macklem Bay Assetholm Review, Scam or Legit? | Tiff Macklem Nexlares Review, Scam or Legit? | Tiff Macklem Cedar Assetgrove Review, Scam or Legit?",url:""},
        {t:"D",src:"Promotional review page",when:"25 Aug 2026",
         find:"The source of the impossible operating history claims and the fabricated endorsement narrative.",
@@ -1811,7 +1853,7 @@ var CORPUS = {
     ["4","","Material issues",100,"c","one critical, three high"],
     ["9","","Sources not reached",56,"n","every one named further down this page"]
   ],
-  bars:[["Tier A, authoritative",3,"a"],["Tier B, structured",2,"b"],["Tier D, open web",2,"c"],["Sources not reached",9,"n"],["Claims cross-examined",4,"a"],["Material issues",4,"a"]],
+  bars:[["Official records",3,"a"],["Verified data",2,"b"],["Public chatter",2,"c"],["Sources not reached",9,"n"],["Claims cross-examined",4,"a"],["Material issues",4,"a"]],
   barFoot:"Seven sources returned a definitive result. The decisive one is a registry record: all three nameservers and the registrar match a brand already on the BC Securities Commission caution list. Nine sources that should have been reached were not.",
   cats:{
     C1:{state:"RED",sum:"Claims to be a registered company in Canada. Gives no name, no number, no address.",
@@ -1897,7 +1939,7 @@ var SPECIMEN = {
     ["4","","Material issues",100,"c","two critical, two high"],
     ["14","","Sources not reached",16,"n","every one named further down this page"]
   ],
-  bars:[["Tier A, authoritative",31,"a"],["Tier B, structured",18,"b"],["Tier C, consumer",19,"c"],["Tier D, open web",5,"c"],["Sources not reached",14,"n"],["Material issues",4,"a"]],
+  bars:[["Official records",31,"a"],["Verified data",18,"b"],["Customer reports",19,"c"],["Public chatter",5,"c"],["Sources not reached",14,"n"],["Material issues",4,"a"]],
   barFoot:"Seventy-three sources returned a definitive result across eleven jurisdictions. The decisive combination is a licensing mismatch, a domain younger than the claimed operating history, a beneficiary that is not the company being verified, and forty-three independent accounts describing the same withdrawal mechanic.",
   cats:{
     C1:{state:"GREEN",sum:"Company record found and the legal entity is verified.",
@@ -1932,7 +1974,7 @@ var SPECIMEN = {
         quote:"Earliest entry 2026-07-16. Validity 90 days.",url:""}]},
     C7:{state:"RED",sum:"Forty-three independent accounts across five platforms describing the same withdrawal mechanic.",
       ev:[{t:"C",src:"Cross-platform negative review sweep",when:"26 Aug 2026",
-        find:"Five platforms carry the same mechanic in different people's words over five months. Community intelligence, promoted to red only because Tier A records corroborate.",
+        find:"Five platforms carry the same mechanic in different people's words over five months. Community intelligence, promoted to red only because official records corroborate.",
         quote:"Depositing took four seconds. I have been waiting nine weeks for a withdrawal and every time I ask it goes back to processing.",url:""}]},
     C8:{state:"RED",sum:"Beneficiary name on the wire does not match the company being verified.",
       ev:[{t:"A",src:"Payment instructions supplied by the consumer",when:"26 Aug 2026",
@@ -2003,7 +2045,7 @@ var GREY = {
     ["0","","Material issues",0,"c","absence of evidence is not evidence of absence"],
     ["10","","Categories unresolved",100,"n","grey is a result, not a failure"]
   ],
-  bars:[["Tier A, authoritative",0,"a"],["Tier B, structured",0,"b"],["Tier D, open web",0,"c"],["Sources not reached",0,"n"],["Categories unresolved",10,"n"]],
+  bars:[["Official records",0,"a"],["Verified data",0,"b"],["Public chatter",0,"c"],["Sources not reached",0,"n"],["Categories unresolved",10,"n"]],
   reviews:{checked:0,carrying:0,reports:0,state:"absent",note:"No review corpus was reached, because nothing identified this party in the first place.",rows:[]},
   barFoot:"Nothing resolved. Grey is a real result, not a failure: it means the console does not have enough of the picture to say anything honest yet.",
   note:"This build carries a seeded evidence corpus of two entities, both retrieved from live public records on 25 August 2026. Anything outside that corpus returns grey, because inventing a result is the one thing this product must never do. Try investhelm.com or nexlares.com to see a full assessment."
@@ -2167,6 +2209,150 @@ C10:[["RED","A dated claim earlier than the domain was created"],
     ["YELLOW","A stated founding year that has changed over time"],
     ["GREEN","Every dated claim fits inside the record"],
     ["NEVER","A brand may predate its domain. The gap alone is not the finding"]]
+};
+
+
+/* How to read a record from each register.
+   [what a hit means, what an absence means, what to look at first]
+   Where a register has no entry here the modal falls back to the description.
+   These are static because they are properties of the register, not of the party.
+   The per record reading, the one sentence that says what a specific document
+   means for the person searching, comes from the assessment as `plain`. */
+var REGREAD = {
+"Corporations Canada":["A federal company by that name exists, with a number, a status and directors on the record.",
+  "Nothing federal was found. The company may still be provincially incorporated, which is normal for a small business.",
+  "Look at the status line first. Active is what you want. Dissolved, struck off or in default means the company you are being asked to pay does not legally exist right now."],
+"Ontario Registry":["A company registered in Ontario, with its status.","Nothing in Ontario. It may be federal or in another province.",
+  "Check the legal name against the name on the invoice or contract. A trading name is not a legal name."],
+"BC Registry":["A company registered in British Columbia.","Nothing in BC.","Status and the registered office address."],
+"Alberta Registry":["A company registered in Alberta.","Nothing in Alberta, or the register was not reachable.","Status, and whether the directors match who you are dealing with."],
+"SEC EDGAR":["A filing exists with the United States securities regulator.",
+  "No filing. For a party selling investments to Americans, that absence is the point rather than a detail.",
+  "Look for a Form D, which is the filing an exempt private offering makes. No Form D and no registration, from a party taking investor money, is a question they need to answer."],
+"Companies House":["A United Kingdom company, with its number, officers and filing history.","Nothing in the UK register.",
+  "Filing history. A company that has stopped filing accounts is a company in trouble."],
+"Florida Sunbiz":["A Florida corporation, with its incorporation date, registered agent and officers.","Nothing in Florida.",
+  "The incorporation date. Nothing the company did can predate it, whatever the website says."],
+"OpenCorporates":["A record aggregated from a state or national register.","Nothing found in the aggregated set.",
+  "Use it to find which register holds the record, then open that register. The aggregator is a finding aid, not the authority."],
+
+"CSA Registration":["The party is registered to sell investments somewhere in Canada, and the categories say what it may sell.",
+  "No matching registration was found. That is not proof they are unregistered, and it is the single most important question to put to them.",
+  "Match the exact legal name and the category. A firm registered as an exempt market dealer may not sell you what a portfolio manager can."],
+"CIRO AdvisorReport":["A registration and disciplinary history for a named individual adviser.","No record for that person.",
+  "Read the disciplinary section before the credentials section."],
+"FINTRAC MSB":["Registered in Canada to exchange or transmit money as a business.","No registration found.",
+  "Anyone moving your money for you should be here. If they are not, ask why not."],
+"Bank of Canada PSP":["Registered as a payment service provider under the Retail Payment Activities Act.","No registration found.",
+  "This register is new. Absence from it is weaker evidence than absence from an established one."],
+"FCA Register":["Authorised by the United Kingdom regulator, with permissions listed.","No authorisation found.",
+  "Check the permissions, not only the presence. A firm authorised for one activity is not authorised for all of them."],
+"BrokerCheck":["A United States broker or firm, with disclosures and disciplinary events.","No record.",
+  "The disclosures section. Customer complaints, terminations and regulatory events all sit there."],
+"NFA BASIC":["Registered for futures or forex in the United States.","No registration found.",
+  "Anyone offering leveraged forex to Americans should be here."],
+"FinCEN MSB":["Registered as a money services business in the United States.",
+  "No registration found. For a party pooling funds and paying distributions, this absence carries weight.",
+  "Registration here is a filing, not an approval. It means they told the government what they do. It is a floor, not a seal."],
+
+"IOSCO I-SCAN":["An entry from a national securities authority warning about this party.","No entry across the contributing authorities.",
+  "Which authority posted it, and when. A warning from the regulator in your own country matters most to you."],
+"BCSC Caution List":["British Columbia has publicly cautioned about this party.","No BC entry.","The date and the wording. These lists say exactly why."],
+"ASC Caution List":["Alberta has publicly cautioned about this party.","No Alberta entry.","The date and the wording."],
+"OSC Alerts":["Ontario has issued an investor warning about this party.","No Ontario entry.","The date and the wording."],
+"CSA Alerts":["At least one Canadian province has warned about this party.","No entry in any province's alerts.",
+  "A listing here is a finding. It is a regulator saying, in public and in its own name, that something is wrong."],
+"FCA Warning List":["The United Kingdom regulator has warned about this firm.","No entry.",
+  "The FCA lists clone firms too. Check whether the warning is about this firm or about somebody impersonating it."],
+"OFAC":["A match against the United States sanctions list.","No match.",
+  "A real match stops everything. Names are common, so confirm the identifiers rather than the name alone."],
+"UN Consolidated":["A match against the United Nations sanctions list.","No match.","Same as OFAC. Confirm identifiers, not names."],
+"DOJ Press":["The Department of Justice has published something naming this party. Arrests, indictments, pleas and forfeitures appear here first.",
+  "Nothing published. Most cases are charged long after the money is gone, so this absence proves very little.",
+  "Read the verb. Charged is an allegation. Pleaded guilty is an admission. They are not the same and the difference is the whole story."],
+"IRS-CI":["IRS Criminal Investigation has published on a case involving this party.","Nothing published.",
+  "These releases carry dollar figures and dates that no other source has."],
+"State AG":["A state attorney general or securities regulator has acted.","Nothing found in the states searched.",
+  "States often act months before a federal authority does. An action in one state is worth as much as a federal one."],
+
+"ISC Ownership":["A record of who actually controls the company.","No ownership record retrieved.",
+  "Compare the named owner to the person you are dealing with."],
+"UK PSC Register":["Persons with significant control over a UK company.","No record.",
+  "A company with no person of significant control declared is worth a question."],
+"ASIC Banned":["An Australian ban or disqualification against this person.","No entry.","The period of the ban and what it covers."],
+"CSA Disciplined":["A Canadian securities regulator has disciplined this person.","No entry.","What they were disciplined for, and when."],
+
+"CanLII":["A Canadian court or tribunal decision involving this party.","Nothing found.",
+  "Check which side they are on. A defendant and a plaintiff are not the same thing."],
+"OSB Bankruptcy":["A Canadian insolvency record.","No record.","Whether it is closed or ongoing."],
+"CourtListener":["A United States court opinion or docket.","Nothing found.",
+  "An opinion is a decision. A docket entry is a filing, and a filing is only an assertion."],
+"UK Insolvency":["A UK bankruptcy or insolvency record.","No record.","Status and date."],
+"PACER":["A United States federal court docket.","Nothing found.",
+  "The case number and the parties. Read the caption before the allegations: it tells you who is suing whom."],
+"Justia Dockets":["A docket found through an aggregator.","Nothing found.",
+  "Use it to locate the case, then read the court's own record. The aggregator can be out of date."],
+"Bankruptcy Claims":["A claims agent site for a bankruptcy or receivership, carrying the full docket.",
+  "No proceeding found.","If your money is in it, the claims deadline on that site is the most important date on this page."],
+
+"ICANN RDAP":["The registry record for the domain: registrar, nameservers, status and creation date.",
+  "The registry did not answer. It almost always does, so a failure here usually means a temporary problem rather than a missing domain.",
+  "The creation date. Everything else on this page can be argued about. That date cannot."],
+"Certificate Log":["Every certificate ever issued for this host, with dates.","No certificates found.",
+  "The earliest date. A site cannot have been serving securely before its first certificate."],
+"Google Web Risk":["Google has flagged this site as unsafe.","Not flagged.",
+  "Not flagged means not yet flagged. New fraud sites are almost never flagged."],
+"VirusTotal":["Security vendors have flagged this domain.","No detections.",
+  "Look at how many vendors, not whether any. One detection out of ninety is usually noise."],
+"urlscan.io":["A recorded scan of what the page loads and where it sends data.","No scan available.",
+  "Where the forms post to. A payment form posting to a different domain is worth understanding."],
+"Mail Config":["The domain has mail routing, so a real mailbox exists on it.",
+  "No mail configuration. A company writing to you from a domain that cannot receive mail is a question.",
+  "Whether the address they emailed you from is actually on this domain."],
+
+"Trustpilot":["Reviews exist on Trustpilot.","No profile or no reviews.",
+  "Read the one and two star reviews only, and read them for the same complaint recurring rather than for the average."],
+"Sitejabber":["Reviews exist on Sitejabber.","No profile or no reviews.",
+  "A different user base from Trustpilot. The same complaint appearing on both is worth far more than either alone."],
+"BBB Scam Tracker":["A Better Business Bureau profile or scam report exists.","No profile.",
+  "The BBB letter rating is mostly age and complaint volume. It is not a safety endorsement. Read the complaints instead."],
+"Forex Peace Army":["Trading community reviews exist.","No entry.",
+  "This community is unusually good on withdrawal complaints specifically."],
+"Reddit":["Community discussion exists.","None found.",
+  "Community intelligence, never verified fact. Useful for the mechanic being described, not for the conclusion being drawn."],
+"Glassdoor":["Employee accounts exist.","No profile.",
+  "Sometimes the earliest signal. Employees describe how an operation actually works before customers can."],
+
+"Beneficiary Match":["The name on the receiving account was compared to the party.","No payment instruction was supplied, so nothing could be compared.",
+  "This is the check that most often stops a payment in time, and it needs the instruction from you."],
+"IBAN and SWIFT":["The account and receiving institution were validated.","No instruction supplied.",
+  "Which country the receiving bank is in. It should make sense against where the company says it is."],
+"Chainabuse":["Community reports exist against this wallet address.","No reports.",
+  "Reports are allegations. Several independent reports of the same pattern are worth taking seriously."],
+"Chain Analytics":["On chain tracing of the address and its counterparties.","Not run or unavailable.",
+  "Where funds move after they arrive."],
+
+"Infrastructure Cluster":["Other domains share nameservers, registrar or hosting with this one.","No cluster found.",
+  "Shared infrastructure alone is common and innocent. Shared infrastructure with a party already found adverse is not."],
+"Identifier Reuse":["The same phone, email, address or wallet appears under another brand name.","No reuse found.",
+  "One operator running several brands is the pattern this looks for."],
+"Document Fingerprint":["A document matching one submitted under another party's name.","No match.",
+  "The same contract template under two different company names is worth a question."],
+
+"ICANN RDAP Date":["The registry creation date for the domain.","The registry did not answer.",
+  "Compare it to every dated claim on their site. A result from before this date cannot have happened here."],
+"Wayback Machine":["The earliest archived capture of the site.","No capture found.",
+  "An archive gap is an archive gap. It is weaker evidence than a registry date and should never be treated as one."],
+"First Certificate":["The first certificate issued for this host.","No certificate history found.",
+  "Corroborates the domain date. A certificate can post-date a site, so it is supporting evidence rather than proof."],
+"Trademark Filing":["A trademark filing exists, with its date.","No filing found.",
+  "A brand claiming a long history usually filed early. No filing at all is not unusual for a small business."],
+"Domain History":["Historical records for the domain, including previous owners.","No history retrieved.",
+  "Whether the domain changed hands. A domain bought second hand carries an older creation date that is not the company's age."],
+"Incorporation Date":["When the legal entity first existed.","No incorporation record retrieved.",
+  "Nothing the company did can predate this. It is the hardest date to argue with."],
+"Public Profile":["A stated tenure or history on a public professional profile.","No profile found.",
+  "Self reported, and treated as such. Useful as a claim to check, never as a record."]
 };
 
 var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
@@ -2350,9 +2536,11 @@ var OPEN = null;
 function countUp(node,to,suffix){
   if(reduce){node.textContent=to+(suffix||"");return;}
   var start=null,dur=1000,from=parseFloat(node.textContent)||0;
+  function now(t){ return typeof t==="number" ? t : (Date.now()); }
   function f(ts){
-    if(!start)start=ts;
-    var p=Math.min(1,(ts-start)/dur), e=1-Math.pow(1-p,3);
+    var t=now(ts);
+    if(start===null)start=t;
+    var p=Math.min(1,(t-start)/dur), e=1-Math.pow(1-p,3);
     node.textContent=Math.round(from+(to-from)*e)+(suffix||"");
     if(p<1)requestAnimationFrame(f);
   }
@@ -2373,15 +2561,84 @@ function setReads(list){
     w.appendChild(c);
   });
 }
+/* What each of the five figures at the top actually means, where it comes from,
+   and what it does not tell you. Keyed on the label so it survives a wording
+   change in the payload. */
+var STAT_BRIEF = {
+"sources returning a result":["How many of the named registers gave us an answer about this party.",
+  ["Counted from the retrieval log, not estimated. A register counts only when a page came back from it.",
+   "The second number is how many registers applied to this party at all. A Canadian register does not apply to a Florida company.",
+   "It does not mean those registers found nothing wrong. It means they answered."],
+  "Source board"],
+"authoritative records":["Records from government, a regulator, a court or an official registry.",
+  ["These are the only records that can carry a finding on their own.",
+   "Everything else needs a second source, or corroborates rather than decides.",
+   "A high count here is why a result can be trusted. A low count is why a result may be grey."],
+  "The ten checks"],
+"claims cross-examined":["Statements the party makes about itself, each put against the record that settles it.",
+  ["Taken from the party's own material, verbatim where we could retrieve it.",
+   "Each one is bound to a specific record, named, with a date.",
+   "This is the part a search engine cannot do for you."],
+  "Cross-examination"],
+"material issues":["Things found that would change a reasonable person's decision.",
+  ["Ordered most serious first, each with the source class it rests on.",
+   "Critical means the check has stopped being advisory.",
+   "An empty list means none were found in the checks that completed. It does not mean none exist."],
+  "Material issues"],
+"sources not reached":["Registers that should have applied and did not answer.",
+  ["Published rather than hidden, because a report showing only what it found lies by omission.",
+   "A register here is never reported as clean.",
+   "The higher this number, the less weight an absence of findings carries."],
+  "Gaps"],
+"connectors in the opening set":["The sources this console can currently reach.",
+  ["Counted from the connector registry, with the tier of each recorded.",
+   "It expands through the IOSCO member network rather than an invented country list.",
+   "Every connector carries its commercial-use terms from the day it is registered."], null],
+"categories unresolved":["Checks that could not be settled on this run.",
+  ["Grey is a real result. It means the console does not have enough of the picture to say anything honest yet.",
+   "Each unresolved check names what it could not reach.",
+   "It is never the same as a clean result."], "The ten checks"]
+};
+
+function statBrief(label){
+  var k=String(label||"").toLowerCase().trim();
+  var b=STAT_BRIEF[k];
+  if(!b) return;
+  var h='<div class="infosec"><div class="infoq" style="margin-top:0">'+esc(b[0])+'</div>'+
+    '<div class="snaplist" style="margin-top:14px">'+b[1].map(function(t,i){
+      return '<div class="snaprow"><span class="sx">'+(i+1)+'</span><span class="sb">'+
+             '<span class="sd" style="margin-top:0">'+esc(t)+'</span></span></div>';
+    }).join('')+'</div></div>';
+  infoOpen("What this number means", label, null, h);
+  if(b[2] && CURRENT && CURRENT.cats){
+    var jump=el("button","gateok"); jump.type="button"; jump.style.marginTop="18px";
+    jump.textContent="Open "+b[2];
+    jump.addEventListener("click",function(){
+      var f={"Source board":snapSources,"The ten checks":snapChecks,
+             "Cross-examination":function(){snapSimple("claims");},
+             "Material issues":function(){snapSimple("issues");},
+             "Gaps":function(){snapSimple("gaps");}}[b[2]];
+      if(f) f();
+    });
+    infoBody.appendChild(jump);
+  }
+}
+
 function setStats(list){
   var w=id("statstrip"); w.innerHTML="";
   list.forEach(function(st){
     var c=el("div","scell");
+    var has=!!STAT_BRIEF[String(st[2]||"").toLowerCase().trim()];
+    if(has){ c.setAttribute("role","button"); c.setAttribute("tabindex","0"); }
     c.innerHTML='<div class="sv tnum">'+esc(st[0])+(st[1]?'<small>'+esc(st[1])+'</small>':'')+'</div>'+
-      '<div class="sl">'+esc(st[2])+'</div>'+
+      '<div class="sl">'+esc(st[2])+(has?' <span class="statq">?</span>':'')+'</div>'+
       '<div class="sp"><i data-c="'+esc(st[4])+'"></i></div>'+
       '<div class="sc">'+esc(st[5])+'</div>';
     w.appendChild(c);
+    if(has){
+      c.addEventListener("click",function(){ statBrief(st[2]); });
+      c.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); statBrief(st[2]); } });
+    }
     var i=c.querySelector(".sp i");
     setTimeout(function(){ i.style.width=Math.max(0,Math.min(100,parseFloat(st[3])||0))+"%"; },90);
   });
@@ -2491,42 +2748,44 @@ infoScrim.addEventListener("click",infoClose);
 
 /* ---- a register light ---- */
 function openRegister(name){
-  var r = REGINFO[name];
+  var r = REGINFO[name], rd = REGREAD[name];
   var state = (CURRENT && CURRENT.board && CURRENT.board[name]) || "ready";
   var group = "";
   SOURCES.forEach(function(g){ if(g.items.indexOf(name)>-1) group=g.c; });
 
-  var h = '<div class="infosec">';
-  if(r){
-    h += '<div class="infop" style="margin-top:0">'+esc(r[2])+'</div>'+
-         '<div class="infometa">'+
-           '<span class="infochip">'+esc(group)+'</span>'+
-           '<span class="infochip">'+esc(r[0])+'</span>'+
-           '<span class="infochip">Tier '+esc(r[1])+'</span>'+
-         '</div>';
-    if(r[3]) h += '<a class="infolink" href="'+esc(r[3])+'" target="_blank" rel="noopener noreferrer">Open this register yourself</a>';
-  } else {
-    h += '<div class="infop" style="margin-top:0">No reference entry for this register.</div>';
-  }
-  h += '</div>';
-
-  /* what it returned on this run */
-  h += '<div class="infosec"><div class="infoh">On this check</div>';
+  /* What it returned on this run, first, because that is the question. */
   var msg = {
     ready:"This check has not been run yet, so nothing has been asked of this register.",
     check:"This register is being read right now.",
-    clear:"This register was reached and returned nothing about this party. That is not a clean bill of health; it means this particular source had no entry.",
-    caution:"This register returned something worth looking at.",
-    adverse:"This register returned something against this party.",
-    unreached:"We could not get an answer out of this register on this run. It is reported as not reached, and it is never reported as clean."
+    clear:"Reached, and nothing about this party came back from it. That is not a clean bill of health. It means this one source had no entry.",
+    caution:"Something came back from this register that is worth looking at.",
+    adverse:"Something came back from this register that is against this party.",
+    unreached:"We could not get an answer out of this register on this run. It is reported as not reached, and never as clean."
   }[state] || "No result recorded.";
-  h += '<div class="infop" style="margin-top:0">'+esc(msg)+'</div>';
 
-  /* any record this run attributed to it */
-  /* Match a record to a register in either direction. A record whose source
-     reads "ICANN RDAP, via the Verisign registry" belongs to both the ICANN
-     RDAP light and the ICANN RDAP Date light, and neither string contains the
-     other whole. Compare the leading phrase of each instead. */
+  var h = '<div class="infosec"><div class="infoq" style="margin-top:0">'+esc(msg)+'</div>'+
+    (r?'<div class="infop">'+esc(r[2])+'</div>':'')+
+    '<div class="infometa">'+
+      '<span class="infochip">'+esc(group)+'</span>'+
+      (r?'<span class="infochip">'+esc(r[0])+'</span>':'')+
+      (r?'<span class="infochip" title="'+esc(tierWhy(r[1]))+'">'+esc(tierWord(r[1]))+'</span>':'')+
+    '</div>'+
+    (r&&r[3]?'<a class="infolink" href="'+esc(r[3])+'" target="_blank" rel="noopener noreferrer">Open this register yourself</a>':'')+
+    '</div>';
+
+  /* How to read it. Static, because it is a property of the register. */
+  if(rd){
+    h += '<div class="infosec"><div class="infoh">How to read this one</div><div class="readgrid">'+
+      '<div class="readrow"><span class="rl2" data-k="hit">If it has them</span><span class="rv2">'+esc(rd[0])+'</span></div>'+
+      '<div class="readrow"><span class="rl2" data-k="miss">If it does not</span><span class="rv2">'+esc(rd[1])+'</span></div>'+
+      '<div class="readrow"><span class="rl2" data-k="look">Look at first</span><span class="rv2">'+esc(rd[2])+'</span></div>'+
+      '</div></div>';
+  }
+
+  /* Records the assessment actually bound to this party, and separately the raw
+     pages that came back from the register. Keeping these apart matters: a
+     company-registry search returns other companies, and showing those under a
+     party's name would imply they are that party's records. */
   function norm(v){ return String(v||"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim(); }
   function head(v){ return norm(String(v||"").split(",")[0]); }
   var rn=norm(name), rh=head(name);
@@ -2536,33 +2795,44 @@ function openRegister(name){
     return sn.indexOf(rn)>-1 || rn.indexOf(sh)>-1 || (sh.length>5 && rh.indexOf(sh)>-1) || (rh.length>5 && sh.indexOf(rh)>-1);
   }
 
-  var hits=[];
+  var bound=[];
   if(CURRENT && CURRENT.cats){
     for(var k in CURRENT.cats){
-      (CURRENT.cats[k].ev||[]).forEach(function(e){ if(belongs(e.src)) hits.push(e); });
+      (CURRENT.cats[k].ev||[]).forEach(function(e){ if(belongs(e.src)) bound.push(e); });
     }
   }
+  if(bound.length){
+    h += '<div class="infosec"><div class="infoh">'+bound.length+' record'+(bound.length===1?'':'s')+
+         ' the assessment used from this register</div>'+bound.slice(0,10).map(evBlock).join('')+'</div>';
+  }
+
+  var raw=[];
   if(CURRENT && CURRENT.retrieved){
-    CURRENT.retrieved.forEach(function(x){
-      if((x.reg||[]).indexOf(name)>-1) hits.push({t:"B",src:x.host,when:x.date||"",find:x.title||"",quote:x.snip||"",url:x.url});
-    });
+    CURRENT.retrieved.forEach(function(x){ if((x.reg||[]).indexOf(name)>-1) raw.push(x); });
   }
-  if(hits.length){
-    h += '<div class="infoh" style="margin-top:22px">'+hits.length+' record'+(hits.length===1?'':'s')+' from this register</div>'+
-         hits.slice(0,8).map(evBlock).join('');
+  if(raw.length){
+    h += '<div class="infosec"><div class="infoh">'+raw.length+' page'+(raw.length===1?'':'s')+' retrieved from this register</div>'+
+      '<div class="infop" style="margin-top:0"><b>These are search results, not findings.</b> A register search returns whatever matched the query, '+
+      'including records belonging to other companies with similar names. Only the records above were bound to this party and used in the assessment. '+
+      'Read the rest as leads to check, and confirm the exact legal name on any one before you rely on it.</div>'+
+      raw.slice(0,10).map(function(x){
+        return '<div class="rt"><div class="rttop"><span class="rthost">'+esc(x.host||"")+'</span>'+
+          (x.date?'<span class="rtdate">'+esc(x.date)+'</span>':'')+'</div>'+
+          (x.title?'<div class="rtt">'+esc(x.title)+'</div>':'')+
+          (x.snip?'<div class="rtsnip">'+esc(x.snip)+'</div>':'')+
+          '<a class="rtlink" href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">Open this page</a></div>';
+      }).join('')+'</div>';
   }
-  h += '</div>';
 
   infoOpen("Register", name, state==="ready"?null:state, h);
 }
 
 /* ------------------------------------------------------------------ *
- * THE QUICK STRIP
+ * THE SNAPSHOTS
  *
- * One row under the answer. Every part of the check reduced to a figure you
- * can read at a glance and open in place. Nothing here scrolls the page: a
- * snapshot opens over the dashboard and closing it puts you back where you
- * were, which is the whole point of a snapshot rather than a section.
+ * Every figure on the summary band opens one of these. A snapshot opens over
+ * the dashboard and closing it puts you back where you were, which is the
+ * whole point of a snapshot rather than a section further down the page.
  * ------------------------------------------------------------------ */
 function snapCells(cells){
   return '<div class="snapgrid">'+cells.map(function(c){
@@ -2599,8 +2869,8 @@ function snapChecks(){
 function snapReviews(){
   var d=CURRENT; if(!d) return;
   var r=d.reviews, led=d.ledger||[];
-  var swept=0, hit=0, pages=0;
-  led.forEach(function(p){ if(p.searched) swept++; if(p.pages>0) hit++; pages+=p.pages||0; });
+  var swept=0, hit=0;
+  led.forEach(function(p){ if(p.searched) swept++; if(p.pages>0) hit++; });
   var accounts = r?r.reports:0, platforms = r?r.checked:(swept||0), carrying = r?r.carrying:hit;
 
   var h='<div class="infosec">'+
@@ -2630,12 +2900,13 @@ function snapReviews(){
        'That is not the same as a clean record. It means the corpus this check would read has not been produced yet, or was not reachable on this run.</div></div>';
   }
 
-  if(led.length){
-    h+='<div class="infosec"><div class="infoh">Where we looked</div>'+ledgerHTML(led)+'</div>';
-  }
+  h+='<div class="infosec"><div class="infoh">Where we looked</div>'+
+     (led.length ? ledgerHTML(led)
+                 : '<div class="infop" style="margin-top:0">The platform sweep log did not come back on this run, so we cannot name which review sites were searched. '+
+                   'Treat the figures above as the part of the corpus we did read, not as the whole of it.</div>')+'</div>';
   h+='<div class="infosec"><div class="infop" style="margin-top:0;font-size:12px">Community evidence is an allegation, not a verified fact. '+
-     'Some accounts come from competitors and some from people who lost money in a legitimate market. Tier C and D material never turns a check red on its own.</div></div>';
-  infoOpen("Reviews", (d.name||"This party"), null, h);
+     'Some accounts come from competitors and some from people who lost money in a legitimate market. Customer reports and public chatter never turn a check red on their own.</div></div>';
+  infoOpen("Reviews, what other people are saying", (d.name||"This party"), null, h);
 }
 
 /* --- the source board, as a figure and a list --- */
@@ -2657,7 +2928,7 @@ function snapSources(){
                [String(adverse),"Returned something adverse","bad"],
                [String(caution),"Returned something to look at","warn"],
                [String(dark),"Could not be reached",""]])+
-    '<div class="infop">A dark register is one we could not get an answer out of. It is never a register that came back clean, and every one is named below.</div>'+
+    '<div class="infop">A dark register is one we could not get an answer out of. It is never a register that came back clean, and every one is named below. Open any register to read what a hit means and what an absence means.</div>'+
     '<div class="snaplist">'+rows.map(function(x){
       return '<button class="snaprow" type="button" data-reg="'+esc(x[1])+'">'+
         '<span class="sx"></span><span class="sb"><span class="st2">'+esc(x[1])+'</span>'+
@@ -2694,7 +2965,7 @@ function snapSimple(kind){
       (is.length?'<div class="snaplist">'+is.map(function(x,i){
         return '<div class="snaprow"><span class="sx">'+(i<9?"0":"")+(i+1)+'</span>'+
           '<span class="sb"><span class="st2">'+esc(x.t)+'</span><span class="sd">'+esc(x.x)+'</span></span>'+
-          '<span class="sg" data-s="'+(x.sev==="critical"||x.sev==="high"?"RED":"YELLOW")+'">'+esc(x.sev)+' &middot; Tier '+esc(x.tier)+'</span></div>';
+          '<span class="sg" data-s="'+(x.sev==="critical"||x.sev==="high"?"RED":"YELLOW")+'">'+esc(x.sev)+' &middot; '+esc(tierWord(x.tier))+'</span></div>';
       }).join('')+'</div>':'<div class="infop">None found in the checks that completed.</div>')+'</div>';
     infoOpen("Material issues", (d.name||"This party"), null, h);
   } else {
@@ -2713,63 +2984,67 @@ function snapSimple(kind){
   }
 }
 
-function renderQuick(d){
-  var w=id("quickRow"); w.innerHTML="";
-  if(!d || !d.cats){ w.classList.remove("on"); return; }
-  var b=d.board||{}, reached=0;
-  SOURCES.forEach(function(g){ g.items.forEach(function(n){ if(b[n] && b[n]!=="unreached") reached++; }); });
-  var rev=d.reviews, led=d.ledger||[];
-  var revN = rev ? (rev.reports||0) : led.reduce(function(n,p){return n+(p.pages||0);},0);
-  var red=0; CATS.forEach(function(c){ var r=d.cats[c.key]; if(r&&r.state==="RED") red++; });
-
-  var items=[
-    ["The ten checks", String(red)+" adverse", red?"bad":"ok", snapChecks],
-    ["Reviews", revN+" read", revN?"warn":"nul", snapReviews],
-    ["Source board", reached+" of "+TOTAL_SOURCES, reached?"ok":"nul", snapSources],
-    ["Cross-examination", String((d.claims||[]).length), (d.claims||[]).length?"warn":"nul", function(){snapSimple("claims");}],
-    ["Material issues", String((d.issues||[]).length), (d.issues||[]).length?"bad":"ok", function(){snapSimple("issues");}],
-    ["Gaps", String((d.gaps||[]).length), "nul", function(){snapSimple("gaps");}]
-  ];
-  items.forEach(function(it){
-    var b2=el("button","quick"); b2.type="button"; b2.setAttribute("data-t",it[2]);
-    b2.innerHTML='<span class="qn">'+esc(it[0])+'</span><span class="qv">'+esc(it[1])+'</span>';
-    b2.addEventListener("click",it[3]);
-    w.appendChild(b2);
-  });
-  w.classList.add("on");
-}
-
-/* The three things a reader opens first, stacked beside the answer. */
+/* ------------------------------------------------------------------ *
+ * THE SUMMARY RAIL
+ *
+ * Six cards stacked beside the answer. Each one is the whole of a section
+ * reduced to a figure and a sentence, and each one opens the section itself.
+ * Nothing here needs the reader to scroll to find out whether it matters.
+ * ------------------------------------------------------------------ */
 function renderSummaryRail(d){
-  var w=id("sbRight"); w.innerHTML="";
+  var w=id("sbRight"); if(!w) return;
+  w.innerHTML="";
   if(!d || !d.cats) return;
+
   var red=0; CATS.forEach(function(c){ var r=d.cats[c.key]; if(r&&r.state==="RED") red++; });
   var b=d.board||{}, reached=0;
   SOURCES.forEach(function(g){ g.items.forEach(function(n){ if(b[n]&&b[n]!=="unreached") reached++; }); });
   var rev=d.reviews, led=d.ledger||[];
   var revN = rev?(rev.reports||0):led.reduce(function(n,p){return n+(p.pages||0);},0);
   var revP = rev?(rev.carrying||0):led.filter(function(p){return p.pages>0;}).length;
+  var claims=d.claims||[], issues=d.issues||[], gaps=d.gaps||[], unres=d.unresolved||[];
+  var contradicted=claims.filter(function(x){return x.v==="RED";}).length;
+  var critical=issues.filter(function(x){return x.sev==="critical"||x.sev==="high";}).length;
 
   var cards=[
     ["The ten checks", String(red)+" adverse", red?"bad":"ok",
      '<div class="sbdots">'+CATS.map(function(c){
         var r=d.cats[c.key]; return '<i data-s="'+esc(r?r.state:"GREY")+'" title="'+esc(c.name)+'"></i>';
-      }).join('')+'</div>', red? red+" of "+CATS.length+" checks came back against them" : "Nothing adverse in the checks that completed",
+      }).join('')+'</div>',
+     red ? red+" of "+CATS.length+" checks came back against them" : "Nothing adverse in the checks that completed",
      snapChecks],
-    ["Reviews", String(revN)+" read", revN?"warn":"nul",
-     '', revP? revP+" platforms carried negative reports" : "No platform carried a negative report",
+
+    ["Reviews, what other people are saying", String(revN)+" read", revN?"warn":"nul", '',
+     revP ? revP+" platforms carried negative reports" : "No platform carried a negative report",
      snapReviews],
+
     ["Source board", reached+" of "+TOTAL_SOURCES, reached?"ok":"nul",
      '<div class="sbbar"><i style="width:'+Math.round(reached/TOTAL_SOURCES*100)+'%"></i></div>',
      (TOTAL_SOURCES-reached)+" could not be reached, and every one is named",
-     snapSources]
+     snapSources],
+
+    ["Cross-examination", String(claims.length), contradicted?"bad":(claims.length?"warn":"nul"), '',
+     contradicted ? contradicted+" of their claims is contradicted by the record"
+                  : (claims.length ? "Claims bound to the record that adjudicates them" : "No claim could be bound to a source"),
+     function(){ snapSimple("claims"); }],
+
+    ["Material issues", String(issues.length), issues.length?"bad":"ok", '',
+     issues.length ? critical+" serious enough to act on before you send"
+                   : "None found in the checks that completed",
+     function(){ snapSimple("issues"); }],
+
+    ["Gaps", String(gaps.length), gaps.length?"warn":"ok", '',
+     unres.length ? gaps.length+" sources unreached, "+unres.length+" questions still open"
+                  : (gaps.length ? gaps.length+" sources we could not reach, every one named" : "Nothing was left unchecked on this run"),
+     function(){ snapSimple("gaps"); }]
   ];
+
   cards.forEach(function(c){
-    var b2=el("button","sbcard"); b2.type="button"; b2.setAttribute("data-t",c[2]);
-    b2.innerHTML='<span class="sbtop"><span class="n">'+esc(c[0])+'</span><span class="v">'+esc(c[1])+'</span></span>'+
-                 c[3]+'<div class="sbx">'+esc(c[4])+'</div>';
-    b2.addEventListener("click",c[5]);
-    w.appendChild(b2);
+    var btn=el("button","sbcard"); btn.type="button"; btn.setAttribute("data-t",c[2]);
+    btn.innerHTML='<span class="sbtop"><span class="n">'+esc(c[0])+'</span><span class="v">'+esc(c[1])+'</span></span>'+
+                  c[3]+'<div class="sbx">'+esc(c[4])+'</div>';
+    btn.addEventListener("click",c[5]);
+    w.appendChild(btn);
   });
 }
 
@@ -2779,11 +3054,23 @@ function toggleDrill(key){
   if(!c) return;
   var res = CURRENT && CURRENT.cats ? CURRENT.cats[key] : null;
 
+  /* Order matters. What was found comes first, because that is what a reader
+     opened this for. The rules and the register list are reference, and
+     reference goes underneath. */
   var h = '<div class="infosec">'+
-    '<div class="infoq">'+esc(c.q)+'</div>'+
-    '<div class="infop">'+esc(c.blurb)+'</div>'+
-    (res ? '<div class="infop"><b>On this check.</b> '+esc(res.sum)+'</div>' : '')+
-    '</div>';
+    (res ? '<div class="infoq">'+esc(res.sum)+'</div>' : '<div class="infoq">'+esc(c.q)+'</div>')+
+    '<div class="infop">'+esc(c.blurb)+'</div></div>';
+
+  if(res && res.ev && res.ev.length){
+    h += '<div class="infosec"><div class="infoh">'+res.ev.length+' record'+(res.ev.length===1?'':'s')+' found</div>'+
+         res.ev.map(evBlock).join('')+'</div>';
+  } else {
+    h += '<div class="infosec"><div class="infoh">0 records found</div>'+
+         '<div class="infop" style="margin-top:0">'+
+         (res ? 'No record was retrieved for this check. It is reported grey, and it appears in the coverage gaps.'
+              : 'This check has not been run against this party yet. Nothing here is a finding, and an empty check is never the same as a clean one.')+
+         '</div></div>';
+  }
 
   var rl = RULES[c.key];
   h += '<div class="infosec"><div class="infoh">How this check is decided</div>'+
@@ -2794,19 +3081,11 @@ function toggleDrill(key){
           : '<div class="infop" style="margin-top:0">'+c.rule+'</div>')+
        '</div>';
 
-  if(res && res.ev && res.ev.length){
-    h += '<div class="infosec"><div class="infoh">'+res.ev.length+' record'+(res.ev.length===1?'':'s')+' found</div>'+
-         res.ev.map(evBlock).join('')+'</div>';
-  } else if(res){
-    h += '<div class="infosec"><div class="infoh">Records found</div>'+
-         '<div class="infop" style="margin-top:0">No record was retrieved for this check. It is reported grey, and it appears in the coverage gaps.</div></div>';
-  }
-
   h += '<div class="infosec"><div class="infoh">'+c.src.length+' registers behind this check</div>'+
-       '<div class="srcwrap"><table class="srctbl"><tr><th>Source</th><th>Where</th><th>Tier</th><th>Access</th><th>Terms</th></tr>'+
+       '<div class="srcwrap"><table class="srctbl"><tr><th>Source</th><th>Where</th><th>What it counts as</th><th>Access</th><th>Terms</th></tr>'+
        c.src.map(function(x){
          var nm = x[5] ? '<a href="'+esc(x[5])+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue-lt)">'+esc(x[0])+'</a>' : esc(x[0]);
-         return '<tr><td>'+nm+'</td><td>'+esc(x[1])+'</td><td><span class="tier" data-t="'+esc(x[2])+'">'+esc(x[2])+'</span></td>'+
+         return '<tr><td>'+nm+'</td><td>'+esc(x[1])+'</td><td><span class="tier" data-t="'+esc(x[2])+'" title="'+esc(tierWhy(x[2]))+'">'+esc(tierWord(x[2]))+'</span></td>'+
                 '<td>'+esc(x[3])+'</td><td>'+esc(x[4])+'</td></tr>';
        }).join('')+'</table></div></div>';
 
@@ -2910,7 +3189,6 @@ function runScan(board, done){
   topBar(0);
   id("auditRow").classList.remove("on");
   id("summaryBand").classList.remove("on");
-  id("quickRow").classList.remove("on");
   id("boardBar").style.width="0%";
   id("boardC").textContent="0 of "+TOTAL_SOURCES+" reached";
 
@@ -2999,7 +3277,7 @@ function toIdle(){
   id("dialMode").textContent="Idle"; id("dialMode").classList.remove("live");
   id("barPanelT").textContent="Connector distribution";
   id("barMode").textContent="MVP set";
-  setDial(1,Math.round(NET.tierA/NET.connectors*100),"of 34","Tier A density","Authoritative sources as a share of the connector set.");
+  setDial(1,Math.round(NET.tierA/NET.connectors*100),"of 34","Official records","Official records as a share of the connector set.");
   setDial(2,Math.round(NET.directFeed/NET.connectors*100),"of 34","Direct feed","Connectors with a documented API or structured feed.");
   setReads(NET.reads); setBars(NET.bars,NET.foot);
   setStats(NET.stats); renderBoard(null); boardCount();
@@ -3024,7 +3302,7 @@ function toResult(d,label){
   if(d.stats) setStats(d.stats);
   id("auditRow").classList.toggle("on", !!d.cats);
   id("summaryBand").classList.add("on");
-  renderQuick(d);
+  id("verdictWrap").classList.add("on");
   renderSummaryRail(d);
   topBar(100);
 
@@ -3187,6 +3465,16 @@ var CATNAME={}; CATS.forEach(function(c){ CATNAME[c.key]=c.id+" "+c.name; });
 /* Internal state keys are for the code. These are the words a reader sees.
    "Clear" was the worst of the old set: it reads as a clean bill of health when
    all it ever meant was that nothing turned up in that particular source. */
+var TIER_WORD = {
+  A:["Official record","Government, regulator, court or registry. Can carry a finding on its own."],
+  B:["Verified data","Independent structured evidence. Normally needs a second source."],
+  C:["Customer reports","Review platforms and complaint boards. Read for pattern, never alone."],
+  D:["Public chatter","Forums and social. Community intelligence, never verified fact."],
+  "4orm":["4orm corpus","Built from what every previous check learned."]
+};
+function tierWord(t){ var x=TIER_WORD[String(t||"").toUpperCase()]||TIER_WORD[t]; return x?x[0]:("Tier "+t); }
+function tierWhy(t){ var x=TIER_WORD[String(t||"").toUpperCase()]||TIER_WORD[t]; return x?x[1]:""; }
+
 var STATE_WORD = {
   ready:"Waiting to run", check:"Reading it now", clear:"Nothing found here",
   caution:"Worth a look", adverse:"Something against them", unreached:"Could not reach it",
@@ -3200,11 +3488,14 @@ function stateWord(v){
 
 function evBlock(e){
   return '<div class="ev"><div class="evtop">'+
-    '<span class="tier" data-t="'+esc(e.t)+'">Tier '+esc(e.t)+'</span>'+
+    '<span class="tier" data-t="'+esc(e.t)+'" title="'+esc(tierWhy(e.t))+'">'+esc(tierWord(e.t))+'</span>'+
     '<span class="evsrc">'+esc(e.src)+'</span>'+
     '<span class="evwhen">'+esc(e.when)+'</span></div>'+
     '<div class="evfind">'+esc(e.find)+'</div>'+
     (e.quote?'<div class="evquote">'+esc(e.quote)+'</div>':'')+
+    /* What this particular record means for the reader. Written by the
+       assessment, one sentence, for somebody who has never seen a registry. */
+    (e.plain?'<div class="evplain"><span class="k"></span><span class="x">'+esc(e.plain)+'</span></div>':'')+
     (e.url?'<a class="evlink" href="'+esc(e.url)+'" target="_blank" rel="noopener noreferrer">Open the source record</a>':'')+
     '</div>';
 }
@@ -3328,7 +3619,8 @@ function buildAudit(d){
     if(d.ledger && d.ledger.length){
       var swept=0, hit=0, pages=0;
       d.ledger.forEach(function(p){ if(p.searched) swept++; if(p.pages>0) hit++; pages+=p.pages||0; });
-      h+='<div class="arh" style="margin-top:30px;font-size:15px">Which platforms were swept, and what came back.</div>'+
+      h+='<div class="lbl gold" style="margin-top:30px">Platform sweep</div>'+
+         '<div class="arh" style="margin-top:10px;font-size:15px">Which platforms were swept, and what came back.</div>'+
          '<div class="arp">Counted from the pages retrieved. A platform with nothing returned was still searched, and is reported that way rather than as clean.</div>'+
          '<div class="pfgrid">'+d.ledger.map(function(p){
            return '<div class="pf" data-hit="'+(p.pages>0?1:0)+'" data-searched="'+(p.searched?1:0)+'">'+
@@ -3352,7 +3644,7 @@ function buildAudit(d){
          return '<div class="issue"><span class="n">'+(i<9?"0":"")+(i+1)+'</span><span class="b">'+
            '<span class="t">'+esc(is.t)+'</span><span class="x">'+esc(is.x)+'</span>'+
            '<span class="m"><span class="sev" data-s="'+esc(is.sev)+'">'+esc(is.sev)+'</span>'+
-           '<span class="tier" data-t="'+esc(is.tier)+'">Tier '+esc(is.tier)+'</span></span></span></div>';
+           '<span class="tier" data-t="'+esc(is.tier)+'" title="'+esc(tierWhy(is.tier))+'">'+esc(tierWord(is.tier))+'</span></span></span></div>';
        }).join('')+'</div></div>';
   }
 

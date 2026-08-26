@@ -74,10 +74,12 @@ export const PAYLOAD_SCHEMA = {
             description: 'Empty only when the category was unreachable or does not apply.',
             items: {
               type: 'object',
-              required: ['tier', 'source', 'retrieved', 'finding'],
+              required: ['tier', 'source', 'retrieved', 'finding', 'plain'],
               properties: {
                 tier:      TIER,
                 source:    { type: 'string', description: 'The organisation and the specific register or page.' },
+                plain:     { type: 'string', description:
+                  'One sentence in plain words telling the reader what THIS record means for them and what to do about it. Not a restatement of the finding. Where the record is ambiguous, say what it does not establish. Write it for somebody who has never seen a corporate registry.' },
                 retrieved: { type: 'string', description: 'Date the record was read, e.g. 26 Aug 2026.' },
                 finding:   { type: 'string', description: 'What the record establishes, in plain words.' },
                 quote:     { type: 'string', description: 'VERBATIM text from the source. Never paraphrase into this field.' },

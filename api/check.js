@@ -135,7 +135,7 @@ function toRenderShape(a, meta) {
       state: c.state, sum: c.summary,
       ev: (c.evidence || []).map(e => ({
         t: e.tier, src: e.source, when: e.retrieved,
-        find: e.finding, quote: e.quote || '', url: e.url || ''
+        find: e.finding, plain: e.plain || '', quote: e.quote || '', url: e.url || ''
       }))
     };
   });
