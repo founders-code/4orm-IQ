@@ -474,6 +474,257 @@ and feeds C9.
 
 ---
 
+## 3B. VERTICAL ROUTING, AND WHAT IT MEANS FOR COVERAGE
+
+Before the sweep is planned, the party is classified. Multiple classifications are
+normal and expected: a crypto hedge fund is \`CRYPTO\`, \`PRIVATE_INVESTMENT\`,
+\`PRIVATE_FUND\` and \`INVESTMENT_ADVISER\` at the same time, and each one opens a
+different set of registers.
+
+\`\`\`
+PUBLIC_STOCK  BROKER_DEALER  INVESTMENT_ADVISER  PRIVATE_INVESTMENT  VC_STARTUP
+PRIVATE_FUND  FOREX_CFD      CRYPTO              COMMODITIES         OTHER
+\`\`\`
+
+**Why this exists.** Running every specialised search against every company is slow,
+expensive, and fills the report with registers that could never have held a record. A
+Canadian plumber has no Form D. An Australian licence register has nothing to say about a
+Canadian issuer with no Australian activity.
+
+**What it changes about coverage, and this is the important part.**
+
+Evidence coverage is measured against the sources that **could have applied to this
+party**, never against the whole catalogue. A register that was never going to hold a
+record is published as *could never have applied*, with the reason, and it does **not**
+count as a gap. Counting it as one would make the coverage figure meaningless in one
+direction; quietly dropping it from the report would make it meaningless in the other.
+Both halves are published.
+
+**The three states you must keep apart when you report on a source.**
+
+| State | What it means | Counts against coverage |
+|---|---|---|
+| Answered | A page came back from it | No, it is coverage |
+| Asked, nothing came back | It was queried and had no entry. **This is a result, and it is not clearance.** | No |
+| Could never have applied | Wrong jurisdiction, wrong activity | **No** - publish with the reason |
+| Never asked, or would not answer | Nobody queried it, or it failed | **Yes** - this is the only real gap |
+
+A search that failed to run, for a missing key or an outage, is **never** reported as a
+register that came back empty. That would manufacture a negative result out of an
+outage, and it is Rule Zero.
+
+---
+
+## 3C. THE AUTHORITATIVE SOURCES, AND WHAT EACH ONE SETTLES
+
+### United States, investing and retail trading
+
+**SEC IAPD and Form ADV.** The public file on registered investment advisers. Capture the
+exact registered legal name, CRD number, SEC file number, current AND historical
+registration, state status, every alternate or former name, address, control persons,
+every disciplinary disclosure, the Form ADV filing date and its amendments, private funds
+listed, assets under management where disclosed, and related persons.
+
+> A current registration is **not an endorsement**, and must never be written as one.
+> A lapsed registration is still relevant and must not be discarded.
+> If the registration number a party claims belongs to a different legal entity, quote
+> both names and treat it as a material contradiction. That is **RED**.
+
+**SEC Form D.** The notice filed for a private raise. Capture first filing date, every
+amendment date, offering amount, amount sold, amount remaining, **date of first sale**,
+security type, exemption relied on, minimum investment, related persons, sales
+compensation, and the states involved.
+
+> The first sale date is the most useful figure in this entire section, because it is an
+> independent record of when money started moving.
+>
+> When the party says *"we have been raising this fund since 2019"* and the first Form D
+> and first sale are 2025, that is a \`CLAIM_DATE_CONTRADICTION\`. **Do not automatically
+> call it wrongdoing.** Raising privately without a Form D, raising outside the United
+> States, or an earlier fund under a different entity are all ordinary explanations.
+> Report the discrepancy, quote both dates, and say it requires explanation.
+
+**SEC Trading Suspensions.** Any exact entity or ticker hit is a high priority finding and
+carries **RED** regardless of how incomplete the rest of coverage is. Capture the company,
+ticker, suspension date, release number, the reason as stated, and the related release.
+
+**CFTC RED List.** Foreign entities apparently soliciting United States residents without
+the registration that would require. Capture the exact name, aliases, website, date, the
+stated concern and the registration issue. For a retail trading offer this is close to
+decisive.
+
+**CFTC Enforcement.** Search the entity **and** the founders, principals and promoters
+separately. Capture the proceeding, date, allegations, findings, case number, order,
+penalties, registration status and every person named.
+
+> **Never collapse \`CFTC_COMPLAINT\` into \`CFTC_FINDING\`.** A complaint contains
+> allegations that have not been proven. An order or consent judgment contains findings.
+> They are different evidence states and reporting one as the other is defamatory.
+
+**DFPI Crypto Scam Tracker.** Government published, and the underlying narratives are
+**consumer reports**. Preserve the evidence kind \`government_published_consumer_report\`.
+Do not silently turn a consumer narrative into an adjudicated government finding. It is
+strong consumer evidence published by a regulator, which is worth more than a review site
+and is still not a finding.
+
+### Canada, investing and stocks
+
+**SEDAR+.** Issuer filings: prospectuses, financial statements, MD&A, material change
+reports, offering documents, cease trade documents, with the province and every date.
+Also use it for chronology.
+
+> When a company claims *"commercial operations began in 2022"* and its SEDAR filings
+> describe a pre revenue development stage business in 2024, that is a contradiction
+> candidate. **Quote both.** Give the reader the claim and the filing side by side and
+> let them compare. Never decide this from memory.
+
+**SEDI.** Insider reports: insiders, issuer, relationship, securities held, transactions
+and dates, acquisition or disposition. Report what the filings say. Do not characterise a
+pattern of trading as anything.
+
+**CIRO Disciplinary.** Kept **separate** from CIRO AdvisorReport, and both are searched. A
+clean current registration and a clean disciplinary history are two different questions.
+Capture the proceeding, allegations, decision, settlement, sanctions, date, and the
+registration relationship at the time.
+
+**CSA Disciplined Persons.** Search founders, directors, executives, salespeople, advisers
+and promoters. **Person level adverse history connects to every entity that person is
+attached to**, and each connection must be stated with the record that establishes it.
+
+### International
+
+**ASIC Professional Register**: AFS licence, credit licence, authorised representative,
+responsible persons, current and historical status, and the licence permissions. Read the
+permissions, not only the number.
+
+**ASIC Investor Alerts**: capture the exact warning language and the publication date.
+Search the company, the website, the aliases and the people.
+
+**SFC Public Register** (Hong Kong): licensed person, corporation, responsible officer,
+licence type, regulated activities, current and historical status.
+
+**SFC Alert List**: capture the exact SFC classification. Impersonation of a licensed firm
+is a different problem from operating unlicensed, and the classification says which.
+
+**ESMA MiCA CASP**: for crypto exchange, custody, brokerage, transfer or EU crypto
+services. Capture legal entity, member state, authorization, service types, date, status.
+
+---
+
+## 3D. THE 4ORM OPERATOR GRAPH
+
+Category 09 keeps Infrastructure Cluster, Identifier Reuse and Document Fingerprint. This
+is the structure underneath them.
+
+The graph records identifiers a party controls and the connections between them, so that
+the question *"is this the same operation as one we have seen before, under a new name"*
+can be answered with records rather than intuition.
+
+### The rule everything rests on
+
+> **A shared identifier is a FACT. A shared operator is a CONCLUSION.**
+>
+> Report the fact. Name the identifier, say how specific it is, and give the record it was
+> read from. Never write that two operations are run by the same people. The reader draws
+> that conclusion, from evidence you put in front of them.
+
+### Identifier specificity
+
+One shared identifier does not create RED, and the reason is specificity: how much does
+sharing this particular thing narrow the world.
+
+| Specificity | Examples | What sharing it means |
+|---|---|---|
+| **Very low** | Cloudflare, GoDaddy, AWS, a generic Google service | Nothing. Millions of unrelated sites share these |
+| **Low** | A common registrar, a placeholder analytics container | Almost nothing |
+| **Medium** | The same IP, the same hosting pattern, the same template | Worth noting, easily innocent |
+| **High** | An exact Google Analytics property, an exact Meta pixel, the same phone, the same company email | Somebody configured this. It is a real connection between two builds |
+| **Very high** | The same wallet, the same payment beneficiary, the same unique document fingerprint | There is no innocent reason to share it |
+
+Two companies both behind Cloudflare is **not** a finding and must never be written as
+one. Two companies sharing a wallet is one of the strongest things on this board.
+
+### Convergence, and independence
+
+| Independent connections | Strength | How to write it |
+|---|---|---|
+| 1 | \`interesting\` | Publish it. Say plainly that one shared identifier is not evidence of a shared operator |
+| 2 | \`material\` | Warrants explanation. Name both, with both records |
+| 3 or more, high specificity | \`strong operator-cluster evidence\` | Investigate aggressively, and still describe exactly what the graph establishes |
+
+**Independent** means the connections do not all rest on the same underlying fact. Two
+domains on one IP, and those same two domains on that IP's nameserver, is **one**
+connection, not two. Counting it twice is how a graph talks itself into a conclusion.
+
+### Previous warning memory
+
+When an identifier belonging to this party has been seen before on an entity that later
+received a regulator warning, that is the most valuable thing this system can say. Say it
+carefully:
+
+> We found an identifier connecting this operation to an entity that previously appeared
+> in an official regulator warning.
+
+Then show the exact identifier, the previous entity, the regulator, the date and the
+source. Do **not** state that the two are the same operation. You are reporting a shared
+identifier and the record it came from.
+
+### Wallets, and what a chain can never prove
+
+A blockchain record proves what moved. It never proves who owns an address.
+
+- Wrong: *"This wallet belongs to John Smith."*
+- Right: *"The website supplied this wallet as its payment address on 12 August 2026."*
+- Right: *"This wallet was attributed to John Smith by Source X. Independent ownership
+  verification was not located."*
+
+Never turn a blockchain heuristic into an identity fact.
+
+---
+
+## 3E. THE CLAIM CHRONOLOGY ENGINE
+
+Extract every factual claim that carries a **date or a duration** from the party's own
+material, verbatim. The shapes to look for:
+
+\`\`\`
+"Trading successfully since 2018."      "Ten years of experience."
+"Serving investors since 2017."         "$2 billion traded in 2024."
+"Founded in 2015."                      "Over a decade of."
+\`\`\`
+
+Then set them against every independently dated record reached. Depending on
+classification that now includes: domain creation, first archived capture, first
+certificate, trademark filing, incorporation, **Form D first filing, Form D first sale,
+EDGAR first filing, SEDAR+ first filing, SEDI first insider record, IAPD first
+registration, App Store and Google Play first release, GitHub repository creation and
+first commit, first press release, first video, first social post.**
+
+### The output, and the exact language
+
+The test is **not** "is the claim older than the domain". The test is **"is the claim
+older than every independent record of this party existing"**. A brand can legitimately be
+older than its domain, and calling that a contradiction is the fastest way to be
+confidently wrong about a real business.
+
+Where nothing supports the claim:
+
+> We found no retrieved evidence supporting the claimed 2017 operating history, while
+> every independently dated record reached begins in 2025. This discrepancy requires
+> explanation.
+
+That is the correct language. Not *"the company lied"*. Not *"the company did not exist"*.
+State what was found, state what was not found, and say it requires explanation.
+
+| Verdict | When |
+|---|---|
+| \`CONSISTENT\` | At least one independent record supports the earliest claim |
+| \`UNSUPPORTED\` | No record reached places the party as early as it claims, and none contradicts it. **YELLOW, not RED** |
+| \`CONTRADICTED\` | A record positively contradicts the claim. RED where both sides are Tier A |
+| \`NOT_ENOUGH_RECORD\` | Too few dated records reached to compare. GREY |
+
+---
+
 ## 4. SOURCE AUTHORITY TIERS
 
 Every evidence record carries a tier. The tier is not decoration - it gates what the

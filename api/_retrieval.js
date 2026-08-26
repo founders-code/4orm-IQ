@@ -29,6 +29,32 @@ export const DOMAINS = {
                   'cftc.gov','nfa.futures.org','nmlsconsumeraccess.org','ftc.gov',
                   'ic3.gov','consumerfinance.gov','dfpi.ca.gov'],
 
+  /* Vertical packs. These are pinned only when the party is classified into the
+     matching vertical, because a Canadian plumber has no Form D and searching
+     for one costs money and returns a register that could never have applied. */
+  us_adviser:    ['adviserinfo.sec.gov','sec.gov','brokercheck.finra.org','nasaa.org'],
+  us_exempt:     ['sec.gov','efts.sec.gov'],
+  us_suspension: ['sec.gov'],
+  us_derivatives:['cftc.gov','nfa.futures.org','sec.gov'],
+  us_crypto_state:['dfpi.ca.gov','dfs.ny.gov','dob.texas.gov'],
+  ca_issuer:     ['sedarplus.ca','sedi.ca','securities-administrators.ca','osc.ca','bcsc.bc.ca'],
+  ca_discipline: ['ciro.ca','securities-administrators.ca','osc.ca','bcsc.bc.ca','asc.ca','lautorite.qc.ca'],
+  au:            ['asic.gov.au','moneysmart.gov.au'],
+  hk:            ['sfc.hk','apps.sfc.hk'],
+  eu_crypto:     ['esma.europa.eu','eba.europa.eu'],
+
+  /* The operator graph. Identifier reuse, infrastructure history and the
+     technology a site is built on. */
+  graph:         ['publicwww.com','builtwith.com','securitytrails.com','censys.io',
+                  'urlscan.io','crt.sh','viewdns.info','dnslytics.com'],
+
+  /* Chain explorers. First party chain data. What moved, never who owns it. */
+  chain:         ['etherscan.io','solscan.io','tronscan.org','blockchain.com',
+                  'blockchair.com','bscscan.com','arbiscan.io','polygonscan.com'],
+
+  /* Where a build first appears in public. */
+  build:         ['github.com','apps.apple.com','play.google.com','npmjs.com'],
+
   /* Criminal and money services. Added after the first real entity checked was a
      Florida corporation whose arrest and guilty plea were published by the
      Department of Justice and by IRS Criminal Investigation, neither of which was
@@ -170,12 +196,19 @@ export async function parallel(objective, queries, opts = {}) {
    the panel. A search is kept when any category it feeds is still switched on. */
 export const ALL_CATS = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 
-export function plan(q, domain, enabled) {
+export function plan(q, domain, enabled, ctx = {}) {
   const on = (Array.isArray(enabled) && enabled.length) ? new Set(enabled) : new Set(ALL_CATS);
-  const keep = e => !e.cats || e.cats.some(c => on.has(c));
   const name = q;
   const d = domain || q;
   const D = DOMAINS;
+
+  /* Vertical routing. A search that carries a verts list runs only when the
+     party was classified into one of them. This is what stops a Form D search
+     running against a plumber, and what stops an Australian licence register
+     lowering coverage on a party with no Australian activity. */
+  const V = new Set((ctx.verticals && ctx.verticals.length) ? ctx.verticals : ['OTHER']);
+  const inV = list => !list || list.some(x => V.has(x));
+  const keep = e => (!e.cats || e.cats.some(c => on.has(c))) && inV(e.verts);
 
   const built = {
     exa: [
@@ -246,7 +279,68 @@ export function plan(q, domain, enabled) {
 
       { label:'Open sweep, everything else', cats:['C1','C3','C5'],
         query:`${name} ${d} fraud investigation regulator complaint`,
-        numResults:5 }
+        numResults:5 },
+
+      /* ---------------- vertical packs ---------------- */
+
+      { label:'C03 SEC trading suspensions', cats:['C3'], verts:['PUBLIC_STOCK'],
+        query:`${name} trading suspension order securities exchange act release`,
+        includeDomains:D.us_suspension, numResults:4, fullText:true, maxChars:2600 },
+
+      { label:'C02 CFTC RED list and registration', cats:['C2','C3'],
+        verts:['FOREX_CFD','COMMODITIES','CRYPTO','BROKER_DEALER'],
+        query:`${name} registration deficient RED list foreign entity solicit`,
+        includeDomains:D.us_derivatives, numResults:5, fullText:true, maxChars:2600 },
+
+      { label:'C03 state crypto scam trackers', cats:['C3','C7'],
+        verts:['CRYPTO','FOREX_CFD','PRIVATE_INVESTMENT'],
+        query:`${name} ${d} crypto scam tracker complaint reported`,
+        includeDomains:D.us_crypto_state, numResults:5, fullText:true, maxChars:2600 },
+
+      { label:'C01 Canadian issuer filings', cats:['C1','C5','C10'],
+        verts:['PUBLIC_STOCK','PRIVATE_INVESTMENT','PRIVATE_FUND'],
+        query:`${name} prospectus material change financial statements filing`,
+        includeDomains:D.ca_issuer, numResults:5, fullText:true, maxChars:2800 },
+
+      { label:'C04 Canadian discipline and insiders', cats:['C4','C3'],
+        verts:['PUBLIC_STOCK','BROKER_DEALER','INVESTMENT_ADVISER','PRIVATE_INVESTMENT'],
+        query:`${name} disciplinary hearing settlement agreement sanctions insider report`,
+        includeDomains:D.ca_discipline, numResults:5, fullText:true, maxChars:2800 },
+
+      { label:'C02 Australian licence and alerts', cats:['C2','C3','C4'],
+        verts:['BROKER_DEALER','INVESTMENT_ADVISER','FOREX_CFD','CRYPTO','PRIVATE_FUND'],
+        query:`${name} ${d} AFS licence authorised representative investor alert`,
+        includeDomains:D.au, numResults:4, fullText:true },
+
+      { label:'C02 Hong Kong licence and alert list', cats:['C2','C3'],
+        verts:['BROKER_DEALER','INVESTMENT_ADVISER','FOREX_CFD','CRYPTO','PUBLIC_STOCK'],
+        query:`${name} ${d} licensed corporation responsible officer alert list`,
+        includeDomains:D.hk, numResults:4, fullText:true },
+
+      { label:'C02 EU crypto authorisation', cats:['C2'], verts:['CRYPTO'],
+        query:`${name} crypto asset service provider authorisation MiCA member state`,
+        includeDomains:D.eu_crypto, numResults:4 },
+
+      /* ---------------- the operator graph ---------------- */
+
+      { label:'C09 identifier reuse across sites', cats:['C9'],
+        query:`"${d}" analytics tag manager pixel id same code other websites`,
+        includeDomains:D.graph, numResults:6, fullText:true, maxChars:3000 },
+
+      { label:'C09 infrastructure and DNS history', cats:['C9','C6','C10'],
+        query:`${d} dns history ip history nameserver previous records related domains`,
+        includeDomains:D.graph, numResults:5, fullText:true, maxChars:2600 },
+
+      /* ---------------- chain and build chronology ---------------- */
+
+      { label:'C08 chain records for the addresses found', cats:['C8','C9'], verts:['CRYPTO'],
+        query:`${name} ${d} wallet address contract first transaction token`,
+        includeDomains:D.chain, numResults:5, fullText:true, maxChars:2600 },
+
+      { label:'C10 first public build record', cats:['C10','C9'],
+        verts:['VC_STARTUP','CRYPTO'],
+        query:`${name} ${d} repository created first commit app released version history`,
+        includeDomains:D.build, numResults:5, fullText:true, maxChars:2400 }
     ],
 
     par: [
@@ -288,11 +382,143 @@ export function plan(q, domain, enabled) {
           `${name} founder CEO director who owns`,
           `${d} same template other websites`,
           `${name} related companies same operator`
-        ], mode:'fast' }
+        ], mode:'fast' },
+
+      /* Sources whose answer spans several pages. A Form ADV is a filing, a
+         list of amendments, a disciplinary section and a private funds
+         schedule, and no single page carries all four. */
+
+      { label:'SEC IAPD and Form ADV', cats:['C2','C4','C1','C10'],
+        verts:['INVESTMENT_ADVISER','PRIVATE_INVESTMENT','PRIVATE_FUND','BROKER_DEALER'],
+        objective:
+          `Establish whether ${name} (${d}) or its principals appear in the SEC Investment Adviser ` +
+          `Public Disclosure system. Capture the firm name exactly as registered, the CRD number, the ` +
+          `SEC file number, current registration status, any state registration, every alternate or ` +
+          `former name, the business address, named control persons, every disciplinary disclosure, ` +
+          `the Form ADV filing date and the dates of amendments, any private funds listed, assets under ` +
+          `management where disclosed, and related persons. Capture historical registration as well as ` +
+          `current: a lapsed registration is still relevant. A current registration is not an endorsement ` +
+          `and must never be reported as one. If the registration number the party claims belongs to a ` +
+          `different legal entity, say so explicitly and quote both names.`,
+        queries:[
+          `${name} investment adviser public disclosure Form ADV CRD`,
+          `${name} SEC registered investment adviser firm summary`,
+          `${name} Form ADV brochure part 2 disciplinary`,
+          `${d} adviser registration status file number`
+        ], includeDomains:D.us_adviser, mode:'advanced', maxChars:16000 },
+
+      { label:'SEC Form D exempt offerings', cats:['C2','C1','C10'],
+        verts:['PRIVATE_INVESTMENT','VC_STARTUP','PRIVATE_FUND','CRYPTO','INVESTMENT_ADVISER'],
+        objective:
+          `Find every Form D exempt offering filing by ${name} (${d}) or entities that share its ` +
+          `principals. Capture the date of the FIRST filing, every amendment date, the total offering ` +
+          `amount, the amount sold, the amount remaining, the date of first sale, the type of security, ` +
+          `the exemption relied on, the minimum investment accepted, related persons named on the filing, ` +
+          `sales compensation, and the states where the offering was made. The date of first filing and ` +
+          `the date of first sale are the two figures that matter most, because they are what a claimed ` +
+          `fundraising history gets checked against. A first sale later than a claimed start date is a ` +
+          `discrepancy to be described, never on its own an allegation of wrongdoing.`,
+        queries:[
+          `${name} Form D notice of exempt offering EDGAR`,
+          `${name} first sale date offering amount Form D`,
+          `${name} Regulation D 506 filing related persons`
+        ], includeDomains:D.us_exempt, mode:'advanced', maxChars:14000 },
+
+      { label:'CFTC enforcement and the people named', cats:['C3','C4','C5'],
+        verts:['FOREX_CFD','COMMODITIES','CRYPTO','PRIVATE_INVESTMENT','PRIVATE_FUND'],
+        objective:
+          `Establish whether the Commodity Futures Trading Commission has taken any action involving ` +
+          `${name} (${d}), its founders, its principals or its promoters. Search the entity and the ` +
+          `people separately. Capture the proceeding, the date, the allegations as pleaded, the findings ` +
+          `if any were made, the case number, the order, penalties, registration status and every person ` +
+          `named. Keep a complaint and a finding apart: a complaint contains allegations that have not ` +
+          `been proven, a consent order or judgment contains findings. Never render one as the other.`,
+        queries:[
+          `${name} CFTC complaint enforcement action order`,
+          `${name} CFTC RED list registration deficient`,
+          `${name} founder principal CFTC civil action`
+        ], includeDomains:D.us_derivatives, mode:'advanced', maxChars:14000 },
+
+      { label:'SEDAR+ filings and chronology', cats:['C1','C5','C10'],
+        verts:['PUBLIC_STOCK','PRIVATE_INVESTMENT','PRIVATE_FUND'],
+        objective:
+          `Find filings by ${name} on SEDAR+. Capture the issuer name, every filing date, filing type, ` +
+          `the province, prospectuses, financial statements, management discussion and analysis, material ` +
+          `change reports, offering documents and anything relating to a cease trade order. Capture the ` +
+          `DATE OF THE EARLIEST FILING separately, and quote any passage describing the stage the business ` +
+          `was at in a given year, for example pre revenue or development stage. That passage is what a ` +
+          `claimed operating history is checked against, and both the claim and the filing must be quoted ` +
+          `so the reader can compare them without taking anybody's word for it.`,
+        queries:[
+          `${name} SEDAR filings prospectus financial statements`,
+          `${name} material change report management discussion analysis`,
+          `${name} cease trade order issuer profile`
+        ], includeDomains:D.ca_issuer, mode:'advanced', maxChars:14000 },
+
+      { label:'SEDI insider reports', cats:['C4','C1','C10'],
+        verts:['PUBLIC_STOCK','PRIVATE_INVESTMENT'],
+        objective:
+          `Find insider reports filed on SEDI relating to ${name}. Capture the insider name, the issuer, ` +
+          `the relationship to the issuer, the securities held, each transaction, the transaction dates, ` +
+          `and whether each was an acquisition or a disposition. Capture the date of the earliest insider ` +
+          `record. Report what the filings say. Do not characterise a pattern of trading as anything.`,
+        queries:[
+          `${name} SEDI insider report securities transactions`,
+          `${name} director officer insider filing acquisition disposition`
+        ], includeDomains:D.ca_issuer, mode:'fast', maxChars:10000 },
+
+      { label:'Discipline against the people, every jurisdiction', cats:['C4','C3'],
+        verts:['PUBLIC_STOCK','BROKER_DEALER','INVESTMENT_ADVISER','PRIVATE_INVESTMENT','PRIVATE_FUND','FOREX_CFD'],
+        objective:
+          `For ${name} (${d}) and for every founder, director, officer, adviser, salesperson or promoter ` +
+          `named anywhere in the material, establish whether that person appears in a disciplinary or ` +
+          `disciplined persons record: CIRO disciplinary proceedings, the CSA disciplined persons list, ` +
+          `ASIC banned and disqualified persons, FCA prohibitions, or any equivalent. Capture the ` +
+          `proceeding, the allegations, the decision, any settlement, the sanctions, the date, and how the ` +
+          `person was connected to the registered firm at the time. A person level adverse history is ` +
+          `relevant to every entity that person is connected to, and each connection must be stated with ` +
+          `the record that establishes it.`,
+        queries:[
+          `${name} director disciplinary proceeding decision sanctions`,
+          `${name} principal banned disqualified prohibited order`,
+          `${name} disciplined persons list securities`
+        ], includeDomains:D.ca_discipline, mode:'advanced', maxChars:14000 },
+
+      { label:'Dated claims made by the party itself', cats:['C10'],
+        objective:
+          `Read ${d} and any other page published by ${name} itself, and extract every FACTUAL CLAIM ` +
+          `THAT CARRIES A DATE OR A DURATION. Examples of the shape: trading successfully since 2018, ` +
+          `ten years of experience, serving investors since 2017, two billion traded in 2024, founded in ` +
+          `2015, established 2019, over a decade of. For each one capture the claim VERBATIM, the page it ` +
+          `appears on, and the year it implies the party began. Do not evaluate the claims. Do not decide ` +
+          `whether they are true. Extract them exactly as written, because they are one half of a ` +
+          `comparison and the records are the other half.`,
+        queries:[
+          `${d} since founded established years experience track record`,
+          `${d} about us our story history milestones`,
+          `${name} "since 20" OR "years of experience" OR "founded in"`
+        ], includeDomains:[d].filter(Boolean), mode:'advanced', maxChars:12000 }
     ]
   };
 
-  return { exa: built.exa.filter(keep), par: built.par.filter(keep), enabled: [...on] };
+  /* Priority order. When MAX_SEARCHES bites it must drop the open sweeps at
+     the end, never the routed register that the classification exists to
+     reach. A vertical pack is the whole point of routing; "everything else"
+     is the consolation prize. */
+  const rank = e => {
+    const L = String(e.label || '');
+    if (e.verts) return 0;                                   /* routed to this party */
+    if (/^C(1|2|3|5|10)\b/.test(L)) return 1;                /* the register checks */
+    if (/^C7/.test(L)) return 2;                             /* the review sweep */
+    if (/Open sweep/i.test(L)) return 4;
+    return 3;
+  };
+  const exa = built.exa.filter(keep)
+    .map((e, i) => ({ e, i, r: rank(e) }))
+    .sort((a, b) => a.r - b.r || a.i - b.i)
+    .map(x => x.e);
+
+  return { exa, par: built.par.filter(keep), enabled: [...on] };
 }
 
 /**

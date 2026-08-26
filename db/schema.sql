@@ -122,3 +122,111 @@ create table if not exists findings (
 );
 create index if not exists findings_run_idx  on findings (run_id);
 create index if not exists findings_kind_idx on findings (kind, severity);
+
+-- =====================================================================
+-- THE OPERATOR GRAPH
+--
+-- The three tables below are what makes the second check on an operator
+-- worth more than the first. A node is an identifier. An edge is a
+-- connection between two of them, carrying the record it was read from.
+--
+-- The discipline this schema exists to enforce: a shared identifier is a
+-- FACT and a shared operator is a CONCLUSION. Nothing here stores the
+-- conclusion. specificity says how much the identifier narrows the world,
+-- status says how well observed the connection is, and evidence_excerpt
+-- plus source_url mean a reader can go and look.
+-- =====================================================================
+
+-- ------------------------------------------------------------ nodes
+-- One row per identifier, ever. normalized_value is what matching runs on:
+-- lower cased, punctuation stripped, company suffixes removed for names,
+-- EVM addresses lower cased. display_value keeps what the source said.
+create table if not exists operator_nodes (
+  node_id           text primary key,          -- TYPE:normalized_value
+  node_type         text not null,
+  normalized_value  text not null,
+  display_value     text not null,
+  specificity       numeric(3,2),              -- 0.00 to 1.00
+  specificity_band  text,                      -- very low | low | medium | high | very high
+  first_seen        timestamptz,
+  last_seen         timestamptz,
+  created_at        timestamptz not null default now()
+);
+create index if not exists operator_nodes_type_idx  on operator_nodes (node_type);
+create index if not exists operator_nodes_value_idx on operator_nodes (normalized_value);
+
+-- ------------------------------------------------------------ edges
+-- One row per observation of a connection. The same connection seen on two
+-- runs is two rows, which is what lets first_seen and last_seen mean
+-- anything and what lets a stale edge be recognised as stale.
+create table if not exists operator_edges (
+  edge_id       bigserial primary key,
+  from_node_id  text not null references operator_nodes(node_id) on delete cascade,
+  to_node_id    text not null references operator_nodes(node_id) on delete cascade,
+  edge_type     text not null,
+  other_party   text,                          -- the named party on the far side, where there is one
+  source_id     text,                          -- which register or service
+  run_id        uuid references runs(id) on delete set null,
+  first_seen    timestamptz,
+  last_seen     timestamptz,
+  source_tier   text,                          -- A | B | C | D | 4orm
+  confidence    numeric(3,2),
+  historically_available boolean not null default false,
+  evidence_excerpt text,
+  source_url    text,
+  retrieved_at  timestamptz,
+  status        text not null default 'OBSERVED',  -- OBSERVED | CORROBORATED | DISPUTED | STALE
+  created_at    timestamptz not null default now()
+);
+create index if not exists operator_edges_from_idx  on operator_edges (from_node_id);
+create index if not exists operator_edges_to_idx    on operator_edges (to_node_id);
+create index if not exists operator_edges_type_idx  on operator_edges (edge_type);
+create index if not exists operator_edges_run_idx   on operator_edges (run_id);
+create index if not exists operator_edges_party_idx on operator_edges (other_party);
+
+-- ------------------------------------------------- entity classifications
+-- What the party appeared to be on this run, why, and how sure. This is the
+-- record of WHY a given register was or was not in the plan, which is what
+-- makes a coverage figure auditable rather than asserted.
+create table if not exists entity_classifications (
+  id             bigserial primary key,
+  entity_id      text,
+  run_id         uuid references runs(id) on delete cascade,
+  classification text not null,     -- PUBLIC_STOCK | CRYPTO | ... | OTHER
+  confidence     numeric(3,2),
+  reason         text,
+  source_ids     text[],
+  created_at     timestamptz not null default now()
+);
+create index if not exists entity_class_run_idx  on entity_classifications (run_id);
+create index if not exists entity_class_type_idx on entity_classifications (classification);
+
+-- ------------------------------------------------------- prior warnings
+-- The part worth the most. An identifier on today's party that also sits on
+-- an entity a regulator warned about. Stored as its own record so it can be
+-- surfaced on the next run without recomputing the whole graph.
+create table if not exists prior_warning_links (
+  id           bigserial primary key,
+  node_id      text references operator_nodes(node_id) on delete cascade,
+  run_id       uuid references runs(id) on delete set null,
+  prior_entity text not null,
+  regulator    text not null,
+  warned_on    date,
+  source_url   text,
+  created_at   timestamptz not null default now()
+);
+create index if not exists prior_warning_node_idx on prior_warning_links (node_id);
+
+-- ------------------------------------------------------- claim chronology
+-- What the party said about its own history, and what the records carried.
+create table if not exists claim_chronology (
+  id            bigserial primary key,
+  run_id        uuid references runs(id) on delete cascade,
+  kind          text not null,        -- claim | record
+  text_value    text,                 -- the claim verbatim, or what the record is
+  year_or_date  text,
+  source        text,
+  url           text,
+  created_at    timestamptz not null default now()
+);
+create index if not exists claim_chron_run_idx on claim_chronology (run_id);

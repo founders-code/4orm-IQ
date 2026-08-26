@@ -10,6 +10,8 @@
  * Set POSTGRES_URL on the project. With it unset this file is inert.
  */
 
+import { node as gnode } from './_graph.js';
+
 let poolPromise = null;
 
 async function pool() {
@@ -62,6 +64,37 @@ export async function recordRun(ctx) {
   } finally {
     client.release();
   }
+}
+
+/* A node the model described. Anything we cannot type or normalise is
+   dropped rather than guessed at: a malformed identifier in the graph is
+   worse than a missing one, because it will match something later. */
+function safeNode(type, value, display) {
+  try {
+    if (!type || !value) return null;
+    return gnode(type, value, display);
+  } catch { return null; }
+}
+
+/* Edge endpoints arrive as values, not typed nodes. Infer the type from the
+   shape, and refuse rather than guess where the shape is ambiguous. */
+function guessType(v) {
+  const s = String(v || '').trim();
+  if (/^0x[a-fA-F0-9]{40}$/.test(s) || /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(s) ||
+      /^bc1[a-z0-9]{20,}$/.test(s) || /^T[A-Za-z0-9]{33}$/.test(s)) return 'CRYPTO_WALLET';
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s)) return 'EMAIL';
+  if (/^(GTM|G|UA)-[A-Z0-9-]+$/i.test(s)) return 'GOOGLE_TAG_MANAGER_ID';
+  if (/^\d{15,17}$/.test(s)) return 'META_PIXEL_ID';
+  if (/^\+?[\d][\d\s().-]{6,}$/.test(s)) return 'PHONE';
+  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(s)) return 'IP_ADDRESS';
+  if (/^ns\d*\./i.test(s)) return 'NAMESERVER';
+  if (/^([\w-]+\.)+[a-z]{2,}$/i.test(s)) return 'DOMAIN';
+  return 'LEGAL_ENTITY';
+}
+
+function parseDate(v) {
+  const d = new Date(String(v || ''));
+  return isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
 }
 
 async function writeAll(c, ctx) {
@@ -175,6 +208,96 @@ async function writeAll(c, ctx) {
          same_registrar = excluded.same_registrar`,
       [a, b, arr(s.shared_nameservers).map(x => trim(x, 253)), !!s.same_registrar]
     );
+  }
+
+  /* ------------------------------------------------------------------ *
+   * THE OPERATOR GRAPH
+   *
+   * Nodes are upserted, because an identifier seen on three runs is one
+   * identifier with a widening first_seen to last_seen window. Edges are
+   * appended, because the same connection observed on two runs is two
+   * observations, and that is what makes a stale edge recognisable.
+   *
+   * Nothing here stores a conclusion. Every row carries the excerpt and the
+   * URL it was read from, so the next run can show a reader the record
+   * rather than asking them to trust a stored verdict.
+   * ------------------------------------------------------------------ */
+  const g = payload.graph;
+  if (g && (g.nodes || []).length) {
+    for (const n of g.nodes.slice(0, 200)) {
+      const built = safeNode(n.type, n.v, n.v);
+      if (!built) continue;
+      await c.query(
+        `insert into operator_nodes
+           (node_id, node_type, normalized_value, display_value, specificity, specificity_band, first_seen, last_seen)
+         values ($1,$2,$3,$4,$5,$6, coalesce($7, now()), now())
+         on conflict (node_id) do update set
+           last_seen  = now(),
+           first_seen = least(operator_nodes.first_seen, excluded.first_seen),
+           display_value = coalesce(operator_nodes.display_value, excluded.display_value)`,
+        [built.node_id, built.node_type, built.normalized_value, trim(built.display_value, 500),
+         built.specificity.value, built.specificity.band, n.first || null]);
+    }
+
+    for (const e of (g.edges || []).slice(0, 400)) {
+      const a = safeNode(guessType(e.from), e.from, e.from);
+      const b = safeNode(guessType(e.to), e.to, e.to);
+      if (!a || !b) continue;
+      /* Both ends must exist before an edge can reference them. */
+      for (const nd of [a, b]) {
+        await c.query(
+          `insert into operator_nodes
+             (node_id, node_type, normalized_value, display_value, specificity, specificity_band, first_seen, last_seen)
+           values ($1,$2,$3,$4,$5,$6, now(), now())
+           on conflict (node_id) do update set last_seen = now()`,
+          [nd.node_id, nd.node_type, nd.normalized_value, trim(nd.display_value, 500),
+           nd.specificity.value, nd.specificity.band]);
+      }
+      await c.query(
+        `insert into operator_edges
+           (from_node_id, to_node_id, edge_type, other_party, source_id, run_id,
+            first_seen, last_seen, source_tier, confidence, historically_available,
+            evidence_excerpt, source_url, retrieved_at, status)
+         values ($1,$2,$3,$4,$5,$6, now(), now(), $7,$8,$9,$10,$11, now(), $12)`,
+        [a.node_id, b.node_id, trim(e.type, 60), trim(e.other, 300), trim(e.src, 120), runId,
+         trim(e.tier, 8), null, !!e.hist, trim(e.quote, 4000), trim(e.url, 2000),
+         trim(e.status, 20) || 'OBSERVED']);
+    }
+
+    for (const w of (g.priors || []).slice(0, 60)) {
+      const nd = safeNode(w.kind, w.id, w.id);
+      if (!nd) continue;
+      await c.query(
+        `insert into prior_warning_links (node_id, run_id, prior_entity, regulator, warned_on, source_url)
+         values ($1,$2,$3,$4,$5,$6)`,
+        [nd.node_id, runId, trim(w.entity, 300), trim(w.reg, 200),
+         parseDate(w.date), trim(w.url, 2000)]);
+    }
+  }
+
+  /* What the party was classified as, and why. This is the audit trail behind
+     every coverage figure: it says which registers were in the plan at all. */
+  for (const cl of (payload.classifications || []).slice(0, 20)) {
+    await c.query(
+      `insert into entity_classifications (entity_id, run_id, classification, confidence, reason, source_ids)
+       values ($1,$2,$3,$4,$5,$6)`,
+      [trim(domain || identifier, 253), runId, trim(cl.classification, 40),
+       cl.confidence ?? null, trim(cl.reason, 1000), arr(cl.matched).map(x => trim(x, 120))]);
+  }
+
+  /* Claim chronology, both halves, so a later run can compare against what
+     the party was saying about itself the last time anybody looked. */
+  const ch = payload.chrono;
+  if (ch) {
+    const rows = []
+      .concat((ch.claims || []).map(x => ['claim', x.q, String(x.year || ''), x.where, x.url]))
+      .concat((ch.records || []).map(x => ['record', x.what, x.date, x.src, x.url]));
+    for (const r2 of rows.slice(0, 120)) {
+      await c.query(
+        `insert into claim_chronology (run_id, kind, text_value, year_or_date, source, url)
+         values ($1,$2,$3,$4,$5,$6)`,
+        [runId, r2[0], trim(r2[1], 2000), trim(r2[2], 40), trim(r2[3], 300), trim(r2[4], 2000)]);
+    }
   }
 
   await c.query('COMMIT');

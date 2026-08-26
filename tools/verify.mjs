@@ -134,11 +134,51 @@ if (!/ALL_CATS\s*=\s*\[[^\]]*'C10'/.test(retrieval)) {
 }
 
 const boardBlock = script.slice(script.indexOf('var SOURCES = ['), script.indexOf('var TOTAL_SOURCES'));
+if (boardBlock.indexOf('GENERATED:SOURCES') === -1 && script.indexOf('GENERATED:SOURCES') === -1) {
+  fails.push('the board is not generated from the catalogue. Run tools/sync-catalogue.mjs.');
+}
 const regNames = [...boardBlock.matchAll(/items:\[([^\]]*)\]/g)]
   .flatMap(m => [...m[1].matchAll(/"([^"]+)"/g)].map(x => x[1]));
-const stated = (html.match(/Registers <b>(\d+)<\/b>/) || [])[1];
-if (stated && Number(stated) !== regNames.length) {
-  fails.push('the header says ' + stated + ' registers, the board holds ' + regNames.length);
+/* No count is typed into the page any more. If one ever comes back, catch it. */
+const typed = html.match(/Registers <b>(\d+)<\/b>/);
+if (typed) fails.push('a register count is typed into the header. It must be computed: ' + typed[1]);
+
+/* ------------------------------------- the console and the catalogue agree
+   The board in index.html is GENERATED from api/_catalogue.js. If somebody
+   edits one without running tools/sync-catalogue.mjs the two drift, and a
+   board that says one number while the API plans against another is the exact
+   disagreement that has cost this project three outages. */
+{
+  const cat = await import('../api/_catalogue.js');
+  const ref = await import('../api/_reference.js');
+
+  const catNames = cat.CATALOGUE.filter(x => x.enabled).map(x => x.display_name);
+  const onlyBoard = regNames.filter(n => !catNames.includes(n));
+  const onlyCat   = catNames.filter(n => !regNames.includes(n));
+  if (onlyBoard.length || onlyCat.length) {
+    fails.push('index.html and api/_catalogue.js disagree about the board. Run tools/sync-catalogue.mjs.' +
+      (onlyBoard.length ? '\n      only in the page: ' + onlyBoard.join(', ') : '') +
+      (onlyCat.length   ? '\n      only in the catalogue: ' + onlyCat.join(', ') : ''));
+  }
+  if (regNames.length !== cat.TOTAL_SOURCES) {
+    fails.push('the board holds ' + regNames.length + ' registers, the catalogue counts ' + cat.TOTAL_SOURCES);
+  }
+  const noRef = catNames.filter(n => !ref.REFERENCE[n]);
+  if (noRef.length) fails.push('sources with no reference entry: ' + noRef.join(', '));
+
+  /* Every source must route somewhere and fail to a gap, never to silence. */
+  const badFail = cat.CATALOGUE.filter(x => x.failure_behavior !== 'gap');
+  if (badFail.length) fails.push('a source whose failure is not published as a gap: ' +
+    badFail.map(x => x.source_id).join(', '));
+  const badVert = cat.CATALOGUE.filter(x =>
+    !x.verticals.every(v => v === 'ALL' || cat.VERTICALS.includes(v)));
+  if (badVert.length) fails.push('a source routed to a vertical that does not exist: ' +
+    badVert.map(x => x.source_id).join(', '));
+  const dupIds2 = cat.CATALOGUE.map(x => x.source_id)
+    .filter((v, i, a) => a.indexOf(v) !== i);
+  if (dupIds2.length) fails.push('duplicate source_id in the catalogue: ' + [...new Set(dupIds2)].join(', '));
+  const dupNames = catNames.filter((v, i, a) => a.indexOf(v) !== i);
+  if (dupNames.length) fails.push('duplicate display_name in the catalogue: ' + [...new Set(dupNames)].join(', '));
 }
 
 /* -------------------------------------------- every board register documented */

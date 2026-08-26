@@ -24,13 +24,19 @@ import { PAYLOAD_SCHEMA } from './_schema.js';
 import { runConnectors, siblingCheck } from './_connectors.js';
 import { exa, parallel, plan, planRound2, extractSeeds, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
 import { retrievedSources, reachedBoard, searchedBoard, applicabilityBoard, overlayBoard, reviewLedger } from './_registers.js';
+import { classify, jurisdictions } from './_classify.js';
+import { applicable, TOTAL_SOURCES, BY_NAME } from './_catalogue.js';
 import { recordRun } from './_store.js';
 
 export const config = { maxDuration: 300 };
 
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 const MAX_INPUT = 200;
-const MAX_SEARCHES  = Math.max(3, Math.min(20, Number(process.env.KBYS_MAX_SEARCHES) || 13));
+/* The plan is now routed, so a crypto fund builds a longer sweep than a
+   plumber. The clamp had to move with it, and the plan is priority ordered so
+   that when the clamp does bite it drops the open sweeps rather than the
+   specialist register the whole routing exists to reach. */
+const MAX_SEARCHES  = Math.max(3, Math.min(34, Number(process.env.KBYS_MAX_SEARCHES) || 22));
 /* Round two is seeded by round one. Capped separately so a subject that surfaces
    many names cannot run the bill up without a deliberate change. */
 const MAX_ROUND2    = Math.max(0, Math.min(10, Number(process.env.KBYS_MAX_ROUND2) || 6));
@@ -127,7 +133,10 @@ function toRenderShape(a, meta) {
   const s = a.scores || {};
   const checked = s.sources_checked || 0;
   const missed  = s.sources_not_reached || 0;
-  const universe = checked + missed;
+  /* The denominator is what could have applied to THIS party, computed by
+     routing before the run. Falling back to the model's own arithmetic only
+     where routing produced nothing. */
+  const universe = (meta.counts && meta.counts.applicable) || (checked + missed);
 
   const cats = {};
   (a.categories || []).forEach(c => {
@@ -203,6 +212,48 @@ function toRenderShape(a, meta) {
 
     board: meta.board,
 
+    /* Routing. What the party appears to be, which decides which registers
+       could ever have applied, which is the denominator coverage is measured
+       against. Published so a reader can see why a register is not on the
+       list rather than wondering whether we forgot it. */
+    classifications: meta.classifications || [],
+    applicable: meta.applicable || [],
+    notApplicable: meta.notApplicable || [],
+    sourceCounts: meta.counts || null,
+
+    /* The operator graph. Identifiers, the connections between them, and the
+       prior warnings any of them touch. */
+    graph: a.operator_graph ? {
+      nodes: (a.operator_graph.nodes || []).map(n => ({
+        type: n.node_type, v: n.value, src: n.source, url: n.url || '',
+        quote: n.excerpt || '', first: n.first_seen || null
+      })),
+      edges: (a.operator_graph.edges || []).map(e => ({
+        from: e.from, to: e.to, type: e.edge_type, other: e.other_party || '',
+        src: e.source, url: e.url || '', quote: e.excerpt || '',
+        tier: e.source_tier || 'B', status: e.status || 'OBSERVED',
+        hist: !!e.historically_available
+      })),
+      priors: (a.operator_graph.prior_warnings || []).map(w => ({
+        kind: w.identifier_type, id: w.identifier, entity: w.prior_entity,
+        reg: w.regulator, date: w.date, src: w.source, url: w.url || ''
+      })),
+      note: a.operator_graph.note || ''
+    } : null,
+
+    /* Claim chronology. What they say, against what the record carries. */
+    chrono: a.claim_chronology ? {
+      claims: (a.claim_chronology.claims || []).map(c => ({
+        q: c.claim, year: c.implies_year, where: c.where, url: c.url || ''
+      })),
+      records: (a.claim_chronology.record_dates || []).map(r => ({
+        what: r.what, date: r.date, src: r.source, url: r.url || ''
+      })),
+      earliest: a.claim_chronology.earliest_independent_record || null,
+      verdict: a.claim_chronology.verdict || 'NOT_ENOUGH_RECORD',
+      statement: a.claim_chronology.statement || ''
+    } : null,
+
     /* Everything retrieval actually reached, as served. The report lists these
        so a reader can open each page and check the finding themselves, and so
        an empty section reads as "nothing came back" rather than as silence. */
@@ -275,9 +326,28 @@ export default async function handler(req, res) {
   };
 
   const t0 = Date.now();
-  const p = plan(q, domain, checks);
+
+  /* Classify before planning. A crypto hedge fund is four things at once and
+     each one opens a different set of registers. Running every specialised
+     search against every company is slow, expensive, and fills the report with
+     registers that could never have held a record. */
+  const cls = classify(q, domain || '');
+  const jur = jurisdictions(q, '', domain || '');
+  const ctx = {
+    verticals: cls.verticals,
+    jurisdictions: jur,
+    entity_kinds: ['COMPANY', 'WEBSITE'],
+    wallet: /^(0x[a-fA-F0-9]{40}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{20,}|T[A-Za-z0-9]{33})$/.test(String(q || '').trim()),
+    document: false
+  };
+  const app = applicable(ctx);
+
+  const p = plan(q, domain, checks, ctx);
   emit('phase', { step: 'plan', label: 'Planning the sweep',
-                  searches: p.exa.length, objectives: p.par.length, categories: checks.length });
+                  searches: p.exa.length, objectives: p.par.length, categories: checks.length,
+                  classifications: cls.classifications,
+                  sources_available: TOTAL_SOURCES,
+                  sources_applicable: app.applicable.length });
 
   try {
     /* Tier 0 and Tier 1 run together. Nothing here depends on anything else. */
@@ -421,12 +491,25 @@ export default async function handler(req, res) {
       stop_reason: msg.stop_reason });
 
     const exaCost = exaAll.reduce((n, b) => n + (b.cost || 0), 0);
-    const board = overlayBoard(applicabilityBoard(board0, call.input), call.input);
+    /* Routing already decided which sources could hold a record here. Carry
+       that onto the board so a register that was never going to apply reads as
+       "does not apply here" rather than as a hole in our coverage. */
+    const naFromRouting = {};
+    app.notApplicable.forEach(x => { naFromRouting[x.source.display_name] = x.reason; });
+    const board1 = { ...board0 };
+    Object.keys(naFromRouting).forEach(nm => {
+      if (!board1[nm] || board1[nm] === 'searched' || board1[nm] === 'unreached') board1[nm] = 'na';
+    });
+    const board = overlayBoard(applicabilityBoard(board1, call.input), call.input);
     const payload = toRenderShape(call.input, {
       board,
       sources,
       ledger,
       checks,
+      classifications: cls.classifications,
+      applicable: app.applicable.map(x => x.display_name),
+      notApplicable: app.notApplicable.map(x => ({ source: x.source.display_name, reason: x.reason })),
+      counts: { available: TOTAL_SOURCES, applicable: app.applicable.length },
       pipeline: {
         connectors: { reached: conn.reached, unreached: conn.unreached, siblings: siblings.length },
         exa:      { calls: exaAll.length, round1: exaOut.length, round2: exa2.length,

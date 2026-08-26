@@ -182,6 +182,146 @@ export const PAYLOAD_SCHEMA = {
       }
     },
 
+    /* ------------------------------------------------------------------ *
+     * THE OPERATOR GRAPH
+     *
+     * Identifiers this party controls, and every other party sharing one.
+     * The rule the whole thing rests on: a shared identifier is a FACT, a
+     * shared operator is a CONCLUSION, and this schema only ever asks for the
+     * fact. Never write a claim that two operations are run by the same
+     * people. Write which identifier is shared, how specific it is, and which
+     * record it was read from, and let the reader draw the conclusion.
+     * ------------------------------------------------------------------ */
+    operator_graph: {
+      type: 'object',
+      required: ['nodes', 'edges'],
+      properties: {
+        nodes: {
+          type: 'array',
+          description: 'Every identifier established for this party. Only identifiers that appear in the retrieved material. Never one you remember or infer.',
+          items: {
+            type: 'object',
+            required: ['node_type', 'value', 'source', 'url'],
+            properties: {
+              node_type: { type: 'string', enum: [
+                'DOMAIN','IP_ADDRESS','NAMESERVER','REGISTRAR',
+                'GOOGLE_ANALYTICS_ID','GOOGLE_TAG_MANAGER_ID','META_PIXEL_ID','OTHER_TRACKING_ID',
+                'EMAIL','PHONE','TELEGRAM','WHATSAPP','SOCIAL_HANDLE',
+                'CRYPTO_WALLET','BANK_BENEFICIARY','BANK_ACCOUNT_REFERENCE','IBAN','SWIFT',
+                'PERSON','DIRECTOR','OFFICER','PROMOTER','ADVISER',
+                'LEGAL_ENTITY','TRADING_NAME','APP','APP_DEVELOPER',
+                'GITHUB_ACCOUNT','GITHUB_REPOSITORY','TRADEMARK','PATENT',
+                'REGULATOR_WARNING','COURT_CASE','ENFORCEMENT_ACTION'] },
+              value:  { type: 'string', description: 'The identifier exactly as it appears in the source.' },
+              source: { type: 'string', description: 'Which register or page this identifier was read from.' },
+              url:    { type: 'string' },
+              excerpt:{ type: 'string', description: 'VERBATIM text showing the identifier in place.' },
+              first_seen: { type: ['string','null'] }
+            }
+          }
+        },
+        edges: {
+          type: 'array',
+          description: 'A connection between two identifiers, or between this party and another named party. Every edge needs the record that establishes it.',
+          items: {
+            type: 'object',
+            required: ['from', 'to', 'edge_type', 'source', 'status'],
+            properties: {
+              from: { type: 'string' },
+              to:   { type: 'string' },
+              edge_type: { type: 'string', enum: [
+                'RESOLVES_TO','USES_NAMESERVER','REGISTERED_WITH','USES_ANALYTICS','USES_META_PIXEL',
+                'USES_EMAIL','USES_PHONE','PROMOTES_WALLET','USES_DOMAIN','CONTROLLED_BY','DIRECTOR',
+                'PROMOTED_BY','RECEIVES_FUNDS_AS','CONTROLS','PROMOTES','ASSOCIATED_WITH',
+                'DEVELOPED_BY','CONTRIBUTES_TO','PREVIOUSLY_WARNED_AS','PREVIOUSLY_WARNED_IN',
+                'SHARES_IDENTIFIER_WITH','SHARES_BENEFICIARY_WITH','SHARES_WALLET_WITH','SHARES_PERSON_WITH'] },
+              other_party: { type: 'string', description: 'The name of the other party, where this edge connects to one.' },
+              source: { type: 'string' },
+              url:    { type: 'string' },
+              excerpt:{ type: 'string', description: 'VERBATIM text from the source establishing this connection.' },
+              source_tier: TIER,
+              status: { type: 'string', enum: ['OBSERVED','CORROBORATED','DISPUTED','STALE'],
+                description: 'OBSERVED means one source showed it. CORROBORATED means two independent sources did. DISPUTED means a source contradicts it. STALE means the record is historical and may no longer hold.' },
+              historically_available: { type: 'boolean' }
+            }
+          }
+        },
+        prior_warnings: {
+          type: 'array',
+          description: 'Where an identifier on this party also appears on an entity that received a regulator warning. State the identifier, the entity, the regulator and the date. Never state that the two are the same operation.',
+          items: {
+            type: 'object',
+            required: ['identifier_type', 'identifier', 'prior_entity', 'regulator', 'date', 'source'],
+            properties: {
+              identifier_type: { type: 'string' },
+              identifier:      { type: 'string' },
+              prior_entity:    { type: 'string' },
+              regulator:       { type: 'string' },
+              date:            { type: 'string' },
+              source:          { type: 'string' },
+              url:             { type: 'string' }
+            }
+          }
+        },
+        note: { type: 'string', description: 'What the graph does and does not establish, in plain words.' }
+      }
+    },
+
+    /* ------------------------------------------------------------------ *
+     * CLAIM CHRONOLOGY
+     *
+     * Every dated claim the party makes about itself, against every
+     * independently dated record we reached. The comparison is arithmetic.
+     * The conclusion is not: a brand can legitimately be older than its
+     * domain, and calling that a contradiction is the fastest way to be
+     * confidently wrong about a real business.
+     * ------------------------------------------------------------------ */
+    claim_chronology: {
+      type: 'object',
+      required: ['claims', 'record_dates', 'verdict'],
+      properties: {
+        claims: {
+          type: 'array',
+          description: 'Dated claims made by the party, quoted verbatim from its own pages.',
+          items: {
+            type: 'object',
+            required: ['claim', 'implies_year', 'where'],
+            properties: {
+              claim:        { type: 'string', description: 'VERBATIM. The words on their page.' },
+              implies_year: { type: 'integer', description: 'The year the claim implies the party began doing this.' },
+              where:        { type: 'string', description: 'The page the claim appears on.' },
+              url:          { type: 'string' }
+            }
+          }
+        },
+        record_dates: {
+          type: 'array',
+          description: 'Every independently dated record reached. One row per record, with the source that carries the date.',
+          items: {
+            type: 'object',
+            required: ['what', 'date', 'source'],
+            properties: {
+              what:   { type: 'string', description: 'Domain created, first archived capture, incorporation, first Form D sale, first SEDAR filing, first commit, and so on.' },
+              date:   { type: 'string' },
+              source: { type: 'string' },
+              url:    { type: 'string' }
+            }
+          }
+        },
+        earliest_independent_record: { type: ['string','null'],
+          description: 'The earliest date any independent record places this party at. Null when no dated record was reached.' },
+        verdict: { type: 'string', enum: ['CONSISTENT','UNSUPPORTED','CONTRADICTED','NOT_ENOUGH_RECORD'],
+          description:
+            'CONSISTENT: at least one independent record supports the earliest claim. ' +
+            'UNSUPPORTED: no record reached places the party as early as it claims, and none contradicts it either. This is YELLOW, not RED. ' +
+            'CONTRADICTED: a record positively contradicts the claim. ' +
+            'NOT_ENOUGH_RECORD: too few dated records were reached to compare anything.' },
+        statement: { type: 'string',
+          description:
+            'Write it the careful way. Not "the company lied". Say what was found: no retrieved evidence supports the claimed history, while every independently dated record reached begins in a later year, and that discrepancy requires explanation.' }
+      }
+    },
+
     unresolved_questions: {
       type: 'array',
       items: { type: 'string' }

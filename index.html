@@ -1295,7 +1295,8 @@ body[data-stage="console"] .verdictwrap.on{display:block}
         </div>
         <div class="r">
           <span class="key">Categories <b>10</b></span>
-          <span class="key">Registers <b>64</b></span>
+          <span class="key" id="keySources">Sources <b id="keySourcesN">0</b></span>
+          <span class="key" id="keyApplic" title="How many of those sources could hold a record for this particular party. Coverage is measured against this number, never against the whole catalogue.">Apply here <b id="keyApplicN">-</b></span>
           <span class="key" title="130+ jurisdictions in the IOSCO alert network, reached through one register. The registers we query directly cover about a dozen jurisdictions.">IOSCO network <b>130+</b></span>
           <span id="clock">--:--:-- UTC</span>
         </div>
@@ -1406,7 +1407,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
         <div class="boardwrap">
           <div class="board">
             <div class="boardhd">
-              <span class="lbl" id="boardT">Source board</span><span class="lbl" style="color:var(--tx-4);text-transform:none;letter-spacing:.04em;font-weight:400">64 registers, drawn from the connectors in the opening set</span>
+              <span class="lbl" id="boardT">Source board</span><span class="lbl" id="boardSub" style="color:var(--tx-4);text-transform:none;letter-spacing:.04em;font-weight:400"></span>
               <span class="bc" id="boardC">0 of 0 reached</span>
             </div>
             <div class="boardprog"><i id="boardBar"></i></div>
@@ -1859,6 +1860,20 @@ var CORPUS = {
 "investhelm.com": {
   name:"INVESTHELM", domain:"investhelm.com", verdict:"RED", headline:"High risk",
   asOf:"25 Aug 2026",
+  /* Built only from the records already seeded on this entry. Nothing added. */
+  chrono:{
+    verdict:"CONTRADICTED",
+    earliest:"2026-02-22",
+    statement:"The site states a 2025 earnings figure and a member count accumulated over a period that ends before its own domain was created. The registry record and the party's own page are both dated, and they cannot both be describing the same thing.",
+    claims:[
+      {q:"$1.35 billion earned by our members in 2025", year:2025, where:"investhelm.com", url:"https://investhelm.com"},
+      {q:"400,000 Canadians already using the platform", year:2025, where:"investhelm.com", url:"https://investhelm.com"}
+    ],
+    records:[
+      {what:"Domain created", date:"2026-02-22", src:"ICANN RDAP, via the Verisign registry", url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"},
+      {what:"Earliest archived capture", date:"2026", src:"Internet Archive Wayback Machine", url:"https://web.archive.org/web/*/investhelm.com"}
+    ]
+  },
   statement:"Material adverse information and serious contradictions were identified. Do not send money to this party.",
   idc:96, cov:45,
   reads:[["14","Sources checked"],["5","Jurisdictions touched"],["21","Verified facts"],["7","Concerns"]],
@@ -2057,6 +2072,57 @@ var CORPUS = {
  * ------------------------------------------------------------------ */
 var SPECIMEN = {
   name:"ATLANTIC GLOBAL WEALTH", domain:"atlanticglobalwealth.com", specimen:true, asOf:"25 Aug 2026",
+
+  /* SPECIMEN ONLY. Every name, identifier, date and quote below is invented,
+     and it exists to show what a populated operator graph and a populated
+     claim chronology look like. None of it is a finding about anybody, and
+     the specimen banner says so on the result itself. */
+  classifications:[
+    {classification:"PRIVATE_FUND", confidence:0.81, reason:"pools money from several investors into one vehicle. Matched: fund manager, limited partners, assets under management"},
+    {classification:"INVESTMENT_ADVISER", confidence:0.69, reason:"advises on or manages other people's money. Matched: wealth management, portfolio management"},
+    {classification:"CRYPTO", confidence:0.57, reason:"deals in crypto assets, custody, exchange or transfer. Matched: digital assets custody"}
+  ],
+  graph:{
+    note:"Three identifiers on this party also appear on two other parties. They are listed with the record each was read from. Nothing here states that the operations are run by the same people.",
+    nodes:[
+      {type:"META_PIXEL_ID", v:"418822730165449", src:"Site source, retrieved page", url:"", quote:"fbq('init','418822730165449')", first:"2026-03-04"},
+      {type:"CRYPTO_WALLET", v:"TQn9Y2khEsLJW1ChVWFMSMeRDow5oy1F2P", src:"Payment page supplied by the party", url:"", quote:"USDT (TRC20) deposits to TQn9Y2khEsLJW1ChVWFMSMeRDow5oy1F2P", first:"2026-04-11"},
+      {type:"DIRECTOR", v:"Marcus Rowe", src:"Companies House officer filing", url:"", quote:"Director appointed 14 March 2026", first:"2026-03-14"},
+      {type:"PHONE", v:"+1-604-555-0148", src:"Site contact page", url:"", quote:"Client desk +1 604 555 0148", first:"2026-03-04"},
+      {type:"NAMESERVER", v:"ns1.cloudflare.com", src:"ICANN RDAP", url:"", quote:"ns1.cloudflare.com", first:"2026-03-04"}
+    ],
+    edges:[
+      {from:"atlanticglobalwealth.com", to:"418822730165449", type:"SHARES_IDENTIFIER_WITH", other:"Harbourline Capital Group",
+       src:"Site source comparison", url:"", quote:"fbq('init','418822730165449')", tier:"B", status:"CORROBORATED", hist:true},
+      {from:"atlanticglobalwealth.com", to:"TQn9Y2khEsLJW1ChVWFMSMeRDow5oy1F2P", type:"SHARES_WALLET_WITH", other:"Harbourline Capital Group",
+       src:"Payment pages of both parties", url:"", quote:"USDT (TRC20) deposits to TQn9Y2khEsLJW1ChVWFMSMeRDow5oy1F2P", tier:"B", status:"OBSERVED", hist:false},
+      {from:"atlanticglobalwealth.com", to:"Marcus Rowe", type:"SHARES_PERSON_WITH", other:"Northbank Capital Partners",
+       src:"Companies House officer filings for both", url:"", quote:"Director appointed 14 March 2026", tier:"A", status:"CORROBORATED", hist:true},
+      {from:"atlanticglobalwealth.com", to:"ns1.cloudflare.com", type:"USES_NAMESERVER", other:"Harbourline Capital Group",
+       src:"ICANN RDAP", url:"", quote:"ns1.cloudflare.com", tier:"A", status:"OBSERVED", hist:false}
+    ],
+    priors:[
+      {kind:"DIRECTOR", id:"Marcus Rowe", entity:"Northbank Capital Partners", reg:"Financial Conduct Authority",
+       date:"9 May 2025", src:"FCA Warning List", url:""}
+    ]
+  },
+  chrono:{
+    verdict:"UNSUPPORTED",
+    earliest:"2026-03-04",
+    statement:"We found no retrieved evidence supporting the claimed 2014 operating history, while every independently dated record reached begins in 2026. This discrepancy requires explanation. It is not, on its own, evidence of wrongdoing: an earlier company under another name would produce the same pattern, and the party can settle it by naming that company.",
+    claims:[
+      {q:"Managing private capital since 2014", year:2014, where:"Home page", url:""},
+      {q:"Over a decade of consistent returns for our limited partners", year:2015, where:"About page", url:""}
+    ],
+    records:[
+      {what:"Domain created", date:"2026-03-04", src:"ICANN RDAP", url:""},
+      {what:"First certificate issued", date:"2026-03-05", src:"Certificate transparency log", url:""},
+      {what:"Earliest archived capture", date:"2026-03-19", src:"Internet Archive Wayback Machine", url:""},
+      {what:"Companies House incorporation", date:"2026-03-14", src:"Companies House", url:""},
+      {what:"Form D first sale", date:"2026-05-02", src:"SEC Form D", url:""},
+      {what:"IAPD first registration", date:"None located", src:"SEC IAPD", url:""}
+    ]
+  },
   verdict:"RED", headline:"High risk",
   statement:"Material adverse information and serious contradictions were identified. Do not send money to this party.",
   idc:91, cov:84,
@@ -2183,18 +2249,21 @@ var GREY = {
 /* The board. Every source the engine reaches for, grouped by the check it
    serves. `w` is the wave it runs in, which is what makes the lights move in
    the right order during a sweep. */
+/* GENERATED:SOURCES - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
 var SOURCES = [
  {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates"]},
- {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB"]},
- {c:"03 Enforcement", w:1, items:["IOSCO I-SCAN","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG"]},
- {c:"04 People", w:2, items:["ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined"]},
- {c:"05 Legal", w:2, items:["CanLII","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims"]},
- {c:"06 Web", w:1, items:["ICANN RDAP","Certificate Log","Google Web Risk","VirusTotal","urlscan.io","Mail Config"]},
- {c:"07 Reviews", w:2, items:["Trustpilot","Sitejabber","BBB Scam Tracker","Forex Peace Army","Reddit","Glassdoor"]},
- {c:"08 Payment", w:2, items:["Beneficiary Match","IBAN and SWIFT","Chainabuse","Chain Analytics"]},
- {c:"09 4orm", w:3, items:["Infrastructure Cluster","Identifier Reuse","Document Fingerprint"]},
- {c:"10 Claim dates", w:1, items:["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile"]}
+ {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP"]},
+ {c:"03 Enforcement", w:3, items:["IOSCO I-SCAN","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]},
+ {c:"04 People", w:1, items:["ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]},
+ {c:"05 Legal", w:2, items:["CanLII","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims","SEDAR+"]},
+ {c:"06 Web", w:3, items:["ICANN RDAP","Certificate Log","Google Web Risk","VirusTotal","urlscan.io","Mail Config"]},
+ {c:"07 Reviews", w:1, items:["Trustpilot","Sitejabber","BBB Scam Tracker","Forex Peace Army","Reddit","Glassdoor"]},
+ {c:"08 Payment", w:2, items:["Beneficiary Match","IBAN and SWIFT","Chainabuse","Chain Analytics","Etherscan","Solscan","Tronscan","Bitcoin Explorer"]},
+ {c:"09 4orm", w:3, items:["Infrastructure Cluster","Identifier Reuse","Document Fingerprint","Analytics and Pixel Reuse","Site Technology","DNS and IP History","Host and Certificate Graph","Wallet Reuse","Beneficiary Reuse","People Cluster","Operator Graph"]},
+ {c:"10 Claim dates", w:1, items:["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile","Form D First Filing","Form D First Sale","EDGAR First Filing","SEDAR+ First Filing","SEDI First Insider Record","IAPD First Registration","App Store First Release","Google Play First Release","GitHub Repository Created","GitHub First Commit","First Press Release","First YouTube Video","First Social Post"]}
 ];
+var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
+/* END GENERATED:SOURCES */
 
 /* ------------------------------------------------------------------ *
  * REGISTER REFERENCE
@@ -2206,6 +2275,7 @@ var SOURCES = [
  * Progressive disclosure: the board answers "did we reach it", the popover
  * answers "what is it and what did it say". Neither belongs in the other.
  * ------------------------------------------------------------------ */
+/* GENERATED:REGINFO - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
 var REGINFO = {
 "Corporations Canada":["CA","A","The federal corporate register. Confirms a federally incorporated company exists, its status, and its directors.","https://ised-isde.canada.ca/cc/lgcy/fdrlCrpSrch.html"],
 "Ontario Registry":["CA-ON","A","Ontario's business registry. Confirms provincial incorporation and standing.","https://www.ontario.ca/page/ontario-business-registry"],
@@ -2215,7 +2285,6 @@ var REGINFO = {
 "Companies House":["UK","A","The United Kingdom register. Company number, officers, filing history and persons with significant control.","https://find-and-update.company-information.service.gov.uk/"],
 "Florida Sunbiz":["US-FL","A","Florida's corporate register. Incorporation date, registered agent, officers and annual reports.","https://search.sunbiz.org/"],
 "OpenCorporates":["GLOBAL","B","An aggregated view across many state and national registers. Useful for finding a record; the register itself is the authority.","https://opencorporates.com/"],
-
 "CSA Registration":["CA","A","The Canadian Securities Administrators National Registration Search. Answers whether a party may lawfully sell investments anywhere in Canada.","https://www.securities-administrators.ca/nrs/"],
 "CIRO AdvisorReport":["CA","A","Registration and disciplinary history for an individual adviser or dealer.","https://www.ciro.ca/investors/advisorreport"],
 "FINTRAC MSB":["CA","A","Canada's money services business register. Required for anyone exchanging or transmitting value as a business.","https://fintrac-canafe.canada.ca/msb-esm/msb-search-recherche-eng"],
@@ -2224,7 +2293,11 @@ var REGINFO = {
 "BrokerCheck":["US","A","FINRA's record of brokers and firms, including disclosures and disciplinary events.","https://brokercheck.finra.org/"],
 "NFA BASIC":["US","A","National Futures Association background affiliation status. Covers futures and forex.","https://www.nfa.futures.org/basicnet/"],
 "FinCEN MSB":["US","A","The United States money services business register. The decisive check for anyone pooling funds and paying distributions.","https://www.fincen.gov/msb-registrant-search"],
-
+"SEC IAPD, Form ADV":["US","A","The Securities and Exchange Commission's public file on investment advisers. Every registered adviser files a Form ADV describing who it is, who controls it, what it manages and every disciplinary event it has to disclose.","https://adviserinfo.sec.gov/"],
+"SEC Form D":["US","A","The notice a company files when it raises money privately without registering the offering. It carries the first filing date, the first sale date, how much was offered, how much was sold, and who is named on it.","https://www.sec.gov/edgar/search/"],
+"ASIC Professional Register":["AU","A","The Australian Securities and Investments Commission's register of financial services and credit licensees, authorised representatives and the people responsible for them.","https://asic.gov.au/online-services/search-asics-registers/"],
+"SFC Public Register":["HK","A","Hong Kong's Securities and Futures Commission register of licensed corporations, licensed people and responsible officers, with the regulated activities each is licensed for.","https://www.sfc.hk/en/Regulatory-functions/Intermediaries/Licensing/"],
+"ESMA MiCA CASP":["EU","A","The European authorisation record for crypto asset service providers under the Markets in Crypto Assets regulation. Names the legal entity, the member state that authorised it and which crypto services it may provide.","https://www.esma.europa.eu/"],
 "IOSCO I-SCAN":["GLOBAL","A","The investor alerts portal carrying warnings from more than ninety national authorities in one place.","https://www.iosco.org/i-scan/"],
 "BCSC Caution List":["CA-BC","A","British Columbia's Investment Caution List.","https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list"],
 "ASC Caution List":["CA-AB","A","Alberta's Investment Caution List.","https://www.asc.ca/en/enforcement/investment-caution-list"],
@@ -2236,12 +2309,19 @@ var REGINFO = {
 "DOJ Press":["US","A","Department of Justice announcements. Arrests, indictments, pleas and forfeitures are published here before anywhere else.","https://www.justice.gov/news"],
 "IRS-CI":["US","A","IRS Criminal Investigation. Publishes its own releases on financial crime cases it worked.","https://www.irs.gov/compliance/criminal-investigation"],
 "State AG":["US","A","State attorneys general and state securities regulators. Where a state acts before a federal authority does.",""],
-
+"SEC Trading Suspensions":["US","A","Securities the SEC has suspended from trading, with the release number and the reason it gave. The SEC suspends a security when it considers it necessary to protect investors.","https://www.sec.gov/litigation/suspensions"],
+"CFTC RED List":["US","A","The Commodity Futures Trading Commission's Registration Deficient list. Foreign entities that appear to be soliciting United States residents for futures, options, forex or similar, and that are not registered.","https://www.cftc.gov/check"],
+"CFTC Enforcement":["US","A","Civil actions, administrative proceedings and orders brought by the CFTC against firms and people, in futures, commodities, forex and increasingly crypto.","https://www.cftc.gov/LawRegulation/Enforcement/index.htm"],
+"DFPI Crypto Scam Tracker":["US-CA","B","A public database run by California's Department of Financial Protection and Innovation, built from complaints Californians filed about crypto operations. Government published, but the underlying accounts are consumer reports.","https://dfpi.ca.gov/crypto-scams/"],
+"CIRO Discipline":["CA","A","Disciplinary proceedings, settlement agreements and sanctions issued by the Canadian Investment Regulatory Organization against member firms and the people registered through them.","https://www.ciro.ca/office-corporate-secretary/enforcement"],
+"ASIC Investor Alerts":["AU","A","Warnings published by the Australian regulator about companies and websites believed to be operating without a licence or targeting Australians improperly.","https://moneysmart.gov.au/check-and-report-scams/investor-alert-list"],
+"SFC Alert List":["HK","A","Hong Kong's list of suspicious websites, unlicensed companies and entities impersonating licensed firms.","https://www.sfc.hk/en/alert-list"],
 "ISC Ownership":["CA","A","Individuals with significant control. Who actually owns a Canadian company.",""],
 "UK PSC Register":["UK","A","Persons with significant control over a United Kingdom company.","https://find-and-update.company-information.service.gov.uk/"],
 "ASIC Banned":["AU","A","Australia's register of banned and disqualified persons.","https://asic.gov.au/online-services/search-asics-registers/banned-and-disqualified/"],
 "CSA Disciplined":["CA","A","The disciplined persons list maintained across Canadian securities regulators.","https://www.securities-administrators.ca/disciplined-persons-list/"],
-
+"CSA Disciplined Persons":["CA","A","The national list of people disciplined by any Canadian securities regulator, searchable by name across provinces.","https://www.securities-administrators.ca/disciplined-persons/"],
+"SEDI Insider Reports":["CA","A","Canada's System for Electronic Disclosure by Insiders. Directors, officers and significant shareholders must report what they hold and every trade they make.","https://www.sedi.ca/"],
 "CanLII":["CA","A","Canadian court and tribunal decisions.","https://www.canlii.org/"],
 "OSB Bankruptcy":["CA","A","The Office of the Superintendent of Bankruptcy insolvency records.","https://www.ic.gc.ca/app/scr/bsf-osb/ins/login.html"],
 "CourtListener":["US","B","A free archive of United States court opinions and dockets.","https://www.courtlistener.com/"],
@@ -2249,38 +2329,60 @@ var REGINFO = {
 "PACER":["US","A","Public access to federal court electronic records. The dockets themselves.","https://pacer.uscourts.gov/"],
 "Justia Dockets":["US","B","Docket aggregators. Fast to search; the court record is the authority.","https://dockets.justia.com/"],
 "Bankruptcy Claims":["US","B","Claims agent sites carrying the full docket, examinations and creditor claims for a bankruptcy or receivership.",""],
-
+"SEDAR+":["CA","A","The filing system for Canadian public companies and investment funds. Prospectuses, financial statements, management discussion and analysis, material change reports and cease trade documents.","https://www.sedarplus.ca/"],
 "ICANN RDAP":["GLOBAL","A","The registry record for a domain. Registrar, nameservers, status and the creation date.","https://rdap.org/"],
 "Certificate Log":["GLOBAL","B","Certificate transparency. Every certificate ever issued for a host, with its date.","https://crt.sh/"],
 "Google Web Risk":["GLOBAL","B","Google's assessment of whether a site is known to be unsafe.","https://transparencyreport.google.com/safe-browsing/search"],
 "VirusTotal":["GLOBAL","B","Aggregated reputation across many security vendors.","https://www.virustotal.com/"],
 "urlscan.io":["GLOBAL","B","A recorded scan of what a page actually loads and where it sends data.","https://urlscan.io/"],
 "Mail Config":["GLOBAL","A","The domain's mail routing and sender policy. Shows whether a real mailbox exists on the domain.",""],
-
 "Trustpilot":["GLOBAL","C","A consumer review platform. Read for the one and two star accounts, never for the average.","https://www.trustpilot.com/"],
 "Sitejabber":["GLOBAL","C","A consumer review platform with a different user base from Trustpilot.","https://www.sitejabber.com/"],
 "BBB Scam Tracker":["US-CA","C","Better Business Bureau complaints and scam reports.","https://www.bbb.org/scamtracker"],
 "Forex Peace Army":["GLOBAL","C","Trading community reviews. Strong on withdrawal complaints specifically.","https://www.forexpeacearmy.com/"],
 "Reddit":["GLOBAL","D","Community intelligence. Never verified fact, and never a finding on its own.","https://www.reddit.com/r/CryptoScams/"],
 "Glassdoor":["GLOBAL","C","Employee accounts. Sometimes the earliest signal that an operation is not what it says.","https://www.glassdoor.com/"],
-
 "Beneficiary Match":["4orm","A","Does the name on the receiving account match the party you are dealing with. Needs a payment instruction from you.",""],
 "IBAN and SWIFT":["GLOBAL","B","Validates the account and identifies the receiving institution and country.",""],
 "Chainabuse":["GLOBAL","C","Community reported wallet addresses.","https://www.chainabuse.com/"],
 "Chain Analytics":["GLOBAL","B","On chain tracing of a wallet address and its counterparties.",""],
-
+"Etherscan":["Chain","B","The public record of the Ethereum blockchain and compatible chains. Every transaction, every contract, every token transfer, with dates.","https://etherscan.io/"],
+"Solscan":["Chain","B","The public record of the Solana blockchain: transactions, token accounts and program interactions.","https://solscan.io/"],
+"Tronscan":["Chain","B","The public record of the Tron blockchain. Matters more than its size suggests, because a great deal of USDT moves on Tron and many payment demands specify it.","https://tronscan.org/"],
+"Bitcoin Explorer":["Chain","B","The public record of the Bitcoin blockchain: addresses, transactions, amounts and dates.","https://www.blockchain.com/explorer"],
 "Infrastructure Cluster":["4orm","4orm","Other domains sharing nameservers, registrar or hosting with this one. Built from every previous check.",""],
 "Identifier Reuse":["4orm","4orm","The same phone, email, address or wallet appearing under a different brand name.",""],
 "Document Fingerprint":["4orm","4orm","A document matching one submitted under another party's name.",""],
-
+"Analytics and Pixel Reuse":["4orm","B","A search of website source code for exact identifiers: Google Analytics properties, Tag Manager containers, Meta pixels, unique scripts, phone numbers and code fragments. Finds other sites carrying the same ones.","https://publicwww.com/"],
+"Site Technology":["4orm","B","What a website is built from: analytics, pixels, hosting, embedded services and payment technology. Used to extract identifiers and to corroborate them.","https://builtwith.com/"],
+"DNS and IP History":["4orm","B","The history of a domain's DNS records: which addresses it has resolved to, which nameservers it has used, and which other domains have shared them.","https://securitytrails.com/"],
+"Host and Certificate Graph":["4orm","B","Internet wide scan data: hosts, TLS certificates and the relationships between them, including historical infrastructure.","https://censys.io/"],
+"Wallet Reuse":["4orm","4orm","Our own record of payment addresses supplied by parties we have checked before. Answers one question: has this address been given to somebody else, by somebody else.",""],
+"Beneficiary Reuse":["4orm","4orm","Our own record of receiving account names, IBANs and bank references taken from payment instructions supplied to us. Answers whether the money goes where somebody else's money went.",""],
+"People Cluster":["4orm","4orm","Our own record of the people found in previous checks: directors, officers, promoters and advisers, and the entities each of them was attached to.",""],
+"Operator Graph":["4orm","4orm","The whole of it: every identifier this party controls, every edge between them, and every other party sharing one. Each edge carries how specific the identifier is and the record it was read from.",""],
 "ICANN RDAP Date":["GLOBAL","A","The domain creation date, from the registry record. The single most decisive date in the check, and never inferred from anything else.","https://rdap.org/"],
 "Wayback Machine":["GLOBAL","B","The first archived capture of the site. Establishes the earliest date the site was demonstrably being published.","https://web.archive.org/"],
 "First Certificate":["GLOBAL","B","The first certificate ever issued for this host. A certificate can post-date a site, so this is corroborating rather than decisive.","https://crt.sh/"],
 "Trademark Filing":["US","A","The filing date of the mark. A brand claiming a long history usually filed early.","https://tsdr.uspto.gov/"],
 "Domain History":["GLOBAL","B","Passive DNS and historical records for the domain, including previous owners and configurations.",""],
 "Incorporation Date":["VARIES","A","When the legal entity itself first existed, from its home registry. Nothing the company did can predate this.",""],
-"Public Profile":["GLOBAL","D","Stated tenure and history on public professional profiles. Self reported, and treated as such.",""]
+"Public Profile":["GLOBAL","D","Stated tenure and history on public professional profiles. Self reported, and treated as such.",""],
+"Form D First Filing":["US","A","The date the first exempt offering notice was filed with the SEC. An independent record of when a private raise was first notified.","https://www.sec.gov/edgar/search/"],
+"Form D First Sale":["US","A","The date of first sale as stated on the Form D. An independent record of when money actually started coming in.","https://www.sec.gov/edgar/search/"],
+"EDGAR First Filing":["US","A","The earliest filing of any kind made to the SEC under this name. The first date the party appears in the federal securities record.","https://www.sec.gov/edgar/search/"],
+"SEDAR+ First Filing":["CA","A","The earliest filing on SEDAR+. When the issuer first appears in the Canadian securities record.","https://www.sedarplus.ca/"],
+"SEDI First Insider Record":["CA","A","The earliest insider report filed against the issuer. When the issuer first had reportable insiders.","https://www.sedi.ca/"],
+"IAPD First Registration":["US","A","The date an adviser first registered with the SEC or a state, from the Form ADV history.","https://adviserinfo.sec.gov/"],
+"App Store First Release":["Store","B","The first release date of an app on Apple's App Store, and its version history.","https://www.apple.com/app-store/"],
+"Google Play First Release":["Store","B","The first release date of an Android app and its update history.","https://play.google.com/"],
+"GitHub Repository Created":["Build","B","The creation date of a public code repository. For anything claiming to have built technology, an independent record of when the work started.","https://github.com/"],
+"GitHub First Commit":["Build","B","The date of the earliest commit in a repository. Harder to backdate convincingly than a website.","https://github.com/"],
+"First Press Release":["Wire","D","The earliest press release issued under this name on a commercial wire service.",""],
+"First YouTube Video":["Social","D","The earliest video published on the party's channel.","https://www.youtube.com/"],
+"First Social Post":["Social","D","The earliest post on the party's own social account, and when the account was created.",""]
 };
+/* END GENERATED:REGINFO */
 
 
 /* How each check is decided, as conditions rather than paragraphs.
@@ -2347,144 +2449,434 @@ C10:[["RED","A dated claim earlier than the domain was created"],
    These are static because they are properties of the register, not of the party.
    The per record reading, the one sentence that says what a specific document
    means for the person searching, comes from the assessment as `plain`. */
+/* GENERATED:REGREAD - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
 var REGREAD = {
 "Corporations Canada":["A federal company by that name exists, with a number, a status and directors on the record.",
   "Nothing federal was found. The company may still be provincially incorporated, which is normal for a small business.",
   "Look at the status line first. Active is what you want. Dissolved, struck off or in default means the company you are being asked to pay does not legally exist right now."],
-"Ontario Registry":["A company registered in Ontario, with its status.","Nothing in Ontario. It may be federal or in another province.",
+"Ontario Registry":["A company registered in Ontario, with its status.",
+  "Nothing in Ontario. It may be federal or in another province.",
   "Check the legal name against the name on the invoice or contract. A trading name is not a legal name."],
-"BC Registry":["A company registered in British Columbia.","Nothing in BC.","Status and the registered office address."],
-"Alberta Registry":["A company registered in Alberta.","Nothing in Alberta, or the register was not reachable.","Status, and whether the directors match who you are dealing with."],
+"BC Registry":["A company registered in British Columbia.",
+  "Nothing in BC.",
+  "Status and the registered office address."],
+"Alberta Registry":["A company registered in Alberta.",
+  "Nothing in Alberta, or the register was not reachable.",
+  "Status, and whether the directors match who you are dealing with."],
 "SEC EDGAR":["A filing exists with the United States securities regulator.",
   "No filing. For a party selling investments to Americans, that absence is the point rather than a detail.",
   "Look for a Form D, which is the filing an exempt private offering makes. No Form D and no registration, from a party taking investor money, is a question they need to answer."],
-"Companies House":["A United Kingdom company, with its number, officers and filing history.","Nothing in the UK register.",
+"Companies House":["A United Kingdom company, with its number, officers and filing history.",
+  "Nothing in the UK register.",
   "Filing history. A company that has stopped filing accounts is a company in trouble."],
-"Florida Sunbiz":["A Florida corporation, with its incorporation date, registered agent and officers.","Nothing in Florida.",
+"Florida Sunbiz":["A Florida corporation, with its incorporation date, registered agent and officers.",
+  "Nothing in Florida.",
   "The incorporation date. Nothing the company did can predate it, whatever the website says."],
-"OpenCorporates":["A record aggregated from a state or national register.","Nothing found in the aggregated set.",
+"OpenCorporates":["A record aggregated from a state or national register.",
+  "Nothing found in the aggregated set.",
   "Use it to find which register holds the record, then open that register. The aggregator is a finding aid, not the authority."],
-
 "CSA Registration":["The party is registered to sell investments somewhere in Canada, and the categories say what it may sell.",
   "No matching registration was found. That is not proof they are unregistered, and it is the single most important question to put to them.",
   "Match the exact legal name and the category. A firm registered as an exempt market dealer may not sell you what a portfolio manager can."],
-"CIRO AdvisorReport":["A registration and disciplinary history for a named individual adviser.","No record for that person.",
+"CIRO AdvisorReport":["A registration and disciplinary history for a named individual adviser.",
+  "No record for that person.",
   "Read the disciplinary section before the credentials section."],
-"FINTRAC MSB":["Registered in Canada to exchange or transmit money as a business.","No registration found.",
+"FINTRAC MSB":["Registered in Canada to exchange or transmit money as a business.",
+  "No registration found.",
   "Anyone moving your money for you should be here. If they are not, ask why not."],
-"Bank of Canada PSP":["Registered as a payment service provider under the Retail Payment Activities Act.","No registration found.",
+"Bank of Canada PSP":["Registered as a payment service provider under the Retail Payment Activities Act.",
+  "No registration found.",
   "This register is new. Absence from it is weaker evidence than absence from an established one."],
-"FCA Register":["Authorised by the United Kingdom regulator, with permissions listed.","No authorisation found.",
+"FCA Register":["Authorised by the United Kingdom regulator, with permissions listed.",
+  "No authorisation found.",
   "Check the permissions, not only the presence. A firm authorised for one activity is not authorised for all of them."],
-"BrokerCheck":["A United States broker or firm, with disclosures and disciplinary events.","No record.",
+"BrokerCheck":["A United States broker or firm, with disclosures and disciplinary events.",
+  "No record.",
   "The disclosures section. Customer complaints, terminations and regulatory events all sit there."],
-"NFA BASIC":["Registered for futures or forex in the United States.","No registration found.",
+"NFA BASIC":["Registered for futures or forex in the United States.",
+  "No registration found.",
   "Anyone offering leveraged forex to Americans should be here."],
 "FinCEN MSB":["Registered as a money services business in the United States.",
   "No registration found. For a party pooling funds and paying distributions, this absence carries weight.",
   "Registration here is a filing, not an approval. It means they told the government what they do. It is a floor, not a seal."],
-
-"IOSCO I-SCAN":["An entry from a national securities authority warning about this party.","No entry across the contributing authorities.",
+"SEC IAPD, Form ADV":["A Form ADV exists. You get the exact registered legal name, the CRD number, the SEC file number, the control persons, the funds it runs, and every disciplinary disclosure the firm was required to make.",
+  "No adviser registration was located under the names searched. For a firm that advises on or manages other people's money in the United States, that is a serious question. For a firm that does neither, it means nothing.",
+  "Match the legal name and the CRD number against what the party told you. A registration number that belongs to a different legal entity is the single most common way this claim is faked. And read the disclosure section: a current registration is not an endorsement."],
+"SEC Form D":["The offering was notified to the SEC. The first sale date is the most useful figure on it, because it is an independent record of when money actually started moving.",
+  "No exempt offering notice was located. A private raise into United States investors normally leaves one. Its absence is a question to put to them, not a finding on its own.",
+  "Compare the date of first sale with whatever they told you about how long they have been raising. A gap is a discrepancy to ask about. It is not, by itself, evidence of wrongdoing."],
+"ASIC Professional Register":["An Australian licence or authorisation exists. It states the licence type, what it permits, who the responsible people are, and whether it is current or historical.",
+  "No Australian licence was located. That matters if they are soliciting Australians and is irrelevant if they are not.",
+  "Read the permissions, not only the number. A licence to do one thing is routinely waved around as authority to do another."],
+"SFC Public Register":["A Hong Kong licence exists, with the regulated activity types and the named responsible officers.",
+  "No Hong Kong licence was located under the names searched.",
+  "The regulated activity types. Type 1 dealing is not Type 9 asset management, and a firm licensed for one and selling the other is operating outside its licence."],
+"ESMA MiCA CASP":["An EU crypto authorisation exists, naming the member state and the specific services permitted.",
+  "No EU crypto authorisation was located. For a party offering crypto exchange, custody, brokerage or transfer to people in the EU, that is a direct question.",
+  "Which services are authorised. Custody and exchange are separate permissions, and a firm holding one frequently advertises both."],
+"IOSCO I-SCAN":["An entry from a national securities authority warning about this party.",
+  "No entry across the contributing authorities.",
   "Which authority posted it, and when. A warning from the regulator in your own country matters most to you."],
-"BCSC Caution List":["British Columbia has publicly cautioned about this party.","No BC entry.","The date and the wording. These lists say exactly why."],
-"ASC Caution List":["Alberta has publicly cautioned about this party.","No Alberta entry.","The date and the wording."],
-"OSC Alerts":["Ontario has issued an investor warning about this party.","No Ontario entry.","The date and the wording."],
-"CSA Alerts":["At least one Canadian province has warned about this party.","No entry in any province's alerts.",
+"BCSC Caution List":["British Columbia has publicly cautioned about this party.",
+  "No BC entry.",
+  "The date and the wording. These lists say exactly why."],
+"ASC Caution List":["Alberta has publicly cautioned about this party.",
+  "No Alberta entry.",
+  "The date and the wording."],
+"OSC Alerts":["Ontario has issued an investor warning about this party.",
+  "No Ontario entry.",
+  "The date and the wording."],
+"CSA Alerts":["At least one Canadian province has warned about this party.",
+  "No entry in any province's alerts.",
   "A listing here is a finding. It is a regulator saying, in public and in its own name, that something is wrong."],
-"FCA Warning List":["The United Kingdom regulator has warned about this firm.","No entry.",
+"FCA Warning List":["The United Kingdom regulator has warned about this firm.",
+  "No entry.",
   "The FCA lists clone firms too. Check whether the warning is about this firm or about somebody impersonating it."],
-"OFAC":["A match against the United States sanctions list.","No match.",
+"OFAC":["A match against the United States sanctions list.",
+  "No match.",
   "A real match stops everything. Names are common, so confirm the identifiers rather than the name alone."],
-"UN Consolidated":["A match against the United Nations sanctions list.","No match.","Same as OFAC. Confirm identifiers, not names."],
+"UN Consolidated":["A match against the United Nations sanctions list.",
+  "No match.",
+  "Same as OFAC. Confirm identifiers, not names."],
 "DOJ Press":["The Department of Justice has published something naming this party. Arrests, indictments, pleas and forfeitures appear here first.",
   "Nothing published. Most cases are charged long after the money is gone, so this absence proves very little.",
   "Read the verb. Charged is an allegation. Pleaded guilty is an admission. They are not the same and the difference is the whole story."],
-"IRS-CI":["IRS Criminal Investigation has published on a case involving this party.","Nothing published.",
+"IRS-CI":["IRS Criminal Investigation has published on a case involving this party.",
+  "Nothing published.",
   "These releases carry dollar figures and dates that no other source has."],
-"State AG":["A state attorney general or securities regulator has acted.","Nothing found in the states searched.",
+"State AG":["A state attorney general or securities regulator has acted.",
+  "Nothing found in the states searched.",
   "States often act months before a federal authority does. An action in one state is worth as much as a federal one."],
-
-"ISC Ownership":["A record of who actually controls the company.","No ownership record retrieved.",
+"SEC Trading Suspensions":["This is as serious as this board gets. The regulator stopped trading in the security. Read the release: it states what the concern was.",
+  "No suspension was located for the names or tickers searched. Most securities are never suspended, so this is the expected result and it clears nothing.",
+  "The date and the release number, then open the release itself. A suspension is temporary; what it says about the reason is not."],
+"CFTC RED List":["The regulator has publicly named this party as apparently soliciting Americans without the registration that would require. For a retail trading offer this is close to decisive.",
+  "Not on the RED list. The list only covers entities the CFTC has looked at and only covers its own remit, so absence is weak.",
+  "Check the website and the aliases as well as the name. These operations rebrand constantly and the list records the domains."],
+"CFTC Enforcement":["There is a proceeding. Read whether it is a complaint or an order: a complaint contains allegations that have not been proven, an order or consent judgment contains findings. They are not the same thing and this board keeps them apart.",
+  "No CFTC action was located against the entity or the people named.",
+  "The names of the individuals, not only the company. People carry their history into the next company; a shell does not."],
+"DFPI Crypto Scam Tracker":["A consumer reported this party, or this website, to a state regulator. That is meaningful and it is still a complaint, not a finding. It is recorded here as a government published consumer report and it is treated as consumer evidence, not as an adjudicated result.",
+  "No entry located. The tracker only holds what Californians reported, so absence says very little.",
+  "The narrative and the date. Read what was actually done to the person, and whether the same mechanic appears in the reviews check."],
+"CIRO Discipline":["A firm or a person has been disciplined. You get the allegations, the decision, any settlement and the sanctions.",
+  "No disciplinary record located. Kept separate from AdvisorReport deliberately, because a clean current registration and a clean disciplinary history are two different questions.",
+  "Whether the person was registered at the time and through which firm. That is how a disciplinary history connects to the entity you are actually being asked to pay."],
+"ASIC Investor Alerts":["An Australian regulator has published a warning naming this party or its website. Read the exact wording: it says what the concern is.",
+  "Not on the list. It carries what ASIC has published, which is a fraction of what exists.",
+  "The website and the aliases. The same operation appears on these lists repeatedly under new names."],
+"SFC Alert List":["The SFC has classified this party or its website. The classification itself is the finding: impersonation of a licensed firm is a different problem from operating unlicensed.",
+  "Not listed.",
+  "The classification the SFC used, and whether the entry names a firm being impersonated. If it does, the real firm is not the one you are dealing with."],
+"ISC Ownership":["A record of who actually controls the company.",
+  "No ownership record retrieved.",
   "Compare the named owner to the person you are dealing with."],
-"UK PSC Register":["Persons with significant control over a UK company.","No record.",
+"UK PSC Register":["Persons with significant control over a UK company.",
+  "No record.",
   "A company with no person of significant control declared is worth a question."],
-"ASIC Banned":["An Australian ban or disqualification against this person.","No entry.","The period of the ban and what it covers."],
-"CSA Disciplined":["A Canadian securities regulator has disciplined this person.","No entry.","What they were disciplined for, and when."],
-
-"CanLII":["A Canadian court or tribunal decision involving this party.","Nothing found.",
+"ASIC Banned":["An Australian ban or disqualification against this person.",
+  "No entry.",
+  "The period of the ban and what it covers."],
+"CSA Disciplined":["A Canadian securities regulator has disciplined this person.",
+  "No entry.",
+  "What they were disciplined for, and when."],
+"CSA Disciplined Persons":["A person connected to this party has been disciplined by a Canadian securities regulator. Person level history follows the person into every company they are involved with.",
+  "No disciplined person record located under the names searched. Only works if you have the right names and the right spellings.",
+  "Match the full name and the province, then read what the person actually did. A name collision is common and the record itself will settle it."],
+"SEDI Insider Reports":["Insider filings exist. You get who the insiders are, their relationship to the issuer, what they hold and every acquisition and disposition with dates.",
+  "No insider filings located. Expected for a private company; a real question for one claiming to be a Canadian reporting issuer.",
+  "The relationship field, which tells you who actually controls the issuer, and the earliest filing date, which is an independent record of when this became a reporting issuer."],
+"CanLII":["A Canadian court or tribunal decision involving this party.",
+  "Nothing found.",
   "Check which side they are on. A defendant and a plaintiff are not the same thing."],
-"OSB Bankruptcy":["A Canadian insolvency record.","No record.","Whether it is closed or ongoing."],
-"CourtListener":["A United States court opinion or docket.","Nothing found.",
+"OSB Bankruptcy":["A Canadian insolvency record.",
+  "No record.",
+  "Whether it is closed or ongoing."],
+"CourtListener":["A United States court opinion or docket.",
+  "Nothing found.",
   "An opinion is a decision. A docket entry is a filing, and a filing is only an assertion."],
-"UK Insolvency":["A UK bankruptcy or insolvency record.","No record.","Status and date."],
-"PACER":["A United States federal court docket.","Nothing found.",
+"UK Insolvency":["A UK bankruptcy or insolvency record.",
+  "No record.",
+  "Status and date."],
+"PACER":["A United States federal court docket.",
+  "Nothing found.",
   "The case number and the parties. Read the caption before the allegations: it tells you who is suing whom."],
-"Justia Dockets":["A docket found through an aggregator.","Nothing found.",
+"Justia Dockets":["A docket found through an aggregator.",
+  "Nothing found.",
   "Use it to locate the case, then read the court's own record. The aggregator can be out of date."],
 "Bankruptcy Claims":["A claims agent site for a bankruptcy or receivership, carrying the full docket.",
-  "No proceeding found.","If your money is in it, the claims deadline on that site is the most important date on this page."],
-
+  "No proceeding found.",
+  "If your money is in it, the claims deadline on that site is the most important date on this page."],
+"SEDAR+":["The issuer files in Canada. The filings describe the business in its own regulated words, which is the version it had to sign.",
+  "No SEDAR+ filings located. For a party describing itself as a Canadian public company or reporting issuer, that is a contradiction to resolve before anything else.",
+  "The earliest filing date, and how the business described itself in each year. A company that told a regulator it was pre revenue in 2024 and tells you it has been trading profitably since 2022 has given two different accounts and you are entitled to ask which is correct."],
 "ICANN RDAP":["The registry record for the domain: registrar, nameservers, status and creation date.",
   "The registry did not answer. It almost always does, so a failure here usually means a temporary problem rather than a missing domain.",
   "The creation date. Everything else on this page can be argued about. That date cannot."],
-"Certificate Log":["Every certificate ever issued for this host, with dates.","No certificates found.",
+"Certificate Log":["Every certificate ever issued for this host, with dates.",
+  "No certificates found.",
   "The earliest date. A site cannot have been serving securely before its first certificate."],
-"Google Web Risk":["Google has flagged this site as unsafe.","Not flagged.",
+"Google Web Risk":["Google has flagged this site as unsafe.",
+  "Not flagged.",
   "Not flagged means not yet flagged. New fraud sites are almost never flagged."],
-"VirusTotal":["Security vendors have flagged this domain.","No detections.",
+"VirusTotal":["Security vendors have flagged this domain.",
+  "No detections.",
   "Look at how many vendors, not whether any. One detection out of ninety is usually noise."],
-"urlscan.io":["A recorded scan of what the page loads and where it sends data.","No scan available.",
+"urlscan.io":["A recorded scan of what the page loads and where it sends data.",
+  "No scan available.",
   "Where the forms post to. A payment form posting to a different domain is worth understanding."],
 "Mail Config":["The domain has mail routing, so a real mailbox exists on it.",
   "No mail configuration. A company writing to you from a domain that cannot receive mail is a question.",
   "Whether the address they emailed you from is actually on this domain."],
-
-"Trustpilot":["Reviews exist on Trustpilot.","No profile or no reviews.",
+"Trustpilot":["Reviews exist on Trustpilot.",
+  "No profile or no reviews.",
   "Read the one and two star reviews only, and read them for the same complaint recurring rather than for the average."],
-"Sitejabber":["Reviews exist on Sitejabber.","No profile or no reviews.",
+"Sitejabber":["Reviews exist on Sitejabber.",
+  "No profile or no reviews.",
   "A different user base from Trustpilot. The same complaint appearing on both is worth far more than either alone."],
-"BBB Scam Tracker":["A Better Business Bureau profile or scam report exists.","No profile.",
+"BBB Scam Tracker":["A Better Business Bureau profile or scam report exists.",
+  "No profile.",
   "The BBB letter rating is mostly age and complaint volume. It is not a safety endorsement. Read the complaints instead."],
-"Forex Peace Army":["Trading community reviews exist.","No entry.",
+"Forex Peace Army":["Trading community reviews exist.",
+  "No entry.",
   "This community is unusually good on withdrawal complaints specifically."],
-"Reddit":["Community discussion exists.","None found.",
+"Reddit":["Community discussion exists.",
+  "None found.",
   "Community intelligence, never verified fact. Useful for the mechanic being described, not for the conclusion being drawn."],
-"Glassdoor":["Employee accounts exist.","No profile.",
+"Glassdoor":["Employee accounts exist.",
+  "No profile.",
   "Sometimes the earliest signal. Employees describe how an operation actually works before customers can."],
-
-"Beneficiary Match":["The name on the receiving account was compared to the party.","No payment instruction was supplied, so nothing could be compared.",
+"Beneficiary Match":["The name on the receiving account was compared to the party.",
+  "No payment instruction was supplied, so nothing could be compared.",
   "This is the check that most often stops a payment in time, and it needs the instruction from you."],
-"IBAN and SWIFT":["The account and receiving institution were validated.","No instruction supplied.",
+"IBAN and SWIFT":["The account and receiving institution were validated.",
+  "No instruction supplied.",
   "Which country the receiving bank is in. It should make sense against where the company says it is."],
-"Chainabuse":["Community reports exist against this wallet address.","No reports.",
+"Chainabuse":["Community reports exist against this wallet address.",
+  "No reports.",
   "Reports are allegations. Several independent reports of the same pattern are worth taking seriously."],
-"Chain Analytics":["On chain tracing of the address and its counterparties.","Not run or unavailable.",
+"Chain Analytics":["On chain tracing of the address and its counterparties.",
+  "Not run or unavailable.",
   "Where funds move after they arrive."],
-
-"Infrastructure Cluster":["Other domains share nameservers, registrar or hosting with this one.","No cluster found.",
+"Etherscan":["The address exists on chain and you can see what moved and when. First activity is an independent date. Ownership is not on the chain and cannot be read off it.",
+  "Nothing found for the address supplied. Check the chain: an address that is empty on Ethereum may be active on another network.",
+  "First activity date, and whether funds move straight out to an exchange. A payment address created days before you were asked to use it is a fact worth having."],
+"Solscan":["The address exists and its activity is visible with dates.",
+  "Nothing found on Solana for the address supplied.",
+  "First activity, and the age of the account against the age of the story you were told."],
+"Tronscan":["The address exists on Tron and its transfers are visible with dates and amounts.",
+  "Nothing found on Tron for the address supplied.",
+  "Whether USDT arrives and leaves within minutes. That is a pass through pattern and it tells you the address is not a destination."],
+"Bitcoin Explorer":["The address exists and its history is visible.",
+  "Nothing found for the address supplied.",
+  "First and last activity, and the amounts. A brand new address given to you as an established company's payment address is a contradiction."],
+"Infrastructure Cluster":["Other domains share nameservers, registrar or hosting with this one.",
+  "No cluster found.",
   "Shared infrastructure alone is common and innocent. Shared infrastructure with a party already found adverse is not."],
-"Identifier Reuse":["The same phone, email, address or wallet appears under another brand name.","No reuse found.",
+"Identifier Reuse":["The same phone, email, address or wallet appears under another brand name.",
+  "No reuse found.",
   "One operator running several brands is the pattern this looks for."],
-"Document Fingerprint":["A document matching one submitted under another party's name.","No match.",
+"Document Fingerprint":["A document matching one submitted under another party's name.",
+  "No match.",
   "The same contract template under two different company names is worth a question."],
-
-"ICANN RDAP Date":["The registry creation date for the domain.","The registry did not answer.",
+"Analytics and Pixel Reuse":["Another website carries an identifier that somebody had to configure on this one. That is a real connection between two builds. It is not proof of a shared operator, and this board never reports it as one.",
+  "No other site was found carrying these identifiers. It does not mean none exists: this searches an index, not the whole web.",
+  "Whether the identifier is a configured property or a placeholder that shipped with the template. A default container id connects nothing."],
+"Site Technology":["The site's technology stack and its embedded identifiers are on record, which is where the reusable identifiers come from.",
+  "No technology profile located for this domain.",
+  "The payment technology. How a site is set up to take money says more about it than what it says about itself."],
+"DNS and IP History":["The domain's infrastructure history is visible, including addresses and neighbours it no longer uses. A shared mass market host means nothing; a shared small private host is a real signal.",
+  "No history retrieved, often because this needs a key we do not have configured. That is published as a gap, never as clean.",
+  "Whether the neighbours are on a mass market provider. Thousands of unrelated sites share a Cloudflare nameserver and that connects nobody to anybody."],
+"Host and Certificate Graph":["The host and certificate relationships are on record, which extends the certificate check in category 06 into a map rather than a single date.",
+  "No scan data retrieved. Often a missing key, and it is published as a gap.",
+  "Certificates covering several unrelated brand names at once. One certificate issued for four brands is one operator running four brands."],
+"Wallet Reuse":["This payment address has appeared in a previous check under a different name. Of everything on this board, this is the hardest to explain innocently.",
+  "This address has not appeared in our records before. On a young corpus that mostly means we have not seen it, not that it is new.",
+  "The other name it appeared under, and the date. Both are shown."],
+"Beneficiary Reuse":["The receiving party on this payment instruction has received money on behalf of a different named company before. The name on the account is the thing to look at, not the company on the invoice.",
+  "This beneficiary has not appeared in our records before.",
+  "Whether the account name matches the company you are being asked to pay. A mismatch is the single most reliable signal on this entire board."],
+"People Cluster":["A person connected to this party appears in our records against another entity. The connection is shown with the record that established it, in both directions.",
+  "No person connected to this party appears elsewhere in our records.",
+  "Whether the earlier entity attracted a regulator warning. That is the connection worth the most, and it is stated separately when it exists."],
+"Operator Graph":["Identifiers connect this party to others. One connection is interesting. Two independent connections are material. Three or more high specificity connections are strong, and every one is listed with its source.",
+  "No identifier connects this party to any other party in our records. That is not evidence of anything either way.",
+  "The specificity column. A shared wallet and a shared web host are both connections and they are not remotely the same claim."],
+"ICANN RDAP Date":["The registry creation date for the domain.",
+  "The registry did not answer.",
   "Compare it to every dated claim on their site. A result from before this date cannot have happened here."],
-"Wayback Machine":["The earliest archived capture of the site.","No capture found.",
+"Wayback Machine":["The earliest archived capture of the site.",
+  "No capture found.",
   "An archive gap is an archive gap. It is weaker evidence than a registry date and should never be treated as one."],
-"First Certificate":["The first certificate issued for this host.","No certificate history found.",
+"First Certificate":["The first certificate issued for this host.",
+  "No certificate history found.",
   "Corroborates the domain date. A certificate can post-date a site, so it is supporting evidence rather than proof."],
-"Trademark Filing":["A trademark filing exists, with its date.","No filing found.",
+"Trademark Filing":["A trademark filing exists, with its date.",
+  "No filing found.",
   "A brand claiming a long history usually filed early. No filing at all is not unusual for a small business."],
-"Domain History":["Historical records for the domain, including previous owners.","No history retrieved.",
+"Domain History":["Historical records for the domain, including previous owners.",
+  "No history retrieved.",
   "Whether the domain changed hands. A domain bought second hand carries an older creation date that is not the company's age."],
-"Incorporation Date":["When the legal entity first existed.","No incorporation record retrieved.",
+"Incorporation Date":["When the legal entity first existed.",
+  "No incorporation record retrieved.",
   "Nothing the company did can predate this. It is the hardest date to argue with."],
-"Public Profile":["A stated tenure or history on a public professional profile.","No profile found.",
-  "Self reported, and treated as such. Useful as a claim to check, never as a record."]
+"Public Profile":["A stated tenure or history on a public professional profile.",
+  "No profile found.",
+  "Self reported, and treated as such. Useful as a claim to check, never as a record."],
+"Form D First Filing":["There is a first filing date on the record, filed by them.",
+  "No Form D located, so this comparison cannot be made and it is published as a gap.",
+  "The gap between this date and any claimed fundraising history. A gap is a discrepancy to explain, not proof of anything."],
+"Form D First Sale":["The party stated to the SEC when its first sale occurred. That is a strong date because they filed it themselves.",
+  "No first sale date located.",
+  "This against the marketing. A fund claiming to have been raising since 2019 with a first sale in 2025 has two accounts of itself and owes you the reconciliation."],
+"EDGAR First Filing":["There is a first appearance date in the federal record.",
+  "The party has never filed with the SEC under the names searched.",
+  "Whether the first appearance is consistent with the history claimed on the website."],
+"SEDAR+ First Filing":["There is a first filing date, and the filings around it describe what stage the business was actually at.",
+  "No SEDAR+ record, so this date is unavailable and published as a gap.",
+  "Read more than the date. Read how the company described itself in the earliest filings, because that description was made to a regulator."],
+"SEDI First Insider Record":["There is a first insider record date.",
+  "No insider records, expected for a private company.",
+  "The date, against a claim to have been a public or reporting issuer earlier than that."],
+"IAPD First Registration":["There is a first registration date on the record.",
+  "No adviser registration history located.",
+  "Registration date against claimed years of managing money. Advising before registering is a licensing question as well as a dating one."],
+"App Store First Release":["The app has a first release date recorded by Apple.",
+  "No App Store listing located under the names searched.",
+  "The first release date, and the developer name. The developer account is often shared across several brands."],
+"Google Play First Release":["The app has a first release date recorded by Google.",
+  "No Play listing located.",
+  "The developer name and the release date. A platform claiming years of users with an app released last quarter is a contradiction."],
+"GitHub Repository Created":["A repository exists with a creation date.",
+  "No public repository located. Plenty of real companies keep code private, so this proves nothing on its own.",
+  "The creation date against the claimed development history, and whether the account contributes to other projects under other brands."],
+"GitHub First Commit":["There is a first commit date.",
+  "No commit history retrieved.",
+  "Whether the entire history was committed on one day. A project with three years of claimed development and one commit is a copy, not a history."],
+"First Press Release":["There is an earliest dated announcement. It is the party's own promotional material, so it is weak evidence of anything except the date.",
+  "No press release located.",
+  "The date only. The contents are marketing."],
+"First YouTube Video":["There is an earliest publication date on the channel.",
+  "No channel located.",
+  "The date, and whether the channel history matches the claimed trading history. Both are easy to check and easy to compare."],
+"First Social Post":["There is an account creation date and an earliest post.",
+  "No account located under the names searched.",
+  "The account creation date. It is the weakest date on this list and it is still a date somebody else recorded."]
 };
+/* END GENERATED:REGREAD */
 
-var TOTAL_SOURCES = SOURCES.reduce(function(n,g){return n+g.items.length;},0);
+/* GENERATED:CATALOGUE_META - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
+var CATALOGUE_META = {
+  total: 104,
+  sources: {
+    "Corporations Canada":{id:"CA_CORPORATIONS",cat:"01",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Ontario Registry":{id:"CA_ON_REGISTRY",cat:"01",tier:"A",jur:["CA-ON"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "BC Registry":{id:"CA_BC_REGISTRY",cat:"01",tier:"A",jur:["CA-BC"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Alberta Registry":{id:"CA_AB_REGISTRY",cat:"01",tier:"A",jur:["CA-AB"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "SEC EDGAR":{id:"SEC_EDGAR",cat:"01",tier:"A",jur:["US"],verts:["ALL"],also:["02","10"],transport:"exa_pinned"},
+    "Companies House":{id:"UK_COMPANIES_HOUSE",cat:"01",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Florida Sunbiz":{id:"US_FL_SUNBIZ",cat:"01",tier:"A",jur:["US-FL"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "OpenCorporates":{id:"OPENCORPORATES",cat:"01",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "CSA Registration":{id:"CSA_REGISTRATION",cat:"02",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","BROKER_DEALER","INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PRIVATE_FUND","FOREX_CFD","CRYPTO","COMMODITIES"],also:[],transport:"exa_pinned"},
+    "CIRO AdvisorReport":{id:"CIRO_ADVISORREPORT",cat:"02",tier:"A",jur:["CA"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","PUBLIC_STOCK","PRIVATE_INVESTMENT"],also:["04"],transport:"exa_pinned"},
+    "FINTRAC MSB":{id:"FINTRAC_MSB",cat:"02",tier:"A",jur:["CA"],verts:["CRYPTO","FOREX_CFD","PRIVATE_INVESTMENT","OTHER"],also:[],transport:"exa_pinned"},
+    "Bank of Canada PSP":{id:"BOC_PSP",cat:"02",tier:"A",jur:["CA"],verts:["CRYPTO","OTHER"],also:[],transport:"exa_pinned"},
+    "FCA Register":{id:"FCA_REGISTER",cat:"02",tier:"A",jur:["UK"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PRIVATE_FUND","PUBLIC_STOCK"],also:["04"],transport:"exa_pinned"},
+    "BrokerCheck":{id:"FINRA_BROKERCHECK",cat:"02",tier:"A",jur:["US"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PUBLIC_STOCK"],also:["04"],transport:"exa_pinned"},
+    "NFA BASIC":{id:"NFA_BASIC",cat:"02",tier:"A",jur:["US"],verts:["FOREX_CFD","COMMODITIES","CRYPTO"],also:["03","04"],transport:"exa_pinned"},
+    "FinCEN MSB":{id:"FINCEN_MSB",cat:"02",tier:"A",jur:["US"],verts:["CRYPTO","FOREX_CFD","OTHER"],also:[],transport:"exa_pinned"},
+    "SEC IAPD, Form ADV":{id:"SEC_IAPD_ADV",cat:"02",tier:"A",jur:["US"],verts:["INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PRIVATE_FUND","BROKER_DEALER"],also:["04","01","10"],transport:"parallel"},
+    "SEC Form D":{id:"SEC_FORM_D",cat:"02",tier:"A",jur:["US"],verts:["PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","CRYPTO","INVESTMENT_ADVISER"],also:["01","10"],transport:"parallel"},
+    "ASIC Professional Register":{id:"ASIC_PRO_REGISTER",cat:"02",tier:"A",jur:["AU"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PRIVATE_FUND"],also:["04"],transport:"exa_pinned"},
+    "SFC Public Register":{id:"HK_SFC_PUBLIC_REGISTER",cat:"02",tier:"A",jur:["HK"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PUBLIC_STOCK"],also:["04"],transport:"exa_pinned"},
+    "ESMA MiCA CASP":{id:"ESMA_MICA_CASP",cat:"02",tier:"A",jur:["EU"],verts:["CRYPTO"],also:["01"],transport:"exa_pinned"},
+    "IOSCO I-SCAN":{id:"IOSCO_ISCAN",cat:"03",tier:"A",jur:["INTL"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "BCSC Caution List":{id:"BCSC_CAUTION",cat:"03",tier:"A",jur:["CA-BC"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "ASC Caution List":{id:"ASC_CAUTION",cat:"03",tier:"A",jur:["CA-AB"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "OSC Alerts":{id:"OSC_ALERTS",cat:"03",tier:"A",jur:["CA-ON"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "CSA Alerts":{id:"CSA_ALERTS",cat:"03",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "FCA Warning List":{id:"FCA_WARNING",cat:"03",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "OFAC":{id:"OFAC",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "UN Consolidated":{id:"UN_CONSOLIDATED",cat:"03",tier:"A",jur:["INTL"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "DOJ Press":{id:"DOJ_PRESS",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:["04","05"],transport:"exa_pinned"},
+    "IRS-CI":{id:"IRS_CI",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:["04"],transport:"exa_pinned"},
+    "State AG":{id:"US_STATE_AG",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "SEC Trading Suspensions":{id:"SEC_TRADING_SUSPENSIONS",cat:"03",tier:"A",jur:["US"],verts:["PUBLIC_STOCK"],also:[],transport:"exa_pinned"},
+    "CFTC RED List":{id:"CFTC_RED_LIST",cat:"03",tier:"A",jur:["US"],verts:["FOREX_CFD","COMMODITIES","CRYPTO","BROKER_DEALER"],also:["02"],transport:"exa_pinned"},
+    "CFTC Enforcement":{id:"CFTC_ENFORCEMENT",cat:"03",tier:"A",jur:["US"],verts:["FOREX_CFD","COMMODITIES","CRYPTO","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:["04","05"],transport:"parallel"},
+    "DFPI Crypto Scam Tracker":{id:"DFPI_CRYPTO_SCAM_TRACKER",cat:"03",tier:"B",jur:["US-CA"],verts:["CRYPTO","FOREX_CFD","PRIVATE_INVESTMENT"],also:["07"],transport:"exa_pinned"},
+    "CIRO Discipline":{id:"CIRO_DISCIPLINARY",cat:"03",tier:"A",jur:["CA"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","PUBLIC_STOCK","PRIVATE_INVESTMENT"],also:["04"],transport:"exa_pinned"},
+    "ASIC Investor Alerts":{id:"ASIC_INVESTOR_ALERTS",cat:"03",tier:"A",jur:["AU"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "SFC Alert List":{id:"HK_SFC_ALERT_LIST",cat:"03",tier:"A",jur:["HK"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "ISC Ownership":{id:"ISC_OWNERSHIP",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "UK PSC Register":{id:"UK_PSC",cat:"04",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "ASIC Banned":{id:"ASIC_BANNED",cat:"04",tier:"A",jur:["AU"],verts:["ALL"],also:["03"],transport:"exa_pinned"},
+    "CSA Disciplined":{id:"CSA_DISCIPLINED",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:["03"],transport:"exa_pinned"},
+    "CSA Disciplined Persons":{id:"CSA_DISCIPLINED_PERSONS",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:["03"],transport:"parallel"},
+    "SEDI Insider Reports":{id:"CSA_SEDI",cat:"04",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT"],also:["01","10"],transport:"parallel"},
+    "CanLII":{id:"CANLII",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "OSB Bankruptcy":{id:"OSB_BANKRUPTCY",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "CourtListener":{id:"COURTLISTENER",cat:"05",tier:"B",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "UK Insolvency":{id:"UK_INSOLVENCY",cat:"05",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "PACER":{id:"PACER",cat:"05",tier:"A",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Justia Dockets":{id:"JUSTIA_DOCKETS",cat:"05",tier:"B",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Bankruptcy Claims":{id:"BANKRUPTCY_CLAIMS",cat:"05",tier:"B",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "SEDAR+":{id:"CSA_SEDAR_PLUS",cat:"05",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:["01","10"],transport:"parallel"},
+    "ICANN RDAP":{id:"ICANN_RDAP",cat:"06",tier:"A",jur:[],verts:["ALL"],also:["10"],transport:"connector"},
+    "Certificate Log":{id:"CERT_LOG",cat:"06",tier:"B",jur:[],verts:["ALL"],also:["10"],transport:"exa_pinned"},
+    "Google Web Risk":{id:"GOOGLE_WEB_RISK",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "VirusTotal":{id:"VIRUSTOTAL",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "urlscan.io":{id:"URLSCAN",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Mail Config":{id:"MAIL_CONFIG",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Trustpilot":{id:"TRUSTPILOT",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Sitejabber":{id:"SITEJABBER",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "BBB Scam Tracker":{id:"BBB_SCAM_TRACKER",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Forex Peace Army":{id:"FOREX_PEACE_ARMY",cat:"07",tier:"C",jur:[],verts:["FOREX_CFD","CRYPTO","COMMODITIES","BROKER_DEALER"],also:[],transport:"exa_pinned"},
+    "Reddit":{id:"REDDIT",cat:"07",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Glassdoor":{id:"GLASSDOOR",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Beneficiary Match":{id:"BENEFICIARY_MATCH",cat:"08",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "IBAN and SWIFT":{id:"IBAN_SWIFT",cat:"08",tier:"B",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Chainabuse":{id:"CHAINABUSE",cat:"08",tier:"C",jur:[],verts:["CRYPTO"],also:["07"],transport:"exa_pinned"},
+    "Chain Analytics":{id:"CHAIN_ANALYTICS",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:[],transport:"connector"},
+    "Etherscan":{id:"ETHERSCAN",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
+    "Solscan":{id:"SOLSCAN",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
+    "Tronscan":{id:"TRONSCAN",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
+    "Bitcoin Explorer":{id:"BTC_EXPLORER",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
+    "Infrastructure Cluster":{id:"INFRA_CLUSTER",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Identifier Reuse":{id:"IDENTIFIER_REUSE",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Document Fingerprint":{id:"DOC_FINGERPRINT",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Analytics and Pixel Reuse":{id:"PUBLICWWW",cat:"09",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Site Technology":{id:"BUILTWITH",cat:"09",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "DNS and IP History":{id:"SECURITYTRAILS",cat:"09",tier:"B",jur:[],verts:["ALL"],also:["06","10"],transport:"exa_pinned"},
+    "Host and Certificate Graph":{id:"CENSYS",cat:"09",tier:"B",jur:[],verts:["ALL"],also:["06"],transport:"exa_pinned"},
+    "Wallet Reuse":{id:"WALLET_REUSE",cat:"09",tier:"4orm",jur:[],verts:["CRYPTO"],also:[],transport:"connector"},
+    "Beneficiary Reuse":{id:"BENEFICIARY_REUSE",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "People Cluster":{id:"PEOPLE_CLUSTER",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Operator Graph":{id:"OPERATOR_GRAPH",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "ICANN RDAP Date":{id:"RDAP_DATE",cat:"10",tier:"A",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Wayback Machine":{id:"WAYBACK",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "First Certificate":{id:"FIRST_CERT",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Trademark Filing":{id:"TRADEMARK",cat:"10",tier:"A",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Domain History":{id:"DOMAIN_HISTORY",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Incorporation Date":{id:"INCORP_DATE",cat:"10",tier:"A",jur:[],verts:["ALL"],also:[],transport:"connector"},
+    "Public Profile":{id:"PUBLIC_PROFILE",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Form D First Filing":{id:"FORM_D_FIRST",cat:"10",tier:"A",jur:["US"],verts:["PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","CRYPTO"],also:[],transport:"parallel"},
+    "Form D First Sale":{id:"FORM_D_FIRST_SALE",cat:"10",tier:"A",jur:["US"],verts:["PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","CRYPTO"],also:[],transport:"parallel"},
+    "EDGAR First Filing":{id:"EDGAR_FIRST",cat:"10",tier:"A",jur:["US"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","INVESTMENT_ADVISER"],also:[],transport:"exa_pinned"},
+    "SEDAR+ First Filing":{id:"SEDAR_FIRST",cat:"10",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:[],transport:"exa_pinned"},
+    "SEDI First Insider Record":{id:"SEDI_FIRST",cat:"10",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK"],also:[],transport:"exa_pinned"},
+    "IAPD First Registration":{id:"IAPD_FIRST",cat:"10",tier:"A",jur:["US"],verts:["INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:[],transport:"exa_pinned"},
+    "App Store First Release":{id:"APP_STORE_FIRST",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "Google Play First Release":{id:"PLAY_STORE_FIRST",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "GitHub Repository Created":{id:"GITHUB_REPO_CREATED",cat:"10",tier:"B",jur:[],verts:["VC_STARTUP","CRYPTO"],also:["09"],transport:"exa_pinned"},
+    "GitHub First Commit":{id:"GITHUB_FIRST_COMMIT",cat:"10",tier:"B",jur:[],verts:["VC_STARTUP","CRYPTO"],also:["09"],transport:"exa_pinned"},
+    "First Press Release":{id:"FIRST_PRESS_RELEASE",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "First YouTube Video":{id:"FIRST_YOUTUBE",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
+    "First Social Post":{id:"FIRST_SOCIAL_POST",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"}
+  }
+};
+/* END GENERATED:CATALOGUE_META */
 
 
 /* ======================= support directory ======================= */
@@ -2802,10 +3194,46 @@ function renderBoard(status){
     });
   });
 }
+/* ------------------------------------------------------------------ *
+ * APPLICABILITY
+ *
+ * The catalogue holds every source the system can reach for. Only some of
+ * them could ever hold a record for the party in front of you. An Australian
+ * licence register is not a gap on a Canadian issuer with no Australian
+ * activity, and counting it as one makes the coverage figure meaningless.
+ *
+ * The API sends `applicable` with the result. Where it is absent, everything
+ * is treated as applicable, which is the conservative direction: it can only
+ * make coverage look worse than it is, never better.
+ * ------------------------------------------------------------------ */
+function applicableSet(d){
+  if(!d || !d.applicable || !d.applicable.length) return null;
+  var set={}; d.applicable.forEach(function(n){ set[n]=1; });
+  return set;
+}
+function appliesHere(d,name){
+  var set=applicableSet(d);
+  return !set || !!set[name];
+}
+function countApplicable(d){
+  var set=applicableSet(d);
+  if(!set) return TOTAL_SOURCES;
+  var n=0; SOURCES.forEach(function(g){ g.items.forEach(function(x){ if(set[x]) n++; }); });
+  return n;
+}
+
 function boardCount(){
   var lit=id("brows").querySelectorAll('.src[data-s="clear"],.src[data-s="caution"],.src[data-s="adverse"]').length;
-  id("boardC").textContent = lit+" of "+TOTAL_SOURCES+" reached";
-  id("boardBar").style.width = Math.round(lit/TOTAL_SOURCES*100)+"%";
+  /* Measured against what applied here, not against the whole catalogue. */
+  var app=countApplicable(CURRENT)||TOTAL_SOURCES;
+  id("boardC").textContent = lit+" of "+app+" reached";
+  id("boardBar").style.width = Math.round(lit/app*100)+"%";
+  var sub=id("boardSub");
+  if(sub) sub.textContent = (CURRENT && CURRENT.applicable && CURRENT.applicable.length)
+    ? app+" of "+TOTAL_SOURCES+" sources could hold a record for this party"
+    : TOTAL_SOURCES+" named sources, routed to the party in front of you";
+  var kn=id("keySourcesN"); if(kn) kn.textContent=String(TOTAL_SOURCES);
+  var ka=id("keyApplicN"); if(ka) ka.textContent = (CURRENT && CURRENT.applicable && CURRENT.applicable.length) ? String(app) : "-";
 }
 
 function setBars(list,foot){
@@ -3202,6 +3630,18 @@ function renderSummaryRail(d){
                    : "None found in the checks that completed",
      function(){ snapSimple("issues"); }],
 
+    (function(){
+      var st=graphStrength(d.graph);
+      var w=STRENGTH_WORD[st.word];
+      return ["Operator graph", w[0], st.word==="strong"?"bad":(st.word==="material"?"warn":(st.counted.length?"warn":"nul")), '',
+        (d.graph && (d.graph.priors||[]).length)
+          ? (d.graph.priors.length+" identifier"+(d.graph.priors.length===1?"":"s")+" also sit on an entity a regulator warned about")
+          : (st.counted.length
+              ? st.counted.length+" independent identifiers shared with another party"
+              : "No identifier connects this party to another in our records"),
+        snapGraph];
+    })(),
+
     ["Gaps", String(realGaps), realGaps?"warn":"ok", '',
      unres.length ? realGaps+" sources we could not reach, "+unres.length+" questions still open"
                   : (realGaps ? realGaps+" sources we could not reach, every one named" : "Nothing that applied was left unchecked"),
@@ -3215,6 +3655,255 @@ function renderSummaryRail(d){
     btn.addEventListener("click",c[5]);
     w.appendChild(btn);
   });
+}
+
+/* ------------------------------------------------------------------ *
+ * THE OPERATOR GRAPH, ON SCREEN
+ *
+ * The console shows a summary. The audit report carries every edge. What both
+ * of them hold to is the same sentence: a shared identifier is a fact, a
+ * shared operator is a conclusion, and only the fact is ours to state.
+ * ------------------------------------------------------------------ */
+var SPEC_BAND = {
+  "very high":["Very specific","There is no ordinary reason for two unrelated parties to share this."],
+  "high":["Specific","Somebody had to configure this. Sharing it is a real connection between two builds."],
+  "medium":["Somewhat specific","Worth noting, and easily innocent."],
+  "low":["Common","Weak on its own."],
+  "very low":["Everybody uses it","Millions of unrelated sites share this. It connects nobody to anybody."]
+};
+
+/* The same specificity table the API uses, so the console never disagrees
+   with the record it is drawing. Kept short on purpose: this decides what a
+   reader is told a connection is worth. */
+var NODE_SPEC = {
+  CRYPTO_WALLET:"very high", BANK_BENEFICIARY:"very high", BANK_ACCOUNT_REFERENCE:"very high", IBAN:"very high",
+  META_PIXEL_ID:"high", GOOGLE_ANALYTICS_ID:"high", GOOGLE_TAG_MANAGER_ID:"high",
+  DIRECTOR:"high", OFFICER:"high", LEGAL_ENTITY:"high", EMAIL:"high", PHONE:"high",
+  PERSON:"high", TELEGRAM:"high", WHATSAPP:"high", APP_DEVELOPER:"high", GITHUB_ACCOUNT:"high",
+  TRADEMARK:"high", REGULATOR_WARNING:"high", ENFORCEMENT_ACTION:"high",
+  OTHER_TRACKING_ID:"high", PROMOTER:"high", ADVISER:"high", COURT_CASE:"high",
+  SOCIAL_HANDLE:"high", GITHUB_REPOSITORY:"high", TRADING_NAME:"medium",
+  IP_ADDRESS:"medium", DOMAIN:"medium", SWIFT:"medium",
+  NAMESERVER:"low", REGISTRAR:"low"
+};
+var GENERIC_HOST_WORDS = ["cloudflare","godaddy","namecheap","aws","amazonaws","google","azure",
+  "digitalocean","hostinger","wix","squarespace","shopify","wordpress","vercel","netlify","fastly","akamai","cdn"];
+
+function nodeBand(type, value){
+  var t=String(type||"").toUpperCase(), v=String(value||"").toLowerCase();
+  if((t==="NAMESERVER"||t==="IP_ADDRESS"||t==="REGISTRAR") &&
+     GENERIC_HOST_WORDS.some(function(g){ return v.indexOf(g)>-1; })) return "very low";
+  return NODE_SPEC[t] || "medium";
+}
+function nodeWord(t){ return String(t||"").toLowerCase().replace(/_/g," "); }
+
+/* Independent connections, counted the way the doctrine requires: one per
+   kind of connection per counterparty, so two facts resting on the same
+   underlying fact are not counted twice. */
+var EDGE_FAMILY = {
+  IP_ADDRESS:"infrastructure", NAMESERVER:"infrastructure", REGISTRAR:"infrastructure", DOMAIN:"infrastructure",
+  GOOGLE_ANALYTICS_ID:"tracking", GOOGLE_TAG_MANAGER_ID:"tracking", META_PIXEL_ID:"tracking", OTHER_TRACKING_ID:"tracking",
+  EMAIL:"contact", PHONE:"contact", TELEGRAM:"contact", WHATSAPP:"contact", SOCIAL_HANDLE:"contact",
+  CRYPTO_WALLET:"money", BANK_BENEFICIARY:"money", BANK_ACCOUNT_REFERENCE:"money", IBAN:"money", SWIFT:"money",
+  PERSON:"people", DIRECTOR:"people", OFFICER:"people", PROMOTER:"people", ADVISER:"people", LEGAL_ENTITY:"people"
+};
+function graphStrength(g){
+  if(!g || !g.edges || !g.edges.length) return {word:"none", counted:[], dropped:[], high:0};
+  var shared=g.edges.filter(function(e){ return e.other; });
+  var seen={}, counted=[], dropped=[];
+  shared.forEach(function(e){
+    var band=nodeBand(e.type.replace(/^SHARES_|_WITH$/g,""), e.to);
+    var nodeT=(g.nodes.filter(function(n){ return n.v===e.to || n.v===e.from; })[0]||{}).type || e.type;
+    band=nodeBand(nodeT, e.to);
+    if(band==="very low"){ dropped.push({e:e, band:band, why:"too common to mean anything on its own"}); return; }
+    var key=(EDGE_FAMILY[String(nodeT).toUpperCase()]||"other")+"||"+e.other;
+    if(seen[key]){ dropped.push({e:e, band:band, why:"the same kind of connection to the same party is already counted"}); return; }
+    seen[key]=1; counted.push({e:e, band:band, nodeT:nodeT});
+  });
+  var high=counted.filter(function(c){ return c.band==="high"||c.band==="very high"; }).length;
+  var word = !counted.length ? "none" : (high>=3 ? "strong" : (counted.length>=2 ? "material" : "interesting"));
+  return {word:word, counted:counted, dropped:dropped, high:high};
+}
+var STRENGTH_WORD = {
+  none:["Nothing connects it","No identifier connects this party to any other party in our records. That is not evidence of anything either way."],
+  interesting:["One connection","One shared identifier is worth knowing about and is not evidence of a shared operator."],
+  material:["Material","Two or more independent identifiers are shared. Independent means they do not all rest on the same underlying fact."],
+  strong:["Strong","Three or more specific identifiers, independently observed. This is the strongest thing the graph can say, and it still describes a connection, not an accusation."]
+};
+
+function snapGraph(){
+  var d=CURRENT; if(!d) return;
+  var g=d.graph;
+  var h='<div class="infosec">';
+  if(!g || (!(g.nodes||[]).length && !(g.edges||[]).length)){
+    h+='<div class="infop" style="margin-top:0">No identifiers were established for this party on this run, so there is no graph to draw. '+
+       'That is a gap in what we reached, not a statement that this party stands alone.</div></div>';
+    infoOpen("Operator graph", (d.name||"This party"), null, h);
+    return;
+  }
+  var st=graphStrength(g), w=STRENGTH_WORD[st.word];
+  h+=snapCells([[String((g.nodes||[]).length),"Identifiers established",""],
+                [String(st.counted.length),"Independent connections", st.counted.length?"warn":""],
+                [String(st.high),"Of them, specific", st.high?"bad":""],
+                [w[0],"What that amounts to", st.word==="strong"?"bad":(st.word==="material"?"warn":"")]])+
+    '<div class="infop"><b>A shared identifier is a fact. A shared operator is a conclusion.</b> '+esc(w[1])+' '+
+    'Everything below is the fact, with the record it was read from. The conclusion is yours.</div>'+
+    (g.note?'<div class="infop">'+esc(g.note)+'</div>':'')+'</div>';
+
+  if((g.priors||[]).length){
+    h+='<div class="infosec"><div class="infoh">Seen before, on something a regulator warned about</div>'+
+       '<div class="snaplist">'+g.priors.map(function(p,i){
+         return '<div class="snaprow" style="background:var(--bad-bg)"><span class="sx">'+(i<9?"0":"")+(i+1)+'</span>'+
+           '<span class="sb"><span class="st2">'+esc(nodeWord(p.kind))+' '+esc(p.id)+'</span>'+
+           '<span class="sd">Also appears on <b>'+esc(p.entity)+'</b>, which '+esc(p.reg)+' published a warning about on '+esc(p.date)+'. '+
+           'We are reporting a shared identifier and the record it came from. We are not stating that the two are run by the same people.</span>'+
+           (p.url?'<span class="sd"><a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue-lt)">Open the warning</a></span>':'')+
+           '</span><span class="sg" data-s="RED">'+esc(p.reg)+'</span></div>';
+       }).join('')+'</div></div>';
+  }
+
+  if(st.counted.length){
+    h+='<div class="infosec"><div class="infoh">'+st.counted.length+' independent connection'+(st.counted.length===1?'':'s')+', most specific first</div>'+
+       '<div class="snaplist">'+st.counted.slice().sort(function(a,b){
+         var o={"very high":0,high:1,medium:2,low:3,"very low":4};
+         return o[a.band]-o[b.band];
+       }).map(function(c){
+         var b=SPEC_BAND[c.band]||["",""];
+         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
+           '<span class="st2">'+esc(nodeWord(c.nodeT))+' shared with '+esc(c.e.other)+'</span>'+
+           '<span class="sd">'+esc(c.e.to)+'</span>'+
+           (c.e.quote?'<span class="sd">&ldquo;'+esc(c.e.quote)+'&rdquo;</span>':'')+
+           '<span class="sd" style="color:var(--tx-4)">'+esc(b[1])+' Read from '+esc(c.e.src||"the record shown")+'. Status '+esc(c.e.status||"OBSERVED")+'.</span>'+
+           (c.e.url?'<span class="sd"><a href="'+esc(c.e.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue-lt)">Open the record</a></span>':'')+
+           '</span><span class="sg" data-s="'+(c.band==="very high"||c.band==="high"?"RED":"YELLOW")+'">'+esc(b[0])+'</span></div>';
+       }).join('')+'</div></div>';
+  }
+
+  if(st.dropped.length){
+    h+='<div class="infosec"><div class="infoh">'+st.dropped.length+' connection'+(st.dropped.length===1?'':'s')+' we found and did not count</div>'+
+       '<div class="infop" style="margin-top:0">Published rather than hidden, because a graph that only shows what it counted is a graph you cannot check.</div>'+
+       '<div class="snaplist">'+st.dropped.map(function(c){
+         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
+           '<span class="st2">'+esc(c.e.to)+(c.e.other?' shared with '+esc(c.e.other):'')+'</span>'+
+           '<span class="sd">'+esc(c.why)+'</span></span>'+
+           '<span class="sg">Not counted</span></div>';
+       }).join('')+'</div></div>';
+  }
+
+  if((g.nodes||[]).length){
+    h+='<div class="infosec"><div class="infoh">'+g.nodes.length+' identifier'+(g.nodes.length===1?'':'s')+' established for this party</div>'+
+       '<div class="snaplist">'+g.nodes.map(function(n){
+         var b=SPEC_BAND[nodeBand(n.type,n.v)]||["",""];
+         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
+           '<span class="st2">'+esc(n.v)+'</span>'+
+           '<span class="sd">'+esc(nodeWord(n.type))+', read from '+esc(n.src||"the record shown")+
+           (n.first?' &middot; first seen '+esc(n.first):'')+'</span>'+
+           (n.quote?'<span class="sd">&ldquo;'+esc(n.quote)+'&rdquo;</span>':'')+
+           '</span><span class="sg">'+esc(b[0])+'</span></div>';
+       }).join('')+'</div></div>';
+  }
+
+  h+='<div class="infosec"><div class="infop" style="margin-top:0;font-size:12px">'+
+     'A wallet address on this list means the party supplied it or a source attributed it. '+
+     'A blockchain record proves what moved. It never proves who owns an address, and nothing here says otherwise.</div></div>';
+  infoOpen("Operator graph", (d.name||"This party"), null, h);
+}
+
+/* ------------------------------------------------------------------ *
+ * CLAIM CHRONOLOGY, ON SCREEN
+ *
+ * What they say about how long they have been doing this, beside every
+ * independently dated record we reached. The comparison is arithmetic. The
+ * conclusion is careful, because a brand can legitimately be older than its
+ * domain and calling that a contradiction gets a real business wrong.
+ * ------------------------------------------------------------------ */
+var CHRONO_WORD = {
+  CONSISTENT:["Consistent","ok","At least one independent record supports the earliest claim."],
+  UNSUPPORTED:["Not supported","warn","No record we reached places this party as early as it claims, and none contradicts it either. That is a discrepancy to explain, not a finding of dishonesty."],
+  CONTRADICTED:["Contradicted","bad","A record positively contradicts a dated claim."],
+  NOT_ENOUGH_RECORD:["Not enough record","","Too few dated records were reached to compare anything."]
+};
+
+function snapChrono(){
+  var d=CURRENT; if(!d) return;
+  var c=d.chrono;
+  var h='<div class="infosec">';
+  if(!c || (!(c.claims||[]).length && !(c.records||[]).length)){
+    h+='<div class="infop" style="margin-top:0">No dated claim and no dated record were retrieved for this party, so there is nothing to compare. '+
+       'This check is reported grey and it appears in the coverage gaps.</div></div>';
+    infoOpen("Claim dates against the record", (d.name||"This party"), null, h);
+    return;
+  }
+  var w=CHRONO_WORD[c.verdict]||CHRONO_WORD.NOT_ENOUGH_RECORD;
+  h+=snapCells([[String((c.claims||[]).length),"Dated claims they make",""],
+                [String((c.records||[]).length),"Independently dated records",""],
+                [c.earliest||"None","Earliest record of them existing",""],
+                [w[0],"What the comparison shows",w[1]]])+
+    '<div class="infop"><b>The test is not whether the claim is older than the domain.</b> '+
+    'A brand can legitimately be older than its website. The test is whether the claim is older than '+
+    '<em>every</em> independent record of this party existing. '+esc(w[2])+'</div>'+
+    (c.statement?'<div class="infop"><b>On this party.</b> '+esc(c.statement)+'</div>':'')+'</div>';
+
+  if((c.claims||[]).length){
+    h+='<div class="infosec"><div class="infoh">What they say, in their own words</div>'+
+       '<div class="snaplist">'+c.claims.map(function(x,i){
+         return '<div class="snaprow"><span class="sx">'+(i<9?"0":"")+(i+1)+'</span>'+
+           '<span class="sb"><span class="st2">&ldquo;'+esc(x.q)+'&rdquo;</span>'+
+           '<span class="sd">On '+esc(x.where)+'. Implies they began in '+esc(x.year)+'.</span></span>'+
+           '<span class="sg">'+esc(x.year)+'</span></div>';
+       }).join('')+'</div></div>';
+  }
+  if((c.records||[]).length){
+    h+='<div class="infosec"><div class="infoh">What the records carry, earliest first</div>'+
+       '<div class="snaplist">'+c.records.slice().sort(function(a,b){
+         return String(a.date).localeCompare(String(b.date));
+       }).map(function(x){
+         return '<div class="snaprow"><span class="sx"></span>'+
+           '<span class="sb"><span class="st2">'+esc(x.what)+'</span>'+
+           '<span class="sd">'+esc(x.src)+
+           (x.url?' &middot; <a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue-lt)">open it</a>':'')+'</span></span>'+
+           '<span class="sg">'+esc(x.date)+'</span></div>';
+       }).join('')+'</div></div>';
+  }
+  h+='<div class="infosec"><div class="infop" style="margin-top:0;font-size:12px">'+
+     'A gap between a claim and the record is a discrepancy that requires explanation. '+
+     'It is not, on its own, evidence of wrongdoing: an earlier company under another name, a domain bought later, '+
+     'or a business that simply did not publish are all ordinary explanations. Ask them, and check the answer here.</div></div>';
+  infoOpen("Claim dates against the record", (d.name||"This party"), null, h);
+}
+
+/* What the party was classified as, and therefore which registers were even
+   in the plan. This is the audit trail behind the coverage figure. */
+function snapRouting(){
+  var d=CURRENT; if(!d) return;
+  var cls=d.classifications||[], na=d.notApplicable||[];
+  var app=countApplicable(d);
+  var h='<div class="infosec">'+
+    snapCells([[String(TOTAL_SOURCES),"Sources in the catalogue",""],
+               [String(app),"Could hold a record here",""],
+               [String(na.length),"Could never have applied",""]])+
+    '<div class="infop"><b>Coverage is measured against what applied.</b> An Australian licence register has nothing to say '+
+    'about a Canadian issuer with no Australian activity, and counting it as a gap would make the coverage figure meaningless. '+
+    'Both halves are published, so you can see what was left out and why.</div></div>';
+
+  if(cls.length){
+    h+='<div class="infosec"><div class="infoh">What this party appears to be</div>'+
+       '<div class="infop" style="margin-top:0">More than one is normal. A crypto fund is several things at once, and each one opens a different set of registers.</div>'+
+       '<div class="snaplist">'+cls.map(function(c){
+         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
+           '<span class="st2">'+esc(String(c.classification).replace(/_/g," ").toLowerCase())+'</span>'+
+           '<span class="sd">'+esc(c.reason)+'</span></span>'+
+           '<span class="sg">'+Math.round((c.confidence||0)*100)+'%</span></div>';
+       }).join('')+'</div></div>';
+  }
+  if(na.length){
+    h+='<div class="infosec"><div class="infoh">'+na.length+' sources that could never have applied</div>'+
+       '<div class="snaplist">'+na.slice(0,80).map(function(x){
+         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
+           '<span class="st2">'+esc(x.source)+'</span><span class="sd">'+esc(x.reason)+'</span></span></div>';
+       }).join('')+'</div></div>';
+  }
+  infoOpen("How this check was routed", (d.name||"This party"), null, h);
 }
 
 /* ---- a category tile ---- */
@@ -3250,6 +3939,27 @@ function toggleDrill(key){
           : '<div class="infop" style="margin-top:0">'+c.rule+'</div>')+
        '</div>';
 
+  /* Two checks carry more than a list of records. C09 is a graph and C10 is a
+     comparison, and neither reads properly as evidence rows alone. */
+  if(c.key==="C9" && CURRENT && CURRENT.graph){
+    var gst=graphStrength(CURRENT.graph), gw=STRENGTH_WORD[gst.word];
+    h += '<div class="infosec"><div class="infoh">The operator graph</div>'+
+      '<div class="infop" style="margin-top:0"><b>'+esc(gw[0])+'.</b> '+esc(gw[1])+'</div>'+
+      ((CURRENT.graph.priors||[]).length
+        ? '<div class="infop" style="color:var(--bad)"><b>'+CURRENT.graph.priors.length+
+          ' identifier'+(CURRENT.graph.priors.length===1?'':'s')+' on this party also sit on an entity a regulator warned about.</b> '+
+          'The identifiers, the entities, the regulators and the dates are all listed in the graph.</div>'
+        : '')+
+      '<button class="ghmore" type="button" id="openGraph"><span class="hi">&#9679;</span> Open the operator graph</button></div>';
+  }
+  if(c.key==="C10" && CURRENT && CURRENT.chrono){
+    var cw=CHRONO_WORD[CURRENT.chrono.verdict]||CHRONO_WORD.NOT_ENOUGH_RECORD;
+    h += '<div class="infosec"><div class="infoh">Claim dates against the record</div>'+
+      '<div class="infop" style="margin-top:0"><b>'+esc(cw[0])+'.</b> '+esc(cw[2])+'</div>'+
+      (CURRENT.chrono.statement?'<div class="infop">'+esc(CURRENT.chrono.statement)+'</div>':'')+
+      '<button class="ghmore" type="button" id="openChrono"><span class="hi">&#9679;</span> Open the full comparison</button></div>';
+  }
+
   h += '<div class="infosec"><div class="infoh">'+c.src.length+' registers behind this check</div>'+
        '<div class="srcwrap"><table class="srctbl"><tr><th>Source</th><th>Where</th><th>What it counts as</th><th>Access</th><th>Terms</th></tr>'+
        c.src.map(function(x){
@@ -3259,6 +3969,10 @@ function toggleDrill(key){
        }).join('')+'</table></div></div>';
 
   infoOpen("Check "+c.id, c.name, res ? res.state : null, h);
+  /* These two buttons exist on two of the ten checks, so the lookup has to
+     tolerate their absence rather than throw on the other eight. */
+  var og=document.getElementById("openGraph"); if(og) og.addEventListener("click", snapGraph);
+  var oc=document.getElementById("openChrono"); if(oc) oc.addEventListener("click", snapChrono);
 }
 /* renderDrill was the inline panel. The detail modal replaced it. */
 
@@ -3361,7 +4075,7 @@ function runScan(board, done){
   id("auditRow").classList.remove("on");
   id("summaryBand").classList.remove("on");
   id("boardBar").style.width="0%";
-  id("boardC").textContent="0 of "+TOTAL_SOURCES+" reached";
+  id("boardC").textContent="0 of "+(countApplicable(CURRENT)||TOTAL_SOURCES)+" reached";
 
   /* Only sweep the registers behind an armed category. The rest stay dark,
      which is the same state they carry for a source that was not reached. */
@@ -3376,7 +4090,12 @@ function runScan(board, done){
     });
   });
 
-  var step = reduce ? 8 : 46;
+  /* The sweep is an animation, and its job is to show the board coming alive,
+     not to take one step per register. With 104 registers a fixed 46ms step
+     ran for five seconds before a result could land, which reads as a hang.
+     Budget the whole sweep instead and divide. */
+  var SWEEP_MS = reduce ? 600 : 2200;
+  var step = Math.max(6, Math.floor(SWEEP_MS / Math.max(1, order.length)));
   order.forEach(function(n,i){
     timers.push(setTimeout(function(){
       var c=id("brows").querySelector('.src[data-n="'+slug(n)+'"]');
@@ -3911,9 +4630,71 @@ function buildAudit(d){
        }).join('')+'</div></div>';
   }
 
+  /* 7B. the operator graph. The console shows a summary; the whole thing
+     belongs here, because this is the document somebody forwards. */
+  if(d.graph && ((d.graph.nodes||[]).length || (d.graph.edges||[]).length)){
+    var gs=graphStrength(d.graph), gwd=STRENGTH_WORD[gs.word];
+    h+='<div class="arsec"><div class="lbl gold">Section 07B</div>'+
+       '<div class="arh">The operator graph: what this party shares with anybody else.</div>'+
+       '<div class="arp"><b>A shared identifier is a fact. A shared operator is a conclusion.</b> '+
+       'Everything below is the fact, with the record it was read from. Nothing below states that two '+
+       'operations are run by the same people, and nothing below should be read that way.</div>'+
+       '<div class="arp" style="margin-top:12px"><b>'+esc(gwd[0])+'.</b> '+esc(gwd[1])+' '+
+       gs.counted.length+' independent connection'+(gs.counted.length===1?'':'s')+' counted, '+
+       gs.high+' of them specific, '+gs.dropped.length+' found and not counted.</div>';
+
+    if((d.graph.priors||[]).length){
+      h+='<div class="arp" style="margin-top:16px;color:var(--bad)"><b>Seen before, on something a regulator warned about.</b></div>'+
+        '<div class="gaps" style="margin-top:10px">'+d.graph.priors.map(function(p2){
+          return '<div class="gap"><div class="s">'+esc(nodeWord(p2.kind))+' '+esc(p2.id)+'</div>'+
+            '<div class="r">Also on '+esc(p2.entity)+'. '+esc(p2.reg)+', '+esc(p2.date)+
+            (p2.url?'. '+esc(p2.url):'')+'</div></div>';
+        }).join('')+'</div>';
+    }
+    if(gs.counted.length){
+      h+='<table class="artbl" style="margin-top:16px"><tr><th>Identifier</th><th>Shared with</th>'+
+         '<th>How specific</th><th>Read from</th><th>Status</th></tr>'+
+         gs.counted.map(function(c2){
+           var b2=SPEC_BAND[c2.band]||["",""];
+           return '<tr><td>'+esc(c2.e.to)+'</td><td>'+esc(c2.e.other)+'</td>'+
+             '<td>'+esc(b2[0])+'</td><td>'+esc(c2.e.src||"")+'</td><td>'+esc(c2.e.status||"OBSERVED")+'</td></tr>';
+         }).join('')+'</table>';
+    }
+    if(gs.dropped.length){
+      h+='<div class="arp" style="margin-top:14px"><b>Found and not counted, published rather than hidden.</b> '+
+         gs.dropped.map(function(c3){ return esc(c3.e.to)+' ('+esc(c3.why)+')'; }).join('; ')+'.</div>';
+    }
+    h+='<div class="arp" style="margin-top:14px">A blockchain record proves what moved. It never proves who '+
+       'owns an address, and no wallet on this list is stated to belong to anybody.</div></div>';
+  }
+
+  /* 7C. the claim chronology. */
+  if(d.chrono && ((d.chrono.claims||[]).length || (d.chrono.records||[]).length)){
+    var cwd=CHRONO_WORD[d.chrono.verdict]||CHRONO_WORD.NOT_ENOUGH_RECORD;
+    h+='<div class="arsec"><div class="lbl gold">Section 07C</div>'+
+       '<div class="arh">What they say about their history, against what the records carry.</div>'+
+       '<div class="arp">The test is not whether a claim is older than the domain. A brand can legitimately be '+
+       'older than its website. The test is whether the claim is older than every independent record of this '+
+       'party existing. <b>'+esc(cwd[0])+'.</b> '+esc(cwd[2])+'</div>'+
+       (d.chrono.statement?'<div class="arp" style="margin-top:12px"><b>On this party.</b> '+esc(d.chrono.statement)+'</div>':'')+
+       '<table class="artbl" style="margin-top:16px"><tr><th>What</th><th>Date or year</th><th>Where it comes from</th></tr>'+
+       (d.chrono.claims||[]).map(function(x){
+         return '<tr><td>Claim: &ldquo;'+esc(x.q)+'&rdquo;</td><td>'+esc(x.year)+'</td><td>'+esc(x.where)+'</td></tr>';
+       }).join('')+
+       (d.chrono.records||[]).slice().sort(function(a,b){ return String(a.date).localeCompare(String(b.date)); })
+        .map(function(x){
+         return '<tr><td>Record: '+esc(x.what)+'</td><td>'+esc(x.date)+'</td><td>'+esc(x.src)+'</td></tr>';
+       }).join('')+'</table>'+
+       '<div class="arp" style="margin-top:14px">A gap between a claim and the record is a discrepancy that '+
+       'requires explanation. It is not, on its own, evidence of wrongdoing. An earlier company under another '+
+       'name, a domain bought later, or a business that simply did not publish are all ordinary explanations.</div></div>';
+  }
+
   /* 8. gaps */
   h+='<div class="arsec"><div class="lbl gold">Section 08</div><div class="arh">What we could not check, and why.</div>'+
-     '<div class="arp">A report showing only what it found lies by omission.</div>';
+     '<div class="arp">A report showing only what it found lies by omission. '+
+     'A source that could never have held a record for this party is listed separately below, because '+
+     'counting it as a gap would make the coverage figure meaningless in the other direction.</div>';
   h+= (d.gaps&&d.gaps.length)
     ? '<div class="gaps" style="margin-top:16px">'+d.gaps.map(function(g){
         return '<div class="gap"><div class="s">'+esc(g[0])+'</div><div class="r">'+esc(g[1])+'</div></div>';
