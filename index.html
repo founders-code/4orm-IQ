@@ -716,14 +716,17 @@ body[data-stage="landing"] .tlead{display:block}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
-.statq{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;
-  border-radius:50%;border:1px solid var(--blue-100);color:var(--blue-lt);background:var(--blue-50);
-  font-family:var(--mono);font-size:9px;font-weight:700;vertical-align:1px;margin-left:6px;
-  transition:all .22s var(--ease)}
-.scell:hover .statq,.bar.clik:hover .statq{border-color:var(--blue-lt);color:var(--bg);background:var(--blue-lt)}
-/* The same mark on every rail card, so it is obvious that all seven open. */
-.sbcard .statq{margin-left:6px;vertical-align:0}
-.sbcard:hover .statq{border-color:var(--blue-lt);color:var(--bg);background:var(--blue-lt)}
+/* A question mark asks a question. It does not say there is a page of working
+   behind this card, which is what a reader needs to know, so every card that
+   opens says so in words instead. */
+.statq{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--dk-tx3);
+  border-bottom:1px solid var(--dk-brs);padding-bottom:2px;
+  transition:color .22s var(--ease),border-color .22s var(--ease)}
+.sq{margin-top:auto;padding-top:12px}
+.scell:hover .statq,.bar.clik:hover .statq,.sbcard:hover .statq{
+  color:var(--dk-ok);border-bottom-color:var(--dk-ok)}
+.sbcard .sq,.bar .sq{margin-top:0;padding-top:9px}
 /* ---- three columns: the two numbers hard left, the answer, everything else ----
    The gauge column is deliberately slim and its border is a hairline, so the
    figures read as instruments sitting beside the answer rather than as a panel
@@ -1699,16 +1702,16 @@ body[data-stage="report"] .foot{display:none}
 /* The verdict is the one thing a frightened person has to read from across the
    room, so it is set to be seen before anything else on the page. The dot
    breathes, slowly, because a still red pill reads as decoration. */
-#rpt .rp-eyebrow{display:inline-flex;align-items:center;gap:16px;border-radius:999px;
-  padding:14px 30px 14px 22px;background:var(--bad-bg);border:2px solid var(--bad-br);
-  font-family:var(--rmono);font-size:clamp(17px,2.1vw,23px);font-weight:800;letter-spacing:.14em;
+#rpt .rp-eyebrow{display:inline-flex;align-items:center;gap:12px;border-radius:999px;
+  padding:10px 22px 10px 16px;background:var(--bad-bg);border:2px solid var(--bad-br);
+  font-family:var(--rmono);font-size:clamp(13px,1.5vw,16px);font-weight:800;letter-spacing:.15em;
   text-transform:uppercase;color:var(--bad);
   box-shadow:0 10px 30px rgba(214,51,78,.20)}
-#rpt .rp-eyebrow i{width:15px;height:15px;border-radius:50%;background:var(--bad);flex:none;
+#rpt .rp-eyebrow i{width:11px;height:11px;border-radius:50%;background:var(--bad);flex:none;
   box-shadow:0 0 0 0 rgba(214,51,78,.55);animation:rp-pulse 2.6s var(--ease) infinite}
 @keyframes rp-pulse{
   0%{box-shadow:0 0 0 0 rgba(214,51,78,.5)}
-  70%{box-shadow:0 0 0 13px rgba(214,51,78,0)}
+  70%{box-shadow:0 0 0 10px rgba(214,51,78,0)}
   100%{box-shadow:0 0 0 0 rgba(214,51,78,0)}}
 @media(prefers-reduced-motion:reduce){#rpt .rp-eyebrow i{animation:none}}
 /* Amber and green carry the same weight, in their own colour. */
@@ -1718,7 +1721,7 @@ body[data-stage="report"] .foot{display:none}
   animation-name:rp-pulse-warn}
 @keyframes rp-pulse-warn{
   0%{box-shadow:0 0 0 0 rgba(143,92,18,.45)}
-  70%{box-shadow:0 0 0 13px rgba(143,92,18,0)}
+  70%{box-shadow:0 0 0 10px rgba(143,92,18,0)}
   100%{box-shadow:0 0 0 0 rgba(143,92,18,0)}}
 #rpt .rp-eyebrow[data-v="GREEN"]{background:var(--ok-bg);border-color:var(--ok-br);
   color:var(--ok);box-shadow:0 10px 30px rgba(14,138,95,.18)}
@@ -1726,14 +1729,14 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-eyebrow[data-v="GREY"]{background:var(--surface-2);border-color:var(--border-strong);
   color:var(--tx-2);box-shadow:none}
 #rpt .rp-eyebrow[data-v="GREY"] i{background:var(--tx-3);animation:none}
-#rpt .rp-who{margin-top:24px;font-size:clamp(38px,6vw,68px);font-weight:800;letter-spacing:-.042em;
-  line-height:1.02;text-wrap:balance}
-#rpt .rp-dom{margin-top:12px;font-family:var(--rmono);font-size:13.5px;color:var(--tx-3);word-break:break-all}
-#rpt .rp-say{margin-top:26px;font-size:clamp(19px,2.4vw,26px);font-weight:500;line-height:1.4;
-  letter-spacing:-.022em;color:var(--tx);max-width:33ch;text-wrap:balance}
+#rpt .rp-who{margin-top:20px;font-size:clamp(31px,4vw,50px);font-weight:800;letter-spacing:-.038em;
+  line-height:1.06;text-wrap:balance}
+#rpt .rp-dom{margin-top:10px;font-family:var(--rmono);font-size:12.5px;color:var(--tx-3);word-break:break-all}
+#rpt .rp-say{margin-top:22px;font-size:clamp(16px,1.5vw,19.5px);font-weight:450;line-height:1.55;
+  letter-spacing:-.012em;color:var(--tx);max-width:52ch}
 /* the base rate. It is the line with the largest measured effect on how a
    warning is read, so it sits with the answer and not in a footnote. */
-#rpt .rp-rate{display:flex;gap:12px;margin-top:24px;padding:13px 16px;border-radius:var(--r-sm);
+#rpt .rp-rate{display:flex;gap:12px;margin-top:22px;padding:13px 16px;border-radius:var(--r-sm);
   background:var(--gold-50);border:1px solid var(--gold);max-width:46ch}
 #rpt .rp-rate i{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold-dp)}
 #rpt .rp-rate span{font-size:13.5px;line-height:1.55;color:#5C4A18}
@@ -1787,7 +1790,7 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-sec.rp-tight{padding-top:54px}
 #rpt .rp-kick{font-family:var(--rmono);font-size:10px;font-weight:800;letter-spacing:.2em;
   text-transform:uppercase;color:var(--gold-dp)}
-#rpt .rp-h2{margin-top:15px;font-size:clamp(26px,3.3vw,37px);font-weight:800;letter-spacing:-.034em;
+#rpt .rp-h2{margin-top:14px;font-size:clamp(22px,2.5vw,30px);font-weight:800;letter-spacing:-.03em;
   line-height:1.1;text-wrap:balance}
 #rpt .rp-sub{margin-top:13px;font-size:15px;line-height:1.6;color:var(--tx-2);max-width:62ch}
 #rpt .rp-para{font-size:15px;line-height:1.66;color:var(--tx-2);max-width:70ch}
@@ -1883,126 +1886,47 @@ body[data-stage="report"] .foot{display:none}
 /* One pack per recipient. The card carries the name, why you would open it, and what
    that body actually does with a report, because "records and refers" is the thing a
    person most needs to know before they spend an hour on a form. */
-#rpt .rp-pakgrid{margin-top:34px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-@media(max-width:1000px){#rpt .rp-pakgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:640px){#rpt .rp-pakgrid{grid-template-columns:1fr}}
-#rpt .rp-pak{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:start;gap:14px;
-  text-align:left;padding:20px 18px;background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);box-shadow:var(--sh-sm);width:100%;
+/* One column, top to bottom. Nine recipients read as a list a person works
+   down, not a grid they have to scan in two directions while frightened. Each
+   row carries the number, the name and why, what that body does, and the way in. */
+#rpt .rp-pakgrid{margin-top:34px;display:grid;grid-template-columns:1fr;gap:10px}
+#rpt .rp-pak{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;
+  align-items:center;gap:22px;text-align:left;padding:20px 22px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-sm);width:100%;
   transition:border-color .3s var(--ease),box-shadow .45s var(--ease),
     transform .5s var(--spring),background .3s var(--ease)}
 #rpt .rp-pak:hover{border-color:var(--blue-100);background:#fff;box-shadow:var(--sh);
-  transform:translateY(-3px)}
+  transform:translateX(3px)}
 #rpt .rp-pak:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
-#rpt .rp-pak .rp-pn{font-family:var(--rmono);font-size:10px;font-weight:800;letter-spacing:.1em;
-  color:var(--tx-3);padding-top:3px}
-#rpt .rp-pak .rp-pb{align-self:stretch;display:flex;flex-direction:column;min-width:0}
-#rpt .rp-pak .rp-pt{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.018em;color:var(--tx);
-  line-height:1.32}
-#rpt .rp-pak .rp-px{display:block;margin:7px 0 14px;font-size:12.9px;line-height:1.52;color:var(--tx-2)}
-#rpt .rp-pak .rp-pm{align-self:start;margin-top:auto;border-radius:999px;padding:4px 11px;
+#rpt .rp-pak .rp-pn{font-family:var(--rmono);font-size:11px;font-weight:800;letter-spacing:.1em;
+  color:var(--tx-3)}
+#rpt .rp-pak .rp-pb{display:block;min-width:0}
+#rpt .rp-pak .rp-pt{display:block;font-size:16.5px;font-weight:700;letter-spacing:-.018em;
+  color:var(--tx);line-height:1.3}
+#rpt .rp-pak .rp-px{display:block;margin-top:5px;font-size:13.2px;line-height:1.5;
+  color:var(--tx-2)}
+#rpt .rp-pak .rp-pm{justify-self:end;white-space:nowrap;border-radius:999px;padding:5px 12px;
   font-family:var(--rmono);font-size:9px;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase}
 #rpt .rp-pak .rp-pm.rp-act{background:var(--ok-bg);border:1px solid var(--ok-br);color:var(--ok)}
-#rpt .rp-pak .rp-pm.rp-intel{background:var(--surface-2);border:1px solid var(--border-strong);color:var(--tx-3)}
-#rpt .rp-pak .rp-pg{display:flex;align-items:center;justify-content:center;width:32px;height:32px;
+#rpt .rp-pak .rp-pm.rp-intel{background:var(--surface-2);border:1px solid var(--border-strong);
+  color:var(--tx-3)}
+#rpt .rp-pak .rp-pg{display:flex;align-items:center;justify-content:center;width:34px;height:34px;
   border-radius:50%;background:var(--blue-50);color:var(--blue-dp);flex:none;
   transition:background .3s var(--ease),color .3s var(--ease),transform .5s var(--spring)}
 #rpt .rp-pak .rp-pg svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.9;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
-#rpt .rp-pak:hover .rp-pg{background:var(--blue);color:#fff;transform:translateY(2px)}
+#rpt .rp-pak:hover .rp-pg{background:var(--blue);color:#fff;transform:translateX(2px)}
 #rpt .rp-pak.rp-got .rp-pg{background:var(--ok);color:#fff;transform:none}
-/* The preview. A person about to file a fraud report should not have to download a
-   file to find out what is in it, so the card opens the document and the download
-   sits at the bottom of it. */
-#rpt .rp-pv{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
-  padding:28px;background:rgba(11,16,26,.44);backdrop-filter:blur(9px);
-  -webkit-backdrop-filter:blur(9px);opacity:0;transition:opacity .34s var(--ease)}
-#rpt .rp-pv[hidden]{display:none}
-#rpt .rp-pv.rp-on{opacity:1}
-@media(max-width:720px){#rpt .rp-pv{padding:0;align-items:flex-end}}
-#rpt .rp-pvsheet{display:flex;flex-direction:column;width:100%;max-width:760px;max-height:100%;
-  background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);
-  box-shadow:var(--sh-lg);overflow:hidden;
-  transform:translateY(18px) scale(.985);transition:transform .5s var(--spring)}
-#rpt .rp-pv.rp-on .rp-pvsheet{transform:none}
-@media(max-width:720px){#rpt .rp-pvsheet{max-height:94vh;border-radius:var(--r-lg) var(--r-lg) 0 0}}
-
-#rpt .rp-pvhd{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex:none;
-  padding:26px 28px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
-#rpt .rp-pvhl{min-width:0}
-#rpt .rp-pveb{display:block;font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.17em;
-  text-transform:uppercase;color:var(--tx-3)}
-#rpt .rp-pvname{margin-top:9px;font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-.03em;
-  line-height:1.16;color:var(--tx)}
-#rpt .rp-pvhl .rp-pm{display:inline-block;margin-top:11px;border-radius:999px;padding:4px 11px;
-  font-family:var(--rmono);font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-#rpt .rp-pvhl .rp-pm.rp-act{background:var(--ok-bg);border:1px solid var(--ok-br);color:var(--ok)}
-#rpt .rp-pvhl .rp-pm.rp-intel{background:var(--surface-2);border:1px solid var(--border-strong);color:var(--tx-3)}
-#rpt .rp-pvx{display:flex;align-items:center;justify-content:center;width:36px;height:36px;flex:none;
-  border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--tx-2);
-  transition:background .3s var(--ease),color .3s var(--ease)}
-#rpt .rp-pvx:hover{background:var(--tx);color:#fff;border-color:var(--tx)}
-#rpt .rp-pvx svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
-
-#rpt .rp-pvbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:26px 28px 30px;
-  overscroll-behavior:contain}
-#rpt .rp-pvlead{font-size:14px;line-height:1.62;color:var(--tx-2)}
-#rpt .rp-pvsec{margin-top:26px;padding-top:22px;border-top:1px solid var(--border)}
-#rpt .rp-pvk{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.17em;
-  text-transform:uppercase;color:var(--blue-dp)}
-#rpt .rp-pvp{margin-top:11px;font-size:14.2px;line-height:1.66;color:var(--tx)}
-#rpt .rp-pvsm{margin-top:10px;font-size:12.8px;line-height:1.6;color:var(--tx-3)}
-#rpt .rp-pvr{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:9px 0;
-  border-bottom:1px solid var(--border);font-size:13.4px;line-height:1.5}
-#rpt .rp-pvr:first-of-type{margin-top:12px;border-top:1px solid var(--border)}
-#rpt .rp-pvr .rp-k{font-family:var(--rmono);font-size:9.5px;font-weight:700;letter-spacing:.11em;
-  text-transform:uppercase;color:var(--tx-3);padding-top:3px}
-#rpt .rp-pvr .rp-v{color:var(--tx);font-weight:600;word-break:break-word}
-@media(max-width:560px){#rpt .rp-pvr{grid-template-columns:1fr;gap:3px}#rpt .rp-pvr .rp-k{padding-top:0}}
-#rpt .rp-pvclock{margin-top:26px;border-left:3px solid var(--gold-dp);background:var(--gold-50);
-  border-radius:0 var(--r-sm) var(--r-sm) 0;padding:15px 18px}
-#rpt .rp-pvclock .rp-k{color:#7A5A0F}
-#rpt .rp-pvclock p{margin-top:8px;font-size:13.6px;line-height:1.62;color:#5B440C}
-#rpt .rp-pvh{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;padding:8px 0;
-  border-bottom:1px solid var(--border);font-size:13.2px;line-height:1.5}
-#rpt .rp-pvh:first-of-type{margin-top:13px;border-top:1px solid var(--border)}
-#rpt .rp-pvh .rp-k{font-family:var(--rmono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--tx-3);padding-top:2px}
-#rpt .rp-pvh .rp-v{color:var(--tx);font-weight:600;word-break:break-word}
-@media(max-width:560px){#rpt .rp-pvh{grid-template-columns:1fr;gap:3px}#rpt .rp-pvh .rp-k{padding-top:0}}
-#rpt .rp-pva{margin-top:15px}
-#rpt .rp-pva .rp-q{display:block;font-size:13.6px;line-height:1.5;color:var(--tx);font-weight:500}
-#rpt .rp-pva .rp-ln{display:block;margin-top:7px;height:1px;background:repeating-linear-gradient(
-  to right,var(--border-strong) 0 6px,transparent 6px 11px)}
-#rpt .rp-pvt{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;align-items:start;
-  margin-top:12px}
-#rpt .rp-pvt .rp-i{display:flex;align-items:center;justify-content:center;width:22px;height:22px;
-  border-radius:50%;background:var(--blue-50);color:var(--blue-dp);font-family:var(--rmono);
-  font-size:9.5px;font-weight:800}
-#rpt .rp-pvt .rp-q{font-size:13.6px;line-height:1.52;color:var(--tx);padding-top:2px}
-#rpt .rp-pvn{margin-top:13px;font-size:13.6px;line-height:1.64;color:var(--tx-2)}
-#rpt .rp-pvfoot{margin-top:26px;padding-top:20px;border-top:1px solid var(--border);
-  font-size:12.4px;line-height:1.62;color:var(--tx-3)}
-
-#rpt .rp-pvft{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:none;
-  flex-wrap:wrap;padding:17px 28px;border-top:1px solid var(--border);background:var(--surface-2)}
-#rpt .rp-pvfn{font-family:var(--rmono);font-size:10px;font-weight:700;letter-spacing:.08em;
-  color:var(--tx-3);word-break:break-all}
-#rpt .rp-pvb{display:inline-flex;align-items:center;gap:10px;flex:none}
-#rpt .rp-pvsec2{border-radius:999px;padding:11px 18px;border:1px solid var(--border-strong);
-  font-size:12.6px;font-weight:600;color:var(--tx-2);background:var(--bg);
-  transition:border-color .3s var(--ease),color .3s var(--ease)}
-#rpt .rp-pvsec2:hover{border-color:var(--tx-3);color:var(--tx)}
-#rpt .rp-pvdl{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:11px 20px;
-  background:var(--blue);color:#fff;font-size:12.8px;font-weight:700;letter-spacing:-.005em;
-  box-shadow:0 6px 18px rgba(46,107,242,.3);
-  transition:background .3s var(--ease),transform .45s var(--spring)}
-#rpt .rp-pvdl:hover{background:var(--blue-dp);transform:translateY(-1px)}
-#rpt .rp-pvdl.rp-got{background:var(--ok);box-shadow:0 6px 18px rgba(14,138,95,.3)}
-#rpt .rp-pvdl svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
-@media(max-width:560px){#rpt .rp-pvft{justify-content:stretch}#rpt .rp-pvfn{display:none}
-  #rpt .rp-pvb{width:100%}#rpt .rp-pvdl{flex:1;justify-content:center}}
+/* Narrow, the badge drops under the text rather than squeezing the name. */
+@media(max-width:820px){
+  #rpt .rp-pak{grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:start;
+    padding:18px}
+  #rpt .rp-pak .rp-pn{padding-top:3px}
+  #rpt .rp-pak .rp-pm{grid-column:2;justify-self:start;margin-top:12px}
+  #rpt .rp-pak .rp-pg{grid-row:1;grid-column:3}}
+@media(max-width:420px){#rpt .rp-pak{gap:12px;padding:16px 14px}
+  #rpt .rp-pak .rp-pt{font-size:15px}}
 
 #rpt .rp-pakfoot{margin-top:22px;border-left:3px solid var(--ok);background:var(--ok-bg);
   border-radius:0 var(--r-sm) var(--r-sm) 0;padding:15px 18px;font-size:13.6px;line-height:1.62;
@@ -4334,9 +4258,10 @@ function setStats(list){
     var has=!!STAT_BRIEF[String(st[2]||"").toLowerCase().trim()];
     if(has){ c.setAttribute("role","button"); c.setAttribute("tabindex","0"); }
     c.innerHTML='<div class="sv tnum">'+esc(st[0])+(st[1]?'<small>'+esc(st[1])+'</small>':'')+'</div>'+
-      '<div class="sl">'+esc(st[2])+(has?' <span class="statq" aria-hidden="true">?</span>':'')+'</div>'+
+      '<div class="sl">'+esc(st[2])+'</div>'+
       '<div class="sp"><i data-c="'+esc(st[4])+'"></i></div>'+
-      '<div class="sc">'+esc(st[5])+'</div>';
+      '<div class="sc">'+esc(st[5])+'</div>'+
+      (has?'<div class="sq"><span class="statq">Read more</span></div>':'');
     w.appendChild(c);
     if(has){
       c.addEventListener("click",function(){ statBrief(st[2]); });
@@ -4487,8 +4412,9 @@ function setBars(list,foot){
     var has=!!BAR_BRIEF[String(b[0]||"").toLowerCase().trim()];
     var r=el("div","bar");
     if(has){ r.setAttribute("role","button"); r.setAttribute("tabindex","0"); r.classList.add("clik"); }
-    r.innerHTML='<div class="bt"><span class="bn">'+esc(b[0])+(has?' <span class="statq" aria-hidden="true">?</span>':'')+'</span><span class="bv">'+esc(b[1])+'</span></div>'+
-                '<div class="bg"><i data-c="'+esc(b[2])+'"></i></div>';
+    r.innerHTML='<div class="bt"><span class="bn">'+esc(b[0])+'</span><span class="bv">'+esc(b[1])+'</span></div>'+
+                '<div class="bg"><i data-c="'+esc(b[2])+'"></i></div>'+
+                (has?'<div class="sq"><span class="statq">Read more</span></div>':'');
     w.appendChild(r);
     if(has){
       r.addEventListener("click",function(){ barBrief(b[0]); });
@@ -5079,8 +5005,9 @@ function renderSummaryRail(d){
   cards.forEach(function(c){
     var btn=el("button","sbcard"); btn.type="button"; btn.setAttribute("data-t",c[2]);
     btn.innerHTML='<span class="sbtop"><span class="n">'+esc(c[0])+
-                  '<span class="statq" aria-hidden="true">?</span></span><span class="v">'+esc(c[1])+'</span></span>'+
-                  c[3]+'<div class="sbx">'+esc(c[4])+'</div>';
+                  '</span><span class="v">'+esc(c[1])+'</span></span>'+
+                  c[3]+'<div class="sbx">'+esc(c[4])+'</div>'+
+                  '<div class="sq"><span class="statq">Read more</span></div>';
     btn.addEventListener("click",c[5]);
     w.appendChild(btn);
   });
@@ -7706,8 +7633,8 @@ function rpPaks(){
     out+='<button class="rp-pak" type="button" data-pak="'+rpEsc(p.id)+'" aria-haspopup="dialog">'
       +'<span class="rp-pn">'+(p.n<10?"0":"")+p.n+'</span>'
       +'<span class="rp-pb"><span class="rp-pt">'+rpEsc(p.name)+'</span>'
-      +'<span class="rp-px">'+rpEsc(p.sub)+'</span>'
-      +'<span class="rp-pm rp-'+p.tone+'">'+rpEsc(p.act)+'</span></span>'
+      +'<span class="rp-px">'+rpEsc(p.sub)+'</span></span>'
+      +'<span class="rp-pm rp-'+p.tone+'">'+rpEsc(p.act)+'</span>'
       +'<span class="rp-pg" aria-hidden="true"><svg viewBox="0 0 24 24">'
       +'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/>'
       +'<circle cx="12" cy="12" r="3"/></svg></span></button>';

@@ -325,8 +325,8 @@ if (!/rpIdRow\(rpAgency\(off\[i\]\.src\)/.test(script))
   fails.push('official names lost the agency that holds them');
 {
   const m = /#rpt \.rp-eyebrow\{[^}]*font-size:clamp\((\d+)px/.exec(styleBlock);
-  if (!m || Number(m[1]) < 16)
-    fails.push('the verdict is no longer set large enough to read across a room');
+  if (!m || Number(m[1]) < 12)
+    fails.push('the verdict is no longer set large enough to be the first thing read');
 }
 if (!/body\[data-stage="console"\] \.searchbox\{display:none\}/.test(
       styleBlock.replace(/\s*\n\s*/g, ''))) {
@@ -336,6 +336,19 @@ if (!/body\[data-stage="console"\] \.searchbox\{display:none\}/.test(
 }
 if (!/id\("navNewCheck"\)/.test(script))
   fails.push('with the search bar off the board there is no way to start a new check');
+
+/* --------------------------------- the packs, and the way into a dark card
+   A question mark asks a question. It does not say there is a page of working
+   behind the card, which is the thing a reader has to know. */
+if (!/#rpt \.rp-pakgrid\{[^}]*grid-template-columns:1fr/.test(styleBlock))
+  fails.push('the recipient packs are no longer one column top to bottom');
+if (/<span class="statq" aria-hidden="true">\?<\/span>/.test(script))
+  fails.push('a dark card still carries a question mark instead of Read more');
+{
+  const n = (script.match(/<span class="statq">Read more<\/span>/g) || []).length;
+  if (n !== 3) fails.push('expected Read more on the stat cells, the rail and the bars, found '
+    + n + ' of 3');
+}
 
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];

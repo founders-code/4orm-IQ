@@ -49,11 +49,25 @@ officer, principal, promoter, named as. Without that cue a capitalised pair of
 words is as likely to be a company, and a company printed as a director on a
 page somebody hands to their bank is worse than printing nothing.
 
+## Reading the packs
+
+The nine recipients are one column, top to bottom. A frightened person works
+down a list; they do not scan a grid in two directions. Each row carries the
+number, the name, why you would open it, and what that body actually does with a
+report, because "records and refers" is the thing most worth knowing before
+spending an hour on a form.
+
 ## The board, once a result exists
 
 The board is the working behind an answer the reader has already been given, so
 the landing pitch, the type pills and the search bar come off it and everything
 moves up. A new check starts from the control in the nav.
+
+Every card on the board that opens something says **Read more**, underlined, in
+the space at its foot. It replaced a question mark, which asked a question
+rather than saying there was a page of working behind the card. Eighteen cards
+carry it: the five figures across the top, the seven rail cards, and the six
+composition bars.
 
 ## Deploying
 
