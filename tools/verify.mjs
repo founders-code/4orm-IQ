@@ -345,10 +345,88 @@ if (!/#rpt \.rp-pakgrid\{[^}]*grid-template-columns:1fr/.test(styleBlock))
 if (/<span class="statq" aria-hidden="true">\?<\/span>/.test(script))
   fails.push('a dark card still carries a question mark instead of Read more');
 {
+  /* The stat cells, the rail, the bars, and the rail again when a run settled
+     nothing and every card renders empty. */
   const n = (script.match(/<span class="statq">Read more<\/span>/g) || []).length;
-  if (n !== 3) fails.push('expected Read more on the stat cells, the rail and the bars, found '
-    + n + ' of 3');
+  if (n < 3) fails.push('a dark card lost its way in: Read more appears '
+    + n + ' times, and it belongs on the stat cells, the rail and the bars');
 }
+
+/* --------------------------------------- the results page, in plain words
+   The page is read by a frightened person on a phone. Every one of these was
+   a real misreading found in review, not a style preference. */
+{
+  const n = (script.match(/Do not send anything tonight\./g) || []).length;
+  if (n < 2) fails.push('the one line the page exists to deliver is gone from '
+    + (2 - n) + ' of the 2 places it belongs');
+}
+if (!/id\("rpAlreadyBtn"\)/.test(script))
+  fails.push('the reader who has already paid has no route again');
+if (!/function rpRegistered/.test(script))
+  fails.push('a registration no longer outranks a complaint');
+if (!/function rpGoods/.test(script))
+  fails.push('the page can only say what is wrong again');
+{
+  /* A registered firm with nothing official against it must not be written the
+     same way as an unregistered one. */
+  if (!/rpRegistered\(d\) && !rpHasOfficial\(d\)/.test(script))
+    fails.push('the verdict stopped checking whether the firm is registered');
+}
+{
+  const banned = [
+    ['Not reached', 'read as "we did not get round to it"'],
+    ['Nothing on file', 'read as good news'],
+    ['Public concern identified', 'passive, and nobody is doing anything in it'],
+    ['Official warning located', '"located" is what you do with lost keys'],
+    ['Nothing adverse found', '"adverse" is a lawyer word and it reads as "you are fine"'],
+    ['Take care', 'in British English that is how you end a phone call'],
+    ['>Before you send<', 'a heading that presumes the reader is going to send'],
+    ['Shares an identifier with', '"identifier" is not a word people use'],
+    ['First trace anywhere', 'detective fiction'],
+    ['Retrieval decides what was reached', 'an internal design principle on a consumer page'],
+  ];
+  /* Comments explain why a phrase was removed, so they are stripped before the
+     check reads the script, or the explanation trips its own guard. */
+  const prose = script.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  for (const [phrase, why] of banned) {
+    if (prose.includes('"' + phrase) || prose.includes(">" + phrase))
+      fails.push('the results page says "' + phrase + '" again: ' + why);
+  }
+}
+
+/* A run that settles nothing still fills the rail. An empty column beside the
+   answer reads as a page that failed to load, not as an honest gap. */
+if (!/if\(!d\.cats\)\{/.test(script))
+  fails.push('a run with no checks renders an empty rail again');
+{
+  /* The empty rail must carry the same seven headings a full one does, so the
+     layout does not change shape when a run settles nothing. */
+  const m = /if\(!d\.cats\)\{[\s\S]*?var empty=\[([\s\S]*?)\n    \];/.exec(script);
+  const body = m ? m[1] : '';
+  const want = ['The ten checks','Reviews, what other people are saying','Source board',
+                'Cross-examination','Material issues','Operator graph','Gaps'];
+  const missing = want.filter(t => !body.includes('["' + t + '"') && !body.includes('["' + t + '",'));
+  if (!m) fails.push('the empty rail cards are gone');
+  else if (missing.length)
+    fails.push('the empty rail is missing cards a full one has: ' + missing.join(', '));
+}
+
+/* --------------------------------- a check, opened, has to explain itself
+   The rules told a reader what the rules are and never which one fired, and the
+   register table carried our plumbing instead of what each register said. */
+if (!/This is what happened here/.test(script))
+  fails.push('the rules no longer mark the one that applied to this party');
+if (!/var RULE_WORD/.test(script))
+  fails.push('the rule badges print a colour again instead of an outcome');
+if (!/var SRC_SAID/.test(script))
+  fails.push('the register table stopped saying what each register returned');
+if (/<th>Access<\/th>|<th>Terms<\/th>/.test(script))
+  fails.push('the register table shows our plumbing again: Access and Terms mean nothing to a reader');
+if (!/What it said about this party/.test(script))
+  fails.push('the register table lost the column a reader opened it for');
+/* A dot sized on an inline element never draws. That has shipped broken twice,
+   but whether it draws depends on the parent being a flex container, which the
+   stylesheet text cannot answer. It is measured in smoke18 instead. */
 
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];

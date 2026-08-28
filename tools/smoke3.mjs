@@ -13,9 +13,14 @@ window.Element.prototype.scrollTo = function(){};
 await new Promise(r=>setTimeout(r,800));
 
 // nav
-const pill=doc.querySelector('.navpill'), help=doc.querySelector('.navhelp');
+const pill=doc.querySelector('.navpill'), help=doc.querySelector('[data-dir="open"]');
 console.log('nav pill children:', pill.children.length, '| links gone:', !doc.querySelector('.navlinks'), '| run-a-check gone:', !doc.querySelector('.navcta'));
-console.log('find support is a direct child of nav:', help.parentElement.classList.contains('nav'));
+if(!help) throw new Error('find support is gone from the nav');
+/* Targeted by what it does, not what it is called, so a restyle of the nav
+   cannot break a test whose subject is still there and still working. */
+console.log('find support sits in the nav:', !!help.closest('.nav'));
+console.log('the nav is one set:', new Set([...doc.querySelectorAll('.nav button')]
+  .map(b=>b.className.replace(/\s*gold\s*/,'').trim())).size === 1);
 console.log('scoring section gone:', !doc.getElementById('scoring'), '| trust score copy gone:', !html.includes('There is no trust score'));
 
 // directory

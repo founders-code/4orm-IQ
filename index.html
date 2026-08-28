@@ -1732,8 +1732,10 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-who{margin-top:20px;font-size:clamp(31px,4vw,50px);font-weight:800;letter-spacing:-.038em;
   line-height:1.06;text-wrap:balance}
 #rpt .rp-dom{margin-top:10px;font-family:var(--rmono);font-size:12.5px;color:var(--tx-3);word-break:break-all}
-#rpt .rp-say{margin-top:22px;font-size:clamp(16px,1.5vw,19.5px);font-weight:450;line-height:1.55;
-  letter-spacing:-.012em;color:var(--tx);max-width:52ch}
+#rpt .rp-say{margin-top:24px;font-size:15px;font-weight:400;line-height:1.62;
+  color:var(--tx-2);max-width:56ch}
+#rpt .rp-saylab{margin-top:26px;font-family:var(--rmono);font-size:9.5px;font-weight:800;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--tx-3)}
 /* the base rate. It is the line with the largest measured effect on how a
    warning is read, so it sits with the answer and not in a footnote. */
 #rpt .rp-rate{display:flex;gap:12px;margin-top:22px;padding:13px 16px;border-radius:var(--r-sm);
@@ -2044,6 +2046,138 @@ body[data-stage="console"] .statstrip{margin-top:22px}
   letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
 body[data-stage="console"] .navnew{display:inline-flex}
 .navnew:hover{border-color:rgba(255,255,255,.42)}
+
+/* ---------------------------------------------------- the nav, as one set
+   Four controls that were four different pills: a green one, two plain ones
+   and a gold one, at three different weights. They are one component now.
+   Green and red are status on this product, never decoration, so the only
+   coloured control left is the gold one, and gold is the human route. */
+.navbtn{pointer-events:auto;display:inline-flex;align-items:center;gap:9px;
+  padding:12px 20px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.045);
+  color:var(--dk-tx2);
+  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;white-space:nowrap;
+  backdrop-filter:blur(20px) saturate(150%);
+  transition:background .28s var(--ease),border-color .28s var(--ease),
+    color .28s var(--ease),transform .34s var(--spring)}
+.navbtn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.34);
+  color:var(--dk-tx);transform:translateY(-1px)}
+.navbtn .hi{font-size:12px;line-height:1;opacity:.75}
+.navbtn.gold{border-color:rgba(231,199,108,.5);background:rgba(231,199,108,.09);
+  color:var(--gold)}
+.navbtn.gold:hover{border-color:var(--gold);background:rgba(231,199,108,.16);
+  color:#F2DFA6}
+.navleft{display:flex;align-items:center;gap:16px;pointer-events:auto;min-width:0}
+.navbtn[data-when]{display:none}
+body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
+@media(max-width:820px){.navbtn{padding:10px 14px;font-size:9.5px;gap:7px;letter-spacing:.1em}}
+@media(max-width:620px){.nav{padding:0 18px;gap:10px}.navactions{gap:7px}.navleft{gap:10px}}
+
+/* ------------------------------------------------- what the reader came for
+   The verdict is an instruction. Under it, why we say it. Under that, the one
+   line the whole product exists to deliver. */
+#rpt .rp-vwhy{margin-top:16px;font-size:clamp(15.5px,1.45vw,18.5px);line-height:1.5;
+  color:var(--tx);max-width:48ch;font-weight:600;letter-spacing:-.016em}
+#rpt .rp-tonight{margin-top:22px;padding:18px 20px;border-radius:var(--r);
+  background:var(--tx);color:#fff;max-width:47ch}
+#rpt .rp-tonight .rp-t{font-size:clamp(17px,1.7vw,21px);font-weight:800;
+  letter-spacing:-.026em;line-height:1.2}
+#rpt .rp-tonight .rp-x{margin-top:9px;font-size:14.5px;line-height:1.55;color:#B9C6D8}
+
+/* The reader who has already paid. Closed by default, because a reader who has
+   not paid does not need it, and one who has needs nothing else first. */
+#rpt .rp-already{position:relative;z-index:2;margin-top:56px}
+#rpt .rp-alreadybtn{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;
+  align-items:center;width:100%;text-align:left;padding:22px 26px;border-radius:var(--r-lg);
+  background:var(--bad-bg);border:1px solid var(--bad-br);
+  transition:border-color .3s var(--ease),box-shadow .45s var(--ease),
+    transform .5s var(--spring)}
+#rpt .rp-alreadybtn:hover{border-color:var(--bad);box-shadow:0 12px 34px rgba(214,51,78,.16);
+  transform:translateY(-2px)}
+#rpt .rp-alreadybtn:focus-visible{outline:2px solid var(--bad);outline-offset:3px}
+#rpt .rp-alreadybtn .rp-t{display:block;font-size:clamp(17px,1.8vw,21px);font-weight:800;
+  letter-spacing:-.026em;color:#8A1F31;line-height:1.24}
+#rpt .rp-alreadybtn .rp-x{display:block;margin-top:7px;font-size:14.5px;line-height:1.5;
+  color:#A33A4C}
+#rpt .rp-alreadybtn .rp-go{display:flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;background:var(--bad);color:#fff;flex:none;
+  transition:transform .45s var(--spring)}
+#rpt .rp-alreadybtn .rp-go svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;
+  fill:none}
+#rpt .rp-already.rp-open .rp-alreadybtn .rp-go{transform:rotate(180deg)}
+#rpt .rp-already.rp-open .rp-alreadybtn{border-radius:var(--r-lg) var(--r-lg) 0 0}
+#rpt .rp-clock[hidden]{display:none}
+#rpt .rp-shame{margin-top:20px;padding:15px 18px;border-radius:var(--r-sm);
+  background:var(--surface-2);border:1px solid var(--border);font-size:14.5px;
+  line-height:1.6;color:var(--tx-2);max-width:68ch}
+
+/* Where a finding came from, said on the finding. Green when the source is
+   strong enough on its own, amber when it never is. */
+#rpt .rp-from{display:flex;align-items:flex-start;gap:11px;margin-top:13px;padding-top:12px;
+  border-top:1px solid var(--border)}
+#rpt .rp-from i{display:block;width:8px;height:8px;border-radius:50%;flex:none;margin-top:4px}
+#rpt .rp-fb{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;min-width:0}
+#rpt .rp-from .c{margin-top:0}
+@media(max-width:700px){#rpt .rp-fb{flex-direction:column;gap:5px}}
+#rpt .rp-fb{min-width:0}
+#rpt .rp-from .w{display:block;font-family:var(--rmono);font-size:9px;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;line-height:1.4}
+#rpt .rp-from .c{display:block;margin-top:5px;font-size:13px;line-height:1.5;color:var(--tx-2)}
+#rpt .rp-from.rp-str i{background:var(--ok)}
+#rpt .rp-from.rp-str .w{color:var(--ok)}
+#rpt .rp-from.rp-soft i{background:var(--warn)}
+#rpt .rp-from.rp-soft .w{color:var(--warn)}
+
+/* What holds up, said as plainly as what does not. */
+#rpt .rp-goods{margin-top:30px;display:grid;gap:10px}
+#rpt .rp-good{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;
+  padding:20px 22px;background:var(--surface);border:1px solid var(--ok-br);
+  border-radius:var(--r);box-shadow:var(--sh-sm)}
+#rpt .rp-good>i{display:flex;align-items:center;justify-content:center;width:28px;height:28px;
+  border-radius:50%;background:var(--ok-bg);color:var(--ok);flex:none}
+#rpt .rp-good>i svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.4;fill:none}
+#rpt .rp-gb{display:block;min-width:0}
+#rpt .rp-good .rp-t{display:block;font-size:15.5px;font-weight:650;letter-spacing:-.016em;
+  color:var(--tx);line-height:1.45}
+#rpt .rp-good .rp-x{display:block;margin-top:6px;font-size:13px;line-height:1.5;color:var(--tx-3)}
+#rpt .rp-good .rp-lk{display:block;margin-top:12px}
+
+#rpt .rp-tonight[data-c="calm"]{background:var(--ok-bg);border:1px solid var(--ok-br)}
+#rpt .rp-tonight[data-c="calm"] .rp-t{color:#0B5C40}
+#rpt .rp-tonight[data-c="calm"] .rp-x{color:#146B4E}
+
+/* The rule that fired, and the ones that did not. Everything except the one
+   that applied is dimmed, so the reader's eye lands on the answer rather than
+   on five equally loud badges. */
+.rulerow .rk{width:auto;min-width:132px;padding:4px 10px;white-space:nowrap}
+.rulelist .rulerow{opacity:.42;transition:opacity .3s var(--ease)}
+.rulelist .rulerow.on{opacity:1}
+.rulerow.on{box-shadow:inset 3px 0 0 var(--blue)}
+.rulerow .rhit{margin-left:auto;flex:none;font-family:var(--mono);font-size:8px;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--blue-lt);white-space:nowrap;
+  padding-left:12px}
+@media(max-width:640px){.rulerow{flex-wrap:wrap}
+  .rulerow .rhit{margin-left:0;padding-left:0;width:100%;padding-top:6px}}
+
+/* What a register said about this party, in the board's own colours, so the
+   dot on the board and the words in the table are the same fact. */
+.said{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-size:12.5px;
+  color:var(--tx-2)}
+.said i{display:block;width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--dk-nul);opacity:.8}
+.said[data-s="clear"] i{background:var(--dk-ok);box-shadow:0 0 7px var(--dk-ok);opacity:1}
+.said[data-s="clear"]{color:var(--dk-ok)}
+.said[data-s="caution"] i{background:var(--dk-warn);box-shadow:0 0 7px var(--dk-warn);opacity:1}
+.said[data-s="caution"]{color:var(--dk-warn)}
+.said[data-s="adverse"] i{background:var(--dk-bad);box-shadow:0 0 7px var(--dk-bad);opacity:1}
+.said[data-s="adverse"]{color:var(--dk-bad)}
+.said[data-s="searched"] i{background:transparent;border:1px solid var(--dk-warn);opacity:1}
+.said[data-s="unreached"] i{background:var(--dk-nul);opacity:.5}
+.said[data-s="na"] i{background:transparent;border:1px dashed var(--dk-tx4);opacity:1}
+.said[data-s="na"]{color:var(--tx-4)}
+.said[data-s="none"]{color:var(--tx-4)}
+.srctbl{min-width:660px}
 </style>
 </head>
 <body>
@@ -2051,14 +2185,20 @@ body[data-stage="console"] .navnew{display:inline-flex}
 <div class="topbar" id="topBar" role="progressbar" aria-label="Check progress"><i></i></div>
 
 <nav class="nav">
+  <div class="navleft">
   <div class="navpill">
     <span class="navbrand"><img src="data:image/png;base64,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" alt="4orm Finance"></span>
   </div>
+    <button class="navbtn" type="button" id="navNewCheck" data-when="console">
+      <span class="hi">&#43;</span> New check</button>
+  </div>
   <div class="navactions">
-    <button class="navreport" type="button" id="navReport"><span class="hi">&#9635;</span> One page summary</button>
-    <button class="navnew" type="button" id="navNewCheck"><span class="hi">&#43;</span> New check</button>
-    <button class="navback" type="button" id="navBackReport"><span class="hi">&#8592;</span> Back to the report</button>
-    <button class="navhelp" type="button" data-dir="open"><span class="hi">&#9873;</span> Find support</button>
+    <button class="navbtn" type="button" id="navBackReport" data-when="console">
+      <span class="hi">&#8592;</span> Back to the report</button>
+    <button class="navbtn" type="button" id="navReport" data-when="console">
+      <span class="hi">&#9635;</span> One page summary</button>
+    <button class="navbtn gold" type="button" data-dir="open">
+      <span class="hi">&#9873;</span> Find support</button>
   </div>
 </nav>
 
@@ -2305,7 +2445,7 @@ body[data-stage="console"] .navnew{display:inline-flex}
         <span class="rp-navsep" aria-hidden="true"></span>
         <button class="rp-navb" type="button" id="rpToConsole">
           <svg viewBox="0 0 24 24"><path d="M3 12h4l3 7 4-14 3 7h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          What is behind this report
+          Where we looked, and how
         </button>
       </nav>
       <div class="rp-stamp" id="rpStamp"></div>
@@ -2317,6 +2457,17 @@ body[data-stage="console"] .navnew{display:inline-flex}
           <span class="rp-eyebrow" id="rpEyebrow"><i></i><span id="rpEyebrowT"></span></span>
           <h1 class="rp-who" id="rpWho"></h1>
           <div class="rp-dom" id="rpDom"></div>
+          <p class="rp-vwhy" id="rpWhy"></p>
+
+          <!-- The one line on the page that has to survive being read badly, on a
+               small screen, by somebody frightened, at eleven at night. It shows on
+               every result, the clean one included. -->
+          <div class="rp-tonight" id="rpTonight">
+            <div class="rp-t" id="rpTonightT"></div>
+            <div class="rp-x" id="rpTonightX"></div>
+          </div>
+
+          <div class="rp-saylab">In our own words</div>
           <p class="rp-say" id="rpSay"></p>
           <div class="rp-rate"><i></i><span>Of the people who reported an investment or crypto
             approach to BBB Scam Tracker in 2025, <b>more than 77% said they lost money.</b> Almost
@@ -2330,68 +2481,104 @@ body[data-stage="console"] .navnew{display:inline-flex}
       <div class="rp-figs" id="rpFigs"></div>
     </div>
 
-    <div class="rp-clock" id="rpClock">
+    <!-- The most frightened reader on this page is the one who has already paid,
+         and until now the page had nothing for them. -->
+    <div class="rp-already" id="rpAlready">
+      <button class="rp-alreadybtn" type="button" id="rpAlreadyBtn" aria-expanded="false"
+        aria-controls="rpClock">
+        <span class="rp-b">
+          <span class="rp-t">If you have already sent money, start here</span>
+          <span class="rp-x">Some of it may still be recoverable. That depends on hours,
+            not days.</span>
+        </span>
+        <span class="rp-go" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round"
+            stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <div class="rp-clock" id="rpClock" hidden>
       <div class="rp-clockin">
         <div class="rp-clockh">
-          <span class="rp-c">Time matters</span>
-          <span class="rp-t">If money has already gone, the next few hours decide whether it comes back.</span>
+          <span class="rp-c">Ring the bank first</span>
+          <span class="rp-t">If money has already gone, the next few hours decide whether it
+            comes back.</span>
         </div>
-        <p class="rp-clocks">Recovery is a race, and almost every route out of it closes on a clock.
-          Do these in order, and do the first one before you finish reading this page.</p>
+        <p class="rp-clocks">Call the bank or card company that sent the money before you do
+          anything else on this page. Nothing here matters more than that call, and it gets
+          harder every hour.</p>
+        <div class="rp-shame">This is a professional operation and it catches accountants and
+          solicitors. Your bank hears this every day. You will not be the first call they take
+          tonight.</div>
         <div class="rp-win" id="rpWindows"></div>
         <div class="rp-tel" id="rpTels"></div>
       </div>
     </div>
 
+    <!-- The page could only ever say what was wrong. A registered firm with a
+         few bad reviews came out looking like an unregistered one, which is the
+         same failure as calling a complaint a finding, pointed the other way. -->
+    <div class="rp-sec" id="rpGoodSec">
+      <div class="rp-kick">In their favour</div>
+      <h2 class="rp-h2" id="rpGoodH"></h2>
+      <p class="rp-sub">These came off official registers. A registration is not a promise
+        that nothing will go wrong. It means a regulator knows who they are, they have rules
+        to follow, and there is somewhere to complain.</p>
+      <div class="rp-goods" id="rpGoods"></div>
+    </div>
+
     <div class="rp-sec" id="rpFindsSec">
-      <div class="rp-kick">What was found</div>
+      <div class="rp-kick">What we found</div>
       <h2 class="rp-h2" id="rpFindsH"></h2>
-      <p class="rp-sub">Every one came off a public record you can open yourself. The green line
-        under each says what it means for you.</p>
+      <p class="rp-sub">Every one came off a record you can open yourself. Under each one we
+        say who says it, and how much weight that carries.</p>
       <div class="rp-finds" id="rpFinds"></div>
     </div>
 
-    <div class="rp-sec" id="rpClaimsSec">
-      <div class="rp-kick">Said, against the record</div>
-      <h2 class="rp-h2">What they claim, and what the register says.</h2>
-      <div class="rp-claims" id="rpClaims"></div>
-    </div>
-
+    <!-- Moved up. It used to sit five screens below, under a heading that assumed
+         the reader was going to send anyway. -->
     <div class="rp-sec" id="rpStepsSec">
-      <div class="rp-kick">Before you send</div>
+      <div class="rp-kick">Right now</div>
       <h2 class="rp-h2" id="rpStepsH"></h2>
+      <p class="rp-sub">In this order. The first one is the only one with a clock on it.</p>
       <div class="rp-steps" id="rpSteps"></div>
     </div>
 
     <div class="rp-sec">
-      <div class="rp-kick">Take this with you</div>
-      <h2 class="rp-h2">What your bank and the reporting line will ask for.</h2>
-      <p class="rp-sub">These are the fields on the intake forms. Everything we already hold is
-        filled in. The rest only you can answer, and having it written down before you call saves
-        the call.</p>
+      <div class="rp-kick">When you ring</div>
+      <h2 class="rp-h2">What to have ready before you call.</h2>
+      <p class="rp-sub">Your bank and the fraud line will both ask for these. Everything we
+        already know is filled in. The rest only you can answer, and writing it down before you
+        call turns a long call into a short one.</p>
       <div class="rp-bundle" id="rpBundle"></div>
     </div>
 
     <div class="rp-sec">
-      <div class="rp-kick">One pack each</div>
-      <h2 class="rp-h2">Every one of them asks for something different.</h2>
-      <p class="rp-sub">Your bank wants the payment. The police want a chronology. The Competition
-        Bureau wants the advertising. Filing the same page nine times is how a report gets set
-        aside. Open the one you are about to contact and you can read the whole document first,
-        built to what that body publishes, with everything we hold already filled in and blanks for
-        the rest. Download it when you are ready to take it with you.</p>
+      <div class="rp-kick">Who to tell</div>
+      <h2 class="rp-h2">Your bank, the police and the regulator each ask for different things.</h2>
+      <p class="rp-sub">Filing the same page nine times is how a report gets set aside. Open the
+        one you are about to contact and you can read the whole document first. Download it when
+        you are ready to take it with you.</p>
       <div class="rp-pakgrid" id="rpPaks"></div>
-      <p class="rp-pakfoot"><b>Only your bank or your card issuer can move money.</b> Only your
+      <p class="rp-pakfoot"><b>Only your bank or your card company can move money.</b> Only your
         local police will investigate what happened to you. Everything else on this list is a
-        record, and records are how the next person gets warned. Call the bank first, get the police
-        file number second, because every other body here will ask you for that number.</p>
+        record, and records are how the next person gets warned. Ring the bank first, get the
+        police file number second, because every other body here will ask you for that number.</p>
+    </div>
+
+    <div class="rp-sec" id="rpClaimsSec">
+      <div class="rp-kick">Their words against the records</div>
+      <h2 class="rp-h2">What they told you, and what the records say.</h2>
+      <div class="rp-claims" id="rpClaims"></div>
     </div>
 
     <div class="rp-sec rp-tight">
       <div class="rp-gapnote">
-        <div class="rp-t">What this does not settle</div>
+        <div class="rp-t">What we could not answer</div>
         <div class="rp-x" id="rpGap1"></div>
         <div class="rp-x" id="rpGap2"></div>
+        <div class="rp-x" id="rpGap3"></div>
       </div>
     </div>
 
@@ -2399,9 +2586,9 @@ body[data-stage="console"] .navnew{display:inline-flex}
       <div class="rp-behindin">
         <button class="rp-behindbtn" id="rpOpenRecord" type="button">
           <span class="rp-b">
-            <span class="rp-t">What is behind this report</span>
-            <span class="rp-x">Every source we asked, every one that answered, every one we could not
-              reach, and the record behind each finding.</span>
+            <span class="rp-t">Where we looked, and how</span>
+            <span class="rp-x">Every register we asked, every one that answered, every one we
+              could not open, and the record behind each thing we found.</span>
           </span>
           <span class="rp-go" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -4595,13 +4782,13 @@ function snapChecks(){
   var h='<div class="infosec">'+
     '<div class="infop" style="margin-top:0">Every check returns a record or a published gap. Open any one to read the records underneath it.</div>'+
     snapCells([[String(counts.RED),"Adverse","bad"],[String(counts.YELLOW),"Unresolved","warn"],
-               [String(counts.GREEN),"Nothing found","ok"],[String(counts.GREY),"Not reached",""]])+
+               [String(counts.GREEN),"Nothing found","ok"],[String(counts.GREY),"Could not check",""]])+
     '<div class="snaplist">'+CATS.map(function(c){
       var r=d.cats?d.cats[c.key]:null;
       return '<button class="snaprow" type="button" data-key="'+esc(c.key)+'">'+
         '<span class="sx">'+esc(c.id)+'</span>'+
         '<span class="sb"><span class="st2">'+esc(c.name)+'</span>'+
-        '<span class="sd">'+esc(r?r.sum:"Not reached on this check.")+'</span></span>'+
+        '<span class="sd">'+esc(r?r.sum:"We could not reach this one.")+'</span></span>'+
         '<span class="sg" data-s="'+esc(r?r.state:"GREY")+'">'+esc(r?r.state:"GREY")+'</span></button>';
     }).join('')+'</div></div>';
   infoOpen("The ten checks", (d.name||"This party"), null, h);
@@ -4931,7 +5118,53 @@ function vmHint(el){
 function renderSummaryRail(d){
   var w=id("sbRight"); if(!w) return;
   w.innerHTML="";
-  if(!d || !d.cats) return;
+  if(!d) return;
+
+  /* A run that could not settle anything has no checks, so the rail used to
+     render nothing at all and leave a column of dead space beside the answer,
+     which reads as a page that failed to load. The same seven cards stay, empty,
+     each saying what it holds and why it holds nothing. A gap is reported as a
+     gap, never as silence. */
+  if(!d.cats){
+    var nb=d.board||{}, nAsk=0, nDark=0, kk;
+    for(kk in nb){ if(answered(nb[kk])) nAsk++; else nDark++; }
+    var empty=[
+      ["The ten checks","none run",
+       '<div class="sbdots">'+CATS.map(function(c){
+          return '<i data-s="GREY" title="'+esc(c.name)+'"></i>'; }).join('')+'</div>',
+       "No check reached a result on this run."],
+      ["Reviews, what other people are saying","none read",'',
+       "No platform was read for this party."],
+      ["Source board", nAsk+" of "+TOTAL_SOURCES,
+       '<div class="sbbar"><i style="width:'+Math.round(nAsk/TOTAL_SOURCES*100)+'%"></i></div>',
+       nDark ? nDark+" registers were not reached on this run" : "No register held a record."],
+      ["Cross-examination","0",'',"Nothing they say could be bound to a record."],
+      ["Material issues","0",'',"Nothing was established, so nothing was raised."],
+      ["Operator graph","nothing",'',
+       "No identifier connects this party to another in our records."],
+      ["Gaps", nDark?String(nDark):"0",'',
+       nDark ? "Every register we could not open is named in the working."
+             : "Nothing that applied was left unchecked."]
+    ];
+    empty.forEach(function(c){
+      var btn=el("button","sbcard"); btn.type="button"; btn.setAttribute("data-t","nul");
+      btn.innerHTML='<span class="sbtop"><span class="n">'+esc(c[0])+
+        '</span><span class="v">'+esc(c[1])+'</span></span>'+c[2]+
+        '<div class="sbx">'+esc(c[3])+'</div>'+
+        '<div class="sq"><span class="statq">Read more</span></div>';
+      btn.addEventListener("click",function(){
+        infoOpen("gap", c[0], "",
+          '<p class="ib-p">'+esc(c[3])+'</p>'
+          +'<p class="ib-p">This run could not settle anything either way. An empty '
+          +'result is not a clean result: it means we could not find enough to tell you '
+          +'anything, which is a reason to keep checking rather than to relax.</p>'
+          +'<p class="ib-p">Everything we asked, and everything we could not open, is '
+          +'listed in the audit report.</p>');
+      });
+      w.appendChild(btn);
+    });
+    return;
+  }
 
   var red=0; CATS.forEach(function(c){ var r=d.cats[c.key]; if(r&&r.state==="RED") red++; });
   var b=d.board||{}, reached=0;
@@ -5263,6 +5496,23 @@ function snapRouting(){
 }
 
 /* ---- a category tile ---- */
+/* The rule badges said RED, GREEN, GREY and NEVER. A colour is not an outcome,
+   and a reader had no way to tie those words to anything else on the page. */
+var RULE_WORD = {
+  RED:"Counts against them", YELLOW:"Worth a second look",
+  GREEN:"Counts in their favour", GREY:"Cannot be settled",
+  NEVER:"We never do this"
+};
+/* What a register said, in the same words the board uses, so the two agree. */
+var SRC_SAID = {
+  clear:"Answered with a record",
+  caution:"Answered, worth a look",
+  adverse:"Answered, something against them",
+  searched:"Asked. Nothing on file.",
+  unreached:"We could not open it",
+  na:"Does not apply to this party",
+  _none:"Not asked on this run"
+};
 function toggleDrill(key){
   var c=null; for(var i=0;i<CATS.length;i++) if(CATS[i].key===key) c=CATS[i];
   if(!c) return;
@@ -5286,11 +5536,20 @@ function toggleDrill(key){
          '</div></div>';
   }
 
-  var rl = RULES[c.key];
-  h += '<div class="infosec"><div class="infoh">How this check is decided</div>'+
+  var rl = RULES[c.key], fired = res ? res.state : null, hit = false;
+  h += '<div class="infosec"><div class="infoh">How we decide this check</div>'+
+       '<div class="infop" style="margin-top:0">'+
+       (fired ? 'These are the rules. The one that applied to this party is marked.'
+              : 'These are the rules. None of them fired, because this check did not run.')+
+       '</div>'+
        (rl ? '<div class="rulelist">'+rl.map(function(r){
-              return '<div class="rulerow" data-v="'+esc(r[0])+'"><span class="rk">'+esc(r[0])+'</span>'+
-                     '<span class="rt">'+esc(r[1])+'</span></div>';
+              var on = fired && r[0]===fired && !hit;
+              if(on) hit = true;
+              return '<div class="rulerow'+(on?' on':'')+'" data-v="'+esc(r[0])+'">'+
+                     '<span class="rk">'+esc(RULE_WORD[r[0]]||r[0])+'</span>'+
+                     '<span class="rt">'+esc(r[1])+'</span>'+
+                     (on?'<span class="rhit">This is what happened here</span>':'')+
+                     '</div>';
             }).join('')+'</div>'
           : '<div class="infop" style="margin-top:0">'+c.rule+'</div>')+
        '</div>';
@@ -5316,15 +5575,28 @@ function toggleDrill(key){
       '<button class="ghmore" type="button" id="openChrono"><span class="hi">&#9679;</span> Open the full comparison</button></div>';
   }
 
+  var bd = (CURRENT && CURRENT.board) || {};
   h += '<div class="infosec"><div class="infoh">'+c.src.length+' registers behind this check</div>'+
-       '<div class="srcwrap"><table class="srctbl"><tr><th>Source</th><th>Where</th><th>What it counts as</th><th>Access</th><th>Terms</th></tr>'+
+       '<div class="infop" style="margin-top:0">Every one we ask for this check, and what each '
+       +'said about this party on this run.</div>'+
+       '<div class="srcwrap"><table class="srctbl">'+
+       '<tr><th>Register</th><th>Country</th><th>How much it carries</th>'
+       +'<th>What it said about this party</th></tr>'+
        c.src.map(function(x){
          var nm = x[5] ? '<a href="'+esc(x[5])+'" target="_blank" rel="noopener noreferrer" style="color:var(--blue-lt)">'+esc(x[0])+'</a>' : esc(x[0]);
-         return '<tr><td>'+nm+'</td><td>'+esc(x[1])+'</td><td><span class="tier" data-t="'+esc(x[2])+'" title="'+esc(tierWhy(x[2]))+'">'+esc(tierWord(x[2]))+'</span></td>'+
-                '<td>'+esc(x[3])+'</td><td>'+esc(x[4])+'</td></tr>';
+         var st = bd[x[0]], sw = SRC_SAID[st] || SRC_SAID._none;
+         return '<tr><td>'+nm+'</td><td>'+esc(x[1])+'</td>'+
+                '<td><span class="tier" data-t="'+esc(x[2])+'" title="'+esc(tierWhy(x[2]))+'">'+esc(tierWord(x[2]))+'</span></td>'+
+                '<td><span class="said" data-s="'+esc(st||"none")+'"><i></i>'+esc(sw)+'</span></td></tr>';
        }).join('')+'</table></div></div>';
 
-  infoOpen("Check "+c.id, c.name, res ? res.state : null, h);
+  /* The badge printed RED. A colour is not an outcome, so it says the outcome. */
+  var badge = res ? (RULE_WORD[res.state] || res.state) : null;
+  infoOpen("Check "+c.id, c.name, null, h);
+  if(badge){
+    var st=id("infoState");
+    st.style.display=""; st.setAttribute("data-s", res.state); st.textContent=badge;
+  }
   /* These two buttons exist on two of the ten checks, so the lookup has to
      tolerate their absence rather than throw on the other eight. */
   var og=document.getElementById("openGraph"); if(og) og.addEventListener("click", snapGraph);
@@ -7337,10 +7609,10 @@ function rpShared(d){
 function rpCatWord(d,key){
   var c=d.cats&&d.cats[key];
   if(!c) return null;
-  if(c.state==="RED") return "Something against them";
-  if(c.state==="YELLOW") return "Worth a look";
-  if(c.state==="GREEN") return "A record was found";
-  return "Nothing settled either way";
+  if(c.state==="RED") return "No. A regulator has recorded a problem";
+  if(c.state==="YELLOW") return "Something here does not add up";
+  if(c.state==="GREEN") return "Yes. They are on a regulator's register";
+  return "We checked and could not tell";
 }
 function rpIdRow(k,v,url,absent,linkValue,flag){
   var val=rpEsc(v), tail="";
@@ -7364,7 +7636,15 @@ function rpAgency(src){
   return s || "The records";
 }
 function rpAbsent(reached){
-  return reached ? "Nothing on file" : "Not reached";
+  /* "Not reached" was read as "we did not get round to it". It means a register
+     exists that we could not open, which is a hole in the report, so it says so. */
+  return reached ? "We checked. Nothing there." : "We could not check";
+}
+function rpAge(days){
+  if(days<31) return days+(days===1?" day":" days")+", brand new";
+  if(days<365) return Math.round(days/30)+" months";
+  var y=Math.floor(days/365);
+  return y+(y===1?" year":" years");
 }
 function rpDomain(d){
   /* On a grey result d.domain carries the detected kind, not a host, so the
@@ -7381,58 +7661,61 @@ function rpIdent(d){
   var hasChrono=!!(d.chrono), hasGraph=!!(d.graph), hasCats=!!(d.cats);
 
   out+=dom
-    ? rpIdRow("Website",dom,"https://"+dom,false,true,false)
-    : rpIdRow("Website","Nothing identified","",true,false,false);
+    ? rpIdRow("The website we checked",dom,"https://"+dom,false,true,false)
+    : rpIdRow("The website we checked","We could not identify one","",true,false,false);
 
   if(reg&&reg.date){
-    out+=rpIdRow("Registered",rpDate(reg.date),reg.url||"",false,false,false);
+    out+=rpIdRow("When this website was made",rpDate(reg.date),reg.url||"",false,false,false);
     var age=rpDays(reg.date,d.asOf);
     out+=(age===null)
-      ? rpIdRow("Domain age",rpAbsent(hasChrono),"",true,false,false)
-      : rpIdRow("Domain age",age+(age===1?" day":" days"),"",false,false,age<365);
+      ? rpIdRow("How long it has existed",rpAbsent(hasChrono),"",true,false,false)
+      : rpIdRow("How long it has existed",rpAge(age),"",false,false,age<365);
   } else {
-    out+=rpIdRow("Registered",rpAbsent(hasChrono),"",true,false,false);
-    out+=rpIdRow("Domain age",rpAbsent(hasChrono),"",true,false,false);
+    out+=rpIdRow("When this website was made",rpAbsent(hasChrono),"",true,false,false);
+    out+=rpIdRow("How long it has existed",rpAbsent(hasChrono),"",true,false,false);
   }
 
   var lic=rpCatWord(d,"C2");
   out+=lic
-    ? rpIdRow("Registration and licensing",lic,"",/Nothing/.test(lic),false,/Something/.test(lic))
-    : rpIdRow("Registration and licensing",rpAbsent(hasCats),"",true,false,false);
+    ? rpIdRow("Are they allowed to hold your money?",lic,"",/We checked/.test(lic),false,
+        /^No\.|does not add up/.test(lic))
+    : rpIdRow("Are they allowed to hold your money?",rpAbsent(hasCats),"",true,false,false);
 
   /* Every name from an official record gets its own line, under the agency that
      holds it. A name on a regulator's file is often the only thing a person has
      to give a bank or the police, so none of them is summarised away. */
   var all=rpNames(d), off=rpOfficialNames(d), i;
   if(all.length){
-    out+=rpIdRow("Names mentioned",all.length===1?"One name found"
-      :all.length+" names found","",false,false,false);
+    out+=rpIdRow("People named in these records",all.length===1?"One person named"
+      :all.length+" people named","",false,false,false);
     for(i=0;i<off.length;i++){
       out+=rpIdRow(rpAgency(off[i].src),off[i].n,off[i].url||"",false,false,true);
     }
   } else {
-    out+=rpIdRow("Names mentioned",(hasGraph||hasCats)?"None on any record reached":"Not reached",
-                 "",true,false,false);
+    out+=rpIdRow("People named in these records",
+      (hasGraph||hasCats)?"Nobody is named anywhere we looked":"We could not check",
+      "",true,false,false);
   }
 
   var sh=rpShared(d);
   out+=sh.length
-    ? rpIdRow("Shares an identifier with",sh[0].other
+    ? rpIdRow("Uses the same details as",sh[0].other
         +(sh.length>1?" and "+(sh.length-1)+" more":""),sh[0].url||"",false,false,true)
-    : rpIdRow("Shares an identifier with",hasGraph?"Nothing shared found":"Not reached",
+    : rpIdRow("Uses the same details as",
+        hasGraph?"Nothing shared with any other firm":"We could not check",
         "",true,false,false);
 
   out+=(d.chrono&&d.chrono.earliest)
-    ? rpIdRow("First trace anywhere",rpDate(d.chrono.earliest),"",false,false,false)
-    : rpIdRow("First trace anywhere",rpAbsent(hasChrono),"",true,false,false);
+    ? rpIdRow("Earliest sign of them",rpDate(d.chrono.earliest),"",false,false,false)
+    : rpIdRow("Earliest sign of them",rpAbsent(hasChrono),"",true,false,false);
 
   var cl=(d.classifications&&d.classifications[0]);
   out+=(cl&&cl.classification)
-    ? rpIdRow("Appears to be",rpTitle(String(cl.classification).replace(/_/g," ")),
+    ? rpIdRow("What they present as",rpTitle(String(cl.classification).replace(/_/g," ")),
         "",false,false,false)
-    : rpIdRow("Appears to be","Could not be classified","",true,false,false);
+    : rpIdRow("What they present as","We could not tell","",true,false,false);
 
-  out+=rpIdRow("Records read",d.asOf||"This run","",false,false,false);
+  out+=rpIdRow("When we looked",d.asOf||"Just now","",false,false,false);
   return out;
 }
 
@@ -7440,10 +7723,11 @@ function rpIdent(d){
    Counted off the payload the same way the console counts them, so the two
    pages can never disagree about what was reached. */
 function rpCounts(d){
-  var adverse=0, checked=0, k;
+  var adverse=0, checked=0, watch=0, k;
   for(k in (d.cats||{})){
     checked++;
     if(d.cats[k].state==="RED") adverse++;
+    else if(d.cats[k].state==="YELLOW") watch++;
   }
   var contra=0, cl=(typeof allClaims==="function")?allClaims(d):(d.claims||[]);
   for(var i=0;i<cl.length;i++) if(cl[i].v==="RED") contra++;
@@ -7458,7 +7742,7 @@ function rpCounts(d){
   var applic=countApplicable(d)||reached;
   var unsettled=0;
   for(k in (d.cats||{})) if(d.cats[k].state==="GREY") unsettled++;
-  return {adverse:adverse, checked:checked, contra:contra, reached:reached,
+  return {adverse:adverse, checked:checked, watch:watch, contra:contra, reached:reached,
           applic:applic, unreached:unreached, unsettled:unsettled,
           claims:cl.length, issues:(d.issues||[]).length};
 }
@@ -7467,24 +7751,53 @@ function rpFig(v,tone,l){
     +'<div class="rp-l">'+rpEsc(l)+'</div></div>';
 }
 function rpFigs(d){
+  /* Three bare numbers gave a reader no way to tell whether high was good. Each
+     one now says which way it points, in a sentence. */
   var c=rpCounts(d), out="";
-  if(c.checked) out+=rpFig(c.adverse+" of "+c.checked, c.adverse?"bad":"ok",
-    c.adverse?"Checks that came back against them.":"Checks that came back against them. None did.");
-  if(c.claims) out+=rpFig(String(c.contra), c.contra?"bad":"ok",
-    "Claims a public record contradicts.");
-  if(c.applic) out+=rpFig(c.reached+" of "+c.applic, c.reached*2<c.applic?"warn":"ok",
-    "Sources that answered, of those that could hold a record here.");
+  if(c.checked){
+    if(c.adverse){
+      out+=rpFig(c.adverse+" of "+c.checked, "bad", "checks we finished found something wrong.");
+    } else if(c.watch){
+      out+=rpFig(c.watch+" of "+c.checked, "warn",
+        c.watch===1 ? "check found something worth a second look. Nothing came back wrong."
+                    : "checks found something worth a second look. Nothing came back wrong.");
+    } else {
+      out+=rpFig("0 of "+c.checked, "ok", "checks found anything wrong.");
+    }
+  }
+  if(c.claims){
+    out+=rpFig(String(c.contra), c.contra?"bad":"ok",
+      c.contra===1
+        ? "thing they say is contradicted by an official record."
+        : "things they say are contradicted by official records.");
+  }
+  if(c.applic){
+    out+=rpFig(c.reached+" of "+c.applic, c.reached*2<c.applic?"warn":"ok",
+      "places that might hold a record on them answered us."
+      + (c.reached*2<c.applic ? " This report is a long way from complete." : ""));
+  }
   return out;
 }
 
 /* -------------------------------------------------- findings, claims, steps */
+/* One name per source, in words a person uses, and what that source can carry
+   said out loud beside it. The reader learns the hierarchy by reading their own
+   result, which is the only way anybody learns it. */
+var RP_SRC = {
+  A:["From a regulator, court or government body","Strong enough to act on by itself","str"],
+  B:["From an official register we checked ourselves","Reliable for facts like names and dates","str"],
+  C:["What customers have reported","A pattern of complaints is a warning, never proof","soft"],
+  D:["From open sources online","Backs up other evidence. Not proof on its own","soft"],
+  "4orm":["From our own records","Backs up other evidence. Not proof on its own","soft"]
+};
+function rpSrcOf(t){ return RP_SRC[t] || RP_SRC.D; }
 function rpTierWord(t){
   if(t==="A") return "official record";
-  if(t==="B") return "verified data";
+  if(t==="B") return "official register";
   if(t==="C") return "customer reports";
-  if(t==="D") return "public chatter";
-  if(t==="4orm") return "4orm intelligence";
-  return "record";
+  if(t==="D") return "the source";
+  if(t==="4orm") return "our records";
+  return "the record";
 }
 /* One plain sentence per finding, and never the same one twice. A sentence that
    does not match anything left over is dropped rather than repeated, because a
@@ -7522,6 +7835,24 @@ function rpPickPlain(pool,issue){
   if(best) best.used=true;
   return best;
 }
+function rpGoodsHtml(d){
+  var g=rpGoods(d), out="", i;
+  for(i=0;i<g.length;i++){
+    var src=rpSrcOf(g[i].tier);
+    out+='<div class="rp-good"><i>'
+      +'<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" '
+      +'stroke-linejoin="round"/></svg></i><span class="rp-gb">'
+      +'<span class="rp-t">'+rpEsc(g[i].t)+'</span>'
+      +(g[i].src?'<span class="rp-x">'+rpEsc(g[i].src)
+        +(g[i].when?", read "+rpEsc(g[i].when):"")+'</span>':'')
+      +'<span class="rp-from rp-str"><i></i><span class="rp-fb">'
+      +'<span class="w">'+rpEsc(src[0])+'</span>'
+      +'<span class="c">'+rpEsc(src[1])+'</span></span></span>'
+      +(g[i].url?'<span class="rp-lk">'+rpOut(g[i].url,"Open the register")+'</span>':'')
+      +'</span></div>';
+  }
+  return out;
+}
 function rpFinds(d){
   var list=(d.issues||[]).slice(0,4), out="", pool=rpPlainPool(d);
   for(var i=0;i<list.length;i++){
@@ -7530,11 +7861,16 @@ function rpFinds(d){
     var plain=(ev&&ev.plain)||"";
     var url=(ev&&ev.url)||"";
     var lab="Open the "+rpTierWord(x.tier||(ev&&ev.t));
+    /* Who says it, and what that carries, sits on the finding itself. Nobody
+       reads a key beside a page; they read the line in front of them. */
+    var tier=x.tier||(ev&&ev.t)||"D", src=rpSrcOf(tier);
     out+='<div class="rp-tray"><div class="rp-plate"><div class="rp-find">'
       +'<span class="rp-n">'+(i+1)+'</span><span class="rp-b">'
       +'<span class="rp-t">'+rpEsc(x.t)+'</span>'
       +'<span class="rp-x">'+rpEsc(x.x)+'</span>'
       +(plain?'<span class="rp-plain"><i></i><span>'+rpEsc(plain)+'</span></span>':'')
+      +'<span class="rp-from rp-'+src[2]+'"><span class="w">'+rpEsc(src[0])+'</span>'
+      +'<span class="c">'+rpEsc(src[1])+'</span></span>'
       +(url?'<span class="rp-lk">'+rpOut(url,lab)+'</span>':'')
       +'</span><span class="rp-sev" data-s="'+sev+'"><i></i>'+sev+'</span>'
       +'</div></div></div>';
@@ -7579,7 +7915,7 @@ function rpHold(d){
   var dom=rpDomain(d);
   h.push(["Website", dom || "Nothing identified"]);
   var sh=rpShared(d);
-  if(sh.length) h.push(["Shares an identifier with", sh[0].other]);
+  if(sh.length) h.push(["Uses the same details as", sh[0].other]);
   var adverse=[];
   for(var k in (d.cats||{})){
     var ev=(d.cats[k].ev)||[];
@@ -7603,7 +7939,7 @@ function rpHold(d){
     }
   }
   if(!all.length) h.push(["Names on the records", "None found on any record reached"]);
-  if(d.chrono&&d.chrono.earliest) h.push(["First trace anywhere", rpDate(d.chrono.earliest)]);
+  if(d.chrono&&d.chrono.earliest) h.push(["Earliest sign of them", rpDate(d.chrono.earliest)]);
   if(d.asOf) h.push(["Records read", d.asOf]);
   h.push(["Report reference", rpRef(d)]);
   return h;
@@ -7828,11 +8164,94 @@ function rpSourcesFill(){
 }
 
 /* ------------------------------------------------------------- the renderer */
-function rpVerdictWord(v){
-  if(v==="RED") return "Do not send";
-  if(v==="YELLOW") return "Take care";
-  if(v==="GREEN") return "Nothing adverse found";
-  return "Not enough to say";
+/* What the reader is asked is "do I send this money", so the answer is an
+   instruction, never a finding. A finding belongs on the line that carries it.
+   And the words come from the strongest source that actually answered: a
+   complaint and a regulator warning must never read the same. */
+/* Anything an official source establishes IN THE FIRM'S FAVOUR. A registration
+   is a finding too, and it outranks any number of reviews. */
+function rpGoods(d){
+  var out=[], k, i;
+  for(k in (d.cats||{})){
+    var c=d.cats[k];
+    if(c.state!=="GREEN") continue;
+    var ev=c.ev||[];
+    for(i=0;i<ev.length;i++){
+      if(ev[i].t!=="A" && ev[i].t!=="B") continue;
+      out.push({t:ev[i].find||c.sum||"", src:ev[i].src||"", url:ev[i].url||"",
+                when:ev[i].when||"", tier:ev[i].t});
+      break;
+    }
+    if(!ev.length && c.sum) out.push({t:c.sum, src:"", url:"", when:"", tier:"B"});
+  }
+  return out;
+}
+function rpRegistered(d){
+  var c=d.cats&&d.cats.C2;
+  if(!c || c.state!=="GREEN") return false;
+  var ev=c.ev||[];
+  for(var i=0;i<ev.length;i++) if(ev[i].t==="A"||ev[i].t==="B") return true;
+  return false;
+}
+/* Is the only thing against them what customers say? */
+function rpOnlyConsumer(d){
+  var soft=false, hard=false;
+  for(var k in (d.cats||{})){
+    var c=d.cats[k];
+    if(c.state!=="RED" && c.state!=="YELLOW") continue;
+    var ev=c.ev||[];
+    for(var i=0;i<ev.length;i++){
+      if(ev[i].t==="A"||ev[i].t==="B") hard=true; else soft=true;
+    }
+    if(!ev.length) soft=true;
+  }
+  return soft && !hard;
+}
+function rpHasOfficial(d){
+  for(var k in (d.cats||{})){
+    var c=d.cats[k], ev=c.ev||[];
+    if(c.state!=="RED") continue;
+    for(var i=0;i<ev.length;i++) if(ev[i].t==="A") return true;
+  }
+  return false;
+}
+function rpVerdictWord(v,d){
+  if(v==="RED") return "Do not send any money.";
+  if(v==="YELLOW"){
+    /* A registered firm with nothing official against it must never be written
+       the same way as an unregistered one. Complaints do not outrank a register. */
+    if(rpRegistered(d) && !rpHasOfficial(d)) return "This firm is on a regulator's register.";
+    return "Stop. Do not send anything tonight.";
+  }
+  if(v==="GREEN"){
+    if(rpRegistered(d)) return "This firm is on a regulator's register.";
+    return "We found no warnings about this firm.";
+  }
+  return "We could not check enough to give you an answer.";
+}
+function rpVerdictWhy(v,d){
+  if(v==="RED"){
+    return rpHasOfficial(d)
+      ? "A regulator or an official record has already flagged this firm."
+      : "The records do not support what this firm says about itself.";
+  }
+  if(v==="YELLOW"){
+    if(rpRegistered(d) && !rpHasOfficial(d)){
+      return rpOnlyConsumer(d)
+        ? "No regulator has acted against them. Some customers have complained, and "
+          +"complaints are not proof of anything. Both are below."
+        : "No regulator has acted against them. There are some things worth checking, "
+          +"and they are below.";
+    }
+    return "We found things that need checking before you send.";
+  }
+  if(v==="GREEN"){
+    return rpRegistered(d)
+      ? "Being registered is not a guarantee. It means a regulator knows who they "
+        +"are, and there is somewhere to complain if this goes wrong."
+      : "That is not the same as safe. Most fraud is too new to be on any register yet.";
+  }
+  return "Treat this as unchecked, not as cleared.";
 }
 function renderReport(d){
   RP=d;
@@ -7842,8 +8261,26 @@ function renderReport(d){
   id("rpStamp").innerHTML=stamp;
   id("rpStamp2").innerHTML=stamp;
 
-  id("rpEyebrow").setAttribute("data-v", d.verdict||"GREY");
-  id("rpEyebrowT").textContent=rpVerdictWord(d.verdict);
+  var tone=d.verdict||"GREY";
+  if((tone==="YELLOW"||tone==="GREEN") && rpRegistered(d) && !rpHasOfficial(d)) tone="GREEN";
+  id("rpEyebrow").setAttribute("data-v", tone);
+  id("rpEyebrowT").textContent=rpVerdictWord(d.verdict,d);
+  id("rpWhy").textContent=rpVerdictWhy(d.verdict,d);
+
+  /* The one line the page exists to deliver. For a firm with nothing official
+     against it, telling somebody not to pay tonight is its own kind of harm, so
+     the instruction becomes the one that is actually true for them: go and look
+     at the register yourself. */
+  var clean = rpRegistered(d) && !rpHasOfficial(d) && d.verdict!=="RED";
+  id("rpTonight").setAttribute("data-c", clean ? "calm" : "urgent");
+  id("rpTonightT").textContent = clean
+    ? "Check the register yourself before you send."
+    : "Do not send anything tonight.";
+  id("rpTonightX").textContent = clean
+    ? "It takes two minutes and you do not have to take our word for any of this. "
+      +"The register we used is linked below."
+    : "Waiting until the morning costs you nothing. Sending tonight could cost you "
+      +"everything.";
   id("rpWho").textContent=rpTitle(d.name||"");
   id("rpDom").textContent=rpDomain(d)||RP_LABEL||"";
   id("rpSay").textContent=d.statement||d.note||"";
@@ -7865,12 +8302,24 @@ function renderReport(d){
              : '<span class="rp-telx"><em>'+rpEsc(t[0])+'</em> '+rpEsc(t[1])+'</span>';
   }
   id("rpTels").innerHTML=w;
-  id("rpClock").style.display=(d.verdict==="RED"||d.verdict==="YELLOW")?"":"none";
+  /* The clock is behind a door now, because a reader who has not paid does not
+     need it and a reader who has needs nothing else first. */
+  id("rpClock").hidden=true;
+  id("rpAlreadyBtn").setAttribute("aria-expanded","false");
+  id("rpAlready").classList.remove("rp-open");
+
+  var g=rpGoodsHtml(d), gn=rpGoods(d).length;
+  id("rpGoods").innerHTML=g;
+  id("rpGoodH").textContent = gn
+    ? (gn===1 ? "One thing checks out." : rpCap(rpWord(gn))+" things check out.")
+    : "";
+  id("rpGoodSec").style.display=g?"":"none";
 
   var f=rpFinds(d);
   id("rpFinds").innerHTML=f;
   id("rpFindsH").textContent=(c.issues?rpCap(rpWord(Math.min(4,c.issues)))
-    +" things, most serious first.":"Nothing came back against them.");
+    +(Math.min(4,c.issues)===1?" thing. ":" things. ")+"Worst first."
+    :"Nothing came back against them.");
   id("rpFindsSec").style.display=f?"":"none";
 
   var cl=rpClaims(d);
@@ -7878,20 +8327,23 @@ function renderReport(d){
   id("rpClaimsSec").style.display=cl?"":"none";
 
   id("rpSteps").innerHTML=rpSteps(d);
-  id("rpStepsH").textContent=rpCap(rpWord((d.bys||[]).slice(0,3).length||3))+" things first.";
+  id("rpStepsH").textContent="Do these "
+    +rpWord((d.bys||[]).slice(0,3).length||3)+" things now.";
   id("rpBundle").innerHTML=rpBundle(d);
   id("rpPaks").innerHTML=rpPaks();
 
-  id("rpGap1").textContent=(c.unreached?rpCap(rpWord(c.unreached))
-      +" sources that could have held a record here were never reached":"Every source that could "
-      +"have held a record here was reached")
-    +(c.unsettled?", and "+rpWord(c.unsettled)+" check"+(c.unsettled===1?"":"s")
-      +" could not be settled either way":"")
-    +". Every one is named in the record behind this report. An absence in a register is never "
-    +"proof that nothing exists: it means that register had no entry on the day we looked.";
-  id("rpGap2").textContent="Nothing here is a finding that any law has been broken. We report what "
-    +"public records showed"+(d.asOf?" on "+d.asOf:"")+", with the source beside each item, so you "
-    +"can open them and judge for yourself.";
+  id("rpGap1").textContent=(c.unreached
+      ? "There are "+c.unreached+" registers we could not open. Every one is named in our working, "
+        +"so you can see the size of the gap."
+      : "We reached every register that could have held a record on them.")
+    +(c.unsettled?" "+rpCap(rpWord(c.unsettled))+" check"+(c.unsettled===1?"":"s")
+      +" came back with too little to call either way." : "");
+  id("rpGap2").textContent="An empty register is not a clean record. It only means that register "
+    +"had nothing on them on the day we looked"+(d.asOf?", which was "+d.asOf:"")
+    +". A new fraud is not on any register yet.";
+  id("rpGap3").textContent="Nothing here says anyone has broken the law. We report what public "
+    +"records showed on the day we read them, with the source beside every item, so you can open "
+    +"them and decide for yourself.";
 
   var sp=id("rpSpec");
   if(d.specimen){
@@ -7973,8 +8425,6 @@ function rpEnter(d,label){
   id("rpReport").hidden=false;
   id("rpSources").hidden=true;
   document.body.setAttribute("data-stage","report");
-  var nb=id("navBackReport");
-  if(nb) nb.classList.add("ready");
   rpTop();
   RP_OPENING=false;
 }
@@ -8007,6 +8457,14 @@ function rpBackFromConsole(){
   rpTop();
 }
 
+id("rpAlreadyBtn").addEventListener("click", function(){
+  var c=id("rpClock"), open=c.hidden;
+  c.hidden=!open;
+  id("rpAlreadyBtn").setAttribute("aria-expanded", open?"true":"false");
+  id("rpAlready").classList.toggle("rp-open", open);
+  if(open && c.scrollIntoView) setTimeout(function(){
+    c.scrollIntoView({behavior:"smooth", block:"start"}); },60);
+});
 id("rpToSources").addEventListener("click", rpSources);
 id("rpToSources2").addEventListener("click", rpSources);
 id("rpBackToReport").addEventListener("click", rpBackToReport);
@@ -8029,7 +8487,6 @@ id("navNewCheck").addEventListener("click", function(){
   id("rpReport").hidden=false;
   toIdle();
   document.body.setAttribute("data-stage","landing");
-  var nb=id("navBackReport"); if(nb) nb.classList.remove("ready");
   rpTop();
   setTimeout(function(){ var i=id("kbInput"); if(i){ i.value=""; i.focus(); } },80);
 });

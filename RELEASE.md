@@ -69,6 +69,27 @@ rather than saying there was a page of working behind the card. Eighteen cards
 carry it: the five figures across the top, the seven rail cards, and the six
 composition bars.
 
+## Opening a check
+
+A check opened from the board explains itself in three parts.
+
+**What we found** comes first, because that is what a reader opened it for.
+
+**How we decide this check** lists the rules, and marks the one that actually
+fired for this party. Everything else is dimmed. The badges say what an outcome
+is, not what colour it is: counts against them, counts in their favour, cannot
+be settled, we never do this.
+
+**The registers behind this check** name every register we ask, and what each
+one said about this party on that run: answered with a record, asked and nothing
+on file, we could not open it, does not apply here. The dot beside each is the
+same colour it carries on the source board, so the board and the table are the
+same fact said twice.
+
+Access and terms came off that table. Whether a register is reached over a web
+form or an API, and whether its licence is open or restricted, is our plumbing.
+It is in the catalogue where it belongs.
+
 ## Deploying
 
 Vercel, Node 20 or later. `api/check.js` is given 300 seconds in `vercel.json`.
