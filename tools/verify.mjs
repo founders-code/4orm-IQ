@@ -266,6 +266,51 @@ if (!/translateX\(-\d/.test(finRule))
 if (!/\.cbtitle \.tlead\{flex:none/.test(styleBlock))
   fails.push('.tlead has lost flex:none on the landing, which reopens the gap under the paragraph');
 
+/* ------------------------------------------------ the report, and its stage
+   The answer page runs on the same payload as the board. Each of these was
+   proved by breaking it: remove the guard's subject and the check fails. */
+if (!/id="rpt"/.test(html)) fails.push('the report section #rpt is gone');
+if (!/body\[data-stage="report"\] #rpt\{display:block\}/.test(styleBlock))
+  fails.push('the report stage no longer shows #rpt');
+if (!/#rpt \.rp-wrap\{[^}]*max-width/.test(styleBlock))
+  fails.push('#rpt .rp-wrap lost its max-width, so the report runs edge to edge');
+{
+  const unscoped = [...styleBlock.matchAll(/(?:^|[{}]\s*)(\.rp-[A-Za-z0-9_-]+[^{};]*)\{/g)]
+    .map(m => m[1].trim()).filter(x => x);
+  if (unscoped.length)
+    fails.push('report rules not scoped to #rpt (the reset will outrank them): '
+      + unscoped.slice(0, 4).join(', '));
+}
+if (/class="[^"]*\brp-rp-/.test(html))
+  fails.push('a report class was prefixed twice (rp-rp-), so its rules never match');
+{
+  const packs = (script.match(/var RP_PACKS = \[/) || []).length;
+  if (!packs) fails.push('the recipient packs are gone');
+  const ids = (script.match(/"id": "(bank|card|police|cafc|bureau|bcsc|ic3|ftc|crypto)"/g) || []);
+  if (ids.length !== 9) fails.push('expected 9 recipient packs, found ' + ids.length);
+}
+{
+  const hand = (script.match(/toResult\(d,q\);\s*rpEnter\(d,q\);/g) || []).length;
+  if (hand !== 2) fails.push('both run paths must open the report, found ' + hand + ' of 2');
+}
+if (!/rpEnter\(er,q\)/.test(script))
+  fails.push('a failed live run no longer opens the report');
+if (!/rpPickPlain\(pool,\s*x\)/.test(script))
+  fails.push('findings lost their one-sentence-each pairing');
+if (!/countApplicable\(d\)\|\|reached/.test(script))
+  fails.push('the report stopped counting coverage the way the board counts it');
+{
+  /* The shell holds no party. Everything about the party is written at render
+     time from the run's own payload, so a stale name can never survive a check. */
+  const empties = ['rpIdent', 'rpWho', 'rpDom', 'rpSay', 'rpFigs', 'rpFinds', 'rpClaims',
+                   'rpSteps', 'rpBundle', 'rpPaks', 'rpStamp'];
+  for (const e of empties) {
+    const m = new RegExp('id="' + e + '"[^>]*>([^<]*)<').exec(html);
+    if (m && m[1].trim()) fails.push('the report shell has content baked into #' + e
+      + ': ' + m[1].trim().slice(0, 40));
+  }
+}
+
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
 if (prev && fs.existsSync(prev)) {
