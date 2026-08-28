@@ -35,6 +35,26 @@ The only published numeric deadline anywhere is CIBC's thirty days from statemen
 date for a card dispute. No other pack carries a number, because no other body
 publishes one.
 
+## Names on the record
+
+The record card carries a **Names mentioned** line, and every name that sits on
+an official record gets its own line beneath it, labelled with the body that
+holds it. None of them is summarised away: a name on a regulator's file is often
+the only lead a person has when they call their bank or the police, so all of
+them are carried, and all of them go into every downloadable pack.
+
+A name is only printed when it came from a node the pipeline typed as a person,
+or from an official record whose own sentence names a role: appointed, director,
+officer, principal, promoter, named as. Without that cue a capitalised pair of
+words is as likely to be a company, and a company printed as a director on a
+page somebody hands to their bank is worse than printing nothing.
+
+## The board, once a result exists
+
+The board is the working behind an answer the reader has already been given, so
+the landing pitch, the type pills and the search bar come off it and everything
+moves up. A new check starts from the control in the nav.
+
 ## Deploying
 
 Vercel, Node 20 or later. `api/check.js` is given 300 seconds in `vercel.json`.

@@ -311,6 +311,32 @@ if (!/countApplicable\(d\)\|\|reached/.test(script))
   }
 }
 
+/* ------------------------------------------- names, the verdict, the console
+   A name printed on a page somebody hands to their bank must have come off a
+   record that names it as a person, so the miner is held to official records
+   carrying a role word. */
+if (!/if\(ev\[i\]\.t!=="A"\) continue;/.test(script))
+  fails.push('the name miner is reading past official records');
+if (!/RP_ROLE\.test\(text\)/.test(script))
+  fails.push('the name miner no longer requires a role word, so a company name can print as a person');
+if (!/function rpOfficialNames/.test(script))
+  fails.push('official record names are no longer separated out');
+if (!/rpIdRow\(rpAgency\(off\[i\]\.src\)/.test(script))
+  fails.push('official names lost the agency that holds them');
+{
+  const m = /#rpt \.rp-eyebrow\{[^}]*font-size:clamp\((\d+)px/.exec(styleBlock);
+  if (!m || Number(m[1]) < 16)
+    fails.push('the verdict is no longer set large enough to read across a room');
+}
+if (!/body\[data-stage="console"\] \.searchbox\{display:none\}/.test(
+      styleBlock.replace(/\s*\n\s*/g, ''))) {
+  const joined = styleBlock.replace(/\s+/g, '');
+  if (!/body\[data-stage="console"\]\.cbtitle,body\[data-stage="console"\]\.cbmain\.idrow,body\[data-stage="console"\]\.searchbox\{display:none\}/.test(joined))
+    fails.push('the board still carries the landing pitch, the type pills or the search bar');
+}
+if (!/id\("navNewCheck"\)/.test(script))
+  fails.push('with the search bar off the board there is no way to start a new check');
+
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
 if (prev && fs.existsSync(prev)) {

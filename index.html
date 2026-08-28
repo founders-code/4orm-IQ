@@ -1696,11 +1696,36 @@ body[data-stage="report"] .foot{display:none}
 @media(max-width:1240px){#rpt .rp-heromain{grid-template-columns:minmax(0,1fr) 400px;gap:34px}}
 @media(max-width:1080px){#rpt .rp-heromain{grid-template-columns:minmax(0,1fr) 340px;gap:30px}}
 @media(max-width:680px){#rpt .rp-heromain{grid-template-columns:1fr;gap:34px}}
-#rpt .rp-eyebrow{display:inline-flex;align-items:center;gap:9px;border-radius:999px;
-  padding:6px 14px 6px 10px;background:var(--bad-bg);border:1px solid var(--bad-br);
-  font-family:var(--rmono);font-size:10px;font-weight:800;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--bad)}
-#rpt .rp-eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--bad);flex:none}
+/* The verdict is the one thing a frightened person has to read from across the
+   room, so it is set to be seen before anything else on the page. The dot
+   breathes, slowly, because a still red pill reads as decoration. */
+#rpt .rp-eyebrow{display:inline-flex;align-items:center;gap:16px;border-radius:999px;
+  padding:14px 30px 14px 22px;background:var(--bad-bg);border:2px solid var(--bad-br);
+  font-family:var(--rmono);font-size:clamp(17px,2.1vw,23px);font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--bad);
+  box-shadow:0 10px 30px rgba(214,51,78,.20)}
+#rpt .rp-eyebrow i{width:15px;height:15px;border-radius:50%;background:var(--bad);flex:none;
+  box-shadow:0 0 0 0 rgba(214,51,78,.55);animation:rp-pulse 2.6s var(--ease) infinite}
+@keyframes rp-pulse{
+  0%{box-shadow:0 0 0 0 rgba(214,51,78,.5)}
+  70%{box-shadow:0 0 0 13px rgba(214,51,78,0)}
+  100%{box-shadow:0 0 0 0 rgba(214,51,78,0)}}
+@media(prefers-reduced-motion:reduce){#rpt .rp-eyebrow i{animation:none}}
+/* Amber and green carry the same weight, in their own colour. */
+#rpt .rp-eyebrow[data-v="YELLOW"]{background:var(--warn-bg);border-color:var(--warn-br);
+  color:var(--warn);box-shadow:0 10px 30px rgba(196,154,58,.20)}
+#rpt .rp-eyebrow[data-v="YELLOW"] i{background:var(--warn);
+  animation-name:rp-pulse-warn}
+@keyframes rp-pulse-warn{
+  0%{box-shadow:0 0 0 0 rgba(143,92,18,.45)}
+  70%{box-shadow:0 0 0 13px rgba(143,92,18,0)}
+  100%{box-shadow:0 0 0 0 rgba(143,92,18,0)}}
+#rpt .rp-eyebrow[data-v="GREEN"]{background:var(--ok-bg);border-color:var(--ok-br);
+  color:var(--ok);box-shadow:0 10px 30px rgba(14,138,95,.18)}
+#rpt .rp-eyebrow[data-v="GREEN"] i{background:var(--ok);animation:none}
+#rpt .rp-eyebrow[data-v="GREY"]{background:var(--surface-2);border-color:var(--border-strong);
+  color:var(--tx-2);box-shadow:none}
+#rpt .rp-eyebrow[data-v="GREY"] i{background:var(--tx-3);animation:none}
 #rpt .rp-who{margin-top:24px;font-size:clamp(38px,6vw,68px);font-weight:800;letter-spacing:-.042em;
   line-height:1.02;text-wrap:balance}
 #rpt .rp-dom{margin-top:12px;font-family:var(--rmono);font-size:13.5px;color:var(--tx-3);word-break:break-all}
@@ -2079,6 +2104,22 @@ body[data-stage="report"] .foot{display:none}
   text-transform:uppercase;color:var(--tx-3)}
 #rpt .rp-catc .rp-cv{margin-top:9px;font-size:13.5px;line-height:1.5;color:var(--tx);font-weight:600}
 #rpt .rp-catc .rp-cx{margin-top:6px;font-size:12px;line-height:1.5;color:var(--tx-3)}
+
+/* ------------------------------------------- the console, once a result exists
+   The board is the working behind an answer the reader has already been given,
+   so the pitch, the type pills and the search bar come off it. Everything that
+   was under them moves up. A new check starts from the control in the nav. */
+body[data-stage="console"] .cbtitle,
+body[data-stage="console"] .cbmain .idrow,
+body[data-stage="console"] .searchbox{display:none}
+body[data-stage="console"] .cbmain{padding:0}
+body[data-stage="console"] .cbtop{margin-bottom:0}
+body[data-stage="console"] .statstrip{margin-top:22px}
+.navnew{display:none;align-items:center;gap:8px;border-radius:999px;padding:9px 16px;
+  border:1px solid rgba(255,255,255,.18);font-family:var(--mono);font-size:10px;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
+body[data-stage="console"] .navnew{display:inline-flex}
+.navnew:hover{border-color:rgba(255,255,255,.42)}
 </style>
 </head>
 <body>
@@ -2091,6 +2132,7 @@ body[data-stage="report"] .foot{display:none}
   </div>
   <div class="navactions">
     <button class="navreport" type="button" id="navReport"><span class="hi">&#9635;</span> One page summary</button>
+    <button class="navnew" type="button" id="navNewCheck"><span class="hi">&#43;</span> New check</button>
     <button class="navback" type="button" id="navBackReport"><span class="hi">&#8592;</span> Back to the report</button>
     <button class="navhelp" type="button" data-dir="open"><span class="hi">&#9873;</span> Find support</button>
   </div>
@@ -7306,6 +7348,57 @@ function rpPeople(d){
   }
   return out;
 }
+
+/* A title is not a person. Chief Executive, Managing Director and Persons With
+   Significant Control all match a name shaped pattern, and printing one as a
+   name on a page somebody takes to their bank is the sort of small lie that
+   costs trust. */
+function rpIsName(s){
+  if(/^(The|This|That|Company|Limited|Corporation|Registered|No |Not )/.test(s)) return false;
+  return !/\b(Chief|Executive|Officer|Director|Manager|Managing|President|Vice|Partner|Persons?|Significant|Control|Secretary|Treasurer|Founder|Head|Senior|Group|Holdings?|Capital|Ventures?|Global|Wealth|Limited|Register|Registry|Commission|Authority|Service|Records?|Search|Filing|Report|Investment|Caution|Warning|Alert|Securities|Administrators|Bank|Canada|United|States|Kingdom|Internet|Archive|Machine)\b/.test(s);
+}
+
+/* Every name the run actually read, with the record it came from.
+
+   Only two things count as a person. A node the pipeline typed as one, and a
+   name sitting in a sentence that says it is a person: appointed, director,
+   officer, principal, named. Without that cue a capitalised pair of words is
+   just as likely to be a company, and "Cedar Assetgrove" printed as a director
+   on a page somebody hands to their bank is worse than printing nothing. */
+var RP_ROLE = /\b(director|officer|appointed|principal|promoter|adviser|advisor|president|chief|founder|owner|shareholder|controlled by|acting for|signatory|named as|named in|beneficial)\b/i;
+
+function rpNames(d){
+  var seen={}, out=[], i, k;
+  var ppl=rpPeople(d);
+  for(i=0;i<ppl.length;i++){
+    var key=String(ppl[i].v).toLowerCase();
+    seen[key]=1;
+    out.push({n:ppl[i].v, src:ppl[i].src||"the records", url:ppl[i].url||"", tier:"A"});
+  }
+  for(k in (d.cats||{})){
+    var ev=d.cats[k].ev||[];
+    for(i=0;i<ev.length;i++){
+      /* Official records only, and only where the sentence names a role. */
+      if(ev[i].t!=="A") continue;
+      var text=String(ev[i].find||"")+" "+String(ev[i].quote||"");
+      if(!RP_ROLE.test(text)) continue;
+      var m=text.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z'.-]+){1,2})\b/g);
+      if(!m) continue;
+      for(var j=0;j<m.length;j++){
+        var nm=m[j].replace(/[.,;:]+$/,"").trim(), k2=nm.toLowerCase();
+        if(seen[k2] || !rpIsName(nm)) continue;
+        seen[k2]=1;
+        out.push({n:nm, src:ev[i].src||"the records", url:ev[i].url||"", tier:"A"});
+      }
+    }
+  }
+  return out;
+}
+function rpOfficialNames(d){
+  var all=rpNames(d), out=[];
+  for(var i=0;i<all.length;i++) if(all[i].tier==="A") out.push(all[i]);
+  return out;
+}
 function rpShared(d){
   var out=[], seen={}, e=(d.graph&&d.graph.edges)||[];
   for(var i=0;i<e.length;i++){
@@ -7337,6 +7430,12 @@ function rpIdRow(k,v,url,absent,linkValue,flag){
 /* Every line shows, always. A reader learns more from "asked, nothing on file"
    than from a line that quietly is not there, and the two absences are kept
    apart: a register that answered empty is not a register nobody reached. */
+function rpAgency(src){
+  /* The label is the body that holds the name, cut to what fits a label column. */
+  var s=String(src||"the records").split(",")[0].split(" via ")[0].trim();
+  if(s.length>30) s=s.slice(0,28).replace(/\s+\S*$/,"")+"...";
+  return s || "The records";
+}
 function rpAbsent(reached){
   return reached ? "Nothing on file" : "Not reached";
 }
@@ -7374,14 +7473,18 @@ function rpIdent(d){
     ? rpIdRow("Registration and licensing",lic,"",/Nothing/.test(lic),false,/Something/.test(lic))
     : rpIdRow("Registration and licensing",rpAbsent(hasCats),"",true,false,false);
 
-  var ppl=rpPeople(d);
-  if(ppl.length){
-    var names=[];
-    for(var i=0;i<Math.min(2,ppl.length);i++) names.push(ppl[i].v);
-    out+=rpIdRow("Named on the records",names.join(", ")
-      +(ppl.length>2?" and "+(ppl.length-2)+" more":""),ppl[0].url||"",false,false,false);
+  /* Every name from an official record gets its own line, under the agency that
+     holds it. A name on a regulator's file is often the only thing a person has
+     to give a bank or the police, so none of them is summarised away. */
+  var all=rpNames(d), off=rpOfficialNames(d), i;
+  if(all.length){
+    out+=rpIdRow("Names mentioned",all.length===1?"One name found"
+      :all.length+" names found","",false,false,false);
+    for(i=0;i<off.length;i++){
+      out+=rpIdRow(rpAgency(off[i].src),off[i].n,off[i].url||"",false,false,true);
+    }
   } else {
-    out+=rpIdRow("Named on the records",hasGraph?"Nobody named":"Not reached",
+    out+=rpIdRow("Names mentioned",(hasGraph||hasCats)?"None on any record reached":"Not reached",
                  "",true,false,false);
   }
 
@@ -7563,8 +7666,16 @@ function rpHold(d){
   if(reg&&reg.date) h.push(["Domain registered", rpDate(reg.date)+", "+(reg.src||"registry record")]);
   var age=reg&&reg.date?rpDays(reg.date,d.asOf):null;
   if(age!==null) h.push(["Domain age when read", age+(age===1?" day":" days")]);
-  var ppl=rpPeople(d);
-  h.push(["Directors or officers named", ppl.length?ppl[0].v:"None found on any record"]);
+  /* Names go into every pack, because the first question a fraud desk asks is
+     who, and a name off a regulator's own file is the strongest answer there is. */
+  var off=rpOfficialNames(d), all=rpNames(d);
+  if(off.length){
+    for(i=0;i<off.length;i++){
+      h.push([i?"Also named on that record":"Named on an official record",
+              off[i].n+" ("+rpAgency(off[i].src)+")"]);
+    }
+  }
+  if(!all.length) h.push(["Names on the records", "None found on any record reached"]);
   if(d.chrono&&d.chrono.earliest) h.push(["First trace anywhere", rpDate(d.chrono.earliest)]);
   if(d.asOf) h.push(["Records read", d.asOf]);
   h.push(["Report reference", rpRef(d)]);
@@ -7984,6 +8095,17 @@ id("rpPaks").addEventListener("click", function(e){
   if(t&&t!==this&&t.getAttribute) rpPvShow(t.getAttribute("data-pak"), t);
 });
 id("navBackReport").addEventListener("click", rpBackFromConsole);
+id("navNewCheck").addEventListener("click", function(){
+  /* The search bar is off the board, so this is the way back to it. */
+  RP=null; RP_LABEL="";
+  id("rpSources").hidden=true;
+  id("rpReport").hidden=false;
+  toIdle();
+  document.body.setAttribute("data-stage","landing");
+  var nb=id("navBackReport"); if(nb) nb.classList.remove("ready");
+  rpTop();
+  setTimeout(function(){ var i=id("kbInput"); if(i){ i.value=""; i.focus(); } },80);
+});
 document.addEventListener("keydown", function(e){
   if(e.key!=="Escape") return;
   if(RP_PV_OPEN) rpPvHide();
