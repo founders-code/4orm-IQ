@@ -129,3 +129,26 @@ duplicate CSS layout properties, a script reference to an element that no longer
 exists, the ten checks, the board against the catalogue, the plain language
 layer, the report stage and its scoping, and both paths from a finished run into
 the report. Every guard was proved by breaking its subject and watching it fail.
+
+## SR-001 controls the build
+
+The source register is no longer documentation. `tools/sr001-build.mjs` reads
+`legal/SR-001-source-register.xlsx` and writes the manifest into `index.html`
+between the `SR001-MANIFEST` markers. Never edit that block by hand.
+
+    node tools/sr001-build.mjs ../../legal/SR-001-source-register.xlsx index.html
+
+The generator refuses to write if any source the build queries is missing from
+the register. A source whose Operational status is not `ENABLED` is never
+planned into a search and draws on the board as `policy`: out of scope, which is
+its own state and never means reached and never means clean.
+
+`SR001_ENFORCE` is currently `false`, because nothing on the register has been
+classified yet and a build that draws every register dark is unusable. A build
+with it off shows a red banner saying so, and `node tools/verify.mjs --production`
+fails while it is off. Turn it on before any deploy.
+
+    node tools/verify.mjs --production
+
+`tools/smoke19.mjs` runs the page both ways and measures the board, so the switch
+is proved to change what a reader sees rather than only what the source says.

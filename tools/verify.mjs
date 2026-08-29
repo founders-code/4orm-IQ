@@ -100,12 +100,192 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   if (clashes.length) fails.push('a layout property is declared more than once on the same selector, the later one silently wins:\n      ' + clashes.join('\n      '));
 }
 
+
+/* ======================================================================
+   OPS-001 s.23 OUTPUT VALIDATOR AND PIA-001 CONTROLS
+
+   Every check below names the clause it enforces. A control that lives only in
+   a document is a control nobody can prove, and every one of these was proved
+   by putting the prohibited thing back and watching the suite fail.
+   ====================================================================== */
+{
+  const src = html;
+
+  /* PIA-001 s.20 / OPS-001 s.8: person name and phone-for-person-lookup are
+     not permitted inputs. */
+  if (/ID_TYPES\s*=\s*\[[^\]]*"Person"/.test(src))
+    fails.push('OPS-001 s.8: "Person" is offered as a search type again');
+  if (/ID_TYPES\s*=\s*\[[^\]]*"Phone"/.test(src))
+    fails.push('OPS-001 s.8: "Phone" is offered as a search type again');
+  if (/placeholder="[^"]*person[^"]*"/i.test(src))
+    fails.push('OPS-001 s.8: the search box still invites a person name');
+  if (!/function inputAllowed\(/.test(src))
+    fails.push('OPS-001 s.8: the input gate function is gone');
+  if (!/BLOCKED_INPUT/.test(src))
+    fails.push('OPS-001 s.8: the blocked-input map is gone');
+
+  /* PIA-001 s.21: no persistent person-level graph reaches the page. */
+  if (!/function rpPeople\(d\)\{\s*return \[\];\s*\}/.test(src))
+    fails.push('PIA-001 s.21: rpPeople returns person nodes again');
+
+  /* PIA-001 s.14: a name prints only from a source SR-001 authorised. */
+  if (!/RP_PERSON_OUTPUT_SOURCES/.test(src))
+    fails.push('PIA-001 s.14: the SR-001 person-output gate is gone');
+  if (!/rpPersonOutputAllowed\(ev\[i\]\.sid \|\| ev\[i\]\.src\)/.test(src))
+    fails.push('PIA-001 s.14: the name miner no longer consults the SR-001 gate');
+
+  /* The Quebec subject rule. A geofence is about the reader; this is about the
+     person being written about, which is what the statute is about. */
+  if (!/function rpQcSubject\(/.test(src))
+    fails.push('the Quebec subject rule is gone');
+  if (!/if\(rpQcSubject\(ev\[i\]\)\) continue;/.test(src))
+    fails.push('the Quebec subject rule is defined but never applied');
+
+  /* Content age and dead items. */
+  if (!/RP_DEAD/.test(src) || !/function rpBarred\(/.test(src))
+    fails.push('the content-age and dead-item filter is gone');
+  for (const w of ['dismissed','withdrawn','acquitted','not guilty'])
+    if (!new RegExp(w, 'i').test((src.match(/var RP_DEAD =[^\n]*/)||[''])[0]))
+      fails.push('the dead-item filter no longer catches "' + w + '"');
+  if (!/RP_ADVERSE_YEARS\s*=\s*7\b/.test(src))
+    fails.push('the seven year cap on adverse information has moved');
+  if (!/var sieved=rpSieve\(d\.issues\|\|\[\]\)/.test(src))
+    fails.push('rpFinds no longer sieves the findings before ranking them');
+  if (!/found and not reported/.test(src))
+    fails.push('items we refuse to publish are dropped silently instead of disclosed');
+
+  /* The conditional imperative. The instruction is the authority's, or it is
+     not made. */
+  if (/return "Do not send any money\.";/.test(src))
+    fails.push('the unconditional imperative is back in the verdict');
+  if (/"Stop\. Do not send anything tonight\."/.test(src))
+    fails.push('the unconditional stop instruction is back in the verdict');
+  if (!/rpOfficialBody\(d\)\+" says do not send money/.test(src))
+    fails.push('the RED verdict no longer attributes the instruction to a body');
+  /* A call site is not an implementation. This guard passed once while the
+     function it names did not exist, and the smoke suite caught it at runtime
+     instead. Check the definition, not only the call. */
+  if (!/function rpOfficialBody\(d\)\{/.test(src))
+    fails.push('rpOfficialBody is called but not defined');
+
+  /* Defamation by juxtaposition: the prior-warning block needs a specific
+     identifier. */
+  if (/'<div class="snaplist">'\+g\.priors\.map/.test(src))
+    fails.push('the prior-warning block renders every prior, including weak ones');
+  {
+    const f = (src.match(/var priors = \(g\.priors\|\|\[\]\)\.filter\([\s\S]*?\n  \}\);/) || [''])[0];
+    if (!f) fails.push('the specificity threshold on prior warnings is gone');
+    else if (!/very high/.test(f) || !/\bhigh\b/.test(f))
+      fails.push('the prior-warning filter no longer tests specificity, so a '
+        + 'shared nameserver can put a firm beside a regulator warning again');
+  }
+
+  /* OPS-001 s.25 prohibited copy, in our own voice. */
+  /* Two exemptions, both real. A verbatim quote from a retrieved source is us
+     showing the reader what that source said, which is the opposite of the harm.
+     And a sentence promising we will NEVER do the thing is not us doing it:
+     "We never publish a trust score" has to survive a guard against trust
+     scores, or the guard deletes the promise. */
+  const ownVoice2 = src
+    .replace(/quote:"[^"]*"/g, '')
+    .replace(/&ldquo;[\s\S]*?&rdquo;/g, '')
+    .split(/(?<=[.!?])\s+/)
+    .filter(sent => !/\bnever\b/i.test(sent))
+    .join(' ');
+  const banned25 = [
+    'trust score', 'reputation score', 'fraud probability',
+    'this person is safe', 'is a scammer', 'bad actor',
+    'high-risk individual', 'guaranteed safe', 'we checked everything',
+    'no risk exists', 'you should invest'
+  ];
+  for (const phrase of banned25)
+    if (new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(ownVoice2))
+      fails.push('OPS-001 s.25 prohibited copy in our own voice: "' + phrase + '"');
+
+  /* A promise we cannot perform is a promise we do not make. */
+  if (/previous six months/.test(src))
+    fails.push('the six month notification promise is back, and retention cannot support it');
+  if (/two business days/.test(src) && /acknowledge/.test(src))
+    fails.push('the two business day acknowledgement is back without instrumentation');
+}
+
+/* ---------------------------------------------------------------- SR-001
+   The register controls the build, or it is a spreadsheet. These guards are
+   what make it the first thing. */
+{
+  const src = html;
+  if (!/SR001-MANIFEST-START/.test(src) || !/SR001-MANIFEST-END/.test(src))
+    fails.push('SR-001: the generated manifest block is gone from the build');
+  const man = (src.match(/SR001-MANIFEST-START[\s\S]*?var SR001 = ([\s\S]*?);\n\/\* SR001-MANIFEST-END/) || [])[1];
+  if (!man) fails.push('SR-001: the manifest cannot be parsed');
+  else {
+    let m; try { m = JSON.parse(man); } catch { fails.push('SR-001: the manifest is not valid JSON'); }
+    if (m) {
+      if (!Array.isArray(m.enabled)) fails.push('SR-001: the manifest has no enabled list');
+      /* Every source the build queries must be on the register. The generator
+         refuses to write otherwise, and this is the second lock in case
+         somebody edits CATS without regenerating. */
+      const cats = eval((src.match(/var CATS\s*=\s*(\[[\s\S]*?\n\]);/) || [null,'[]'])[1].replace(/<\/?b>/g, ''));
+      const inBuild = new Set();
+      cats.forEach(c => (c.src || []).forEach(s => inBuild.add(String(s[0]).trim())));
+      if (m.total && inBuild.size > m.total)
+        fails.push('SR-001: the build queries ' + inBuild.size + ' sources and the register carries '
+          + m.total + '. Re-run tools/sr001-build.mjs.');
+      /* A name may print only from a source the register cleared for it, and
+         the two gates must agree. */
+      const po = Object.keys(m.personOutput || {}).length;
+      const code = (src.match(/var RP_PERSON_OUTPUT_SOURCES = \{([^}]*)\}/) || [null,''])[1].trim();
+      if (po === 0 && code !== '')
+        fails.push('SR-001 clears no source for person-level output, but the build hardcodes some');
+    }
+  }
+  if (!/function srEnabled\(name\)/.test(src))
+    fails.push('SR-001: the enforcement function is gone');
+  if (!/function srScope\(c\)/.test(src))
+    fails.push('SR-001: srScope, the one place that answers which registers a check may use, is gone');
+  if (!/srEnabled\(n\) \? \(status/.test(src))
+    fails.push('SR-001: the board no longer marks an uncleared register out of scope');
+  if (!/SR_OUT_OF_SCOPE = "policy"/.test(src))
+    fails.push('SR-001: the out-of-scope board state is gone, and an uncleared register '
+      + 'will read as one we reached');
+  /* Both rules, not either. The chip needs its own border treatment and its
+     own dot treatment, and a guard satisfied by one of the two passed while the
+     other was renamed. */
+  if (!/\.src\[data-s="policy"\]\{/.test(src))
+    fails.push('SR-001: the out-of-scope chip has no styling, so it draws as ready');
+  if (!/\.src\[data-s="policy"\] i\{/.test(src))
+    fails.push('SR-001: the out-of-scope chip keeps a lit dot, which reads as reached');
+
+  /* Fail visible. Enforcement off is allowed; enforcement off and silent is not. */
+  const enforcing = /var SR001_ENFORCE = true;/.test(src);
+  if (!enforcing) {
+    if (!/id="srWarn"/.test(src))
+      fails.push('SR-001 enforcement is off and the page does not say so');
+    if (!/id\("srWarn"\)/.test(src))
+      fails.push('SR-001 enforcement is off and the banner is never shown');
+    if (process.argv.includes('--production'))
+      fails.push('SR-001 enforcement is off. This build queries registers the '
+        + 'register has not cleared, and must not be deployed.');
+    else
+      console.log('  NOTE  SR-001 enforcement is off. Run with --production before deploying.');
+  }
+}
+
 /* ------------------------------------------------------------ house rules */
 if (/[—–]/.test(html)) fails.push('an em dash or en dash is present');
 const banned = ['not just', 'genuinely', 'substantially', 'delve', 'seamless',
                 'robust', 'crucial', 'vital', 'holistic', 'underscore', 'testament'];
 const hits = banned.filter(w => new RegExp('\\b' + w + '\\b', 'i').test(html));
 if (hits.length) fails.push('banned words: ' + hits.join(', '));
+
+/* The experience behind this product is ours, told in the first person. Writing
+   it as "our founders" puts a third party between the reader and the people who
+   sat in those rooms, and it reads like a marketing page describing itself. */
+{
+  const prose = html.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  if (/\bfounders\b/i.test(prose))
+    fails.push('copy refers to "founders" in the third person, it should be "we"');
+}
 
 /* -------------------------------------------- the rules that are the product */
 /* A trust score in our own voice is a failure. The same words inside a verbatim
@@ -356,9 +536,19 @@ if (/<span class="statq" aria-hidden="true">\?<\/span>/.test(script))
    The page is read by a frightened person on a phone. Every one of these was
    a real misreading found in review, not a style preference. */
 {
+  /* The tonight banner survives the securities rewrite, deliberately. It names
+     no firm and recommends a pause rather than a decision about an investment,
+     which is the distinction the whole verdict rewrite turns on. It used to
+     appear twice: once here and once as the YELLOW verdict headline. The
+     headline was entity specific and answered "should I send my money to this
+     firm", so it went. This one stays and is required. */
   const n = (script.match(/Do not send anything tonight\./g) || []).length;
-  if (n < 2) fails.push('the one line the page exists to deliver is gone from '
-    + (2 - n) + ' of the 2 places it belongs');
+  if (n < 1) fails.push('the tonight banner is gone, which is the one line the '
+    + 'page exists to deliver');
+  const vw = (script.match(/function rpVerdictWord\(v,d\)\{[\s\S]*?\n\}/) || [''])[0];
+  if (/Do not send anything tonight/.test(vw))
+    fails.push('the tonight instruction is back inside the verdict headline, '
+      + 'where it is a recommendation about a named firm');
 }
 if (!/id\("rpAlreadyBtn"\)/.test(script))
   fails.push('the reader who has already paid has no route again');

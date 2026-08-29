@@ -54,12 +54,12 @@ for(let i=0;i<tiles.length;i++){
   const t=b.textContent||'';
   const kind=doc.getElementById('infoKind').textContent;
   const okRecords=/records? found/i.test(t);
-  const okRules=/How this check is decided/.test(t);
+  const okRules=/How we decide this check/.test(t);
   const okRegs=/registers behind this check/.test(t);
   if(!okRecords||!okRules||!okRegs) fails.push('check '+kind+' missing: '+
     [!okRecords&&'records',!okRules&&'rules',!okRegs&&'registers'].filter(Boolean).join(', '));
   const iF=(t.match(/\d+ records? found/)||[''])[0];
-  if(iF && t.indexOf(iF) > t.indexOf('How this check is decided')) fails.push('check '+kind+' puts rules before records');
+  if(iF && t.indexOf(iF) > t.indexOf('How we decide this check')) fails.push('check '+kind+' puts rules before records');
   doc.getElementById('infoClose').click(); await wait(4);
 }
 console.log('  all ten open with records, rules and registers:', !fails.some(f=>/^check /.test(f)));

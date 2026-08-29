@@ -337,6 +337,16 @@ body[data-stage="console"] .console{padding-top:112px}
 .searchbox .pfx{font-family:var(--mono);font-size:15px;color:var(--blue);flex:none;user-select:none}
 .searchbox input{flex:1;min-width:0;padding:21px 0;font-size:18px;letter-spacing:-.012em}
 .searchbox input::placeholder{color:var(--tx-4)}
+.srwarn{
+  margin-top:14px;padding:12px 16px;border-radius:var(--r);
+  border:1px solid var(--bad-br);background:var(--bad-bg);color:var(--bad);
+  font-size:13.5px;line-height:1.5;max-width:62ch;
+}
+.srwarn b{font-weight:700}
+.kbblocked{
+  margin-top:12px;font-size:13.5px;line-height:1.5;color:var(--gold);
+  max-width:52ch;
+}
 .gobtn{
   flex:none;padding:18px 30px;border-radius:999px;background:var(--blue);color:#fff;text-align:center;
   font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;
@@ -434,6 +444,15 @@ body[data-stage="landing"] .tlead{display:block}
 .src[data-s="clear"],.src[data-s="caution"],.src[data-s="adverse"]{font-weight:700}
 .src[data-s="unreached"]{color:var(--dim);background:transparent;border-color:var(--border-strong)}
 .src[data-s="unreached"] i{background:var(--dim);box-shadow:none}
+/* A fourth dark state, and the newest. policy means the register has not been
+   cleared for production on SR-001, so we did not query it. It is drawn as a
+   hatched outline rather than a dot, because it is the only dark state that is
+   about us rather than about the source, and the reader should be able to see
+   at a glance which silences are ours. It never counts as checked and it never
+   counts as clean. */
+.src[data-s="policy"]{color:var(--dim);background:transparent;border-style:dashed;
+  border-color:var(--border-strong);opacity:.72}
+.src[data-s="policy"] i{background:transparent;border:1px dashed var(--dim);box-shadow:none}
 /* Three different reasons a light is dark, and they are not the same fact.
    searched  the register was queried and returned nothing. That is a result.
    na        the register could never have applied to this party.
@@ -2178,6 +2197,27 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 .said[data-s="na"]{color:var(--tx-4)}
 .said[data-s="none"]{color:var(--tx-4)}
 .srctbl{min-width:660px}
+
+/* A complaint against a regulated firm is not a fraud recovery, and the door
+   should not be painted like one. */
+#rpt .rp-already[data-c="calm"] .rp-alreadybtn{background:var(--surface-2);
+  border-color:var(--border-strong)}
+#rpt .rp-already[data-c="calm"] .rp-alreadybtn:hover{border-color:var(--blue-100);
+  box-shadow:0 12px 34px rgba(16,32,64,.1)}
+#rpt .rp-already[data-c="calm"] .rp-alreadybtn .rp-t{color:var(--tx)}
+#rpt .rp-already[data-c="calm"] .rp-alreadybtn .rp-x{color:var(--tx-2)}
+#rpt .rp-already[data-c="calm"] .rp-alreadybtn .rp-go{background:var(--blue)}
+
+/* Neither a warning nor a reassurance. It is the page saying what it does not
+   know, which is the same job the gap note does, so it wears the same clothes. */
+#rpt .rp-twoways{margin-top:26px;padding:24px 26px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:var(--r);max-width:72ch}
+#rpt .rp-twoways .rp-t{font-size:16.5px;font-weight:700;letter-spacing:-.02em;color:var(--tx);
+  line-height:1.35}
+#rpt .rp-twoways .rp-x{margin-top:13px;font-size:14.2px;line-height:1.62;color:var(--tx-2)}
+#rpt .rp-twoways .rp-last{margin-top:16px;padding-top:15px;border-top:1px solid var(--border);
+  color:var(--tx)}
+@media(max-width:560px){#rpt .rp-twoways{padding:20px 18px}}
 </style>
 </head>
 <body>
@@ -2241,9 +2281,15 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
         <form class="searchbox" id="kbForm" autocomplete="off">
           <span class="pfx">&gt;</span>
-          <input id="kbInput" type="text" placeholder="Company, person, website, email, phone or wallet" aria-label="Enter a company, person, website, email, phone or wallet">
+          <input id="kbInput" type="text" placeholder="Company, website, email or wallet" aria-label="Enter a company, a website, an email address or a wallet address">
           <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
         </form>
+        <div class="kbblocked" id="kbBlocked" role="status" aria-live="polite" style="display:none"></div>
+        <div class="srwarn" id="srWarn" role="alert" style="display:none">
+          <b>Source enforcement is off.</b> This build queries registers that SR-001 has not cleared
+          for production. It is not a production build and no result from it may be relied on or shown
+          to anyone as a live check.
+        </div>
 
         <!-- Real or absent. It renders only when the engine returns a real
              count, and shows nothing at all otherwise. -->
@@ -2487,9 +2533,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <button class="rp-alreadybtn" type="button" id="rpAlreadyBtn" aria-expanded="false"
         aria-controls="rpClock">
         <span class="rp-b">
-          <span class="rp-t">If you have already sent money, start here</span>
-          <span class="rp-x">Some of it may still be recoverable. That depends on hours,
-            not days.</span>
+          <span class="rp-t" id="rpAlreadyT"></span>
+          <span class="rp-x" id="rpAlreadyX"></span>
         </span>
         <span class="rp-go" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round"
@@ -2501,16 +2546,11 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     <div class="rp-clock" id="rpClock" hidden>
       <div class="rp-clockin">
         <div class="rp-clockh">
-          <span class="rp-c">Ring the bank first</span>
-          <span class="rp-t">If money has already gone, the next few hours decide whether it
-            comes back.</span>
+          <span class="rp-c" id="rpClockC"></span>
+          <span class="rp-t" id="rpClockT"></span>
         </div>
-        <p class="rp-clocks">Call the bank or card company that sent the money before you do
-          anything else on this page. Nothing here matters more than that call, and it gets
-          harder every hour.</p>
-        <div class="rp-shame">This is a professional operation and it catches accountants and
-          solicitors. Your bank hears this every day. You will not be the first call they take
-          tonight.</div>
+        <p class="rp-clocks" id="rpClockX"></p>
+        <div class="rp-shame" id="rpShame"></div>
         <div class="rp-win" id="rpWindows"></div>
         <div class="rp-tel" id="rpTels"></div>
       </div>
@@ -2534,6 +2574,26 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <p class="rp-sub">Every one came off a record you can open yourself. Under each one we
         say who says it, and how much weight that carries.</p>
       <div class="rp-finds" id="rpFinds"></div>
+
+      <!-- Only where a finding rests on what customers said. A pattern of
+           complaints is real information and it is also, sometimes, a mismatch
+           rather than a fault. Both are true and we cannot tell which from the
+           outside, so we say so rather than pick one. -->
+      <div class="rp-twoways" id="rpTwoWays">
+        <div class="rp-t">A pattern of complaints can mean two different things.</div>
+        <p class="rp-x">Sometimes it is the early shape of a real problem inside a business that
+          no regulator has caught yet. That is worth knowing before you put money in.</p>
+        <p class="rp-x">Sometimes it is a person who was never suited to what they bought. We have
+          sat with people who lost money on a platform that had broken no rule, because nobody
+          had explained what they were actually taking on. The loss was real. The
+          firm was not at fault.</p>
+        <p class="rp-x">Those two look identical in a review score, which is why we never let one
+          become a verdict. We show you what people are reporting, how many report the same thing,
+          and whether any authority has acted. The judgement stays with you.</p>
+        <p class="rp-x rp-last">Closing the gap between a sound business and a customer who did not
+          understand what they were buying is a problem 4orm is working on directly. It is the
+          other half of the same job.</p>
+      </div>
     </div>
 
     <!-- Moved up. It used to sit five screens below, under a heading that assumed
@@ -2633,7 +2693,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     <div class="rp-why">
       <div class="rp-k">Why this exists</div>
       <div class="rp-t">We have sat across from hundreds of people on the worst day of their year.</div>
-      <p class="rp-x">4orm's founders have worked personally with hundreds of individuals who lost money
+      <p class="rp-x">We have worked personally with hundreds of individuals who lost money
         to cryptocurrency and retail trading scams, from 2020 through to today. <b>Some of those
         conversations happened as recently as March 2026.</b></p>
       <p class="rp-x">The pattern almost never changes. The money is gone before anybody suspects
@@ -2652,6 +2712,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <p class="rp-sub">Those two steps are kept apart on purpose. Mixing them is how a service ends up
         confident about something it never actually looked at.</p>
       <div class="rp-rows"><div id="rpMethod"></div></div>
+    </div>
+
+    <div class="rp-sec">
+      <div class="rp-kick">The hardest call we make</div>
+      <h2 class="rp-h2">A complaint can be a warning or a mismatch, and both are real.</h2>
+      <p class="rp-sub">This is the judgement we get asked about most, and the one we refuse to
+        make on a reader's behalf.</p>
+      <div class="rp-rows" id="rpWhySoft"></div>
     </div>
 
     <div class="rp-sec">
@@ -4459,13 +4527,21 @@ function setStats(list){
   });
 }
 function slug(x){ return x.toLowerCase().replace(/[^a-z0-9]+/g,"-"); }
+
+/* The one place that answers "which registers is this check allowed to use".
+   Everything that plans, sweeps, counts or draws goes through here. */
+function srScope(c){
+  var all=(c&&c.src)||[], inn=[], out=[];
+  for(var i=0;i<all.length;i++) (srEnabled(all[i][0])?inn:out).push(all[i]);
+  return {inn:inn, out:out, all:all};
+}
 function renderBoard(status){
   var w=id("brows"); w.innerHTML="";
   SOURCES.forEach(function(g){
     var r=el("div","brow");
     var chips='';
     g.items.forEach(function(n){
-      var st = status && status[n] ? status[n] : "ready";
+      var st = srEnabled(n) ? (status && status[n] ? status[n] : "ready") : SR_OUT_OF_SCOPE;
       chips+='<span class="src" role="button" tabindex="0" data-s="'+esc(st)+'" data-n="'+esc(slug(n))+'" data-reg="'+esc(n)+'" title="'+esc((REGINFO[n]&&REGINFO[n][2])||n)+'"><i></i>'+esc(n)+'</span>';
     });
     r.innerHTML='<span class="bl">'+esc(g.c)+'</span><span class="bchips">'+chips+'</span>';
@@ -5339,9 +5415,19 @@ function snapGraph(){
     'Everything below is the fact, with the record it was read from. The conclusion is yours.</div>'+
     (g.note?'<div class="infop">'+esc(g.note)+'</div>':'')+'</div>';
 
-  if((g.priors||[]).length){
+  /* Defamation by juxtaposition is what this block does if it runs on a weak
+     identifier. Thousands of unrelated sites share a nameserver, and placing a
+     firm beside a warned entity on that basis is an accusation the page never
+     makes in words and could not defend if it did. So the block requires a
+     specific identifier. A low specificity prior is not lost: it is carried in
+     the not-counted list with everything else we found and did not rely on. */
+  var priors = (g.priors||[]).filter(function(p){
+    var sp=String(p.spec||p.specificity||"").toLowerCase();
+    return sp==="very high" || sp==="high" || (!sp && p.strong===true);
+  });
+  if(priors.length){
     h+='<div class="infosec"><div class="infoh">Seen before, on something a regulator warned about</div>'+
-       '<div class="snaplist">'+g.priors.map(function(p,i){
+       '<div class="snaplist">'+priors.map(function(p,i){
          return '<div class="snaprow" style="background:var(--bad-bg)"><span class="sx">'+(i<9?"0":"")+(i+1)+'</span>'+
            '<span class="sb"><span class="st2">'+esc(nodeWord(p.kind))+' '+esc(p.id)+'</span>'+
            '<span class="sd">Also appears on <b>'+esc(p.entity)+'</b>, which '+esc(p.reg)+' published a warning about on '+esc(p.date)+'. '+
@@ -5604,17 +5690,77 @@ function toggleDrill(key){
 }
 /* renderDrill was the inline panel. The detail modal replaced it. */
 
-var ID_TYPES=["Company","Person","Website","Email","Phone","Wallet"];
+/* OPS-001 s.8. A person's name and a phone-number-for-person-lookup are not
+   permitted inputs. They are the two queries that make this a report about a
+   natural person rather than about a counterparty, and they are the queries with
+   no business-capacity defence in any province. The chips are the permitted set,
+   and detect() below refuses the two prohibited shapes rather than silently
+   classifying them as something else. */
+/* ------------------------------------------------------------------ SR-001
+   Which sources this build is permitted to query. The block below is generated
+   from the register by tools/sr001-build.mjs and must not be edited here: the
+   answer to "why did this source run" has to be a row somebody signed, not a
+   line somebody typed into a page at midnight.
+
+   A source that is not ENABLED on the register is never planned into a search.
+   It is not reported as checked, and it is never reported as clean, because an
+   out-of-scope register is exactly as silent as an unreachable one and the
+   whole product rests on those two never being confused. */
+/* SR001-MANIFEST-START generated by tools/sr001-build.mjs, do not edit by hand */
+var SR001 = {
+ "generated": "2026-08-29",
+ "register": "SR-001-source-register.xlsx",
+ "total": 117,
+ "enabled": [],
+ "critical": [],
+ "personOutput": {}
+};
+/* SR001-MANIFEST-END */
+
+/* Enforcement is on. It is a variable rather than a constant for exactly one
+   reason: a build with an empty register shows an empty board, which is correct
+   and is also unusable for a demo. So it can be turned off, and a build with it
+   off says so on the page in words the reader cannot miss. Fail visible, never
+   fail silent. The guard in verify.mjs checks that the banner exists whenever
+   the switch is off, so this cannot ship quietly. */
+/* false today, and deliberately. The register is a day old, nothing on it has
+   been classified, and a build that draws every register dark teaches nobody
+   anything. The banner above says so on the page, and `node tools/verify.mjs
+   --production` refuses to pass while this is false, so it cannot reach a
+   production deploy without somebody turning it on and meaning it. */
+var SR001_ENFORCE = false;
+var SR001_SET = null;
+function srEnabled(name){
+  if(!SR001_ENFORCE) return true;
+  if(!SR001_SET){ SR001_SET={}; (SR001.enabled||[]).forEach(function(x){ SR001_SET[x]=1; }); }
+  return !!SR001_SET[String(name||"").trim()];
+}
+function srCritical(name){ return (SR001.critical||[]).indexOf(String(name||"").trim())>=0; }
+/* The board state for a source the register has not cleared. It is its own
+   state, not a variant of unreached: unreached means we tried and could not
+   get there, this means we did not try and are saying so. */
+var SR_OUT_OF_SCOPE = "policy";
+
+var ID_TYPES=["Company","Website","Email","Wallet"];
+var BLOCKED_INPUT = {
+  Person:"We do not run checks on a person's name. Search the company, the website, "
+        +"the email address or the wallet you were asked to send to.",
+  Phone :"We do not look people up by phone number. Search the company, the website, "
+        +"the email address or the wallet you were asked to send to."
+};
 function detect(v){
   v=(v||"").trim(); if(!v) return null;
   if(/^(0x[a-fA-F0-9]{40}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{20,}|T[A-Za-z0-9]{33})$/.test(v)) return "Wallet";
   if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return "Email";
-  if(/^[+()\d][\d\s().-]{6,}$/.test(v)) return "Phone";
+  if(/^[+()\d][\d\s().-]{6,}$/.test(v)) return "Phone";   /* refused at the gate */
   if(/^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(v)) return "Website";
   var w=v.split(/\s+/);
   if(w.length>=2&&w.length<=3&&/^[A-Z][a-z]+$/.test(w[0])&&/^[A-Z][a-z'-]+$/.test(w[w.length-1])) return "Person";
   return "Company";
 }
+/* The gate. detect() still names the shape, because telling somebody we do not
+   do this is better than pretending we did not understand them. */
+function inputAllowed(t){ return !!t && !BLOCKED_INPUT[t]; }
 var idsEl=id("kbIds");
 ID_TYPES.forEach(function(t){var c=el("span","idchip",esc(t));c.setAttribute("data-t",t);idsEl.appendChild(c);});
 function paintIds(t){
@@ -5623,11 +5769,17 @@ function paintIds(t){
 }
 var input=id("kbInput"), go=id("kbGo");
 (function(){
-  var wide="Company, person, website, email, phone or wallet", narrow="Name, website, email or wallet";
+  var wide="Company, website, email or wallet", narrow="Company, website or wallet";
   function ph(){ input.placeholder = window.innerWidth<640 ? narrow : wide; }
   ph(); window.addEventListener("resize",ph,{passive:true});
 })();
-input.addEventListener("input",function(){ paintIds(detect(input.value)); go.disabled=!input.value.trim(); });
+input.addEventListener("input",function(){
+  var t=detect(input.value), bad=t&&BLOCKED_INPUT[t];
+  paintIds(bad?null:t);
+  var w=id("kbBlocked");
+  if(w){ w.textContent = bad ? BLOCKED_INPUT[t] : ""; w.style.display = bad ? "" : "none"; }
+  go.disabled = !input.value.trim() || !!bad;
+});
 
 /* Every check runs on every search. enabledChecks stays as the single place
    that answers "which categories is this run allowed to use", so the request
@@ -7081,10 +7233,17 @@ window.addEventListener("keydown",function(e){
   if(OPEN) toggleDrill(OPEN);
 });
 
+/* Fail visible. A build with enforcement off says so on the page, every time,
+   in the place nobody can scroll past. */
+(function(){
+  var w=id("srWarn");
+  if(w) w.style.display = SR001_ENFORCE ? "none" : "";
+})();
+
 if(LIVE){
   var ll=id("liveLbl");
   ll.style.display=""; ll.classList.add("live"); ll.textContent="Live checking";
-  id("kbInput").placeholder="Any company, person, website, email, phone or wallet";
+  id("kbInput").placeholder="Any company, website, email or wallet";
   document.querySelector(".upnote").innerHTML=
     "<b>Live checking is on.</b> Every identifier you type runs a real sweep against public records. "+
     "Nothing is read from a stored corpus, and nothing is invented: if the sweep cannot complete, the console says so.";
@@ -7481,8 +7640,33 @@ var RP_WINDOWS = [["now", "The first hours", "Call the bank or card issuer that 
 var RP_TELS = [["Canada", "1-888-495-8501", "tel:18884958501"], ["United States", "1-877-382-4357", "tel:18773824357"], ["Your bank", "The number on your card", ""]];
 var RP_PACKS = [{"id": "bank", "n": 1, "name": "Your bank or credit union", "sub": "They can try to recall the payment. This is the only call that can move money.", "tone": "act", "act": "Handles your case", "does": "Your bank adjudicates your claim and, if the money has not yet been drawn down, may be able to attempt a recall. This is the one report on this page with a chance of getting funds back, and its chance falls every hour.", "route": [["Where", "The number on the back of your card, or your bank's app"], ["Published guidance", "cba.ca/article/financialfraudpreventiontips"], ["Interac phishing samples", "phishing@interac.ca"]], "clock": "No bank publishes a numeric deadline. Every one of them publishes the word immediately. Make this call before you finish reading this page.", "ask": ["Amount and currency sent", "Date and exact time of each payment", "How you paid: wire, e-Transfer, card, bill payment, crypto purchase", "Name on the receiving account, exactly as you typed it", "Receiving institution and country", "The account or reference number the payment went to", "Whether any further payment is scheduled or promised", "Whether you gave them remote access to any device", "Whether you gave them any banking credential, code or one time passcode"], "attach": ["Your payment confirmation or wire receipt", "The screen or message that told you where to send the money", "This report"], "note": ["Ask the bank to record this as a fraud claim, not a disputed purchase, and ask for the claim number before you hang up.", "The Canadian Bankers Association publishes that you should contact your bank immediately and keep every communication related to the scam.", "TD publishes that reporting to the police will not change the speed or priority of your bank claim. Do both, in either order, but do not delay the bank call waiting for a police file number."]}, {"id": "card", "n": 2, "name": "Your card issuer", "sub": "A card payment has a dispute route a transfer does not. It has the only hard deadline.", "tone": "act", "act": "Handles your case", "does": "Your issuer investigates the claim and, where it qualifies, raises a chargeback against the merchant's acquirer. Visa and Mastercard do not take cardholder disputes themselves; both publish that you must go to the institution that issued your card.", "route": [["Where", "The number on the back of your card, or your issuer's app"], ["Mastercard Assistance Center", "1-800-627-8372"], ["Regulator guidance", "canada.ca, Financial Consumer Agency of Canada, protection from unauthorized transactions"]], "clock": "This is the one published deadline on this page. CIBC publishes: submit the dispute within 30 days of your statement date at the latest. Other issuers vary. Treat 30 days from the statement as the outside limit and file well inside it.", "ask": ["The exact amount, date and merchant descriptor as it appears on your statement", "Every related transaction on the same card, including small test charges", "Whether you authorised the transaction at all, or authorised it having been deceived", "Whether you still physically hold the card", "Whether anyone else is an authorised user on the account", "What you were told you were buying", "What attempt you made to resolve it with the merchant, and when", "A current mailing address for a replacement card"], "attach": ["The statement line, circled", "Any order confirmation, receipt or invoice they sent you", "Your messages with them", "This report"], "note": ["RBC publishes that you should try the merchant first and allow 15 to 20 business days for a credit before raising the dispute. That guidance is written for an ordinary merchant dispute. Where a securities regulator has published a caution about the party, say so on the call and ask the issuer whether the fraud route applies instead.", "Zero liability protection covers unauthorised use. A payment you were deceived into authorising is a different category and is decided case by case. Describe what happened plainly and let the issuer classify it."]}, {"id": "police", "n": 3, "name": "Your local police", "sub": "The only body that investigates your case, and the source of the file number everyone else asks for.", "tone": "act", "act": "Investigates", "does": "Local police investigate the individual matter. The Canadian Anti-Fraud Centre publishes plainly that it is the role of your local police to investigate. Every other body on this page will ask you for the file number this report generates.", "route": [["Where", "Your local police service, in person or by their non emergency line"], ["Toronto Police non emergency", "416-808-2222"], ["Guidance", "sfo.opp.ca/reporting-fraud"]], "clock": "No deadline and no minimum loss threshold is published. Report it even if the amount feels too small to bother them with.", "ask": ["A detailed chronology of events, in order, with dates", "Personal identification you handed over during the fraud", "How they first reached you, and on what platform", "Every name, phone number, email address and handle they used", "Every payment: amount, date, method and destination", "Whether you have had any contact since"], "attach": ["Receipts, correspondence, financial documents and statements", "Emails, text messages and social media exchanges", "Screenshots of the website and of anything since taken down", "This report"], "note": ["The Ontario Provincial Police Serious Fraud Office publishes exactly three requirements: identification you provided during the fraud, supporting documents, and a detailed chronology. The chronology is the one you have to write yourself. Write it before you go in.", "Ask for the file number and write it down. Do not leave without it."]}, {"id": "cafc", "n": 4, "name": "Canadian Anti-Fraud Centre", "sub": "The national record. It does not investigate, and the record is still worth making.", "tone": "intel", "act": "Records and refers", "does": "The CAFC maintains the central repository that law enforcement draws on. It publishes that it does not investigate your case. What your report does is put this party into the national picture, which is how the next person gets warned.", "route": [["Phone", "1-888-495-8501, Monday to Friday, 10am to 4:45pm Eastern"], ["Online", "reportcyberandfraud.canada.ca"], ["Guidance", "antifraudcentre-centreantifraude.ca"]], "clock": null, "ask": ["Your police file number, which the CAFC asks you to obtain first", "The name of the person or business that approached you", "How they first made contact, and on what platform", "What they asked you to do", "Every amount sent, with dates and method", "The financial institution that transferred the money", "Whether anyone has since contacted you offering to recover it"], "attach": ["Documents and receipts", "Copies of emails and text messages", "Screenshots", "This report"], "note": ["The CAFC publishes a warning that belongs on this page more than any other: fraudsters often target victims a second or third time with the promise of recovering money. Nobody legitimate will ask you to pay to get your money back. Not a lawyer, not a recovery firm, not somebody claiming to be from the CAFC itself.", "Report to your financial institution and your local police first. The CAFC's own published order puts both ahead of them."]}, {"id": "bureau", "n": 5, "name": "Competition Bureau Canada", "sub": "For the advertising and the marketing that reached you. It publishes the fullest list of what to gather.", "tone": "intel", "act": "Enforcement, not redress", "does": "The Bureau enforces the Competition Act. It publishes plainly that it is not a consumer protection agency, cannot act on your behalf to obtain reimbursement, and does not provide legal advice. Its interest is the deceptive marketing itself.", "route": [["Phone", "1-800-348-5358"], ["Online", "competition-bureau.canada.ca, complaint form"], ["Guidance", "competition-bureau.canada.ca, how to report fraud and scams in Canada"]], "clock": null, "ask": ["The name of the person who approached you, what they were trying to get you to do, and when it happened", "The phone number they used, if they called", "The exact website address, written or pasted in full", "The sender's IP address from the email header, if you can find it", "The search terms you used, if you found them through a search engine, and whether you clicked a link or a banner advert", "A detailed description of the complaint", "Whether you are a victim, and the dollar amount if so"], "attach": ["Printouts or screenshots of key web pages: the product or service, the terms and conditions, and the payment page", "Receipts for mail, card payments, wire transfers and money orders", "Cancelled cheques, phone bills, shipping envelopes", "Copies of emails, text messages and chat logs", "This report"], "note": ["That list is the Bureau's own, and it is the most complete evidence checklist any Canadian body publishes. Gathering it once covers most of what every other recipient on this page will ask for.", "Take the screenshots today. A site named on a caution list often disappears within weeks, and a page you did not capture is a page that never existed."]}, {"id": "bcsc", "n": 6, "name": "British Columbia Securities Commission", "sub": "The regulator that published the caution about this party. It can assess and investigate.", "tone": "act", "act": "May investigate", "does": "The BCSC assesses complaints with a connection to British Columbia, meaning illegal activity affecting BC residents or occurring in BC. It publishes four possible outcomes: it contacts you for more, closes the file, refers it to another regulator, or points you to police.", "route": [["Phone", "604-899-6854, or toll free 1-800-373-6393"], ["Email", "inquiries@bcsc.bc.ca"], ["Online", "bcsc.bc.ca, filing a complaint with the BCSC"]], "clock": null, "ask": ["A detailed summary of what happened", "The names of every individual, company or entity you came into contact with", "How the investment was described to you, and what return you were promised", "Where you are resident, and where you were when you were approached", "Every amount sent, with dates and method", "Whether you were told the party was registered or licensed anywhere"], "attach": ["Correspondence and paperwork", "Screenshots and photographs", "Account statements, if an account was opened", "Emails, text messages and other written communication", "This report"], "note": ["This party is already on the BCSC Investment Caution List, added 14 July 2026. Your report is not telling them something they do not know about the name. It is telling them the name is still operating and still reaching people, which is what moves a listing along.", "A caution list entry is a warning, not a finding that any law has been broken."]}, {"id": "ic3", "n": 7, "name": "FBI Internet Crime Complaint Center", "sub": "For a United States connection. It publishes its required fields exactly.", "tone": "intel", "act": "Records and refers", "does": "IC3 takes the complaint, analyses it, and may refer it onward. It publishes that you will not be contacted by IC3 and that any investigation is at the discretion of the agency receiving it.", "route": [["Online", "complaint.ic3.gov"], ["Field list", "ic3.gov, frequently asked questions"]], "clock": "No numeric window is published. IC3 does describe a Recovery Asset Team that works with financial institutions to freeze funds, and speed is the whole basis of it.", "ask": ["Your name, address, telephone and email", "Financial transaction information: account information, transaction date and amount, and who received the money", "The total amount of your loss", "The subject's name, address, telephone, email, website and IP address", "Specific details of what happened", "Email headers, if available"], "attach": ["Email headers in full, which is more than the visible message", "Transaction records", "This report"], "note": ["IC3 publishes that its ability to address the complaint depends on the accuracy and completeness of what you give it. The subject's IP address and the full email headers are the two fields most people leave blank, and they are the two that make a complaint traceable."]}, {"id": "ftc", "n": 8, "name": "United States Federal Trade Commission", "sub": "For a United States connection. The report reaches thousands of enforcers at once.", "tone": "intel", "act": "Records and refers", "does": "The FTC publishes that it uses reports to investigate, bring law enforcement cases and alert companies and consumers, and that a report made through its portal is instantly available to more than three thousand federal, state and local law enforcers.", "route": [["Online", "reportfraud.ftc.gov"], ["Phone", "1-877-382-4357"], ["Guidance", "consumer.ftc.gov, what to do if you were scammed"]], "clock": null, "ask": ["The name of the company", "Contact details for the person who dealt with you", "The amount you paid", "The payment method", "When you paid", "How you first heard about it", "What was offered to you", "A description of events in your own words"], "attach": ["Your own written account, prepared before you start the form", "Payment records", "This report"], "note": ["The FTC's own instruction for money already sent is to go to the payment channel first: your bank for a transfer, the wire company for a wire, the card issuer for a card, the gift card issuer for a gift card, the exchange for crypto. The FTC report does not recover money and does not claim to.", "Check reportfraud.ftc.gov is available before you begin. It has been intermittently offline, in which case consumer.ftc.gov carries the guidance."]}, {"id": "crypto", "n": 9, "name": "The crypto exchange or platform", "sub": "Only if funds moved through crypto. Read the first line of this one before you hope.", "tone": "intel", "act": "Secures your account", "does": "An exchange can secure your account, act on its own fraud intelligence and give you a paper trail. Kraken publishes the sentence that matters: cryptocurrency transactions are irreversible, once a transaction leaves your account funds cannot be recovered, and the exchange is unable to reverse or recover funds for you.", "route": [["Where", "Your exchange's own support or complaint form"], ["Kraken complaints", "support.kraken.com, complaint handling process"], ["Coinbase", "help.coinbase.com, report an unauthorized transaction"]], "clock": "Kraken publishes its own handling times: acknowledgment within 5 business days, response within 15, and up to 30 to 35 business days for a complex investigation.", "ask": ["Your full name and the email address on the account", "Your country of residence", "A detailed description of the issue", "The dates and events involved", "Any existing support ticket number", "The transaction hash or TXID of every transfer out", "The destination wallet address", "The network each transfer was sent on"], "attach": ["Screenshots of the transaction history", "The instructions you were given about where to send it", "This report"], "note": ["The last three fields are not a published form requirement. Neither Coinbase nor Kraken publishes a scam report field list. They are here because the transaction hash, the destination address and the network are what any investigator or exchange actually uses to follow a transfer, and both exchanges describe the hash in exactly those terms.", "Lock the account before you write anything. Coinbase publishes a lock account page for this. Change the password and check for any device or session you do not recognise."]}];
 var RP_METHOD = [["What is retrieved", "Every register we can reach is asked directly, and every page that comes back is kept with the address it came from and the date it was read. <b>What was reached is counted from that log</b>, not asserted by anything downstream of it."], ["What is judged", "Reading a record is a separate step from retrieving it. Judgement can say a register that answered means something worse than it first appeared. It can never light a register that returned nothing."], ["The two numbers", "<b>Identity confidence</b> is how sure we are that every record describes the same party. <b>Evidence coverage</b> is how much of what could have applied was actually reached. They are published side by side and never combined, because one number out of a hundred gets read as permission."], ["Dark is three things", "A register can be dark because it was asked and held nothing, because it could never have held a record for this party, or because nobody reached it. Only the last is a gap, and the board keeps them apart."], ["How current it is", "Every page carries the date the records were read. Registers change. A result is a photograph of the public record on one day, and we say which day on every screen."]];
+var RP_WHYSOFT = [
+ ["What a pattern of complaints is worth",
+  "It is real information. A group of people describing the same problem, in their own words, is "
+  +"often the first sign of something a regulator has not reached yet. We read it for the "
+  +"repeated thing, not for the volume, because ten people describing one problem tells you more "
+  +"than a hundred scores out of five."],
+ ["What it is not",
+  "It is not a finding. Nobody in a review has been cross examined, nothing in it has been tested, "
+  +"and a complaint board has no duty to be fair to the party it names. That is why a pattern can "
+  +"never turn a result red on its own, whatever the number."],
+ ["The half nobody says out loud",
+  "We have sat with people who lost money on a platform that had broken no rule. Nobody "
+  +"had explained what they were actually taking on, the product was never right for them, and by "
+  +"the time that was clear the money had gone. The loss was real. The distress was real. The firm "
+  +"was not at fault. That complaint looks exactly like the other kind in a review score."],
+ ["Why we will not choose for you",
+  "From outside a business we usually cannot tell which of those two we are looking at. So we "
+  +"publish what people are reporting, how many report the same thing, and whether any authority "
+  +"has acted, and we leave the judgement where it belongs. Presenting either reading as certain "
+  +"would be the same failure, pointed in two different directions."],
+ ["The other half of the job",
+  "A sound business and a customer who did not understand what they were buying is a gap, and it "
+  +"costs people money without anybody doing anything wrong. Closing it is work 4orm is doing "
+  +"directly. Warning people away from fraud is only half of what this is for."]
+];
 var RP_NEVERS = [["We never invent evidence", "No licence number, registry reference, case number or filing date is ever produced that we did not read off a source you can open."], ["We never publish a trust score", "No single number out of a hundred, no letter grade, no stars. A composite is read as permission and it hides which half of it is weak."], ["We never call an outage a clean result", "If a register cannot be reached, it is reported as not reached. A missing key never becomes \u201cwe looked and found nothing\u201d."], ["We never decide for you", "This is a research summary. It is not a legal finding, not advice, and not a determination that anybody has done anything wrong."]];
-var RP_LAWFUL = [["What this is not", "Inclusion of a party in a 4orm result does not mean we have concluded that any law has been broken, or that any authority has made a finding. We report what public records showed on a stated date, with the source beside each item."], ["Absence proves nothing", "A party missing from a caution list is not cleared by that absence. Regulators say so themselves: entities are added as they become known. A register with no entry on the day we looked is a fact about that day, not a verdict."], ["Accuracy is an ongoing duty", "Where a result names a person, that is personal information and we treat accuracy as a continuing obligation rather than something we fix only when challenged."], ["If you are the party named", "Write to us and we will re-check the record. If an item cannot be verified against a source, we remove it. If we disagree, your response is attached to the result so anybody reading it sees both. We tell anyone who received the result in the previous six months."], ["Our commitment on timing", "We acknowledge a challenge within two business days and complete the re-check within thirty days. Items that cannot be verified come off during that window, not at the end of it."]];
+var RP_LAWFUL = [["What this is not", "Inclusion of a party in a 4orm result does not mean we have concluded that any law has been broken, or that any authority has made a finding. We report what public records showed on a stated date, with the source beside each item."], ["Absence proves nothing", "A party missing from a caution list is not cleared by that absence. Regulators say so themselves: entities are added as they become known. A register with no entry on the day we looked is a fact about that day, not a verdict."], ["Accuracy is an ongoing duty", "Where a result names a person, that is personal information and we treat accuracy as a continuing obligation rather than something we fix only when challenged."], ["If you are the party named", "Write to us and we will re-check the record. If an item cannot be verified against a source, we remove it. If we disagree, your response is attached to the result so anybody reading it sees both."], ["Why there is no old copy to correct", "We do not keep results. Every check is run fresh against the registers on the day you ask, and the answer is not stored and served to somebody else later. That is why this page carries no promise to go back and notify people who read an old result: there is no old result in the world to notify them about. A correction lands the moment the record changes, because the next check reads the record and not our memory of it."], ["Our commitment on timing", "We aim to acknowledge a challenge within five business days and to finish the re-check within thirty. Items we cannot verify against a source come off while we are looking, not at the end."]];
 var RP_CATLIST = [["Official record", "Regulators, courts, registries", "Government, regulator, court and registry sources. Can carry a red result on their own."], ["Verified data", "Certificates, chain, infrastructure", "Independent structured data: certificate logs, domain records, threat feeds, chain explorers."], ["Customer reports", "Complaint boards, review platforms", "What customers say, read for a repeated pattern rather than for volume. Never decides alone."], ["Public chatter", "Open web", "Labelled as community intelligence and never as verified fact. Corroborates, never concludes."]];
 var RP_ARROW = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7 17L17 7M9 7h8v8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
 var RP_CROSS = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 6l12 12M18 6L6 18\" stroke-linecap=\"round\"/></svg>";
@@ -7537,15 +7721,21 @@ function rpChrono(d,re){
   for(var i=0;i<r.length;i++) if(re.test(String(r[i].what||""))) return r[i];
   return null;
 }
-function rpPeople(d){
-  var out=[], seen={}, n=(d.graph&&d.graph.nodes)||[];
-  for(var i=0;i<n.length;i++){
-    if(/^(PERSON|DIRECTOR|OFFICER|PROMOTER|ADVISER)$/.test(String(n[i].type||""))){
-      var v=String(n[i].v||"").trim();
-      if(v && !seen[v.toLowerCase()]){ seen[v.toLowerCase()]=1; out.push(n[i]); }
-    }
-  }
-  return out;
+/* PIA-001 s.21. A persistent person-level graph is prohibited, so the person
+   node types never reach the page. The pipeline may still type a node as a
+   person, because that typing is what lets us recognise and suppress it. What
+   it may not do is print one.
+
+   This function used to return them. It now returns nothing, and it stays here
+   rather than being deleted so the suppression is visible, testable and
+   attributable to a clause rather than being an absence somebody re-adds by
+   accident six months from now. */
+var RP_PERSON_NODE = /^(PERSON|DIRECTOR|OFFICER|PROMOTER|ADVISER)$/;
+function rpPeople(d){ return []; }
+function rpPersonNodesSuppressed(d){
+  var c=0, n=(d.graph&&d.graph.nodes)||[];
+  for(var i=0;i<n.length;i++) if(RP_PERSON_NODE.test(String(n[i].type||""))) c++;
+  return c;
 }
 
 /* A title is not a person. Chief Executive, Managing Director and Persons With
@@ -7566,6 +7756,80 @@ function rpIsName(s){
    on a page somebody hands to their bank is worse than printing nothing. */
 var RP_ROLE = /\b(director|officer|appointed|principal|promoter|adviser|advisor|president|chief|founder|owner|shareholder|controlled by|acting for|signatory|named as|named in|beneficial)\b/i;
 
+/* ---------------------------------------------------- the Quebec subject rule
+   Blocking Quebec users is a rule about who is reading. It says nothing about
+   who is being written about, and the statute is about the second one. A user
+   in Toronto checking a Montreal firm is the case a geofence never sees.
+
+   So the rule runs on the evidence, not on the reader: where a record carrying
+   personal information also carries a Quebec connection, that record may not
+   produce person-level output, no matter where the person searching is sitting.
+   Firm-level reporting is unaffected. */
+var RP_QC = new RegExp("\\b(qu[eé]bec|montr[eé]al|laval|gatineau|sherbrooke|"
+  + "trois[- ]rivi[eè]res|saguenay|l[eé]vis|longueuil|terrebonne|"
+  + "autorit[eé] des march[eé]s financiers|\\bAMF\\b|"
+  + "commission d.acc[eè]s [aà] l.information|\\bCAI\\b|"
+  + "\\bQC\\b|\\bG[0-9][A-Z]|\\bH[0-9][A-Z]|\\bJ[0-9][A-Z])", "i");
+function rpQcSubject(ev){
+  if(!ev) return false;
+  return RP_QC.test(String(ev.find||"")+" "+String(ev.quote||"")+" "
+                   +String(ev.src||"")+" "+String(ev.where||""));
+}
+
+/* ------------------------------------------------- content age and dead items
+   Every consumer reporting statute in Canada bars adverse information after six
+   or seven years, and bars a charge that was dismissed, withdrawn, stayed or
+   acquitted absolutely, with no time limit at all. Those rules bite only if one
+   of those Acts applies to us, which is unsettled. We apply them anyway, because
+   an item that no regulated reporter in the country may publish is not an item
+   we want on a page a frightened person is reading at eleven at night.
+
+   The seven year clock runs from the date on the record. An item with no date
+   is not aged out, because guessing would be worse; it is marked undated and the
+   reader is told. */
+var RP_DEAD = /\b(dismissed|withdrawn|stayed|stay of proceedings|acquitted|acquittal|not guilty|no conviction|charges? dropped|discontinued|nolle prosequi)\b/i;
+var RP_ADVERSE_YEARS = 7;
+function rpItemAgeYears(ev){
+  var t = ev && (ev.date || ev.when || ev.filed || ev.published);
+  if(!t) return null;
+  var ms = Date.parse(t);
+  if(isNaN(ms)) { var y=String(t).match(/\b(19|20)\d{2}\b/); if(!y) return null; ms=Date.parse(y[0]+"-01-01"); }
+  if(isNaN(ms)) return null;
+  return (Date.now()-ms)/(365.2425*24*3600*1000);
+}
+/* Returns a reason string when the item must not be published, or null. */
+function rpBarred(ev){
+  if(!ev) return null;
+  var text=String(ev.find||"")+" "+String(ev.quote||"");
+  if(RP_DEAD.test(text))
+    return "a charge that did not result in a conviction is never reported, at any age";
+  var age=rpItemAgeYears(ev);
+  if(age!==null && age>RP_ADVERSE_YEARS && ev.adverse!==false)
+    return "adverse information older than "+RP_ADVERSE_YEARS+" years is not reported";
+  return null;
+}
+function rpSieve(list){
+  var out=[], dropped=[];
+  for(var i=0;i<(list||[]).length;i++){
+    var why=rpBarred(list[i]);
+    if(why) dropped.push({ev:list[i], why:why}); else out.push(list[i]);
+  }
+  out.dropped = dropped;
+  return out;
+}
+
+/* PIA-001 s.14. A name may reach the page only from a source SR-001 has
+   specifically authorised for person-level output. Until SR-001 carries that
+   determination for a given source, this map is empty and no name is printed.
+
+   The map, not a deletion, is the control. It makes the answer to "why is this
+   name here" a source id rather than a judgement call, and it makes the answer
+   to "why is this name not here" a missing row rather than a lost feature. */
+var RP_PERSON_OUTPUT_SOURCES = {};   /* SR-001: no source authorised yet */
+function rpPersonOutputAllowed(srcId){
+  return Object.prototype.hasOwnProperty.call(RP_PERSON_OUTPUT_SOURCES, String(srcId||""));
+}
+
 function rpNames(d){
   var seen={}, out=[], i, k;
   var ppl=rpPeople(d);
@@ -7581,6 +7845,12 @@ function rpNames(d){
       if(ev[i].t!=="A") continue;
       var text=String(ev[i].find||"")+" "+String(ev[i].quote||"");
       if(!RP_ROLE.test(text)) continue;
+      /* SR-001 gate. Not authorised for person-level output means the name
+         does not print, however good the record it came from. */
+      if(!rpPersonOutputAllowed(ev[i].sid || ev[i].src)) continue;
+      /* A subject we have reason to think is in Quebec is never written about
+         at person level, wherever the reader is. See rpQcSubject. */
+      if(rpQcSubject(ev[i])) continue;
       var m=text.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z'.-]+){1,2})\b/g);
       if(!m) continue;
       for(var j=0;j<m.length;j++){
@@ -7853,8 +8123,14 @@ function rpGoodsHtml(d){
   }
   return out;
 }
+var RP_LAST_DROPPED = [];
 function rpFinds(d){
-  var list=(d.issues||[]).slice(0,4), out="", pool=rpPlainPool(d);
+  /* The sieve runs before anything is chosen, not after, so a barred item can
+     never be the reason a finding was ranked into the top four and then vanish
+     from underneath it. */
+  var sieved=rpSieve(d.issues||[]);
+  var list=sieved.slice(0,4), out="", pool=rpPlainPool(d);
+  RP_LAST_DROPPED = sieved.dropped||[];
   for(var i=0;i<list.length;i++){
     var x=list[i], sev=(x.sev==="critical")?"critical":"high";
     var ev=rpPickPlain(pool,x);
@@ -7874,6 +8150,18 @@ function rpFinds(d){
       +(url?'<span class="rp-lk">'+rpOut(url,lab)+'</span>':'')
       +'</span><span class="rp-sev" data-s="'+sev+'"><i></i>'+sev+'</span>'
       +'</div></div></div>';
+  }
+  /* An item we refused to publish is disclosed as refused. Silently dropping it
+     would make the page look thinner than the record and would hide a rule the
+     reader is entitled to know we applied. */
+  if(RP_LAST_DROPPED.length){
+    var w={};
+    for(var q=0;q<RP_LAST_DROPPED.length;q++) w[RP_LAST_DROPPED[q].why]=1;
+    var whys=[]; for(var z in w) whys.push(z);
+    out+='<div class="rp-held"><b>'+RP_LAST_DROPPED.length+' item'
+      +(RP_LAST_DROPPED.length===1?' was':'s were')+' found and not reported.</b> '
+      +rpEsc(whys.join("; "))+'. This is a rule we apply to ourselves, and it '
+      +'applies whether the item would have helped this firm or hurt it.</div>';
   }
   return out;
 }
@@ -8149,6 +8437,12 @@ function rpSourcesFill(){
   }
   id("rpNevers").innerHTML=out;
   out="";
+  for(i=0;i<RP_WHYSOFT.length;i++){
+    out+='<div class="rp-row"><span class="rp-rk">'+rpEsc(RP_WHYSOFT[i][0])+'</span>'
+      +'<span class="rp-rv">'+rpEsc(RP_WHYSOFT[i][1])+'</span></div>';
+  }
+  id("rpWhySoft").innerHTML=out;
+  out="";
   for(i=0;i<RP_LAWFUL.length;i++){
     out+='<div class="rp-row"><span class="rp-rk">'+rpEsc(RP_LAWFUL[i][0])+'</span>'
       +'<span class="rp-rv">'+rpEsc(RP_LAWFUL[i][1])+'</span></div>';
@@ -8215,13 +8509,38 @@ function rpHasOfficial(d){
   }
   return false;
 }
+/* The imperative is the sentence the product exists to deliver, and it is also
+   the sentence that most looks like advice about an investment. So it is not
+   banned and it is not free: it is conditional. Where an authority has itself
+   said this, we carry the authority's instruction and name the authority. Where
+   no authority has said it, we describe the record and stop, because at that
+   point the instruction would be ours. */
+/* The body whose warning carries the verdict. If we speak in the imperative it
+   has to be attributable to somebody the reader can go and check, so the
+   sentence names them and the name is read off the record, never supplied by
+   us. No official record, no imperative. */
+function rpOfficialBody(d){
+  for(var k in (d.cats||{})){
+    var c=d.cats[k], ev=c.ev||[];
+    if(c.state!=="RED") continue;
+    for(var i=0;i<ev.length;i++){
+      if(ev[i].t!=="A") continue;
+      var nm=String(ev[i].reg||ev[i].src||"").trim();
+      if(nm) return nm.replace(/\s*[,(\u2013-].*$/,"").trim();
+    }
+  }
+  return "A regulator";
+}
 function rpVerdictWord(v,d){
-  if(v==="RED") return "Do not send any money.";
+  if(v==="RED") return rpHasOfficial(d)
+    ? (rpOfficialBody(d)+" says do not send money to this firm.")
+    : "The records do not support what this firm says about itself.";
   if(v==="YELLOW"){
     /* A registered firm with nothing official against it must never be written
        the same way as an unregistered one. Complaints do not outrank a register. */
     if(rpRegistered(d) && !rpHasOfficial(d)) return "This firm is on a regulator's register.";
-    return "Stop. Do not send anything tonight.";
+    if(rpHasOfficial(d)) return rpOfficialBody(d)+" has published a warning about this firm.";
+    return "There is enough here to stop and check before you send anything.";
   }
   if(v==="GREEN"){
     if(rpRegistered(d)) return "This firm is on a regulator's register.";
@@ -8308,6 +8627,42 @@ function renderReport(d){
   id("rpAlreadyBtn").setAttribute("aria-expanded","false");
   id("rpAlready").classList.remove("rp-open");
 
+  /* On a registered firm with nothing official against it, a recovery route is
+     the wrong door, and offering one insinuates a loss that nobody has reported.
+     A problem with a regulated business is a complaint, which is a different
+     thing with a different escalation, so that is the door it opens. */
+  id("rpAlready").setAttribute("data-c", clean ? "calm" : "urgent");
+  if(clean){
+    id("rpAlreadyT").textContent="If something has gone wrong with your account, start here";
+    id("rpAlreadyX").textContent="A regulated firm has a complaints process, and a regulator "
+      +"above it. Both are open to you.";
+    id("rpClockC").textContent="Put it in writing";
+    id("rpClockT").textContent="Raise it with the firm first, then take it above them.";
+    id("rpClockX").textContent="A registered firm is required to have a complaints process, and "
+      +"the regulator that registered them will want to see that you used it. Write down what "
+      +"happened, with dates and amounts, and send it to the firm in writing so there is a record "
+      +"of when you raised it. If they do not resolve it, that written record is what you take to "
+      +"the regulator.";
+    id("rpShame").textContent="Raising a complaint is not an accusation and it is not a fight. "
+      +"It is how a regulated business is supposed to find out that something is not working, and "
+      +"the regulator counts them.";
+    id("rpWindows").style.display="none";
+  } else {
+    id("rpAlreadyT").textContent="If you have already sent money, start here";
+    id("rpAlreadyX").textContent="Some of it may still be recoverable. That depends on hours, "
+      +"not days.";
+    id("rpClockC").textContent="Ring the bank first";
+    id("rpClockT").textContent="If money has already gone, the next few hours decide whether it "
+      +"comes back.";
+    id("rpClockX").textContent="Call the bank or card company that sent the money before you do "
+      +"anything else on this page. Nothing here matters more than that call, and it gets harder "
+      +"every hour.";
+    id("rpShame").textContent="This is a professional operation and it catches accountants and "
+      +"solicitors. Your bank hears this every day. You will not be the first call they take "
+      +"tonight.";
+    id("rpWindows").style.display="";
+  }
+
   var g=rpGoodsHtml(d), gn=rpGoods(d).length;
   id("rpGoods").innerHTML=g;
   id("rpGoodH").textContent = gn
@@ -8321,6 +8676,12 @@ function renderReport(d){
     +(Math.min(4,c.issues)===1?" thing. ":" things. ")+"Worst first."
     :"Nothing came back against them.");
   id("rpFindsSec").style.display=f?"":"none";
+  var soft=false, ff=(d.issues||[]).slice(0,4);
+  for(var fi=0; fi<ff.length; fi++){
+    var ft=ff[fi].tier;
+    if(ft==="C"||ft==="D") soft=true;
+  }
+  id("rpTwoWays").style.display=(f&&soft)?"":"none";
 
   var cl=rpClaims(d);
   id("rpClaims").innerHTML=cl;
