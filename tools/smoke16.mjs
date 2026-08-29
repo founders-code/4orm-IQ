@@ -49,17 +49,26 @@ console.log('\nTHE TEN CHECKS');
 const tiles=[...doc.querySelectorAll('#tiles .tile')];
 console.log('  tiles:', tiles.length);
 for(let i=0;i<tiles.length;i++){
+  /* Two steps now: the tile opens a short read, and the full check sits behind
+     a button on it. Nobody is dropped into ten screens of registers because
+     they wanted to know what a number meant. */
   tiles[i].click(); await wait(12);
+  const brief=(doc.getElementById('infoBody').textContent||'');
+  if(!/Check \d+\./.test(brief)) fails.push('tile '+(i+1)+' does not open a short read first');
+  const openFull=[...doc.querySelectorAll('#infoBody button')]
+    .find(x=>/Open the full check/.test(x.textContent));
+  if(!openFull){ fails.push('tile '+(i+1)+' short read does not offer the full check'); continue; }
+  openFull.click(); await wait(20);
   const b=doc.getElementById('infoBody');
   const t=b.textContent||'';
   const kind=doc.getElementById('infoKind').textContent;
   const okRecords=/records? found/i.test(t);
-  const okRules=/How we decide this check/.test(t);
+  const okRules=/The rules for this check, and which one applied/.test(t);
   const okRegs=/registers behind this check/.test(t);
   if(!okRecords||!okRules||!okRegs) fails.push('check '+kind+' missing: '+
     [!okRecords&&'records',!okRules&&'rules',!okRegs&&'registers'].filter(Boolean).join(', '));
   const iF=(t.match(/\d+ records? found/)||[''])[0];
-  if(iF && t.indexOf(iF) > t.indexOf('How we decide this check')) fails.push('check '+kind+' puts rules before records');
+  if(iF && t.indexOf(iF) > t.indexOf('The rules for this check, and which one applied')) fails.push('check '+kind+' puts rules before records');
   doc.getElementById('infoClose').click(); await wait(4);
 }
 console.log('  all ten open with records, rules and registers:', !fails.some(f=>/^check /.test(f)));

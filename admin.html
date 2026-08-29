@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ Operations</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#FFFFFF;--sunk:#F6F7F9;--edge:#E4E7EC;--edge2:#D3D8E0;
+  --ink:#14171C;--ink2:#3F4650;--ink3:#6C7480;--ink4:#98A0AC;
+  --blue:#2E6BF2;--ok:#0E8A5F;--warn:#B48A2E;--bad:#D6334E;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sunk);color:var(--ink);font-family:var(--sans);font-size:15px;
+  line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px 90px}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+
+header.top{padding:34px 0 22px;display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
+header.top h1{font-size:26px;font-weight:800}
+header.top .eb{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
+.spacer{flex:1}
+.ctl{display:flex;gap:8px;align-items:center}
+.ctl select,.ctl input{font-family:var(--sans);font-size:13.5px;padding:8px 11px;border:1px solid var(--edge2);
+  border-radius:8px;background:#fff;color:var(--ink)}
+.ctl button{font-size:13.5px;font-weight:600;padding:8px 16px;border-radius:8px;border:1px solid var(--blue);
+  background:var(--blue);color:#fff;cursor:pointer}
+.ctl button:hover{background:#2455C8}
+
+.notice{margin:0 0 26px;padding:15px 19px;border-radius:11px;border:1px solid var(--edge2);
+  background:#fff;font-size:13.5px;color:var(--ink2);line-height:1.6}
+.notice b{color:var(--ink)}
+.notice.err{border-color:var(--bad);background:#FDF0F2;color:var(--bad)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-bottom:26px}
+.tile{background:#fff;border:1px solid var(--edge);border-radius:12px;padding:17px 18px 16px;
+  display:flex;flex-direction:column;min-height:112px}
+.tile .v{font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:14px;font-weight:600;color:var(--ink3);letter-spacing:0;margin-left:3px}
+.tile .l{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink3);margin-top:9px;line-height:1.5}
+.tile .c{margin-top:auto;padding-top:9px;font-size:11px;color:var(--ink4);line-height:1.45}
+.tile[data-s="ok"] .v{color:var(--ok)} .tile[data-s="warn"] .v{color:var(--warn)}
+.tile[data-s="bad"] .v{color:var(--bad)}
+
+.card{background:#fff;border:1px solid var(--edge);border-radius:12px;padding:22px 24px;margin-bottom:20px}
+.card h2{font-size:16px;font-weight:700;margin-bottom:4px}
+.card .sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+
+/* one series, direct labelled, no legend */
+.tsvg{width:100%;height:190px;display:block;overflow:visible}
+.tsvg .grid line{stroke:var(--edge);stroke-width:1}
+.tsvg .ax{fill:var(--ink4);font-family:var(--mono);font-size:9.5px}
+.tsvg rect.bar{fill:var(--blue);rx:2}
+.tsvg rect.hit{fill:transparent;cursor:pointer}
+.tsvg .lastlbl{fill:var(--ink);font-family:var(--mono);font-size:10.5px;font-weight:600}
+
+.rank{display:grid;gap:9px}
+.rrow{display:grid;grid-template-columns:1fr 132px 62px;gap:12px;align-items:center;font-size:13px}
+.rrow .n{color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rtrack{height:7px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.rtrack i{display:block;height:100%;border-radius:4px}
+.rrow .p{font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink3);padding:9px 12px;border-bottom:1px solid var(--edge)}
+td{padding:10px 12px;border-bottom:1px solid var(--edge);color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
+  font-weight:600;padding:3px 9px;border-radius:5px;border:1px solid currentColor}
+.pill i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)} .pill.mut{color:var(--ink3)}
+
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;
+  padding:7px 10px;border-radius:7px;opacity:0;transition:opacity .12s;font-family:var(--mono)}
+.tip.on{opacity:1}
+footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--edge);font-size:12.5px;
+  color:var(--ink3);line-height:1.6}
+</style></head><body>
+<div class="wrap">
+
+<header class="top">
+  <div><span class="eb">4orm IQ</span><h1>Operations</h1></div>
+  <div class="spacer"></div>
+  <div class="ctl">
+    <input id="tok" type="password" placeholder="Admin token" autocomplete="off" style="width:190px">
+    <select id="days">
+      <option value="7">7 days</option><option value="30" selected>30 days</option>
+      <option value="90">90 days</option><option value="365">12 months</option>
+    </select>
+    <button id="go" type="button">Load</button>
+  </div>
+</header>
+
+<div class="notice">
+  <b>This page shows how the machine is running. It cannot show who anybody looked up.</b>
+  There is no column in the operations schema for the identifier a user searched, the party a check
+  was about, or the result it returned, and there will not be one. A table holding that would rebuild
+  the person-level file the product was rebuilt to refuse. What it costs is a search-history screen.
+  What it buys is that there is nothing here to disclose on an access request and nothing to breach.
+</div>
+
+<div id="err" class="notice err" hidden></div>
+<main id="out" hidden></main>
+<div class="tip" id="tip"></div>
+
+<footer>
+  Metrics per OPS-001 s.51. Evidence pack per s.52. Served by <span class="mono">/api/admin-metrics</span>,
+  which is disabled outright when <span class="mono">ADMIN_TOKEN</span> is unset rather than left open.
+</footer>
+</div>
+
+<script>
+var $=function(s){return document.querySelector(s)};
+var tip=$("#tip");
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function num(n){return n==null?"—":Number(n).toLocaleString();}
+
+function tile(v,unit,label,cap,state){
+  return '<div class="tile"'+(state?' data-s="'+state+'"':'')+'>'
+    +'<div class="v">'+esc(v)+(unit?'<small>'+esc(unit)+'</small>':'')+'</div>'
+    +'<div class="l">'+esc(label)+'</div>'
+    +(cap?'<div class="c">'+esc(cap)+'</div>':'')+'</div>';
+}
+
+/* Daily volume. One series, so no legend: the heading names it. The last bar is
+   direct-labelled rather than every bar carrying a number. */
+function timeSeries(rows){
+  if(!rows.length) return '<p style="color:var(--ink3);font-size:13px">No runs in this window.</p>';
+  var W=760,H=190,padL=34,padB=22,padT=14;
+  var max=Math.max.apply(null,rows.map(function(r){return r.attempted;}))||1;
+  var iw=W-padL-8, ih=H-padB-padT;
+  var bw=Math.max(2,(iw/rows.length)-2);
+  var svg='<svg class="tsvg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" '
+    +'aria-label="Checks attempted per day">';
+  svg+='<g class="grid">';
+  for(var g=0;g<=2;g++){var y=padT+ih-(ih*g/2);
+    svg+='<line x1="'+padL+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'"/>'
+      +'<text class="ax" x="4" y="'+(y+3)+'">'+Math.round(max*g/2)+'</text>';}
+  svg+='</g>';
+  rows.forEach(function(r,i){
+    var h=Math.max(1,(r.attempted/max)*ih), x=padL+i*(iw/rows.length), y=padT+ih-h;
+    svg+='<rect class="bar" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'"/>';
+    svg+='<rect class="hit" x="'+x+'" y="'+padT+'" width="'+bw+'" height="'+ih+'" '
+      +'data-t="'+esc(r.day+"  "+r.attempted+" attempted, "+r.completed+" completed")+'"/>';
+    if(i===rows.length-1)
+      svg+='<text class="lastlbl" x="'+(x+bw+5)+'" y="'+(y+9)+'">'+r.attempted+'</text>';
+  });
+  svg+='<text class="ax" x="'+padL+'" y="'+(H-5)+'">'+esc(rows[0].day)+'</text>';
+  svg+='<text class="ax" x="'+(W-8)+'" y="'+(H-5)+'" text-anchor="end">'+esc(rows[rows.length-1].day)+'</text>';
+  return svg+'</svg>';
+}
+
+function ranked(rows){
+  if(!rows.length) return '<p style="color:var(--ink3);font-size:13px">No source activity recorded.</p>';
+  return '<div class="rank">'+rows.map(function(r){
+    var p=r.ok_pct==null?0:Number(r.ok_pct);
+    var col=p>=95?"var(--ok)":(p>=80?"var(--warn)":"var(--bad)");
+    return '<div class="rrow"><span class="n" title="'+esc(r.source_id)+'">'+esc(r.source_id)+'</span>'
+      +'<span class="rtrack"><i style="width:'+p+'%;background:'+col+'"></i></span>'
+      +'<span class="p">'+(r.ok_pct==null?"—":p+"%")+'</span></div>';
+  }).join('')+'</div>';
+}
+
+function render(d){
+  var r=d.runs||{}, s=d.sources||{}, del=d.deletion||{}, inc=d.incidents||{};
+  var h='';
+  h+='<div class="grid">'
+    +tile(num(r.attempted),"","Checks attempted","Every request that reached the gates")
+    +tile(d.completion_pct==null?"—":d.completion_pct,"%","Completed",
+          num(r.completed)+" of "+num(r.attempted),
+          d.completion_pct==null?null:(d.completion_pct>=95?"ok":(d.completion_pct>=85?"warn":"bad")))
+    +tile(s.success_pct==null?"—":s.success_pct,"%","Source success rate",
+          num(s.ok)+" of "+num(s.attempts)+" attempts",
+          s.success_pct==null?null:(s.success_pct>=95?"ok":(s.success_pct>=85?"warn":"bad")))
+    +tile(d.incomplete_pct==null?"—":d.incomplete_pct,"%","Reported incomplete",
+          "A critical register was unreachable",
+          d.incomplete_pct==null?null:(d.incomplete_pct<=5?"ok":"warn"))
+    +tile(num(r.suppressed),"","Person-level suppressions","Tier C/D or Quebec subject")
+    +tile(num(r.barred),"","Items refused","Dead charge or over seven years")
+    +'</div>';
+
+  h+='<div class="two">';
+  h+='<div class="card"><h2>Checks attempted per day</h2>'
+    +'<div class="sub">Requests that passed the jurisdiction and purpose gates.</div>'
+    +timeSeries(d.by_day||[])+'</div>';
+  h+='<div class="card"><h2>Registers by success rate, worst first</h2>'
+    +'<div class="sub">A register that starts failing quietly is the one hazard the product cannot '
+    +'survive, because a failure reported as a clean result is the only dishonest output it can make.</div>'
+    +ranked(s.worst||[])+'</div>';
+  h+='</div>';
+
+  h+='<div class="two">';
+  h+='<div class="card"><h2>How runs ended</h2><div class="sub">Blocks are the gates working, not errors.</div>'
+    +'<table><thead><tr><th>Outcome</th><th style="text-align:right">Runs</th></tr></thead><tbody>'
+    +(d.by_outcome||[]).map(function(o){
+        var cls=o.outcome==="COMPLETED"?"ok":(o.outcome==="ERROR"?"bad":"mut");
+        return '<tr><td><span class="pill '+cls+'"><i></i>'+esc(o.outcome)+'</span></td>'
+          +'<td class="num">'+num(o.n)+'</td></tr>';}).join('')
+    +'</tbody></table></div>';
+  h+='<div class="card"><h2>What people searched</h2>'
+    +'<div class="sub">The shape of the request. Never its content.</div>'
+    +'<table><thead><tr><th>Input type</th><th style="text-align:right">Runs</th></tr></thead><tbody>'
+    +(d.by_input||[]).map(function(o){
+        return '<tr><td>'+esc(o.input_type)+'</td><td class="num">'+num(o.n)+'</td></tr>';}).join('')
+    +'</tbody></table></div>';
+  h+='</div>';
+
+  h+='<div class="card"><h2>The evidence a regulator asks for</h2>'
+    +'<div class="sub">Rights handling, deletion and incidents. OPS-001 s.52.</div>'
+    +'<table><thead><tr><th>Measure</th><th style="text-align:right">Count</th><th>Note</th></tr></thead><tbody>';
+  (d.rights||[]).forEach(function(x){
+    h+='<tr><td>'+esc(x.kind)+' requests</td><td class="num">'+num(x.opened)+'</td>'
+      +'<td>'+num(x.closed)+' closed'+(x.avg_days?', '+x.avg_days+' days average':'')+'</td></tr>';
+  });
+  if(!(d.rights||[]).length)
+    h+='<tr><td>Access, correction and challenge</td><td class="num">0</td><td>None received in this window</td></tr>';
+  h+='<tr><td>Deletion job</td><td class="num">'+num(del.days_run)+'</td>'
+    +'<td>days run, '+num(del.days_failed)+' failed, '+num(del.deleted)+' records deleted</td></tr>';
+  h+='<tr><td>Incidents</td><td class="num">'+num(inc.total)+'</td>'
+    +'<td>'+num(inc.pi)+' involving personal information, '+num(inc.rrosh)
+    +' meeting the real-risk threshold, '+num(inc.reported)+' reported</td></tr>';
+  if(r.ran_unenforced)
+    h+='<tr><td><span class="pill bad"><i></i>SR-001 UNENFORCED</span></td><td class="num">'
+      +num(r.ran_unenforced)+'</td><td>runs executed with source enforcement off. '
+      +'Investigate: these queried registers the register had not cleared.</td></tr>';
+  h+='</tbody></table></div>';
+
+  h+='<p style="font-size:12.5px;color:var(--ink3);margin-top:6px">Window: '+esc(d.window_days)
+    +' days. Generated '+esc((d.generated||"").slice(0,19).replace("T"," "))+' UTC.</p>';
+  $("#out").innerHTML=h; $("#out").hidden=false;
+  wireTips();
+}
+
+function wireTips(){
+  document.querySelectorAll("rect.hit").forEach(function(el){
+    el.addEventListener("mousemove",function(e){
+      tip.textContent=this.getAttribute("data-t");
+      tip.style.left=(e.clientX+13)+"px"; tip.style.top=(e.clientY-30)+"px";
+      tip.classList.add("on");
+    });
+    el.addEventListener("mouseleave",function(){ tip.classList.remove("on"); });
+  });
+}
+
+function load(){
+  var t=$("#tok").value.trim(), d=$("#days").value;
+  $("#err").hidden=true; 
+  if(!t){ fail("Enter the admin token. It is the ADMIN_TOKEN environment variable on the deployment."); return; }
+  try{ sessionStorage.setItem("4orm_admin_tok", t); }catch(e){}
+  fetch("/api/admin-metrics?days="+encodeURIComponent(d),{headers:{Authorization:"Bearer "+t}})
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
+    .then(function(res){
+      if(!res.ok){
+        if(res.status===401) return fail("That token was not accepted.");
+        if(res.j&&res.j.error==="admin_disabled")
+          return fail("This endpoint is switched off. ADMIN_TOKEN is not set on the deployment, which "
+            +"disables it outright rather than leaving it open.");
+        if(res.j&&res.j.error==="no_database_configured")
+          return fail("POSTGRES_URL is not set, so there is nothing recorded to report on yet. "
+            +"Run db/telemetry.sql once the database is attached.");
+        return fail("Request failed: "+(res.j&&res.j.detail||res.status));
+      }
+      render(res.j);
+    })
+    .catch(function(e){ fail("Could not reach the metrics endpoint. "+e.message); });
+}
+function fail(m){ var e=$("#err"); e.textContent=m; e.hidden=false; $("#out").hidden=true; }
+$("#go").addEventListener("click",load);
+$("#tok").addEventListener("keydown",function(e){ if(e.key==="Enter") load(); });
+try{ var s=sessionStorage.getItem("4orm_admin_tok"); if(s){ $("#tok").value=s; load(); } }catch(e){}
+</script>
+</body></html>

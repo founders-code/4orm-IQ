@@ -209,6 +209,30 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     fails.push('the two business day acknowledgement is back without instrumentation');
 }
 
+/* --------------------------------------------------- markup without styling
+   The pack preview dialog shipped with fifteen classes in the markup and not
+   one CSS rule for any of them, so it rendered as a plain block near the foot
+   of the report and clicking a pack looked like a jump to the bottom of the
+   page. Nothing in the suite could see it, because every element existed and
+   every handler fired. This guard reads the classes out of the markup and
+   checks each one is styled somewhere. */
+{
+  const need = ['rp-pv','rp-pvsheet','rp-pvhd','rp-pvbody','rp-pvft','rp-pvname',
+                'rp-pvx','rp-pvdl','rp-pvlead','rp-pvsec','rp-pvk','rp-pvp',
+                'rp-pvr','rp-pvclock','rp-pvfn'];
+  /* `.rp-pvclock .rp-k{...}` styles a child, not the element. Require a rule
+     whose selector ENDS at the class, which is what actually gives the element
+     its own box. */
+  const unstyled = need.filter(c => !new RegExp('\\.' + c + '\\s*[{,]').test(html));
+  if (unstyled.length)
+    fails.push('the pack preview dialog has ' + unstyled.length + ' unstyled class(es), so it '
+      + 'renders in document flow instead of as a dialog: ' + unstyled.join(', '));
+  /* And it must be taken out of flow, or it is a block at the bottom of a page. */
+  if (!/#rpt \.rp-pv\{[^}]*position:fixed/.test(html))
+    fails.push('the pack preview dialog is not position:fixed, so opening one scrolls '
+      + 'the reader to the foot of the report');
+}
+
 /* ---------------------------------------------------------------- SR-001
    The register controls the build, or it is a spreadsheet. These guards are
    what make it the first thing. */
@@ -504,9 +528,17 @@ if (!/function rpOfficialNames/.test(script))
 if (!/rpIdRow\(rpAgency\(off\[i\]\.src\)/.test(script))
   fails.push('official names lost the agency that holds them');
 {
-  const m = /#rpt \.rp-eyebrow\{[^}]*font-size:clamp\((\d+)px/.exec(styleBlock);
-  if (!m || Number(m[1]) < 12)
-    fails.push('the verdict is no longer set large enough to be the first thing read');
+  /* This used to guard the eyebrow pill, which was wrong. The pill is a label;
+     the sentence under it is the verdict. Shrinking the label was a deliberate
+     change and the guard should not have blocked it. What must stay large is
+     the headline, so that is what is measured now. */
+  const m = /#rpt \.rp-who\{[^}]*font-size:clamp\(([\d.]+)px/.exec(styleBlock);
+  if (!m || Number(m[1]) < 24)
+    fails.push('the verdict headline is no longer set large enough to be the first thing read');
+  /* And the pill must stay a label, not grow back into a second headline. */
+  const p = /#rpt \.rp-eyebrow\{[^}]*font-size:clamp\(([\d.]+)px[^)]*,\s*([\d.]+)px\)/.exec(styleBlock);
+  if (p && Number(p[2]) > 13)
+    fails.push('the verdict pill has grown back to headline size');
 }
 if (!/body\[data-stage="console"\] \.searchbox\{display:none\}/.test(
       styleBlock.replace(/\s*\n\s*/g, ''))) {
@@ -604,8 +636,15 @@ if (!/if\(!d\.cats\)\{/.test(script))
 /* --------------------------------- a check, opened, has to explain itself
    The rules told a reader what the rules are and never which one fired, and the
    register table carried our plumbing instead of what each register said. */
-if (!/This is what happened here/.test(script))
-  fails.push('the rules no longer mark the one that applied to this party');
+/* Guard the behaviour, not the sentence. The wording changed once and the
+   guard failed for the wrong reason: what matters is that exactly one rule can
+   be marked, and that the marker renders. */
+if (!/var on = fired && r\[0\]===fired && !hit;/.test(script))
+  fails.push('the rules no longer mark exactly one applied rule');
+if (!/<span class="rhit">/.test(script))
+  fails.push('the applied rule has no visible marker');
+if (!/\.rulerow \.rhit\{/.test(html))
+  fails.push('the applied-rule marker is unstyled');
 if (!/var RULE_WORD/.test(script))
   fails.push('the rule badges print a colour again instead of an outcome');
 if (!/var SRC_SAID/.test(script))

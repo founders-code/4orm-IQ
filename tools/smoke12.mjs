@@ -46,7 +46,14 @@ doc.getElementById('infoClose').click(); await new Promise(r=>setTimeout(r,30));
 
 // check 10 opens the chronology
 const tiles=doc.querySelectorAll('#tiles .tile');
+/* A tile now opens a short read first and the full check behind a button on it,
+   which is the same two-step the five figures at the top of the page use. */
 tiles[9].click(); await new Promise(r=>setTimeout(r,60));
+const brief=doc.getElementById('infoBody').textContent||'';
+console.log('\ntile opens a short read first:', /What this check is|Check 10/.test(brief));
+const openFull=[...doc.querySelectorAll('#infoBody button')].find(x=>/Open the full check/.test(x.textContent));
+if(!openFull) throw new Error('the short read does not offer the full check');
+openFull.click(); await new Promise(r=>setTimeout(r,80));
 b=doc.getElementById('infoBody').innerHTML;
 console.log('\ncheck 10 offers the comparison:', b.includes('openChrono'));
 doc.getElementById('openChrono').click(); await new Promise(r=>setTimeout(r,60));

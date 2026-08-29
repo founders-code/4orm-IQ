@@ -33,7 +33,7 @@ console.log('ENFORCEMENT OFF');
 console.log('  chips        ', off.chips);
 console.log('  states       ', JSON.stringify(off.states));
 console.log('  banner shown ', off.banner);
-console.log('\nENFORCEMENT ON  (register has nothing enabled)');
+console.log('\nENFORCEMENT ON  (register decides)');
 console.log('  chips        ', on.chips);
 console.log('  states       ', JSON.stringify(on.states));
 console.log('  banner shown ', on.banner);
@@ -44,10 +44,24 @@ if(off.banner!==true)  fails.push('enforcement is off and the page does not warn
 if(on.banner!==false)  fails.push('enforcement is on and the page still warns');
 /* The measurement that matters: with nothing enabled, every register must be
    out of scope. Any chip in another state is a source running without a row. */
-const policy = on.states['policy']||0;
-if(policy !== on.chips)
-  fails.push('enforcement is on and nothing is enabled, yet ' + (on.chips-policy)
-    + ' of ' + on.chips + ' registers are not marked out of scope');
+/* The register now enables most chips and disables the 36 that appear on the
+   board with no source row behind them. So the measurement is not "everything
+   dark", it is "the split matches the register exactly". */
+const policy = on.states['policy']||0, live = on.chips - policy;
+console.log('\n  out of scope :', policy, '| in scope:', live);
+if(policy === 0)
+  fails.push('enforcement is on and nothing is excluded, so the switch does nothing');
+if(live === 0)
+  fails.push('enforcement is on and everything is excluded, so the board is unusable');
+/* And the split must be the register's, not a coincidence. */
+const man = JSON.parse(base.match(/var SR001 = ([\s\S]*?);\n\/\* SR001-MANIFEST-END/)[1]);
+const enabled = new Set(man.enabled);
+const boardNames = (eval(base.match(/var SOURCES\s*=\s*(\[[\s\S]*?\n\]);/)[1]))
+  .flatMap(g => g.items);
+const expectLive = boardNames.filter(n => enabled.has(n)).length;
+if(live !== expectLive)
+  fails.push('the board shows ' + live + ' registers in scope and the register enables '
+    + expectLive + ' of them');
 if((off.states['policy']||0) !== 0)
   fails.push('enforcement is off and ' + off.states['policy'] + ' registers are still excluded');
 if(off.errs||on.errs) fails.push('page errors: '+(off.errs+on.errs));

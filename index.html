@@ -798,13 +798,27 @@ body[data-stage="landing"] .tlead{display:block}
 /* ---- the waiting screen. A check takes a minute or two. The page goes quiet,
        a bar fills, and the wait is spent on the two things a reader needs:
        what this is not, and what is actually happening to people. ---- */
-.waitscrim{position:fixed;inset:0;z-index:400;background:rgba(9,14,24,.62);
-  backdrop-filter:blur(5px) saturate(80%);opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
+/* The wait screen is the doorway to the report, and the report is a white
+   document. Fading the dark console through and leaving it visible behind the
+   dialog made the wait feel like an interruption of the console rather than the
+   first page of the report. It is opaque and white now, so the two minutes are
+   spent on the surface the answer will arrive on. */
+.waitscrim{position:fixed;inset:0;z-index:400;background:#FFFFFF;
+  opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
 .waitscrim.on{opacity:1;pointer-events:auto}
 .waitbox{position:fixed;z-index:401;top:50%;left:50%;transform:translate(-50%,-48%) scale(.99);
   width:min(760px,93vw);max-height:88vh;display:flex;flex-direction:column;opacity:0;pointer-events:none;
-  background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);
-  box-shadow:var(--sh-xl);overflow:hidden;transition:opacity .45s var(--ease),transform .55s var(--spring)}
+  background:#FFFFFF;border:1px solid #E4E7EC;border-radius:var(--r-lg);
+  box-shadow:0 30px 80px rgba(20,23,28,.13),0 2px 8px rgba(20,23,28,.06);
+  overflow:hidden;transition:opacity .45s var(--ease),transform .55s var(--spring);
+  color:#14171C}
+/* The dialog is on white now, so the tokens inside it that were written for the
+   dark console have to be restated rather than inherited. */
+.waitbox .waithd{background:#F6F7F9;border-bottom-color:#E4E7EC}
+.waitbox .waitq,.waitbox .waitfoot{color:#6C7480}
+.waitbox h2,.waitbox h3,.waitbox b,.waitbox strong{color:#14171C}
+.waitbox p,.waitbox li,.waitbox span{color:#3F4650}
+.waitbox .gateok{background:var(--blue);color:#fff;border-color:var(--blue)}
 .waitbox.on{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
 .waithd{display:flex;align-items:center;gap:16px;padding:17px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .waitq{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--tx-2);letter-spacing:.03em;
@@ -947,11 +961,25 @@ body[data-stage="console"] .summaryband.on{display:grid}
 /* ---- rules as colour, not as paragraphs ---- */
 .rulelist{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);
   border-radius:var(--r-sm);overflow:hidden;margin-top:4px}
-.rulerow{background:var(--surface);padding:6px 12px;display:flex;align-items:center;gap:11px}
-.rulerow .rk{flex:none;width:50px;font-family:var(--mono);font-size:8px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;padding:3px 0;text-align:center;
-  border-radius:3px;border:1px solid var(--border-strong);color:var(--tx-3)}
-.rulerow .rt{font-size:12px;color:var(--tx-2);line-height:1.4}
+/* The label was 50px wide and 8px tall, holding words like "Counts against
+   them". It wrapped to three lines of unreadable capitals beside a sentence.
+   It is now a proper pill on its own line above the rule on narrow screens, and
+   a wider column on wide ones. */
+.rulerow{background:var(--surface);padding:10px 13px;display:grid;
+  grid-template-columns:132px 1fr;gap:6px 14px;align-items:start}
+.rulerow .rk{font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;padding:4px 8px;text-align:center;
+  border-radius:4px;border:1px solid var(--border-strong);color:var(--tx-3);
+  white-space:nowrap;align-self:start}
+.rulerow .rt{font-size:12.5px;color:var(--tx-2);line-height:1.5}
+.rulerow.on{box-shadow:inset 3px 0 0 var(--blue)}
+.rulerow .rhit{grid-column:2;font-family:var(--mono);font-size:8.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--blue-lt)}
+@media(max-width:560px){
+  .rulerow{grid-template-columns:1fr}
+  .rulerow .rk{justify-self:start}
+  .rulerow .rhit{grid-column:1}
+}
 .rulerow[data-v="RED"]{background:linear-gradient(90deg,var(--bad-bg),var(--surface) 42%)}
 .rulerow[data-v="RED"] .rk{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
 .rulerow[data-v="YELLOW"]{background:linear-gradient(90deg,var(--warn-bg),var(--surface) 42%)}
@@ -1287,12 +1315,33 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
 @media(max-width:980px){.tiles{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.tiles{grid-template-columns:1fr}}
+/* The ten checks are read the same way as the five figures at the top of the
+   page, so they are built the same way: a number, a quiet label, a bar, and a
+   short read on click that offers the whole thing behind it. The card that used
+   to sit here carried a sentence nobody read at a glance and a 250px height that
+   pushed the tenth check off the screen. */
 .tile{
-  background:var(--surface);padding:22px 20px 20px;display:flex;flex-direction:column;gap:12px;
-  transition:background .3s var(--ease);position:relative;width:100%;min-height:250px;
+  background:var(--bg-2);padding:18px 19px 17px;display:flex;flex-direction:column;
+  transition:background .22s var(--ease);position:relative;width:100%;min-height:132px;
+  cursor:pointer;text-align:left;
 }
 .tile:hover{background:var(--surface-2)}
 .tile.sel{background:var(--surface-2)}
+.tile .sv{font-size:25px;font-weight:800;letter-spacing:-.04em;line-height:1;
+  font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:9px}
+.tile .sv small{font-size:13px;font-weight:700;color:var(--tx-3);letter-spacing:0;margin-left:2px}
+.tile .sl{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--tx-3);margin-top:8px;line-height:1.5}
+.tile .sp{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:11px}
+.tile .sp i{display:block;height:100%;width:0%;border-radius:3px;transition:width 1.1s var(--spring)}
+.tile .sp i[data-s="RED"]{background:linear-gradient(90deg,#8E2033,var(--bad))}
+.tile .sp i[data-s="YELLOW"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.tile .sp i[data-s="GREEN"]{background:linear-gradient(90deg,#0A6A49,var(--ok))}
+.tile .sp i[data-s="GREY"],.tile .sp i[data-s="IDLE"]{background:linear-gradient(90deg,#CCD6E4,#A7B4C6)}
+.tile .scap{margin-top:auto;padding-top:11px;font-size:10.5px;color:var(--tx-4);line-height:1.45}
+.tile .statq{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--blue-lt);text-decoration:underline;
+  text-underline-offset:3px;margin-top:9px;display:inline-block}
 .tile.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue)}
 .tiletop{display:flex;align-items:center;gap:10px}
 .tileix{font-family:var(--mono);font-size:9.5px;font-weight:700;color:var(--tx-4);letter-spacing:.1em}
@@ -1659,10 +1708,92 @@ body[data-stage="report"] .foot{display:none}
 
 
 /* ------------------------------------------------------------- the light views */
-#rpt .rp-wrap{max-width:1220px;margin:0 auto;padding:0 28px}
-#rpt .rp-sheet{position:relative;z-index:2;padding:0 0 40px;
+/* Wide margins, so the report reads as a document sitting on a dashboard
+   rather than a page that runs to the edge of the browser. The gutter grows
+   with the viewport and collapses on a phone, where a margin is just lost
+   reading width. */
+#rpt .rp-wrap{max-width:1120px;margin:0 auto;
+  padding:0 clamp(28px,7vw,110px)}
+#rpt{background:var(--rp-ground,#F4F5F7)}
+@media (max-width:820px){ #rpt .rp-wrap{padding:0 20px} }
+
+/* ------------------------------------------------- the pack preview dialog
+   This markup shipped with no styling at all, so the dialog rendered as a
+   plain block in document flow near the foot of the report and clicking a pack
+   appeared to scroll the reader to the bottom of the page. Fifteen classes,
+   none of them defined. It is scoped under #rpt like everything else, and it is
+   position:fixed against the viewport, which is only safe because no ancestor
+   of #rpt sets a transform. */
+#rpt .rp-pv{position:fixed;inset:0;z-index:120;display:flex;align-items:center;
+  justify-content:center;padding:32px 20px;background:rgba(8,11,16,.62);
+  opacity:0;transition:opacity .22s var(--ease);backdrop-filter:blur(3px)}
+#rpt .rp-pv.rp-on{opacity:1}
+#rpt .rp-pv[hidden]{display:none}
+#rpt .rp-pvsheet{width:min(760px,100%);max-height:88vh;display:flex;flex-direction:column;
+  background:#fff;border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:0 32px 90px rgba(8,11,16,.34),0 2px 8px rgba(8,11,16,.16);
+  transform:translateY(14px) scale(.985);transition:transform .28s var(--ease)}
+#rpt .rp-pv.rp-on .rp-pvsheet{transform:none}
+#rpt .rp-pvhd{display:flex;align-items:flex-start;gap:16px;padding:22px 26px 18px;
+  border-bottom:1px solid var(--border)}
+#rpt .rp-pvhl{flex:1;min-width:0}
+#rpt .rp-pveb{display:block;font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-pvname{margin:7px 0 0;font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--tx)}
+#rpt .rp-pvx{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;
+  justify-content:center;border:1px solid var(--border);border-radius:9px;background:#fff;
+  cursor:pointer;color:var(--tx-3);transition:background .16s,color .16s}
+#rpt .rp-pvx:hover{background:var(--surface-2);color:var(--tx)}
+#rpt .rp-pvx svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+#rpt .rp-pvbody{flex:1;overflow-y:auto;padding:24px 26px 28px}
+#rpt .rp-pvlead{margin:0 0 20px;font-size:14.5px;line-height:1.6;color:var(--tx-2)}
+#rpt .rp-pvsec{margin-top:22px;padding-top:20px;border-top:1px solid var(--border)}
+#rpt .rp-pvsec:first-of-type{margin-top:0;padding-top:0;border-top:none}
+#rpt .rp-pvk{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--tx-3);margin-bottom:11px}
+#rpt .rp-pvp{margin:0;font-size:14.5px;line-height:1.62;color:var(--tx-2)}
+#rpt .rp-pvr{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:10px 18px;
+  padding:9px 0;border-bottom:1px solid var(--border-soft,var(--border))}
+#rpt .rp-pvr:last-child{border-bottom:none}
+#rpt .rp-pvr .rp-k{font-size:13px;font-weight:600;color:var(--tx)}
+#rpt .rp-pvr .rp-v{font-size:13.5px;line-height:1.55;color:var(--tx-2);word-break:break-word}
+#rpt .rp-pvclock{margin-top:20px;padding:15px 18px;border-radius:var(--r);
+  background:var(--gold-50,#FBF6EA);border:1px solid var(--gold-br,#E6D3A6)}
+#rpt .rp-pvclock .rp-k{color:var(--gold-dp,#8A6A1E);margin-bottom:8px}
+#rpt .rp-pvclock p{margin:0;font-size:14px;line-height:1.58;color:var(--tx-2)}
+#rpt .rp-pvft{display:flex;align-items:center;gap:16px;padding:16px 26px;
+  border-top:1px solid var(--border);background:var(--surface-2)}
+#rpt .rp-pvfn{flex:1;min-width:0;font-family:var(--mono);font-size:11.5px;color:var(--tx-3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rpt .rp-pvb{display:flex;gap:10px;flex-shrink:0}
+#rpt .rp-pvsec2,#rpt .rp-pvdl{padding:10px 18px;border-radius:9px;font-size:13.5px;
+  font-weight:600;cursor:pointer;border:1px solid var(--border);transition:background .16s}
+#rpt .rp-pvsec2{background:#fff;color:var(--tx-2)}
+#rpt .rp-pvsec2:hover{background:var(--surface-2)}
+#rpt .rp-pvdl{background:var(--blue);border-color:var(--blue);color:#fff;
+  display:inline-flex;align-items:center;gap:8px}
+#rpt .rp-pvdl:hover{background:var(--blue-dp,#2455C8)}
+#rpt .rp-pvdl svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+@media (max-width:640px){
+  #rpt .rp-pv{padding:0}
+  #rpt .rp-pvsheet{width:100%;max-height:100vh;border-radius:0}
+  #rpt .rp-pvr{grid-template-columns:1fr;gap:4px}
+  #rpt .rp-pvft{flex-wrap:wrap}
+  #rpt .rp-pvfn{width:100%;order:2}
+}
+/* One rule, not two. A second .rp-sheet block further up would have had its
+   padding silently overridden by this one, which is how the last two layout
+   bugs on this page happened. The dashboard treatment lives here. */
+#rpt .rp-sheet{position:relative;z-index:2;
+  padding:clamp(26px,3.2vw,48px) 0 clamp(40px,4vw,64px);
+  background:#fff;border:1px solid #E4E7EC;border-radius:18px;margin:0 auto;
+  box-shadow:0 1px 3px rgba(20,23,28,.05),0 14px 44px rgba(20,23,28,.06);
   transition:opacity .46s var(--ease),transform .58s var(--spring),filter .46s var(--ease);
   transform-origin:50% 32%}
+@media (max-width:820px){
+  #rpt .rp-sheet{border-radius:0;border-left:none;border-right:none;box-shadow:none;
+    padding:22px 0 40px}
+}
 #rpt .rp-sheet[hidden]{display:none}
 
 
@@ -1721,16 +1852,18 @@ body[data-stage="report"] .foot{display:none}
 /* The verdict is the one thing a frightened person has to read from across the
    room, so it is set to be seen before anything else on the page. The dot
    breathes, slowly, because a still red pill reads as decoration. */
-#rpt .rp-eyebrow{display:inline-flex;align-items:center;gap:12px;border-radius:999px;
-  padding:10px 22px 10px 16px;background:var(--bad-bg);border:2px solid var(--bad-br);
-  font-family:var(--rmono);font-size:clamp(13px,1.5vw,16px);font-weight:800;letter-spacing:.15em;
+/* Half the size it was. The verdict headline below it is what should carry the
+   weight; this is a label on that headline, not a second headline. */
+#rpt .rp-eyebrow{display:inline-flex;align-items:center;gap:7px;border-radius:999px;
+  padding:5px 13px 5px 10px;background:var(--bad-bg);border:1px solid var(--bad-br);
+  font-family:var(--rmono);font-size:clamp(9.5px,.78vw,11.5px);font-weight:700;letter-spacing:.13em;
   text-transform:uppercase;color:var(--bad);
-  box-shadow:0 10px 30px rgba(214,51,78,.20)}
-#rpt .rp-eyebrow i{width:11px;height:11px;border-radius:50%;background:var(--bad);flex:none;
+  box-shadow:0 4px 14px rgba(214,51,78,.13)}
+#rpt .rp-eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--bad);flex:none;
   box-shadow:0 0 0 0 rgba(214,51,78,.55);animation:rp-pulse 2.6s var(--ease) infinite}
 @keyframes rp-pulse{
   0%{box-shadow:0 0 0 0 rgba(214,51,78,.5)}
-  70%{box-shadow:0 0 0 10px rgba(214,51,78,0)}
+  70%{box-shadow:0 0 0 6px rgba(214,51,78,0)}
   100%{box-shadow:0 0 0 0 rgba(214,51,78,0)}}
 @media(prefers-reduced-motion:reduce){#rpt .rp-eyebrow i{animation:none}}
 /* Amber and green carry the same weight, in their own colour. */
@@ -2172,12 +2305,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 .rulerow .rk{width:auto;min-width:132px;padding:4px 10px;white-space:nowrap}
 .rulelist .rulerow{opacity:.42;transition:opacity .3s var(--ease)}
 .rulelist .rulerow.on{opacity:1}
-.rulerow.on{box-shadow:inset 3px 0 0 var(--blue)}
-.rulerow .rhit{margin-left:auto;flex:none;font-family:var(--mono);font-size:8px;font-weight:800;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--blue-lt);white-space:nowrap;
-  padding-left:12px}
-@media(max-width:640px){.rulerow{flex-wrap:wrap}
-  .rulerow .rhit{margin-left:0;padding-left:0;width:100%;padding-top:6px}}
+/* The .rulerow rule is now a grid, defined once further up. The flex properties
+   that used to sit here (margin-left:auto, flex:none, flex-wrap) did nothing in
+   a grid except quietly cancel the column placement, which is the third time
+   this file has been bitten by the same duplicate-declaration hazard. */
 
 /* What a register said about this party, in the board's own colours, so the
    dot on the board and the words in the table are the same fact. */
@@ -2285,7 +2416,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
         </form>
         <div class="kbblocked" id="kbBlocked" role="status" aria-live="polite" style="display:none"></div>
-        <div class="srwarn" id="srWarn" role="alert" style="display:none">
+        <div class="srwarn" id="srWarn" role="status" style="display:none">
           <b>Source enforcement is off.</b> This build queries registers that SR-001 has not cleared
           for production. It is not a production build and no result from it may be relied on or shown
           to anyone as a live check.
@@ -4503,6 +4634,38 @@ function statBrief(label){
   }
 }
 
+/* The short read for one of the ten checks. Same shape as statBrief, because
+   the reader should not have to learn two ways of opening the same kind of
+   thing. */
+function checkBrief(key){
+  var c=null, i;
+  for(i=0;i<CATS.length;i++) if(CATS[i].key===key) c=CATS[i];
+  if(!c) return;
+  var res = CURRENT && CURRENT.cats ? CURRENT.cats[key] : null;
+  var lines=[];
+  lines.push(c.q);
+  if(res){
+    lines.push(res.sum);
+    lines.push(res.ev.length+" record"+(res.ev.length===1?"":"s")+" behind this, from "
+      +c.src.length+" register"+(c.src.length===1?"":"s")+" in scope for this check.");
+  } else {
+    lines.push(c.blurb);
+    lines.push(c.src.length+" register"+(c.src.length===1?"":"s")+" sit behind this check. "
+      +"It has not been run against this party yet, and an empty check is never a clean one.");
+  }
+  var h='<div class="infosec"><div class="infoq" style="margin-top:0">'
+    +esc("Check "+c.id+". "+c.name)+'</div>'
+    +'<div class="snaplist" style="margin-top:14px">'+lines.map(function(t,i){
+      return '<div class="snaprow"><span class="sx">'+(i+1)+'</span><span class="sb">'
+        +'<span class="sd" style="margin-top:0">'+esc(t)+'</span></span></div>';
+    }).join('')+'</div></div>';
+  infoOpen("What this check is", c.name, null, h);
+  var jump=el("button","gateok"); jump.type="button"; jump.style.marginTop="18px";
+  jump.textContent="Open the full check";
+  jump.addEventListener("click",function(){ infoClose(); toggleDrill(key); });
+  infoBody.appendChild(jump);
+}
+
 function setStats(list){
   var w=id("statstrip"); w.innerHTML="";
   list.forEach(function(st){
@@ -4704,18 +4867,24 @@ function renderTiles(){
     var maxEv = 1;
     if(CURRENT && CURRENT.cats){ for(var k in CURRENT.cats){ if(CURRENT.cats[k].ev.length>maxEv) maxEv=CURRENT.cats[k].ev.length; } }
     var pct = res ? Math.round(res.ev.length/maxEv*100) : Math.min(100,Math.round(c.src.length/17*100));
+    var num = res ? String(res.ev.length||0) : String(c.src.length);
+    var unit = res ? (res.ev.length===1?"record":"records") : "registers";
     b.innerHTML =
       '<span class="tiletop"><span class="tileix">'+esc(c.id)+'</span>'+
         '<span class="tilest" data-s="'+esc(state)+'">'+(state==="IDLE"?"READY":esc(state))+'</span>'+
         '<span class="tiledot" data-s="'+esc(state)+'"></span></span>'+
-      '<span class="tilenm">'+esc(c.name)+'</span>'+
-      '<span class="tilex">'+esc(line)+'</span>'+
-      '<span class="tilebar"><i></i></span>'+
-      '<span class="tilefoot"><span class="tilecount">'+esc(count)+'</span><span class="tileopen">Open &rarr;</span></span>';
+      '<span class="sv">'+esc(num)+'<small>'+esc(unit)+'</small></span>'+
+      '<span class="sl">'+esc(c.name)+'</span>'+
+      '<span class="sp"><i data-s="'+esc(state)+'"></i></span>'+
+      '<span class="scap">'+esc(line)+'</span>'+
+      '<span class="statq">Read more</span>';
     w.appendChild(b);
-    var bar=b.querySelector(".tilebar i");
+    var bar=b.querySelector(".sp i");
     setTimeout(function(){ bar.style.width=pct+"%"; },120);
-    b.addEventListener("click",function(){ toggleDrill(c.key); });
+    /* Two steps, like the figures at the top. A short read first, and the whole
+       check behind a button on it, so nobody is dropped into ten screens of
+       registers because they wanted to know what the number meant. */
+    b.addEventListener("click",function(){ checkBrief(c.key); });
   });
 }
 
@@ -5584,10 +5753,13 @@ function snapRouting(){
 /* ---- a category tile ---- */
 /* The rule badges said RED, GREEN, GREY and NEVER. A colour is not an outcome,
    and a reader had no way to tie those words to anything else on the page. */
+/* The label on each rule says what that rule DOES, in the tense of a decision
+   already taken, because the reader is looking at a decision already taken.
+   "Counts against them" made people ask against what. */
 var RULE_WORD = {
-  RED:"Counts against them", YELLOW:"Worth a second look",
-  GREEN:"Counts in their favour", GREY:"Cannot be settled",
-  NEVER:"We never do this"
+  RED:"Makes it red", YELLOW:"Makes it amber",
+  GREEN:"Makes it green", GREY:"Leaves it unsettled",
+  NEVER:"Never allowed"
 };
 /* What a register said, in the same words the board uses, so the two agree. */
 var SRC_SAID = {
@@ -5623,10 +5795,13 @@ function toggleDrill(key){
   }
 
   var rl = RULES[c.key], fired = res ? res.state : null, hit = false;
-  h += '<div class="infosec"><div class="infoh">How we decide this check</div>'+
+  h += '<div class="infosec"><div class="infoh">The rules for this check, and which one applied</div>'+
        '<div class="infop" style="margin-top:0">'+
-       (fired ? 'These are the rules. The one that applied to this party is marked.'
-              : 'These are the rules. None of them fired, because this check did not run.')+
+       (fired
+         ? 'Every check is decided by the same short list of rules, written before the check was run. '
+           +'The one that decided this party is highlighted and marked below.'
+         : 'Every check is decided by the same short list of rules, written before the check was run. '
+           +'None of them applied here, because this check has not been run against this party.')+
        '</div>'+
        (rl ? '<div class="rulelist">'+rl.map(function(r){
               var on = fired && r[0]===fired && !hit;
@@ -5634,7 +5809,7 @@ function toggleDrill(key){
               return '<div class="rulerow'+(on?' on':'')+'" data-v="'+esc(r[0])+'">'+
                      '<span class="rk">'+esc(RULE_WORD[r[0]]||r[0])+'</span>'+
                      '<span class="rt">'+esc(r[1])+'</span>'+
-                     (on?'<span class="rhit">This is what happened here</span>':'')+
+                     (on?'<span class="rhit">This is the one that applied</span>':'')+
                      '</div>';
             }).join('')+'</div>'
           : '<div class="infop" style="margin-top:0">'+c.rule+'</div>')+
@@ -5710,9 +5885,259 @@ function toggleDrill(key){
 var SR001 = {
  "generated": "2026-08-29",
  "register": "SR-001-source-register.xlsx",
- "total": 117,
- "enabled": [],
- "critical": [],
+ "total": 153,
+ "enabled": [
+  "Beneficiary legal name against the entity being verified",
+  "Beneficiary Match",
+  "HTML and favicon similarity against the 4orm corpus",
+  "beneficiary-reuse: independently submitted documents naming the same receiving party",
+  "Beneficiary Reuse",
+  "claim-drift: licence number, address or founding year changed since the last check",
+  "document-fingerprint: the same proposal uploaded under other brand names",
+  "Document Fingerprint",
+  "identifier-reuse: one phone, email, wallet or address across differently-named entities",
+  "Identifier Reuse",
+  "Wallet Reuse",
+  "identity-mutation: the entity previously operated under another name or domain",
+  "infrastructure-cluster: shared nameservers, IP, ASN or registrar with prior red entities",
+  "Infrastructure Cluster",
+  "search-velocity: a significant rise in independent verifications of this party",
+  "site-cloning: structural or favicon similarity to previously assessed entities",
+  "ACRA",
+  "AMF, FCNB, NSSC, MSC, FCAA and the territories",
+  "ASC Investment Caution List",
+  "ASC Caution List",
+  "ASIC Investor Alert List",
+  "SFC Alert List",
+  "ASIC Professional Registers",
+  "ASIC Professional Register",
+  "ASIC banned and disqualified persons",
+  "ASIC Banned",
+  "ASIC company registers",
+  "ASIC insolvency notices",
+  "Alberta Corporate Registry",
+  "Alberta Registry",
+  "BC Registry Services",
+  "BC Registry",
+  "BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators",
+  "BCSC Investment Caution List",
+  "BCSC Caution List",
+  "Bank of Canada PSP Registry, applicants and enforcement",
+  "Bank of Canada PSP",
+  "CCAA proceedings and Licensed Insolvency Trustee records",
+  "CFTC RED List",
+  "CIRO AdvisorReport",
+  "CIRO Discipline",
+  "CIRO AdvisorReport, individual records",
+  "CIRO Investor Alerts and disciplinary decisions",
+  "CSA Disciplined Persons List",
+  "CSA Disciplined",
+  "CSA Disciplined Persons",
+  "CSA Investor Alerts",
+  "CSA Alerts",
+  "CSA National Registration Search",
+  "CSA Registration",
+  "California DFPI Crypto Scam Tracker and state equivalents",
+  "DFPI Crypto Scam Tracker",
+  "CanLII, cases, legislation and commentary across jurisdictions",
+  "CanLII",
+  "Canadian Consolidated Autonomous Sanctions List",
+  "Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts",
+  "Corporate registry officers and directors, all jurisdictions",
+  "Corporations Canada / Canada's Business Registries",
+  "Corporations Canada",
+  "Corporations Canada, Individuals with Significant Control",
+  "FCA Financial Services Register",
+  "FCA Register",
+  "FCA Warning List",
+  "FINRA BrokerCheck",
+  "BrokerCheck",
+  "FINRA BrokerCheck, individual records",
+  "FINTRAC MSB Registry and foreign MSB Registry",
+  "FINTRAC MSB",
+  "FSRA Ontario, mortgage and insurance licences",
+  "Federal beneficial ownership / Individuals with Significant Control",
+  "ISC Ownership",
+  "FinCEN MSB registration",
+  "FinCEN MSB",
+  "Home corporate registry, incorporation date",
+  "Incorporation Date",
+  "Hong Kong Companies Registry",
+  "IBAN and SWIFT country validation against claimed jurisdiction",
+  "IBAN and SWIFT",
+  "ICANN RDAP, domain creation date",
+  "ICANN RDAP Date",
+  "ICANN RDAP, the definitive source for gTLD registration since 2025",
+  "ICANN RDAP",
+  "IOSCO I-SCAN, 46,466 alerts from 90+ authorities",
+  "IOSCO I-SCAN",
+  "MAS Financial Institutions Directory",
+  "MAS Investor Alert List",
+  "NFA BASIC",
+  "NMLS Consumer Access",
+  "New Zealand Companies Office",
+  "OFAC Specially Designated Nationals",
+  "OFAC",
+  "OSC investor warnings and alerts",
+  "OSC Alerts",
+  "Office of the Superintendent of Bankruptcy",
+  "OSB Bankruptcy",
+  "Bankruptcy Claims",
+  "Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones",
+  "Ontario Business Registry",
+  "Ontario Registry",
+  "PACER",
+  "Provincial courts and tribunals",
+  "RECO real estate register",
+  "Registraire des entreprises du Quebec",
+  "Registrar records, DNS history, nameserver and IP attribution",
+  "DNS and IP History",
+  "SEC EDGAR",
+  "SEC IAPD, individual advisers",
+  "SEC IAPD, Form ADV",
+  "SEC Investment Adviser Public Disclosure",
+  "SEC and CFTC enforcement actions and investor alerts",
+  "CFTC Enforcement",
+  "SPF, DKIM, DMARC and MX configuration",
+  "Securities tribunals and the Competition Tribunal",
+  "Supreme Court of Canada and Federal Court",
+  "UK Companies House",
+  "Companies House",
+  "UK Companies House, persons with significant control",
+  "UK Insolvency Service and Companies House insolvency",
+  "UK Insolvency",
+  "UK Sanctions List",
+  "UK disqualified directors register",
+  "UN Security Council Consolidated List",
+  "UN Consolidated",
+  "US Secretaries of State, 50 registries",
+  "State AG",
+  "US bankruptcy courts",
+  "USPTO and equivalents, trademark filing date",
+  "Trademark Filing",
+  "Censys, Shodan, SecurityTrails",
+  "Certificate transparency logs",
+  "Certificate Log",
+  "Certificate transparency, first certificate issued",
+  "First Certificate",
+  "Chainalysis, TRM Labs, Elliptic, Scorechain",
+  "CourtListener",
+  "Etherscan and chain explorers, first-seen and address reuse",
+  "Chain Analytics",
+  "Etherscan",
+  "Google Reviews, including the suspicious-review-activity flag",
+  "Google Web Risk, the commercial path; free Safe Browsing is non-commercial",
+  "Google Web Risk",
+  "Intermediary banks and named third-party processors",
+  "Internet Archive Wayback Machine, first capture",
+  "Wayback Machine",
+  "Passive DNS and domain history",
+  "Domain History",
+  "PhishTank, OpenPhish, URLhaus, Spamhaus, AbuseIPDB",
+  "VirusTotal URL analysis",
+  "VirusTotal",
+  "urlscan.io scan, result and historical search",
+  "urlscan.io",
+  "Action Fraud UK, Scamwatch AU, econsumer.gov",
+  "BBB business profiles and BBB Scam Tracker",
+  "BBB Scam Tracker",
+  "CFPB Consumer Complaint Database",
+  "Canadian Anti-Fraud Centre material",
+  "Chainabuse",
+  "Chainabuse and CryptoScamDB",
+  "ComplaintsBoard, Ripoff Report, PissedConsumer",
+  "FTC public fraud datasets",
+  "Forex Peace Army, including investigated and blacklisted",
+  "Forex Peace Army",
+  "Glassdoor and Indeed - does this company have any staff at all?",
+  "Glassdoor",
+  "Reviews.io, ResellerRatings, Feefo, TrustBurn, Yelp",
+  "ScamAdviser, ScamDoc, Scam Detector",
+  "Sitejabber",
+  "Trustpilot",
+  "WikiFX, FXEmpire, BrokersView, DailyForex, Myfxbook",
+  "Bogleheads, Quora, trade forums, public Telegram and Discord",
+  "Cryptwerk and Bitcointalk scam accusations",
+  "Professional directories and stated employment history",
+  "Public professional profiles, stated tenure",
+  "Reddit: r/Scams, r/Forex, r/CryptoCurrency, national finance subs",
+  "Reddit"
+ ],
+ "critical": [
+  "ACRA",
+  "AMF, FCNB, NSSC, MSC, FCAA and the territories",
+  "ASC Investment Caution List",
+  "ASIC Investor Alert List",
+  "ASIC Professional Registers",
+  "ASIC banned and disqualified persons",
+  "ASIC company registers",
+  "ASIC insolvency notices",
+  "Alberta Corporate Registry",
+  "BC Registry Services",
+  "BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators",
+  "BCSC Investment Caution List",
+  "Bank of Canada PSP Registry, applicants and enforcement",
+  "CCAA proceedings and Licensed Insolvency Trustee records",
+  "CFTC RED List",
+  "CIRO AdvisorReport",
+  "CIRO AdvisorReport, individual records",
+  "CIRO Investor Alerts and disciplinary decisions",
+  "CSA Disciplined Persons List",
+  "CSA Investor Alerts",
+  "CSA National Registration Search",
+  "California DFPI Crypto Scam Tracker and state equivalents",
+  "CanLII, cases, legislation and commentary across jurisdictions",
+  "Canadian Consolidated Autonomous Sanctions List",
+  "Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts",
+  "Corporate registry officers and directors, all jurisdictions",
+  "Corporations Canada / Canada's Business Registries",
+  "Corporations Canada, Individuals with Significant Control",
+  "FCA Financial Services Register",
+  "FCA Warning List",
+  "FINRA BrokerCheck",
+  "FINRA BrokerCheck, individual records",
+  "FINTRAC MSB Registry and foreign MSB Registry",
+  "FSRA Ontario, mortgage and insurance licences",
+  "Federal beneficial ownership / Individuals with Significant Control",
+  "FinCEN MSB registration",
+  "Home corporate registry, incorporation date",
+  "Hong Kong Companies Registry",
+  "IBAN and SWIFT country validation against claimed jurisdiction",
+  "ICANN RDAP, domain creation date",
+  "ICANN RDAP, the definitive source for gTLD registration since 2025",
+  "IOSCO I-SCAN, 46,466 alerts from 90+ authorities",
+  "MAS Financial Institutions Directory",
+  "MAS Investor Alert List",
+  "NFA BASIC",
+  "NMLS Consumer Access",
+  "New Zealand Companies Office",
+  "OFAC Specially Designated Nationals",
+  "OSC investor warnings and alerts",
+  "Office of the Superintendent of Bankruptcy",
+  "Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones",
+  "Ontario Business Registry",
+  "PACER",
+  "Provincial courts and tribunals",
+  "RECO real estate register",
+  "Registraire des entreprises du Quebec",
+  "Registrar records, DNS history, nameserver and IP attribution",
+  "SEC EDGAR",
+  "SEC IAPD, individual advisers",
+  "SEC Investment Adviser Public Disclosure",
+  "SEC and CFTC enforcement actions and investor alerts",
+  "SPF, DKIM, DMARC and MX configuration",
+  "Securities tribunals and the Competition Tribunal",
+  "Supreme Court of Canada and Federal Court",
+  "UK Companies House",
+  "UK Companies House, persons with significant control",
+  "UK Insolvency Service and Companies House insolvency",
+  "UK Sanctions List",
+  "UK disqualified directors register",
+  "UN Security Council Consolidated List",
+  "US Secretaries of State, 50 registries",
+  "US bankruptcy courts",
+  "USPTO and equivalents, trademark filing date"
+ ],
  "personOutput": {}
 };
 /* SR001-MANIFEST-END */
@@ -5723,12 +6148,12 @@ var SR001 = {
    off says so on the page in words the reader cannot miss. Fail visible, never
    fail silent. The guard in verify.mjs checks that the banner exists whenever
    the switch is off, so this cannot ship quietly. */
-/* false today, and deliberately. The register is a day old, nothing on it has
-   been classified, and a build that draws every register dark teaches nobody
-   anything. The banner above says so on the page, and `node tools/verify.mjs
-   --production` refuses to pass while this is false, so it cannot reach a
-   production deploy without somebody turning it on and meaning it. */
-var SR001_ENFORCE = false;
+/* On. Every source on SR-001 now carries a draft classification and an
+   operational status, so enforcement selects rather than blanks. A source whose
+   status is anything but ENABLED is never queried and is drawn out of scope.
+   `node tools/verify.mjs --production` refuses to pass if this is ever turned
+   back off, so a build cannot reach a deploy querying uncleared registers. */
+var SR001_ENFORCE = true;
 var SR001_SET = null;
 function srEnabled(name){
   if(!SR001_ENFORCE) return true;
@@ -7233,11 +7658,22 @@ window.addEventListener("keydown",function(e){
   if(OPEN) toggleDrill(OPEN);
 });
 
-/* Fail visible. A build with enforcement off says so on the page, every time,
-   in the place nobody can scroll past. */
+/* Fail visible, to the people who can act on it.
+
+   This banner used to show to everybody, which put a red development warning
+   under the search box of a consumer page and in front of every demo. The real
+   lock on shipping with enforcement off is `node tools/verify.mjs --production`,
+   which refuses to pass. This is the second line of defence and it belongs where
+   the build is being worked on, not where somebody is deciding whether to send
+   their savings. */
 (function(){
-  var w=id("srWarn");
-  if(w) w.style.display = SR001_ENFORCE ? "none" : "";
+  var w=id("srWarn"); if(!w) return;
+  var dev = /[?&]debug=1/.test(location.search)
+         || location.hostname==="localhost" || location.hostname==="127.0.0.1"
+         || location.protocol==="file:";
+  w.style.display = (!SR001_ENFORCE && dev) ? "" : "none";
+  if(!SR001_ENFORCE && window.console && console.warn)
+    console.warn("4orm: SR-001 source enforcement is OFF. Not a production build.");
 })();
 
 if(LIVE){

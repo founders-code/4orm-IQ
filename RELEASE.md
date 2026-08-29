@@ -143,12 +143,45 @@ the register. A source whose Operational status is not `ENABLED` is never
 planned into a search and draws on the board as `policy`: out of scope, which is
 its own state and never means reached and never means clean.
 
-`SR001_ENFORCE` is currently `false`, because nothing on the register has been
-classified yet and a build that draws every register dark is unusable. A build
-with it off shows a red banner saying so, and `node tools/verify.mjs --production`
-fails while it is off. Turn it on before any deploy.
+`SR001_ENFORCE` is `true`. Every register on SR-001 carries a draft
+classification and an operational status, so enforcement selects rather than
+blanks: 68 registers are in scope and 36 are held out because they appear on the
+board with no source row behind them. If it is ever turned off, a dev-only
+banner appears and `node tools/verify.mjs --production` fails.
 
     node tools/verify.mjs --production
 
 `tools/smoke19.mjs` runs the page both ways and measures the board, so the switch
 is proved to change what a reader sees rather than only what the source says.
+
+
+## Operations telemetry
+
+`db/telemetry.sql` and `api/admin-metrics.js` serve the OPS-001 s.51 metric list.
+`admin.html` renders it.
+
+    psql "$POSTGRES_URL" -f db/telemetry.sql
+    # then set ADMIN_TOKEN in Vercel and open /admin.html
+
+Two environment variables, both required: `POSTGRES_URL` and `ADMIN_TOKEN`. With
+`ADMIN_TOKEN` unset the route returns 503 and is disabled outright rather than
+left open.
+
+**There is no column anywhere in the operations schema for the identifier a user
+searched, the party a check was about, or the result it returned.** That is
+deliberate and it is guarded: `tools/smoke20.mjs` fails if `db/telemetry.sql`
+grows such a column, and it fails if the metrics endpoint returns a response key
+nobody vetted. An administrator can see how the machine is running; they cannot
+see who anybody asked about. If somebody asks for a search-history screen, the
+answer is that the column does not exist, and the reason is written at the top of
+`db/telemetry.sql`.
+
+## Test suite
+
+    node tools/verify.mjs                 # static guards, 40+
+    node tools/verify.mjs --production    # adds the deploy gate
+    node tools/smoke.mjs ... smoke20.mjs  # 20 behavioural suites
+    node tools/graph-tests.mjs            # 40 assertions
+
+Every guard in `verify.mjs` was proved by breaking its subject and watching the
+suite fail. That log is the evidence OPS-001 s.45 asks for.

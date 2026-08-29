@@ -33,6 +33,8 @@ for row in ws.iter_rows(min_row=2, values_only=True):
       "id":   row[ix["Source ID"]],
       "name": str(row[ix["Source name"]]).strip(),
       "tier": row[ix["Tier"]],
+      "board": (row[ix["Board name"]] or "").strip(),
+      "origin": (row[ix["Where it appears"]] or "").strip(),
       "status": (row[ix["Operational status"]] or "DISABLED pending classification").strip(),
       "legal":  (row[ix["Legal review status"]] or "NOT REVIEWED").strip(),
       "crit":   (row[ix["Criticality"]] or "").strip(),
@@ -52,11 +54,27 @@ const html = fs.readFileSync(target, 'utf8');
 const cats = eval(html.match(/var CATS\s*=\s*(\[[\s\S]*?\n\]);/)[1].replace(/<\/?b>/g, ''));
 const inBuild = new Set();
 cats.forEach(c => (c.src || []).forEach(s => inBuild.add(String(s[0]).trim())));
+/* The board is a second name space for the same registers. Every chip needs a
+   row too, or the board advertises a register nothing accounts for. */
+const boardNames = new Set();
+(eval((html.match(/var SOURCES\s*=\s*(\[[\s\S]*?\n\]);/) || [null,'[]'])[1]))
+  .forEach(g => (g.items || []).forEach(x => boardNames.add(String(x).trim())));
 const onRegister = new Set(rows.map(r => r.name));
+const onBoardCol = new Set();
+rows.forEach(r => String(r.board || '').split(';').map(x => x.trim()).filter(Boolean)
+  .forEach(x => onBoardCol.add(x)));
 const missing = [...inBuild].filter(n => !onRegister.has(n));
-if (missing.length) {
-  console.error('REFUSING TO WRITE. ' + missing.length + ' source(s) run in the build and are not on SR-001:');
-  missing.slice(0, 20).forEach(n => console.error('  ' + n));
+const missingBoard = [...boardNames].filter(n => !onBoardCol.has(n) && !onRegister.has(n));
+if (missing.length || missingBoard.length) {
+  console.error('REFUSING TO WRITE.');
+  if (missing.length) {
+    console.error('  ' + missing.length + ' source(s) run in the build and are not on SR-001:');
+    missing.slice(0, 12).forEach(n => console.error('    ' + n));
+  }
+  if (missingBoard.length) {
+    console.error('  ' + missingBoard.length + ' board chip(s) have no row on SR-001:');
+    missingBoard.slice(0, 12).forEach(n => console.error('    ' + n));
+  }
   process.exit(1);
 }
 
@@ -64,7 +82,10 @@ const manifest = {
   generated: new Date().toISOString().slice(0, 10),
   register: path.basename(xlsx),
   total: rows.length,
-  enabled: enabled.map(r => r.name),
+  /* Both names for every enabled register, so the board and the search plan
+     resolve against the same list. */
+  enabled: [...new Set(enabled.flatMap(r =>
+    [r.name].concat(String(r.board || '').split(';').map(x => x.trim()).filter(Boolean))))],
   critical: enabled.filter(r => r.crit === 'CRITICAL').map(r => r.name),
   personOutput: Object.fromEntries(person.map(r => [r.name, true])),
 };
@@ -82,5 +103,7 @@ console.log('  on the register   ' + rows.length);
 console.log('  enabled           ' + enabled.length);
 console.log('  critical          ' + manifest.critical.length);
 console.log('  person output     ' + person.length);
-console.log('  in the build       ' + inBuild.size + ' (all on the register)');
+console.log('  in the build      ' + inBuild.size + ' (all on the register)');
+console.log('  board chips       ' + boardNames.size + ' (all on the register)');
+console.log('  names in manifest ' + manifest.enabled.length);
 if (!enabled.length) console.log('\n  Nothing is enabled, so nothing is in scope. That is the register working,\n  not a bug. Fill in the yellow cells and set Operational status to ENABLED.');
