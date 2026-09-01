@@ -342,6 +342,31 @@ export default async function handler(req, res) {
     : ALL_CATS.slice();
   const on = k => checks.includes(k);
 
+  /* The two optional questions from the console. Both may be absent, and an
+     absent answer is absent, never a default that nobody chose. Values are
+     matched against a fixed list rather than trusted, because everything here
+     reaches the operations log and a free text field on a request body is how
+     an identifier ends up in a table that must never hold one. */
+  const ONE_OF = (v, allowed) => {
+    const x = String(v || '').trim().toUpperCase();
+    return allowed.includes(x) ? x : null;
+  };
+  const ask = {
+    sector:  ONE_OF(body?.sector,  ['INVESTMENT', 'MORTGAGE', 'AUTO', 'INSURANCE', 'OTHER']),
+    stage:   ONE_OF(body?.stage,   ['BEFORE', 'SENT', 'DILIGENCE']),
+    channel: ONE_OF(body?.channel, ['DEALER', 'PRIVATE']),
+  };
+  /* A channel answer only means anything for a vehicle. Carried over from a
+     sector somebody switched away from, it would be a fact about the run that
+     nobody stated. */
+  if (ask.sector !== 'AUTO') ask.channel = null;
+
+  /* Stage rides the purpose field that already exists rather than becoming a
+     new hashed column. It describes why somebody is asking, which is what that
+     field is for, and it keeps the row shape stable. */
+  const OPS_PURPOSE = { BEFORE: 'TRANSACTION', SENT: 'TRANSACTION_DONE',
+                        DILIGENCE: 'DILIGENCE' }[ask.stage] || 'TRANSACTION';
+
   const domain = isDomain(q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0])
     ? q.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase()
     : null;
@@ -590,7 +615,7 @@ export default async function handler(req, res) {
     const ops = await recordOps(req, {
       input_type: opsInputType(q, domain),
       province: null,                       /* set when the purpose gate lands */
-      purpose: 'TRANSACTION',
+      purpose: OPS_PURPOSE,
       outcome: 'COMPLETED',
       sources_planned: sources?.length ?? 0,
       sources_ok: call.input?.scores?.sources_checked ?? 0,
@@ -604,7 +629,7 @@ export default async function handler(req, res) {
       policy_version: OPS_POLICY_VERSION,
       manifest_generated: POLICY.manifest_generated,
       enforcement_on: POLICY.enforcement_on,
-      sector: call.input?.sector || null,
+      sector: ask.sector,
     }).catch(e => ({ ok: false, reason: e?.message || 'ops threw' }));
     payload.pipeline.ops = {
       ok: ops.ok, seq: ops.seq, reason: ops.reason, schema: ops.schema,
@@ -614,6 +639,16 @@ export default async function handler(req, res) {
       manifest_generated: POLICY.manifest_generated,
       policy_recorded: !!(pol && pol.ok),
     };
+    /* Echoed back so the report can say what it was laid out for, and so the
+       audit panel can show it. Absent answers stay absent.
+
+       Note what this does NOT do yet: the declared sector does not narrow the
+       search plan, because the provincial dealer, mortgage and insurance
+       registers are not on SR-001 yet and routing to a vertical no source
+       claims would return a coverage figure of zero. It reaches the log and
+       the layout today, and it will reach routing the day those registers are
+       classified. */
+    payload.pipeline.context = ask;
 
     /* Per register, rolled into the day. Fire and forget: a health counter must
        never be able to hold up a response. */

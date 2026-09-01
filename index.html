@@ -504,6 +504,36 @@ body[data-stage="landing"] .tlead{display:block}
   border:1px solid var(--border-strong);background:var(--bg-2);transition:all .32s var(--ease);
 }
 .idchip.on{color:var(--bg);background:var(--gold);border-color:var(--gold);box-shadow:0 0 20px rgba(196,154,58,.26)}
+
+/* The two optional questions. Quiet by construction: they arrive only after
+   something is in the bar, they carry no required marker, and nothing about
+   the Check button depends on them. */
+/* Spacing lives on the ROWS, not on a gap on this container.
+   body[data-stage="landing"] .landing-only{display:block} has two class
+   selectors and beats a single-class display:flex here, so a column gap set on
+   .ctx is silently discarded and the rows collapse into each other. That is
+   the fourth time a duplicate layout property has silently won on this page.
+   Margins on the children work whichever display the parent ends up with. */
+.ctx{margin-top:22px;max-width:74ch}
+body[data-stage="landing"] .ctx{margin-left:auto;margin-right:auto;text-align:center}
+.ctx[hidden]{display:none!important}
+.ctxrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:22px}
+.ctxrow:first-child{margin-top:0}
+body[data-stage="landing"] .ctxrow{justify-content:center}
+.ctxq{
+  font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tx-3);width:100%;margin-bottom:1px;
+}
+.ctxchip{
+  font-size:12.5px;line-height:1;padding:9px 15px;border-radius:999px;cursor:pointer;
+  color:var(--tx-2);border:1px solid var(--border-strong);background:var(--bg-2);
+  transition:color .22s var(--ease),background .22s var(--ease),border-color .22s var(--ease);
+}
+.ctxchip:hover{color:var(--tx-1);border-color:var(--tx-3)}
+.ctxchip[aria-pressed="true"]{color:var(--bg);background:var(--blue);border-color:var(--blue)}
+.ctxskip{margin-top:18px;font-size:11.5px;color:var(--tx-3);line-height:1.5;max-width:64ch}
+body[data-stage="landing"] .ctxskip{margin-left:auto;margin-right:auto}
+@media(max-width:560px){.ctxchip{font-size:12px;padding:8px 13px}}
 /* The seed row is gone. The six identifier chips are what sits under the bar. */
 .upnote{margin-top:16px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:74ch}
 .upnote b{color:var(--tx-2);font-weight:600}
@@ -2363,6 +2393,17 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-tonight .rp-t{font-size:clamp(17px,1.7vw,21px);font-weight:800;
   letter-spacing:-.026em;line-height:1.2}
 #rpt .rp-tonight .rp-x{margin-top:9px;font-size:14.5px;line-height:1.55;color:#B9C6D8}
+/* The action control, written only where the money has gone and an authority
+   has already acted. Hidden everywhere else, including in print. */
+#rpt .rp-acta{margin-top:14px}
+#rpt .rp-acta[hidden]{display:none!important}
+#rpt .rp-actb{display:inline-block;padding:11px 18px;border-radius:999px;cursor:pointer;
+  background:#fff;color:var(--tx);border:1px solid #fff;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;transition:background .22s var(--ease),color .22s var(--ease)}
+#rpt .rp-actb:hover{background:var(--bad);color:#fff;border-color:var(--bad)}
+#rpt .rp-actb:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media print{#rpt .rp-acta{display:none!important}}
 
 /* The reader who has already paid. Closed by default, because a reader who has
    not paid does not need it, and one who has needs nothing else first. */
@@ -2564,6 +2605,16 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
         </form>
         <div class="kbblocked" id="kbBlocked" role="status" aria-live="polite" style="display:none"></div>
+
+        <!-- Two questions, both optional, neither of which can hold up a check.
+             Somebody at eleven at night with money in a wire form does not fill
+             in a form, so these appear only once there is something in the bar,
+             the Check button never waits on them, and skipping both runs the
+             same search it would have run anyway. What they change is which
+             registers can hold a record, and how the answer is delivered. The
+             chips are written by the page from CTX_Q below, so the wording here
+             and the wording the report acts on cannot drift apart. -->
+        <div class="ctx landing-only" id="kbCtx" hidden></div>
         <div class="srwarn" id="srWarn" role="status" style="display:none">
           <b>Source enforcement is off.</b> This build queries registers that SR-001 has not cleared
           for production. It is not a production build and no result from it may be relied on or shown
@@ -2800,6 +2851,9 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <div class="rp-tonight" id="rpTonight">
             <div class="rp-t" id="rpTonightT"></div>
             <div class="rp-x" id="rpTonightX"></div>
+            <!-- Written only where the money has gone and an authority has
+                 already acted. Empty and hidden in every other case. -->
+            <div class="rp-acta" id="rpTonightA" hidden></div>
           </div>
 
           <div class="rp-saylab">In our own words</div>
@@ -6400,7 +6454,115 @@ input.addEventListener("input",function(){
   var w=id("kbBlocked");
   if(w){ w.textContent = bad ? BLOCKED_INPUT[t] : ""; w.style.display = bad ? "" : "none"; }
   go.disabled = !input.value.trim() || !!bad;
+  /* The questions arrive after the identifier, never before it. Nothing about
+     the Check button consults them. */
+  ctxShow(!!input.value.trim() && !bad);
 });
+
+/* ------------------------------------------------------------------ *
+ * CONTEXT: WHAT THIS IS ABOUT, AND WHERE THEY ARE IN IT
+ *
+ * Two questions. Neither is required, neither blocks the check, and skipping
+ * both runs the same search that would have run without them.
+ *
+ * Sector decides which registers can hold a record here. A car dealer is on a
+ * provincial dealer register and nowhere near a securities register, and
+ * searching the wrong hundred registers produces a coverage figure that means
+ * nothing. It rides in the operations log as an aggregate category.
+ *
+ * Stage does NOT change what we look for. It changes how the answer is
+ * delivered, and only that. Somebody who has already sent money and somebody
+ * comparing brokers over a fortnight need the same evidence in a different
+ * order, and telling the second one not to send anything tonight is noise.
+ *
+ * The critical rule, and the reason stage is presentation and never judgement:
+ * "already sent" NEVER promotes an answer. It reorders a page. What decides
+ * whether somebody is pointed at their bank is the evidence, never the box
+ * they ticked.
+ * ------------------------------------------------------------------ */
+var CTX_Q = [
+  { key:"sector", q:"What is this about?", opts:[
+    { v:"INVESTMENT", label:"An investment" },
+    { v:"MORTGAGE",   label:"A mortgage or a loan" },
+    { v:"AUTO",       label:"A vehicle" },
+    { v:"INSURANCE",  label:"Insurance" },
+    { v:"OTHER",      label:"Something else" }
+  ]},
+  { key:"stage", q:"Where are you with it?", opts:[
+    { v:"BEFORE",    label:"I have not sent anything yet" },
+    { v:"SENT",      label:"I already sent money" },
+    { v:"DILIGENCE", label:"I am just doing my homework" }
+  ]},
+  /* Only for a vehicle, and it is the single most important question in this
+     whole section. A private seller holds no licence, and reading the absence
+     of one as a finding would be the largest false positive in the product. */
+  { key:"channel", q:"Who are you buying from?", onlyIf:{ sector:"AUTO" }, opts:[
+    { v:"DEALER",  label:"A dealership" },
+    { v:"PRIVATE", label:"A private seller" }
+  ]}
+];
+var CTX = { sector:null, stage:null, channel:null };
+/* The context the CURRENT report was run under. Read by the report, never
+   written by it. */
+var RUN_CTX = {};
+
+function ctxApplies(q){
+  if(!q.onlyIf) return true;
+  for(var k in q.onlyIf) if(CTX[k]!==q.onlyIf[k]) return false;
+  return true;
+}
+/* Answers to a question that no longer applies are dropped rather than carried
+   quietly. A dealer answer left behind after somebody switched to insurance
+   would be a fact about the run that nobody stated. */
+function ctxPrune(){
+  for(var i=0;i<CTX_Q.length;i++){
+    var q=CTX_Q[i];
+    if(!ctxApplies(q)) CTX[q.key]=null;
+  }
+}
+function ctxPaint(){
+  var box=id("kbCtx"); if(!box) return;
+  ctxPrune();
+  var h="";
+  for(var i=0;i<CTX_Q.length;i++){
+    var q=CTX_Q[i];
+    if(!ctxApplies(q)) continue;
+    h+='<div class="ctxrow" role="group" aria-label="'+esc(q.q)+'">'
+      +'<span class="ctxq">'+esc(q.q)+'</span>';
+    for(var j=0;j<q.opts.length;j++){
+      var o=q.opts[j], on=CTX[q.key]===o.v;
+      h+='<button type="button" class="ctxchip" data-q="'+esc(q.key)+'" data-v="'+esc(o.v)+'"'
+        +' aria-pressed="'+(on?"true":"false")+'">'+esc(o.label)+'</button>';
+    }
+    h+='</div>';
+  }
+  h+='<div class="ctxskip">Both are optional. Answering them narrows the registers we search '
+    +'and changes how we lay the answer out. It never changes what the record says.</div>';
+  box.innerHTML=h;
+  var chips=box.querySelectorAll(".ctxchip");
+  for(var k=0;k<chips.length;k++){
+    chips[k].addEventListener("click",function(){
+      var q=this.getAttribute("data-q"), v=this.getAttribute("data-v");
+      CTX[q] = (CTX[q]===v) ? null : v;   /* tapping the chosen one clears it */
+      ctxPaint();
+    });
+  }
+}
+function ctxShow(on){
+  var box=id("kbCtx"); if(!box) return;
+  if(on && box.hidden){ box.hidden=false; ctxPaint(); }
+  else if(!on && !box.hidden){ box.hidden=true; }
+}
+/* What travels with the request. Nulls are dropped so an unanswered question
+   arrives as absent rather than as a value nobody chose. */
+function ctxPayload(){
+  ctxPrune();
+  var o={};
+  if(CTX.sector)  o.sector=CTX.sector;
+  if(CTX.stage)   o.stage=CTX.stage;
+  if(CTX.channel) o.channel=CTX.channel;
+  return o;
+}
 
 /* Every check runs on every search. enabledChecks stays as the single place
    that answers "which categories is this run allowed to use", so the request
@@ -6724,7 +6886,7 @@ function liveCheck(q, onEvent){
   return fetch("/api/check",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({q:q, checks:enabledChecks(), stream:true})
+    body:JSON.stringify(Object.assign({q:q, checks:enabledChecks(), stream:true}, ctxPayload()))
   }).then(function(r){
     var ct = r.headers.get("content-type")||"";
     if(!r.body || !r.body.getReader || ct.indexOf("ndjson")<0){
@@ -6778,6 +6940,10 @@ function liveCheck(q, onEvent){
 
 function check(q){
   var key=(q||"").trim().toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
+
+  /* Frozen at submit, so that changing a chip while a check is running cannot
+     re-lay a report that was decided under a different context. */
+  RUN_CTX = ctxPayload();
 
   waitOpen(q);
 
@@ -7927,7 +8093,16 @@ if(LIVE){
    which is how a failed live check gets diagnosed without guessing. */
 if(/[?&]debug=1\b/.test(window.location.search)){
   window.__KBYS__={ toResult:toResult, buildAudit:buildAudit, buildSummary:buildSummary, errorResult:errorResult,
-                    check:check, liveCheck:liveCheck, current:function(){return CURRENT;} };
+                    check:check, liveCheck:liveCheck, current:function(){return CURRENT;},
+                    /* The two questions and what they change. Exposed because the
+                       property worth testing is not that chips render, it is that
+                       an answer cannot promote a verdict, and that is only
+                       measurable by driving these directly. */
+                    ctx:function(){return CTX;},
+                    ctxPayload:ctxPayload,
+                    runCtx:function(v){ if(arguments.length) RUN_CTX=v; return RUN_CTX; },
+                    escalation:function(d){return rpEscalation(d);},
+                    delivery:function(d){return rpDelivery(d);} };
 }
 
 /* ------------------------------------------------------------------ *
@@ -9204,6 +9379,43 @@ function rpOfficialBody(d){
   }
   return "A regulator";
 }
+/* ------------------------------------------------------------------ *
+ * THE ESCALATION LADDER
+ *
+ * Businesses make mistakes. A couple of bad reviews is a business having a bad
+ * month, and treating it as a finding would make this product the thing it was
+ * built to replace. What earns escalation is a regulator saying so, or a
+ * pattern, or volume. Three rungs, and only the top one moves a reader toward
+ * their bank.
+ *
+ *   OFFICIAL   a tier A body has acted or warned. This is a finding.
+ *   PATTERN    the same kind of complaint on THREE OR MORE INDEPENDENT
+ *              platforms. Independent matters more than the count: forty
+ *              complaints on one board is one board, and one board can be
+ *              brigaded, bought, or simply be where angry people go.
+ *   NOISE      anything less. Shown, labelled as what people said, and never
+ *              written as though we found something.
+ * ------------------------------------------------------------------ */
+var RP_PATTERN_PLATFORMS = 3;
+function rpConsumerHosts(d){
+  var hosts={};
+  for(var k in (d.cats||{})){
+    var ev=(d.cats[k]||{}).ev||[];
+    for(var i=0;i<ev.length;i++){
+      var e=ev[i];
+      if(e.t!=="C"&&e.t!=="D") continue;
+      var h=String(e.reg||e.src||e.host||"").trim().toLowerCase();
+      if(h) hosts[h]=1;
+    }
+  }
+  return Object.keys(hosts);
+}
+function rpEscalation(d){
+  if(rpHasOfficial(d)) return "OFFICIAL";
+  if(d && d.verdict==="RED") return "OFFICIAL";   /* the record contradicts them */
+  return rpConsumerHosts(d).length >= RP_PATTERN_PLATFORMS ? "PATTERN" : "NOISE";
+}
+
 function rpVerdictWord(v,d){
   if(v==="RED") return rpHasOfficial(d)
     ? (rpOfficialBody(d)+" says do not send money to this firm.")
@@ -9245,6 +9457,74 @@ function rpVerdictWhy(v,d){
   }
   return "Treat this as unchecked, not as cleared.";
 }
+/* ------------------------------------------------------------------ *
+ * DELIVERY
+ *
+ * The same evidence, laid out for where somebody actually is. Three states.
+ *
+ * The rule that governs all of it: stage NEVER promotes an answer. Ticking
+ * "I already sent money" cannot make a finding out of two bad reviews, and it
+ * cannot point anybody at their bank. What decides that is the evidence, which
+ * is why every branch below reads rpEscalation and not the box they ticked.
+ *
+ * Where there IS an official finding and the money has gone, the order flips
+ * and the instruction comes first, because a bank recall window is short and
+ * the verdict can wait four lines.
+ * ------------------------------------------------------------------ */
+function rpDelivery(d){
+  var stage = (RUN_CTX && RUN_CTX.stage) || "BEFORE";
+  var esc2  = rpEscalation(d);
+  var clean = rpRegistered(d) && !rpHasOfficial(d) && d.verdict!=="RED";
+
+  if(stage==="SENT"){
+    if(esc2==="OFFICIAL"){
+      return { c:"urgent", act:"bank",
+        t:"Tell your bank now, before you finish reading this.",
+        x:rpOfficialBody(d)+" has already flagged this firm. No bank publishes a deadline "
+         +"for a recall and every one of them publishes the word immediately. Everything "
+         +"below will still be here in ten minutes." };
+    }
+    /* Nothing official. We are not going to tell somebody they have been
+       defrauded on the strength of complaints, and we are not going to tell
+       them they are fine either. Both would be us deciding. */
+    return { c:"calm", act:null,
+      t:"Nothing in the record says this firm has been flagged.",
+      x:(esc2==="PATTERN"
+          ? "That is not the same as saying nothing is wrong. Several separate places carry "
+           +"the same kind of complaint, and that is set out below. "
+          : "That is not the same as saying nothing is wrong. Records lag, and complaints are "
+           +"not proof either way. What we found is set out below. ")
+        +"If something about this feels wrong to you, banks act on a short window, so raising "
+        +"it early costs you nothing." };
+  }
+
+  if(stage==="DILIGENCE"){
+    if(esc2==="OFFICIAL"){
+      return { c:"urgent", act:null,
+        t:"You do not need to weigh this one up.",
+        x:rpOfficialBody(d)+" has already published a finding about this firm. The record is "
+         +"below and every line links to where it came from." };
+    }
+    return { c:"calm", act:null,
+      t:"Nothing here needs deciding today.",
+      x:(clean
+          ? "They are on a regulator's register, which is a starting point rather than a "
+           +"verdict. "
+          : "")
+        +"What the record holds is below, and every line links to where it came from so you "
+        +"can check it yourself." };
+  }
+
+  /* BEFORE, and the default when nobody answered. */
+  return { c: clean ? "calm" : "urgent", act:null,
+    t: clean ? "Check the register yourself before you send."
+             : "Do not send anything tonight.",
+    x: clean ? "It takes two minutes and you do not have to take our word for any of this. "
+              +"The register we used is linked below."
+             : "Waiting until the morning costs you nothing. Sending tonight could cost you "
+              +"everything." };
+}
+
 function renderReport(d){
   RP=d;
   var c=rpCounts(d), stamp="";
@@ -9263,16 +9543,28 @@ function renderReport(d){
      against it, telling somebody not to pay tonight is its own kind of harm, so
      the instruction becomes the one that is actually true for them: go and look
      at the register yourself. */
+  var dl = rpDelivery(d);
+  /* Still needed below for the already-paid panel, which asks a different
+     question: not how urgent this is, but which door is the right one. */
   var clean = rpRegistered(d) && !rpHasOfficial(d) && d.verdict!=="RED";
-  id("rpTonight").setAttribute("data-c", clean ? "calm" : "urgent");
-  id("rpTonightT").textContent = clean
-    ? "Check the register yourself before you send."
-    : "Do not send anything tonight.";
-  id("rpTonightX").textContent = clean
-    ? "It takes two minutes and you do not have to take our word for any of this. "
-      +"The register we used is linked below."
-    : "Waiting until the morning costs you nothing. Sending tonight could cost you "
-      +"everything.";
+  id("rpTonight").setAttribute("data-c", dl.c);
+  id("rpTonightT").textContent = dl.t;
+  id("rpTonightX").textContent = dl.x;
+  /* The one case where the page hands over a control rather than a sentence:
+     money has gone AND an authority has already acted. Everything else keeps
+     the pages available further down, where they read as available rather
+     than as instruction. */
+  var actBox = id("rpTonightA");
+  if(actBox){
+    if(dl.act){
+      actBox.innerHTML = '<button class="rp-actb" type="button" data-pak="'+rpEsc(dl.act)+'">'
+        + 'Open what to tell your bank</button>';
+      actBox.hidden = false;
+    } else {
+      actBox.innerHTML = "";
+      actBox.hidden = true;
+    }
+  }
   id("rpWho").textContent=rpTitle(d.name||"");
   id("rpDom").textContent=rpDomain(d)||RP_LABEL||"";
   id("rpSay").textContent=d.statement||d.note||"";
@@ -9512,6 +9804,14 @@ id("rpPaks").addEventListener("click", function(e){
   var t=e.target;
   while(t && t!==this && !(t.className&&String(t.className).indexOf("rp-pak")>=0)) t=t.parentNode;
   if(t&&t!==this&&t.getAttribute) rpPvShow(t.getAttribute("data-pak"), t);
+});
+/* The action control in the verdict card opens the same pack the list opens.
+   A second implementation of a modal is a second modal to keep working, and
+   this page has already shipped one that had no styling at all. */
+id("rpTonightA").addEventListener("click", function(e){
+  var t=e.target;
+  while(t && t!==this && !(t.getAttribute && t.getAttribute("data-pak"))) t=t.parentNode;
+  if(t && t!==this && t.getAttribute) rpPvShow(t.getAttribute("data-pak"), t);
 });
 id("navBackReport").addEventListener("click", rpBackFromConsole);
 id("navNewCheck").addEventListener("click", function(){

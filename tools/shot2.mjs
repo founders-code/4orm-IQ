@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const p = await b.newPage({ viewport: { width: 1280, height: 1000 }, deviceScaleFactor: 2 });
+await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1');
+await p.waitForTimeout(1300);
+await p.evaluate(()=>{const l=document.querySelector('#room .lit'); if(l){l.style.animationPlayState='paused';l.style.animationDelay='0s';}});
+await p.fill('#kbInput','atlanticglobalwealth.com');
+await p.waitForTimeout(300);
+await p.screenshot({ path: '/tmp/ctx-1.png' });
+await p.click('#kbCtx .ctxchip[data-v="AUTO"]');
+await p.waitForTimeout(250);
+await p.screenshot({ path: '/tmp/ctx-2.png' });
+const overflow = await p.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth);
+console.log('horizontal overflow:', overflow);
+await b.close();
+console.log('ok');

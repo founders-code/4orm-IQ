@@ -386,6 +386,38 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
       fails.push('the rule record types a register count rather than reading it off the register');
   }
 
+  /* ---------------------------------------------------------------- *
+     THE TWO QUESTIONS
+
+     Optional, and they have to STAY optional. The failure that matters is not
+     a broken chip, it is a question that quietly becomes a gate on a page
+     somebody reaches at eleven at night with money in a wire form.
+     ---------------------------------------------------------------- */
+  if (!/var CTX_Q = \[/.test(html))
+    fails.push('the context questions are gone');
+  if (/go\.disabled\s*=[^;]*CTX/.test(html))
+    fails.push('the Check button now depends on an answer to an optional question');
+  if (!/onlyIf:\s*\{\s*sector:\s*"AUTO"\s*\}/.test(html))
+    fails.push('the private-seller question is gone, so a private sale reads as an '
+      + 'unlicensed dealer, which would be the largest false positive in the product');
+  if (!/if\(!ctxApplies\(q\)\) CTX\[q\.key\]=null;/.test(html))
+    fails.push('an answer to a question that no longer applies is carried anyway');
+
+  /* Stage changes layout and never judgement. Every delivery branch must read
+     the evidence, and the one control the page hands over must be gated on an
+     official finding rather than on a box somebody ticked. */
+  if (!/function rpDelivery/.test(html))
+    fails.push('the delivery rules are gone');
+  if (!/if\(stage==="SENT"\)\{[\s\S]{0,200}if\(esc2==="OFFICIAL"\)/.test(html))
+    fails.push('the bank instruction is no longer gated on an official finding, so ticking '
+      + '"already sent" is enough to tell somebody they were defrauded');
+  if (!/var RP_PATTERN_PLATFORMS = 3;/.test(html))
+    fails.push('the pattern threshold moved. Below three independent platforms this product '
+      + 'convicts businesses on complaints, which is the thing it replaces');
+  if (!/e\.t!=="C"&&e\.t!=="D"/.test(html))
+    fails.push('the pattern count no longer restricts itself to consumer sources, so a '
+      + 'regulator record is being counted twice');
+
   /* The console must run live by default. It shipped for a day defaulting to
      the seeded corpus, which meant a visitor sent the bare link got a canned
      answer that looked exactly like a check and wrote nothing to the log. The
