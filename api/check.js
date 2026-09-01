@@ -659,7 +659,10 @@ export default async function handler(req, res) {
       sector: ask.sector,
     }).catch(e => ({ ok: false, reason: e?.message || 'ops threw' }));
     payload.pipeline.ops = {
-      ok: ops.ok, seq: ops.seq, reason: ops.reason, schema: ops.schema,
+      /* The row hash goes back to the page. The report card prints it beside
+         the reference, because a reference somebody can quote is worth more
+         when the thing it points at can be checked against the chain. */
+      ok: ops.ok, seq: ops.seq, hash: ops.hash, reason: ops.reason, schema: ops.schema,
       policy_version: OPS_POLICY_VERSION,
       policy_effective: POLICY.effective_from,
       registers_in_scope: POLICY.sources_enabled,

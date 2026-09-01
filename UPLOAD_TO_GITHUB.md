@@ -37,6 +37,64 @@ set, storage is skipped and the audit report says so. Checks are unaffected.
 
 ## What changed in this build
 
+**The back office stopped bouncing you to the landing page.** Clerk navigates to
+"/" after a sign in unless it is told otherwise, and "/" is the consumer landing
+page. That is the whole of it: the sign in was succeeding and Clerk was
+navigating away from the page that asked for it. Every redirect Clerk can take
+is now pinned to `/admin.html`, and the page holds its shell back until Clerk
+has answered, so a hard reload no longer flashes.
+
+**The flash on the way to the waiting screen is gone.** The scrim faded in over
+four hundred and fifty milliseconds while the console was being laid out
+underneath it, so for a third of a second the reader watched an empty board
+build behind a half transparent sheet. It opens instantly now and fades only on
+the way out.
+
+**The address bar stays at 4ormiq.com.** `?live=1` was how somebody used to opt
+into a real check. Live is the default now and `?demo=1` is the escape hatch, so
+the old parameter means nothing and is taken out of the URL without a
+navigation. Nothing else in the query is touched. Every button in the search
+form also declares its type, because a button in a form with no type is a submit
+button, and a submit is a page load.
+
+**The progress bar.** No change from the last build: it is driven by the
+heartbeat from ninety to ninety-nine and cannot go backwards. If it stalls again
+it is worth checking the browser console, because nothing in the page can
+navigate on its own any more.
+
+**Open the whole record moved to the very bottom of Do this right now,** after
+everything a reader can act on without it.
+
+**The two doors are twice the size.** The red one for somebody who has already
+sent money and the green ones that carry the reader on. One pair of rules, so
+they cannot drift apart.
+
+**The pills are back on the right,** in the same place on the report as on the
+landing, rather than centred.
+
+**The identity plate is a report card.** The reference is at the top, where
+somebody reads it down a phone to a fraud desk, followed by the date the records
+were read, the log entry and the record hash from the operations chain. A run
+that was not logged says so rather than showing a blank. Every field on the card
+is what the nine document packs are built from.
+
+**What we found reads as one page.** The pattern note runs the full measure
+instead of sitting stranded at 72 characters between two full width blocks.
+
+**Do this right now shows all four titles at once,** collapsed by default on
+native disclosure elements.
+
+**Find support is rebuilt as a light document.** It was a dark panel, which is
+the wrong register entirely for the page somebody opens after the money has
+gone. Pale blue grey ground, white cards, every telephone number in ink, the
+index full height beside it, and web addresses wide enough to read back down a
+phone. Every number is still the one published on that organisation's own
+contact page, and no individual lawyer, firm or recovery service is named.
+
+**Five new cards on the waiting screen,** sixteen in all: who is doing this check
+and what it costs the people it is for.
+
+
 **What we found reads as one page again.** The pattern note ran at 72 characters
 and sat stranded between a full width row of findings and a full width door,
 which reads as a box that failed to load rather than a considered aside. It now

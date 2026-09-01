@@ -93,6 +93,11 @@ td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-num
 .gate p{font-size:14px;color:var(--ink2);line-height:1.6}
 .gate .sm{margin-top:16px;font-size:12.5px;color:var(--ink3)}
 #clerkMount{margin-top:20px;min-height:40px}
+.boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:#0B0F17;color:#8494AB;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  z-index:50}
+body:not([data-boot]) .boot{display:none}
+body[data-boot] .wrap,body[data-boot] footer{visibility:hidden}
 
 /* the evidence layer */
 .chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
@@ -113,7 +118,13 @@ footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--edge);font-si
   color:var(--ink3);line-height:1.6}
 </style></head><!-- The Clerk publishable key. It is public by design; the secret key never
      appears in a page. Replace at build or inject at deploy. -->
-<body data-clerk="pk_test_YWN0dWFsLWRvbmtleS03ODYuY2xlcmsuYWNjb3VudHMuZGV2JA">
+<body data-clerk="pk_test_YWN0dWFsLWRvbmtleS03ODYuY2xlcmsuYWNjb3VudHMuZGV2JA" data-boot="1">
+<!-- BOOT.
+     The page used to render its whole shell, then the sign in gate, then either
+     the panel or a redirect, which read as a flash of something on every hard
+     reload. Nothing shows until Clerk has answered the only question that
+     matters, which is whether this person is signed in. -->
+<div class="boot" id="boot"><span class="mono">Checking your session</span></div>
 <div class="wrap">
 
 <header class="top">
@@ -160,7 +171,7 @@ var $=function(s){return document.querySelector(s)};
 var tip=$("#tip");
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-function num(n){return n==null?"—":Number(n).toLocaleString();}
+function num(n){return n==null?"not recorded":Number(n).toLocaleString();}
 
 function tile(v,unit,label,cap,state){
   return '<div class="tile"'+(state?' data-s="'+state+'"':'')+'>'
@@ -204,7 +215,7 @@ function ranked(rows){
     var col=p>=95?"var(--ok)":(p>=80?"var(--warn)":"var(--bad)");
     return '<div class="rrow"><span class="n" title="'+esc(r.source_id)+'">'+esc(r.source_id)+'</span>'
       +'<span class="rtrack"><i style="width:'+p+'%;background:'+col+'"></i></span>'
-      +'<span class="p">'+(r.ok_pct==null?"—":p+"%")+'</span></div>';
+      +'<span class="p">'+(r.ok_pct==null?"none yet":p+"%")+'</span></div>';
   }).join('')+'</div>';
 }
 
@@ -223,7 +234,7 @@ function chainPanel(c){
     +'<div class="chip" data-s="'+(lv?(okv?'ok':'bad'):'')+'"><div class="l">Last verification</div>'
       +'<div class="v">'+(lv?(okv?'Intact':'BROKEN'):'Never run')+'</div></div>'
     +'<div class="chip"><div class="l">Verified at</div><div class="v h">'
-      +(lv?esc(String(lv.at).slice(0,19).replace('T',' ')):'—').replace('—','not yet')+'</div></div>'
+      +(lv?esc(String(lv.at).slice(0,19).replace('T',' ')):'not yet')+'</div></div>'
     +'<div class="chip"><div class="l">Hash schemas in use</div><div class="v h">'
       +((c.schemas&&c.schemas.length)
           ? c.schemas.map(function(x){ return esc(x.hash_schema)+' \u00d7'+num(x.n); }).join('  ')
@@ -289,13 +300,13 @@ function render(d){
   h+='<div class="grid">'
     +tile(num(r.attempted),"","Checks attempted","Every request that reached the gates")
     +tile(num(d.people),"","People helped","Distinct visitor-days. A floor, never a headcount")
-    +tile(d.completion_pct==null?"—":d.completion_pct,"%","Completed",
+    +tile(d.completion_pct==null?"none yet":d.completion_pct, d.completion_pct==null?"":"%","Completed",
           num(r.completed)+" of "+num(r.attempted),
           d.completion_pct==null?null:(d.completion_pct>=95?"ok":(d.completion_pct>=85?"warn":"bad")))
-    +tile(s.success_pct==null?"—":s.success_pct,"%","Source success rate",
+    +tile(s.success_pct==null?"none yet":s.success_pct, s.success_pct==null?"":"%","Source success rate",
           num(s.ok)+" of "+num(s.attempts)+" attempts",
           s.success_pct==null?null:(s.success_pct>=95?"ok":(s.success_pct>=85?"warn":"bad")))
-    +tile(d.incomplete_pct==null?"—":d.incomplete_pct,"%","Reported incomplete",
+    +tile(d.incomplete_pct==null?"none yet":d.incomplete_pct, d.incomplete_pct==null?"":"%","Reported incomplete",
           "A critical register was unreachable",
           d.incomplete_pct==null?null:(d.incomplete_pct<=5?"ok":"warn"))
     +tile(num(r.suppressed),"","Person-level suppressions","Tier C/D or Quebec subject")
@@ -428,23 +439,38 @@ function fail(m){ var e=$("#err"); e.textContent=m; e.hidden=false; $("#panel").
 
 function signedIn(){
   var u=window.Clerk && window.Clerk.user;
+  booted();
   $("#gate").hidden=true;
   $("#out").hidden=false;
   $("#who").textContent = u && u.primaryEmailAddress ? u.primaryEmailAddress.emailAddress : "";
   load();
 }
+function booted(){ document.body.removeAttribute("data-boot"); }
 function signedOut(){
   $("#gate").hidden=false;
   $("#panel").hidden=true;
   $("#out").hidden=true;
   $("#who").textContent="";
-  if(window.Clerk) window.Clerk.mountSignIn(document.getElementById("clerkMount"));
+  var m=document.getElementById("clerkMount");
+  if(window.Clerk && !m.hasChildNodes()){
+    var HERE = window.location.pathname + window.location.search;
+    /* routing:"virtual" keeps the component in this page rather than taking
+       over the path, and the two fallbacks bring an OAuth round trip back to
+       the back office instead of the consumer landing page. */
+    window.Clerk.mountSignIn(m, {
+      routing: "virtual",
+      fallbackRedirectUrl: HERE,
+      signUpFallbackRedirectUrl: HERE
+    });
+  }
+  booted();
 }
 
 $("#days").addEventListener("change",function(){ if(!$("#panel").hidden) load(); });
 $("#out").addEventListener("click",function(){ if(window.Clerk) window.Clerk.signOut(); });
 
 if(!CLERK_KEY){
+  document.body.removeAttribute("data-boot");
   $("#gate").hidden=false;
   document.getElementById("gateNote").textContent =
     "Clerk is not configured on this build. Set the publishable key on the body tag "
@@ -459,20 +485,44 @@ if(!CLERK_KEY){
      breaking change on a Tuesday. */
   sc.src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js";
   sc.onload=function(){
-    window.Clerk.load({}).then(function(){
+    /* COME BACK HERE.
+       Clerk sends somebody to "/" after a sign in unless it is told otherwise,
+       and "/" is the consumer landing page. That is why the back office opened
+       for a second and then vanished: the sign in succeeded and Clerk navigated
+       away from the page that asked for it. Every redirect Clerk can take is
+       pinned to this page. */
+    var HERE = window.location.pathname + window.location.search;
+    window.Clerk.load({
+      afterSignOutUrl: HERE,
+      signInUrl: HERE,
+      signInFallbackRedirectUrl: HERE,
+      signUpFallbackRedirectUrl: HERE
+    }).then(function(){
       window.Clerk.addListener(function(){
         if(window.Clerk.user) signedIn(); else signedOut();
       });
       if(window.Clerk.user) signedIn(); else signedOut();
+      booted();
     }).catch(function(e){
       $("#gate").hidden=false;
       document.getElementById("gateNote").textContent="Clerk failed to load: "+e.message;
+      booted();
     });
   };
   sc.onerror=function(){
     $("#gate").hidden=false;
     document.getElementById("gateNote").textContent="Clerk script could not be loaded.";
+    booted();
   };
+  /* A gate that never resolves is a page that never appears. If Clerk has not
+     answered in eight seconds, show the gate and say so. */
+  setTimeout(function(){
+    if(!document.body.hasAttribute("data-boot")) return;
+    $("#gate").hidden=false;
+    document.getElementById("gateNote").textContent =
+      "Sign in is taking longer than expected. If this does not clear, reload the page.";
+    booted();
+  }, 8000);
   document.head.appendChild(sc);
 }
 </script>

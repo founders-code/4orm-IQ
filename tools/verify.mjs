@@ -13,6 +13,7 @@ import path from 'path';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const admin = fs.readFileSync(path.join(root, 'admin.html'), 'utf8');
 const script = (html.match(/<script[^>]*>([\s\S]*?)<\/script>/) || [])[1] || '';
 const fails = [];
 const warn = [];
@@ -1014,13 +1015,20 @@ belongs_('What we could not answer', 'rpReport', 'the gap note');
 belongs_('id="rpAlready"', 'rpReport', 'the door for somebody who has already paid');
 belongs_('id="rpToFound"', 'rpReport', 'the way on to what we found');
 belongs_('id="rpFindsSec"', 'rpFound', 'the findings');
-belongs_('id="rpOpenRecord"', 'rpFound', 'where we looked');
+/* The door to the whole console is the last thing on the last screen, after
+   everything a reader can act on without it. */
+belongs_('id="rpOpenRecord"', 'rpAct', 'the door to the whole record');
 belongs_('id="rpTwoWays"', 'rpFound', 'the two things a pattern of complaints can mean');
 belongs_('id="rpToAct"', 'rpFound', 'the way on to what to do');
 belongs_('id="rpStepsSec"', 'rpAct', 'the three things to do now');
 belongs_('id="rpBundle"', 'rpAct', 'what to have ready before the call');
 belongs_('id="rpPaks"', 'rpAct', 'who to tell');
 belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
+{
+  const a = sheets_.rpAct;
+  if (a.indexOf('id="rpOpenRecord"') < a.indexOf('id="rpClaimsSec"'))
+    fails.push('the door to the whole record sits above the four things to do, it belongs at the foot of the screen');
+}
 
 /* The gap note reads as the last thing the result screen could not tell them,
    which is exactly the thought that should precede the door for somebody who
@@ -1124,6 +1132,70 @@ if (!/\.waitbox:not\(\.on\) \.waitpills \.navbtn\{pointer-events:none\}/.test(st
                       'What keeps people quiet', 'Why we keep doing it'])
     if (!edu.includes(need)) fails.push('the waiting deck has lost the card "' + need + '"');
 }
+
+/* -------------------------------------- nothing may navigate on its own
+   A <button> inside a <form> with no type attribute is a submit button, and a
+   submit is a page load: the check dies, the wait screen goes, and the reader
+   is back at the top with a query string they did not ask for. */
+{
+  const f = html.indexOf('<form class="searchbox" id="kbForm"');
+  const form = f < 0 ? '' : html.slice(f, html.indexOf('</form>', f));
+  if (!form) fails.push('the search form is gone');
+  for (const b of (form.match(/<button[^>]*>/g) || []))
+    if (!/type="(button|submit|reset)"/.test(b))
+      fails.push('a button in the search form has no type, so it submits and reloads the page: ' + b.slice(0, 60));
+  if (!/e\.preventDefault\(\)/.test(script.slice(script.indexOf('id("kbForm").addEventListener("submit"'), script.indexOf('id("kbForm").addEventListener("submit"') + 200)))
+    fails.push('submitting the search form is not prevented, so it navigates');
+}
+/* And a parameter this build no longer honours does not sit in the address bar
+   getting copied, bookmarked and shared as though it still did something. */
+if (!/searchParams\.delete\("live"\)/.test(script))
+  fails.push('the dead live=1 parameter is left in the address bar');
+if (!/history\.replaceState/.test(script))
+  fails.push('the address bar is cleaned with a navigation rather than replaceState');
+
+/* The waiting screen opens with no transition, because the console is being
+   laid out underneath it and a fading scrim shows the reader an empty board. */
+if (!/\.waitscrim\.snap,\.waitbox\.snap\{transition:none!important\}/.test(styleBlock))
+  fails.push('the waiting screen fades in over the console being built underneath it');
+if (!/waitScrim\.classList\.add\("snap"\)/.test(script))
+  fails.push('nothing turns off the transition when the waiting screen opens');
+
+/* THE REPORT CARD. Reference first, then what makes the run findable again. */
+{
+  const plate = html.slice(html.indexOf('<div class="rp-idtray">'), html.indexOf('</div></div>', html.indexOf('<div class="rp-idtray">')));
+  if (plate.indexOf('id="rpCardRef"') > plate.indexOf('id="rpIdent"'))
+    fails.push('the report reference is below the record rows, it belongs at the top of the card');
+  for (const x of ['rpCardRef', 'rpCardMeta', 'rpCardFoot'])
+    if (!plate.includes('id="' + x + '"')) fails.push('the report card has lost ' + x);
+}
+if (!/Record hash/.test(script)) fails.push('the report card no longer carries the record hash');
+if (!/Log entry/.test(script)) fails.push('the report card no longer carries the log entry');
+
+/* FIND SUPPORT IS A LIGHT DOCUMENT. It was a dark panel, which is the wrong
+   register for the page somebody reads after the money has gone. */
+{
+  const dir = (styleBlock.match(/\.dirbox\{\n?\s*--bg:[^}]*\}/) || [''])[0];
+  if (!dir) fails.push('the find support palette block is gone');
+  else {
+    const bg = (dir.match(/--bg:\s*(#[0-9A-Fa-f]{6})/) || [])[1] || '';
+    const lum = bg ? (parseInt(bg.slice(1,3),16)+parseInt(bg.slice(3,5),16)+parseInt(bg.slice(5,7),16))/3 : 0;
+    if (lum < 200) fails.push('find support is on a dark ground again (' + bg + ')');
+  }
+}
+
+/* -------------------------------------- the back office comes back to itself
+   Clerk navigates to "/" after a sign in unless it is told otherwise, and "/"
+   is the consumer landing page. That is why the back office opened for a second
+   and then vanished. */
+if (/Clerk\.load\(\{\}\)/.test(admin))
+  fails.push('the back office loads Clerk with no redirect configuration, so a sign in lands on the landing page');
+for (const k of ['afterSignOutUrl', 'signInFallbackRedirectUrl', 'fallbackRedirectUrl'])
+  if (!admin.includes(k)) fails.push('the back office does not pin Clerk\'s ' + k + ' to itself');
+if (!/data-boot/.test(admin))
+  fails.push('the back office renders its shell before it knows whether anybody is signed in');
+if (/[\u2014\u2013]/.test(admin))
+  fails.push('an em dash or en dash is present in the back office');
 
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
