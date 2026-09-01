@@ -55,22 +55,63 @@ export function visitorDay(req) {
     .digest('hex').slice(0, 12);
 }
 
-/* The canonical string a row is hashed over. Field order is fixed here and must
-   never be reordered, because reordering it invalidates every hash ever written
-   and there is no way to tell that apart from tampering. */
-function canonical(r) {
-  return [
+/* ------------------------------------------------------------------ *
+ * THE CANONICAL STRING, AND WHY IT IS VERSIONED
+ *
+ * A row's hash is taken over a fixed list of its fields in a fixed order.
+ * Reorder that list, or add a field to it, and every hash ever written stops
+ * matching, which is indistinguishable from somebody having altered the log.
+ *
+ * That is a trap, because the recorded fields have to be able to grow. So each
+ * row carries the name of the canonical function that produced its hash, and
+ * the verifier picks the function by what the row says rather than by what the
+ * current code happens to do. A row written under v1 verifies under v1 forever.
+ *
+ * The rules:
+ *   - An existing version is FROZEN. Never edit one. Not to fix a typo.
+ *   - A new field means a new version, appended, and HASH_SCHEMA moves to it.
+ *   - Nothing is ever removed from CANON.
+ *
+ * This is also why a rule change does not touch a hash. A row commits to WHICH
+ * policy governed it, by version string, and never to what that policy said.
+ * The policy's own contents live in ops_policy, chained separately, so rules
+ * can change as often as they need to without disturbing a single run.
+ * ------------------------------------------------------------------ */
+
+const CANON = {
+  /* v1: the original eighteen fields, 2026-08-31. Frozen. */
+  v1: r => [
     r.at, r.visitor_day || '', r.input_type, r.province || '', r.purpose, r.outcome,
     r.sources_planned, r.sources_ok, r.sources_failed, r.sources_out_of_scope,
     r.critical_failed, r.incomplete ? '1' : '0', r.suppressed_items, r.barred_items,
     r.duration_ms == null ? '' : r.duration_ms,
     r.policy_version || '', r.manifest_generated || '', r.enforcement_on ? '1' : '0',
-  ].join('|');
+  ].join('|'),
+
+  /* v2: adds the sector a check was run under, appended so v1 stays intact. */
+  v2: r => [
+    r.at, r.visitor_day || '', r.input_type, r.province || '', r.purpose, r.outcome,
+    r.sources_planned, r.sources_ok, r.sources_failed, r.sources_out_of_scope,
+    r.critical_failed, r.incomplete ? '1' : '0', r.suppressed_items, r.barred_items,
+    r.duration_ms == null ? '' : r.duration_ms,
+    r.policy_version || '', r.manifest_generated || '', r.enforcement_on ? '1' : '0',
+    r.sector || '',
+  ].join('|'),
+};
+
+/** The version new rows are written under. Moving this is a deliberate act. */
+export const HASH_SCHEMA = 'v2';
+
+export function rowHash(prevHash, r, schema) {
+  const fn = CANON[schema || HASH_SCHEMA];
+  /* An unknown marker must not fall back to the current version, because that
+     would silently re-hash an old row under new rules and report the log as
+     broken. It is a verification failure, and it says so. */
+  if (!fn) throw new Error('unknown hash schema: ' + String(schema));
+  return crypto.createHash('sha256').update(prevHash + '|' + fn(r)).digest('hex');
 }
 
-export function rowHash(prevHash, r) {
-  return crypto.createHash('sha256').update(prevHash + '|' + canonical(r)).digest('hex');
-}
+export function hashSchemas() { return Object.keys(CANON); }
 
 /**
  * Write one run. Returns {ok, seq, hash} or {ok:false, reason}.
@@ -110,27 +151,28 @@ export async function recordRun(req, run) {
       policy_version: run.policy_version || null,
       manifest_generated: run.manifest_generated || null,
       enforcement_on: run.enforcement_on !== false,
+      sector: run.sector || null,
     };
-    const hash = rowHash(prev, r);
+    const hash = rowHash(prev, r, HASH_SCHEMA);
 
     const ins = await client.query(
       `insert into ops_runs
-        (at, prev_hash, row_hash, visitor_day, input_type, province, purpose, outcome,
+        (at, prev_hash, row_hash, hash_schema, visitor_day, input_type, province, purpose, outcome,
          sources_planned, sources_ok, sources_failed, sources_out_of_scope, critical_failed,
          incomplete, suppressed_items, barred_items, duration_ms,
-         policy_version, manifest_generated, enforcement_on)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
+         policy_version, manifest_generated, enforcement_on, sector)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
        returning seq`,
-      [r.at, prev, hash, r.visitor_day, r.input_type, r.province, r.purpose, r.outcome,
+      [r.at, prev, hash, HASH_SCHEMA, r.visitor_day, r.input_type, r.province, r.purpose, r.outcome,
        r.sources_planned, r.sources_ok, r.sources_failed, r.sources_out_of_scope,
        r.critical_failed, r.incomplete, r.suppressed_items, r.barred_items, r.duration_ms,
-       r.policy_version, r.manifest_generated, r.enforcement_on]);
+       r.policy_version, r.manifest_generated, r.enforcement_on, r.sector]);
 
     await client.query(
       "update ops_chain set height=height+1, head_hash=$1, updated_at=now() where name='ops_runs'",
       [hash]);
     await client.query('commit');
-    return { ok: true, seq: Number(ins.rows[0].seq), hash };
+    return { ok: true, seq: Number(ins.rows[0].seq), hash, schema: HASH_SCHEMA };
   } catch (e) {
     if (client) { try { await client.query('rollback'); } catch {} }
     return { ok: false, reason: String(e.message || e).slice(0, 120) };
@@ -177,10 +219,11 @@ export async function verifyChain(limit) {
     let after = 0;
     for (;;) {
       const rows = (await p.query(
-        `select seq, at, prev_hash, row_hash, visitor_day, input_type, province, purpose, outcome,
+        `select seq, at, prev_hash, row_hash, hash_schema, visitor_day, input_type, province,
+                purpose, outcome,
                 sources_planned, sources_ok, sources_failed, sources_out_of_scope, critical_failed,
                 incomplete, suppressed_items, barred_items, duration_ms,
-                policy_version, manifest_generated, enforcement_on
+                policy_version, manifest_generated, enforcement_on, sector
            from ops_runs where seq > $1 order by seq asc limit $2`, [after, page])).rows;
       if (!rows.length) break;
       for (const row of rows) {
@@ -189,7 +232,11 @@ export async function verifyChain(limit) {
           manifest_generated: row.manifest_generated
             ? new Date(row.manifest_generated).toISOString().slice(0, 10) : null,
         });
-        const want = rowHash(prev, r);
+        /* Verify the row under the schema the row itself names. Rows written
+           before the marker existed are v1, which is what they were. */
+        let want;
+        try { want = rowHash(prev, r, row.hash_schema || 'v1'); }
+        catch (e) { brokenAt = Number(row.seq); break; }
         if (row.prev_hash !== prev || row.row_hash !== want) { brokenAt = Number(row.seq); break; }
         prev = row.row_hash; last = prev; checked++;
         after = Number(row.seq);
@@ -215,4 +262,171 @@ export async function verifyChain(limit) {
   } catch (e) {
     return { ok: false, reason: String(e.message || e).slice(0, 120) };
   }
+}
+
+/* ==================================================================== *
+ * THE POLICY RECORD
+ *
+ * Every run row commits to a policy VERSION, never to what that policy said.
+ * That separation is what lets a rule change without disturbing a single hash
+ * already written. It also leaves the version string pointing at nothing
+ * unless the policy itself is recorded, which is what this is.
+ *
+ * One chained row per rule change. What changed, why, when it took effect, a
+ * digest of the enabled source list at that moment, and the evidence for the
+ * change. Chained on the same pattern as the runs, in its own chain, so the
+ * two can be verified and retired independently.
+ *
+ * A regulator asking "under what rules was this check run, and who decided
+ * that" is answered by one row here plus the version on the run.
+ * ==================================================================== */
+
+/** The digest of a source list. Order independent, so a reordered register is
+ *  not reported as a rule change and a genuinely changed one always is. */
+export function sourceDigest(names) {
+  const list = (Array.isArray(names) ? names : []).map(String).sort();
+  return crypto.createHash('sha256').update(list.join('\n')).digest('hex');
+}
+
+function policyCanonical(r) {
+  return [
+    r.at, r.version, r.effective_from || '', r.manifest_generated || '',
+    r.sources_total, r.sources_enabled, r.source_digest,
+    r.enforcement_on ? '1' : '0', r.change_kind, r.summary || '',
+    r.reason || '', r.evidence_url || '', r.author || '',
+  ].join('|');
+}
+
+export function policyHash(prevHash, r) {
+  return crypto.createHash('sha256')
+    .update(prevHash + '|' + policyCanonical(r)).digest('hex');
+}
+
+/**
+ * Record one rule change. Returns {ok, seq, hash} or {ok:false, reason}.
+ *
+ * Writing the same version twice with the same content is not an error and not
+ * a new row: a deploy that changed no rule must not manufacture a rule change,
+ * or the history stops meaning anything. Same version with DIFFERENT content is
+ * refused outright, because a version that quietly changed underneath a run
+ * that cites it is the one failure this table exists to make impossible.
+ */
+export async function recordPolicy(policy) {
+  const p = await pool();
+  if (!p) return { ok: false, reason: 'no_database' };
+  let client;
+  try {
+    client = await p.connect();
+    await client.query('begin');
+    const head = await client.query(
+      "select height, head_hash from ops_chain where name='ops_policy' for update");
+    if (!head.rows.length) { await client.query('rollback'); return { ok: false, reason: 'no_chain' }; }
+    const prev = head.rows[0].head_hash;
+
+    const digest = policy.source_digest || sourceDigest(policy.sources || []);
+    const existing = await client.query(
+      'select seq, source_digest, enforcement_on, row_hash from ops_policy where version=$1 order by seq desc limit 1',
+      [String(policy.version || '')]);
+    if (existing.rows.length) {
+      const e = existing.rows[0];
+      const same = e.source_digest === digest
+                && !!e.enforcement_on === (policy.enforcement_on !== false);
+      await client.query('rollback');
+      return same
+        ? { ok: true, seq: Number(e.seq), hash: e.row_hash, unchanged: true }
+        : { ok: false, reason: 'version_reused_with_different_rules' };
+    }
+
+    const r = {
+      at: new Date().toISOString(),
+      version: String(policy.version || ''),
+      effective_from: policy.effective_from || new Date().toISOString().slice(0, 10),
+      manifest_generated: policy.manifest_generated || null,
+      sources_total: policy.sources_total | 0,
+      sources_enabled: policy.sources_enabled | 0,
+      source_digest: digest,
+      enforcement_on: policy.enforcement_on !== false,
+      change_kind: String(policy.change_kind || 'UPDATE'),
+      summary: policy.summary || null,
+      reason: policy.reason || null,
+      evidence_url: policy.evidence_url || null,
+      author: policy.author || null,
+    };
+    if (!r.version) { await client.query('rollback'); return { ok: false, reason: 'no_version' }; }
+    const hash = policyHash(prev, r);
+
+    const ins = await client.query(
+      `insert into ops_policy
+        (at, prev_hash, row_hash, version, effective_from, manifest_generated,
+         sources_total, sources_enabled, source_digest, enforcement_on,
+         change_kind, summary, reason, evidence_url, author)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       returning seq`,
+      [r.at, prev, hash, r.version, r.effective_from, r.manifest_generated,
+       r.sources_total, r.sources_enabled, r.source_digest, r.enforcement_on,
+       r.change_kind, r.summary, r.reason, r.evidence_url, r.author]);
+
+    await client.query(
+      "update ops_chain set height=height+1, head_hash=$1, updated_at=now() where name='ops_policy'",
+      [hash]);
+    await client.query('commit');
+    return { ok: true, seq: Number(ins.rows[0].seq), hash };
+  } catch (e) {
+    if (client) { try { await client.query('rollback'); } catch {} }
+    return { ok: false, reason: String(e.message || e).slice(0, 120) };
+  } finally {
+    if (client) client.release();
+  }
+}
+
+/** The rule history, newest first. What a reader needs to answer "which rule
+ *  was in force when you looked, and what changed since". */
+export async function policyHistory(limit) {
+  const p = await pool();
+  if (!p) return { ok: false, reason: 'no_database' };
+  try {
+    const rows = (await p.query(
+      `select seq, at, version, effective_from, manifest_generated, sources_total,
+              sources_enabled, source_digest, enforcement_on, change_kind,
+              summary, reason, evidence_url, author, row_hash
+         from ops_policy order by seq desc limit $1`, [Math.min(limit || 50, 200)])).rows;
+    const h = (await p.query(
+      "select height, head_hash from ops_chain where name='ops_policy'")).rows[0] || {};
+    return { ok: true, height: Number(h.height || 0), head: h.head_hash || null, rows };
+  } catch (e) { return { ok: false, reason: String(e.message || e).slice(0, 120) }; }
+}
+
+/** Walk the policy chain. Same contract as verifyChain, its own chain. */
+export async function verifyPolicyChain() {
+  const p = await pool();
+  if (!p) return { ok: false, reason: 'no_database' };
+  const t0 = Date.now();
+  try {
+    const head = await p.query("select height, head_hash from ops_chain where name='ops_policy'");
+    const rows = (await p.query(
+      `select seq, at, prev_hash, row_hash, version, effective_from, manifest_generated,
+              sources_total, sources_enabled, source_digest, enforcement_on,
+              change_kind, summary, reason, evidence_url, author
+         from ops_policy order by seq asc`)).rows;
+    let prev = '0'.repeat(64), checked = 0, brokenAt = null, last = prev;
+    for (const row of rows) {
+      const r = Object.assign({}, row, {
+        at: new Date(row.at).toISOString(),
+        effective_from: row.effective_from
+          ? new Date(row.effective_from).toISOString().slice(0, 10) : null,
+        manifest_generated: row.manifest_generated
+          ? new Date(row.manifest_generated).toISOString().slice(0, 10) : null,
+      });
+      const want = policyHash(prev, r);
+      if (row.prev_hash !== prev || row.row_hash !== want) { brokenAt = Number(row.seq); break; }
+      prev = row.row_hash; last = prev; checked++;
+    }
+    const h = head.rows[0] || {};
+    return {
+      ok: true, intact: brokenAt === null, checked, broken_at: brokenAt,
+      height: Number(h.height || 0), head_hash: h.head_hash || null,
+      computed_head: last, head_matches: !brokenAt && h.head_hash === last,
+      ms: Date.now() - t0,
+    };
+  } catch (e) { return { ok: false, reason: String(e.message || e).slice(0, 120) }; }
 }

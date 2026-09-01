@@ -329,6 +329,63 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     fails.push('the chain head is un-hidden by clearing an inline style, which does not work '
       + 'when a class rule sets display:none');
 
+  /* ---------------------------------------------------------------- *
+     THE HASH SCHEMA, AND THE RULE RECORD
+
+     A row's hash is taken over a fixed field list. Growing that list used to
+     invalidate every hash already written, which is indistinguishable from
+     somebody having altered the log, so rows now name the function that hashed
+     them and the verifier picks by that name. Everything below protects that
+     property. Comments are stripped first: three guards in this suite have
+     flagged a sentence promising not to do a thing rather than the thing.
+     ---------------------------------------------------------------- */
+  const opsCode = strip(ops);
+  if (!/const CANON = \{/.test(opsCode))
+    fails.push('the canonical field lists are no longer versioned, so adding a recorded field '
+      + 'invalidates every hash already written');
+  if (!/\bv1:\s*r\s*=>/.test(opsCode))
+    fails.push('the v1 canonical function is gone, orphaning every row written under it');
+  if (!/if \(!fn\) throw new Error/.test(opsCode))
+    fails.push('an unknown hash schema no longer fails, so a row can be verified under rules '
+      + 'it was never written under');
+  if (!/rowHash\(prev, r, row\.hash_schema \|\| 'v1'\)/.test(opsCode))
+    fails.push('the verifier no longer hashes each row under the schema that row names');
+  /* SQL comments start with two dashes, which the JS stripper above leaves
+     alone. This guard passed once while the column it checks for had been
+     deleted, because the comment explaining the column was still there. That
+     is the fourth time in this suite. Strip, then test. */
+  const sqlCode = sql.replace(/--.*$/gm, '');
+  if (!/hash_schema/.test(sqlCode))
+    fails.push('the operations schema has no hash_schema column, so no row can say how it was hashed');
+
+  /* The rule record. A run row cites a policy version and never the policy's
+     contents, which is what lets a rule change without touching a hash. The
+     cost is that the version points at nothing unless the rules are recorded. */
+  if (!/export async function recordPolicy\s*\(/.test(opsCode))
+    fails.push('rule changes are not recorded, so every run row cites a version that cannot '
+      + 'be looked up');
+  if (!/version_reused_with_different_rules/.test(opsCode))
+    fails.push('a version can be reused with different rules, so a run can cite a rule set '
+      + 'that changed underneath it');
+  if (!/name='ops_policy' for update/.test(opsCode))
+    fails.push('the rule chain head is advanced without locking it');
+  if (!/create table if not exists ops_policy\s*\(/.test(sqlCode))
+    fails.push('the rule history table is gone');
+  if (!/^\s*evidence_url\s+text/im.test(sqlCode))
+    fails.push('a rule change no longer records the evidence behind it, which makes it an '
+      + 'assertion, which is the thing this layer exists to stop');
+  {
+    const pol = strip(fs.readFileSync(new URL('../api/_policy.js', import.meta.url), 'utf8'));
+    const chk2 = strip(fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8'));
+    if (!/POLICY\s*=\s*\{/.test(pol)) fails.push('the rule declaration is gone');
+    if (!/recordPolicy/.test(chk2))
+      fails.push('nothing records the rule set, so the version on every row points at nothing');
+    if (!/await ensurePolicyRecorded\(\)/.test(chk2))
+      fails.push('the rule set is not recorded before the run that cites it');
+    if (/sources_enabled:\s*\d/.test(pol))
+      fails.push('the rule record types a register count rather than reading it off the register');
+  }
+
   /* The console must run live by default. It shipped for a day defaulting to
      the seeded corpus, which meant a visitor sent the bare link got a canned
      answer that looked exactly like a check and wrote nothing to the log. The

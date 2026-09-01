@@ -35,12 +35,13 @@ create extension if not exists pgcrypto;
 -- s.74.01(1)(b) puts the onus of substantiating a performance claim on us, and
 -- a chain head plus a verification run is what discharging it looks like.
 create table if not exists ops_chain (
-  name       text primary key,        -- always 'ops_runs'
+  name       text primary key,        -- 'ops_runs' or 'ops_policy'
   height     bigint not null default 0,
   head_hash  text not null default repeat('0',64),
   updated_at timestamptz not null default now()
 );
-insert into ops_chain (name) values ('ops_runs') on conflict do nothing;
+insert into ops_chain (name) values ('ops_runs')   on conflict do nothing;
+insert into ops_chain (name) values ('ops_policy') on conflict do nothing;
 
 create table if not exists ops_verify (
   id         uuid primary key default gen_random_uuid(),
@@ -60,6 +61,11 @@ create table if not exists ops_runs (
   -- row_hash is sha256 over prev_hash plus this row's own fields.
   prev_hash            text not null,
   row_hash             text not null,
+  -- Which canonical field list produced row_hash. The verifier picks the
+  -- function by what the row says, not by what today's code does, so the
+  -- recorded fields can grow without invalidating a single earlier hash.
+  -- An existing version is frozen. A new field is a new version.
+  hash_schema          text not null default 'v1',
   -- A visitor-day, not a visitor. Twelve characters of a salted hash over the
   -- day and the requester, so two checks from one person on one day count once
   -- and nothing here survives to the next morning or points at anybody. There
@@ -79,9 +85,10 @@ create table if not exists ops_runs (
   suppressed_items     int  not null default 0,   -- tier C/D or Quebec-subject suppressions
   barred_items         int  not null default 0,   -- content-age and dead-item refusals
   duration_ms          int,
-  policy_version       text,
+  policy_version       text,                 -- WHICH rules governed, never what they said
   manifest_generated   date,
-  enforcement_on       boolean
+  enforcement_on       boolean,
+  sector               text                  -- AUTO | MORTGAGE | INSURANCE | INVESTMENT | OTHER
 );
 create index if not exists ops_runs_at    on ops_runs (at desc);
 create index if not exists ops_runs_seq   on ops_runs (seq);
@@ -137,3 +144,40 @@ create table if not exists ops_incident (
   reported   boolean not null default false,
   ref        text not null
 );
+
+-- ----------------------------------------------------------- the rules
+-- One chained row per rule change.
+--
+-- A run row commits to a policy VERSION and never to what that policy said.
+-- That is deliberate: it is what lets a rule change without disturbing a hash
+-- already written. The cost of that separation is that the version string
+-- points at nothing unless the policy itself is recorded, which is this table.
+--
+-- source_digest is an order independent hash of the enabled source list, so a
+-- reordered register is not reported as a rule change and a genuinely changed
+-- one always is. evidence_url is what the change was based on: a regulator's
+-- notice that a register moved, a licence class that was retired, a legal
+-- opinion. Without it a rule change is an assertion, which is the thing this
+-- whole layer exists to stop being.
+create table if not exists ops_policy (
+  id                 uuid primary key default gen_random_uuid(),
+  seq                bigserial not null,
+  at                 timestamptz not null default now(),
+  prev_hash          text not null,
+  row_hash           text not null,
+  version            text not null,
+  effective_from     date,
+  manifest_generated date,
+  sources_total      int not null default 0,
+  sources_enabled    int not null default 0,
+  source_digest      text not null,
+  enforcement_on     boolean not null default true,
+  change_kind        text not null,      -- INITIAL | SOURCE_ADDED | SOURCE_REMOVED
+                                         -- | SCOPE_CHANGED | RULE_CHANGED | CORRECTION
+  summary            text,
+  reason             text,
+  evidence_url       text,
+  author             text
+);
+create index if not exists ops_policy_version_idx on ops_policy (version);
+create index if not exists ops_policy_seq_idx     on ops_policy (seq);

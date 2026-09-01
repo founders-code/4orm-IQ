@@ -32,12 +32,27 @@ import { recordRun } from './_store.js';
    "seen before". _ops.js holds the shape of the run and nothing that names a
    party, and it is chained so the counter can be proved. Neither one may grow
    into the other. */
-import { recordRun as recordOps, recordSource } from './_ops.js';
+import { recordRun as recordOps, recordSource, recordPolicy } from './_ops.js';
+import { POLICY } from './_policy.js';
 
-/* Bumped whenever a rule that governs a run changes, so a row in the log says
-   which version of the rules produced it. A log that cannot answer "what were
-   the rules that day" is a log nobody can audit. */
-const OPS_POLICY_VERSION = '2026-08-31';
+/* The version of the rules a run cites. It lives in _policy.js beside the rules
+   themselves, so the row and the rule record can never disagree about which
+   rules governed a check. A log that cannot answer "what were the rules that
+   day" is a log nobody can audit. */
+const OPS_POLICY_VERSION = POLICY.version;
+
+/* The rule record is written once per cold start, not once per check. Writing
+   the same version with the same rules is not a change and makes no row, so
+   this is idempotent by design rather than by us remembering. A deploy that
+   changed no rule leaves no trace here, which is what makes the rows that do
+   exist worth reading. */
+let policyRecorded = null;
+function ensurePolicyRecorded() {
+  if (!policyRecorded) {
+    policyRecorded = recordPolicy(POLICY).catch(e => ({ ok: false, reason: String(e && e.message || e) }));
+  }
+  return policyRecorded;
+}
 
 /* The SHAPE of the identifier, never the identifier. This is the only thing
    about the query that reaches the operations log, and the four values are the
@@ -567,6 +582,11 @@ export default async function handler(req, res) {
        run, never its subject. This is what the counter on the landing page and
        the back office read, and it is deliberately a separate write from the
        one above so that retiring either leaves the other intact. */
+    /* Awaited, and before the run is recorded. A row citing a policy version
+       whose record does not exist yet is precisely the gap this closes, so the
+       ordering is the guarantee, not an optimisation. */
+    const pol = await ensurePolicyRecorded();
+
     const ops = await recordOps(req, {
       input_type: opsInputType(q, domain),
       province: null,                       /* set when the purpose gate lands */
@@ -582,10 +602,18 @@ export default async function handler(req, res) {
       barred_items: payload.pipeline?.barred ?? 0,
       duration_ms: Date.now() - t0,
       policy_version: OPS_POLICY_VERSION,
-      manifest_generated: null,
-      enforcement_on: true,
+      manifest_generated: POLICY.manifest_generated,
+      enforcement_on: POLICY.enforcement_on,
+      sector: call.input?.sector || null,
     }).catch(e => ({ ok: false, reason: e?.message || 'ops threw' }));
-    payload.pipeline.ops = { ok: ops.ok, seq: ops.seq, reason: ops.reason };
+    payload.pipeline.ops = {
+      ok: ops.ok, seq: ops.seq, reason: ops.reason, schema: ops.schema,
+      policy_version: OPS_POLICY_VERSION,
+      policy_effective: POLICY.effective_from,
+      registers_in_scope: POLICY.sources_enabled,
+      manifest_generated: POLICY.manifest_generated,
+      policy_recorded: !!(pol && pol.ok),
+    };
 
     /* Per register, rolled into the day. Fire and forget: a health counter must
        never be able to hold up a response. */

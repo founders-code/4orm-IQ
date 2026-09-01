@@ -1,8 +1,9 @@
 /**
  * 4orm IQ - CHAIN VERIFICATION
  *
- * GET /api/evidence          the chain head, and the last verification run
- * GET /api/evidence?run=1    walk the chain now and report
+ * GET /api/evidence          both chain heads, the rule history, and the last
+ *                            verification run
+ * GET /api/evidence?run=1    walk both chains now and report
  *
  * Admin only. Walking the chain is the expensive operation on this deployment
  * and an open endpoint for it is a way to be knocked over.
@@ -14,7 +15,7 @@
  */
 
 import { requireAdmin } from './_auth.js';
-import { verifyChain } from './_ops.js';
+import { verifyChain, verifyPolicyChain, policyHistory } from './_ops.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -28,7 +29,13 @@ export default async function handler(req, res) {
 
   if (req.query.run === '1') {
     const limit = Math.min(500000, Math.max(0, parseInt(req.query.limit, 10) || 0));
-    return res.status(200).json(await verifyChain(limit || null));
+    /* Both chains, because a runs chain that verifies while the rule history
+       has been rewritten underneath it proves the wrong thing. */
+    const [runs, policy] = await Promise.all([
+      verifyChain(limit || null),
+      verifyPolicyChain(),
+    ]);
+    return res.status(200).json(Object.assign({}, runs, { policy }));
   }
 
   let client;
@@ -39,9 +46,17 @@ export default async function handler(req, res) {
     await client.connect();
     const head = (await client.query(
       "select height, head_hash, updated_at from ops_chain where name='ops_runs'")).rows[0] || {};
+    const policyHead = (await client.query(
+      "select height, head_hash, updated_at from ops_chain where name='ops_policy'")).rows[0] || {};
     const last = (await client.query(
       'select at, height, head_hash, intact, broken_at, ms from ops_verify order by at desc limit 5')).rows;
-    return res.status(200).json({ head, verifications: last });
+    const schemas = (await client.query(
+      'select hash_schema, count(*)::int as n from ops_runs group by hash_schema order by hash_schema')).rows;
+    const rules = await policyHistory(25);
+    return res.status(200).json({
+      head, verifications: last, schemas,
+      policy: { head: policyHead, history: rules.ok ? rules.rows : [], error: rules.ok ? null : rules.reason },
+    });
   } catch (e) {
     return res.status(500).json({ error: 'query_failed', detail: String(e.message || e).slice(0, 200) });
   } finally {

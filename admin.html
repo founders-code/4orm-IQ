@@ -69,6 +69,11 @@ header.top .eb{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-s
 .rrow .p{font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
 
 table{border-collapse:collapse;width:100%;font-size:13.5px}
+/* Wide content scrolls inside its own box. The page body never scrolls sideways. */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:720px}
+.tw td{vertical-align:top}
+.q{color:var(--ink3);font-size:12.5px;line-height:1.5}
 th{text-align:left;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.11em;
   text-transform:uppercase;color:var(--ink3);padding:9px 12px;border-bottom:1px solid var(--edge)}
 td{padding:10px 12px;border-bottom:1px solid var(--edge);color:var(--ink2)}
@@ -219,6 +224,10 @@ function chainPanel(c){
       +'<div class="v">'+(lv?(okv?'Intact':'BROKEN'):'Never run')+'</div></div>'
     +'<div class="chip"><div class="l">Verified at</div><div class="v h">'
       +(lv?esc(String(lv.at).slice(0,19).replace('T',' ')):'—').replace('—','not yet')+'</div></div>'
+    +'<div class="chip"><div class="l">Hash schemas in use</div><div class="v h">'
+      +((c.schemas&&c.schemas.length)
+          ? c.schemas.map(function(x){ return esc(x.hash_schema)+' \u00d7'+num(x.n); }).join('  ')
+          : 'v1')+'</div></div>'
     +'</div>'
     +(lv&&!okv?'<p style="color:var(--bad);font-size:13.5px;margin-bottom:14px"><b>The chain does not '
       +'verify.</b> A row at sequence '+num(lv.broken_at)+' does not match its predecessor. Do not '
@@ -228,6 +237,47 @@ function chainPanel(c){
     +'</div>';
 }
 
+/* The rule history.
+   A run row commits to a rule VERSION and never to what that rule said, which
+   is what lets a rule change without disturbing a hash already written. The
+   cost of that separation is that the version points at nothing unless the
+   rules themselves are recorded. This is that record, and it is chained too,
+   because a runs chain that verifies while the rule history was rewritten
+   underneath it proves the wrong thing. */
+function policyPanel(p){
+  if(!p) return '';
+  var head=p.head||{}, hist=p.history||[];
+  var h='<div class="card"><h2>The rules, and every time they changed</h2>'
+    +'<div class="sub">Each row is one rule change: what changed, why, when it took effect, '
+    +'and the evidence behind it. Every run in the log names the version it ran under, so a '
+    +'report can say which rule was in force when we looked instead of quietly applying '
+    +'today\u2019s rule to an older record.</div>'
+    +'<div class="chain">'
+    +'<div class="chip"><div class="l">Rule changes recorded</div><div class="v">'+num(head.height||0)+'</div></div>'
+    +'<div class="chip"><div class="l">Rule chain head</div><div class="v h">'
+      +esc(String(head.head_hash||'').slice(0,16)||'not started')+'</div></div>'
+    +'<div class="chip"><div class="l">Rules in force</div><div class="v h">'
+      +esc(hist.length?String(hist[0].version):'none recorded')+'</div></div>'
+    +'</div>';
+  if(!hist.length){
+    return h+'<div class="sub">No rule change has been recorded yet. Until one is, every run '
+      +'row cites a version that cannot be looked up.</div></div>';
+  }
+  h+='<div class="tw"><table><thead><tr><th>Version</th><th>In force from</th><th>Change</th>'
+    +'<th>What changed</th><th>Registers</th><th>Evidence</th></tr></thead><tbody>';
+  hist.forEach(function(r){
+    h+='<tr><td class="mono">'+esc(r.version)+'</td>'
+      +'<td class="mono">'+esc(String(r.effective_from||'').slice(0,10))+'</td>'
+      +'<td>'+esc(r.change_kind||'')+'</td>'
+      +'<td>'+esc(r.summary||'')+(r.reason?'<br><span class="q">'+esc(r.reason)+'</span>':'')+'</td>'
+      +'<td class="mono">'+num(r.sources_enabled)+'/'+num(r.sources_total)+'</td>'
+      +'<td>'+(r.evidence_url
+                ? '<a href="'+esc(r.evidence_url)+'" rel="noopener noreferrer" target="_blank">source</a>'
+                : '<span class="q">internal change</span>')+'</td></tr>';
+  });
+  return h+'</tbody></table></div></div>';
+}
+
 /* Exposed so the render path can be exercised without standing up Clerk. What
    the suite tests is the panel, not the auth library. */
 window.render = render;
@@ -235,6 +285,7 @@ function render(d){
   var r=d.runs||{}, s=d.sources||{}, del=d.deletion||{}, inc=d.incidents||{};
   var h='';
   h+=chainPanel(d.chain);
+  h+=policyPanel(d.policy);
   h+='<div class="grid">'
     +tile(num(r.attempted),"","Checks attempted","Every request that reached the gates")
     +tile(num(d.people),"","People helped","Distinct visitor-days. A floor, never a headcount")
@@ -308,10 +359,19 @@ function render(d){
     api("/api/evidence?run=1").then(function(res){
       if(!res.ok){ o.textContent="Could not verify: "+(res.j&&res.j.error||res.status); return; }
       var v=res.j;
-      o.textContent = v.intact && v.head_matches
-        ? ("Intact. "+num(v.checked)+" rows checked in "+v.ms+"ms, head matches.")
-        : ("BROKEN at sequence "+v.broken_at+". "+num(v.checked)+" rows checked before the break.");
-      o.style.color = (v.intact && v.head_matches) ? "var(--ok)" : "var(--bad)";
+      var runsOk = v.intact && v.head_matches;
+      var pol = v.policy || null;
+      var polOk = !pol || !pol.ok || (pol.intact && pol.head_matches);
+      var msg = runsOk
+        ? ("Runs intact. "+num(v.checked)+" rows checked in "+v.ms+"ms, head matches.")
+        : ("Runs BROKEN at sequence "+v.broken_at+". "+num(v.checked)+" rows checked before the break.");
+      if(pol && pol.ok){
+        msg += polOk
+          ? (" Rules intact, "+num(pol.checked)+" changes checked.")
+          : (" Rules BROKEN at sequence "+pol.broken_at+".");
+      }
+      o.textContent = msg;
+      o.style.color = (runsOk && polOk) ? "var(--ok)" : "var(--bad)";
     });
   });
 }

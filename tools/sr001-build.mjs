@@ -98,6 +98,12 @@ const re = new RegExp(OPEN.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&') + '[\\s\\S]*?
 if (!re.test(html)) { console.error('markers not found in ' + target); process.exit(1); }
 fs.writeFileSync(target, html.replace(re, block));
 
+/* The same manifest, on disk, for the server side. The console and the API must
+   answer "which registers were in scope" identically, and two copies of a list
+   maintained by hand is how they stop agreeing. */
+const apiManifest = new URL('../api/_sr001.json', import.meta.url);
+fs.writeFileSync(apiManifest, JSON.stringify(manifest, null, 1) + '\n');
+
 console.log('SR-001 -> ' + target);
 console.log('  on the register   ' + rows.length);
 console.log('  enabled           ' + enabled.length);

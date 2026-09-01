@@ -22,7 +22,26 @@ const payload={window_days:30,generated:new Date().toISOString(),
  people:1103,
  chain:{height:1842,head_hash:"9f2c4ae1bb70d3f5a8c19e4472bd6013fe8a2c5d7b41903e6ca8df2145b7ce80",
         updated_at:new Date().toISOString(),
-        last_verify:{at:new Date().toISOString(),height:1842,intact:true,broken_at:null,ms:412}}};
+        schemas:[{hash_schema:"v1",n:1200},{hash_schema:"v2",n:642}],
+        last_verify:{at:new Date().toISOString(),height:1842,intact:true,broken_at:null,ms:412}},
+ by_sector:[{sector:"INVESTMENT",n:900},{sector:"UNDECLARED",n:942}],
+ policy:{head:{height:3,head_hash:"c71b0e4d99aa2f6318bd45c0a7e2f19d3b8046ca5127ee9034fb7a6d21c805ef",
+               updated_at:new Date().toISOString()},
+   history:[
+     {seq:3,at:new Date().toISOString(),version:"2026-09-01",effective_from:"2026-09-01",
+      change_kind:"RULE_CHANGED",summary:"Row hashes carry a schema marker.",
+      reason:"Recorded fields have to grow without invalidating earlier hashes.",
+      evidence_url:null,author:"4orm Finance",sources_enabled:175,sources_total:153,
+      enforcement_on:true,manifest_generated:"2026-09-01"},
+     {seq:2,at:new Date().toISOString(),version:"2026-08-31",effective_from:"2026-08-31",
+      change_kind:"SOURCE_ADDED",summary:"Two provincial registers added.",
+      reason:"Coverage gap in Atlantic Canada.",
+      evidence_url:"https://example.org/notice",author:"4orm Finance",
+      sources_enabled:173,sources_total:153,enforcement_on:true,manifest_generated:"2026-08-31"},
+     {seq:1,at:new Date().toISOString(),version:"2026-08-29",effective_from:"2026-08-29",
+      change_kind:"INITIAL",summary:"First recorded rule set.",reason:null,
+      evidence_url:null,author:"4orm Finance",sources_enabled:170,sources_total:153,
+      enforcement_on:true,manifest_generated:"2026-08-29"}]}};
 const errs=[];
 const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/admin.html',
  beforeParse(w){ w.fetch=()=>Promise.resolve({ok:true,status:200,json:()=>Promise.resolve(payload)});
@@ -57,6 +76,19 @@ if(doc.querySelectorAll('.tile').length < 7) fails.push('the stat row lost a til
 if(!/evidence layer/i.test(out.textContent)) fails.push('the evidence panel is gone');
 if(!/9f2c4ae1bb70/.test(out.textContent)) fails.push('the chain head is not shown');
 if(!doc.getElementById('verify')) fails.push('there is no way to verify the chain from the page');
+/* The rule history. A version string on every run row that points at nothing
+   is worse than no version string, so the page has to show what it points at. */
+if(!/every time they changed/i.test(out.textContent)) fails.push('the rule history panel is gone');
+if(!/2026-09-01/.test(out.textContent)) fails.push('the rule versions are not shown');
+if(!/c71b0e4d99aa/.test(out.textContent)) fails.push('the rule chain head is not shown');
+if(!/SOURCE_ADDED/.test(out.textContent)) fails.push('what kind of change it was is not shown');
+if(!/Coverage gap in Atlantic Canada/.test(out.textContent)) fails.push('the reason for a change is not shown');
+if(!/example\.org\/notice/.test(out.innerHTML)) fails.push('the evidence for a change is not linked');
+if(!/v1[\s\S]{0,40}v2/.test(out.textContent)) fails.push('the hash schemas in use are not shown');
+/* Markup without styling has shipped here before: every class the panel emits
+   must resolve to a rule, or the panel renders in document flow looking broken. */
+for(const cls of ['tw','q'])
+  if(!new RegExp('\\.'+cls+'[{ ,:]').test(html)) fails.push('.'+cls+' is used but has no CSS rule');
 /* Auth: no shared secret may reappear on the page. */
 const asrc = fs.readFileSync('/home/claude/kbys/build/4orm-iq/admin.html','utf8');
 if(/type="password"/.test(asrc)) fails.push('a shared secret box is back on the admin page');
@@ -76,13 +108,21 @@ if(doc.querySelectorAll('.rrow').length < 4) fails.push('the register ranking is
       new one has to be added deliberately, which is the moment somebody has to
       think about whether it carries a subject. */
 const ALLOWED = new Set(['window_days','generated','runs','completion_pct','incomplete_pct',
-  'by_outcome','by_input','by_day','sources','rights','deletion','incidents','people','chain']);
+  'by_outcome','by_input','by_day','sources','rights','deletion','incidents','people','chain',
+  /* Vetted 2026-09-01. by_sector is the category a check was run under, which is
+     a shape, not a subject. policy is the rule history: what WE decided and
+     when, carrying nothing about any party we checked. */
+  'by_sector','policy']);
 const extra = Object.keys(payload).filter(k => !ALLOWED.has(k));
 if(extra.length) fails.push('the metrics response has grown key(s) nobody vetted: '+extra.join(', '));
 
 const api = fs.readFileSync('/home/claude/kbys/build/4orm-iq/api/admin-metrics.js','utf8');
 if(/select[\s\S]{0,400}identifier/i.test(api))
   fails.push('the metrics endpoint selects an identifier column');
+/* The rule history is about us, not about anybody we checked, and it must stay
+   that way: it is the one table on this page with free text in it. */
+if(/\bpolicy\b[\s\S]{0,300}\b(identifier|subject|party|searched)\b/i.test(api))
+  fails.push('the rule history has grown a field that could name a party');
 const sql = fs.readFileSync('/home/claude/kbys/build/4orm-iq/db/telemetry.sql','utf8');
 const body = sql.split('\n').filter(l=>!l.trim().startsWith('--')).join('\n');
 for(const bad of ['identifier','subject','party','query'])

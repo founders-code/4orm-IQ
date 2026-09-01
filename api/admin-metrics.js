@@ -49,7 +49,8 @@ export default async function handler(req, res) {
     const q = (sql, p = []) => client.query(sql, p).then(r => r.rows);
     const since = `now() - interval '${days} days'`;
 
-    const [runs, byOutcome, byInput, byDay, srcWorst, srcTotals, rights, del, ppl, chain, lastVerify, inc] = await Promise.all([
+    const [runs, byOutcome, byInput, byDay, srcWorst, srcTotals, rights, del, ppl, chain, lastVerify, inc,
+           policyChain, policyRows, schemas, bySector] = await Promise.all([
       q(`select
            count(*)::int                                            as attempted,
            count(*) filter (where outcome='COMPLETED')::int          as completed,
@@ -97,6 +98,13 @@ export default async function handler(req, res) {
                 count(*) filter (where rrosh)::int as rrosh,
                 count(*) filter (where reported)::int as reported
          from ops_incident where at > ${since}`),
+      q("select height, head_hash, updated_at from ops_chain where name='ops_policy'"),
+      q(`select seq, at, version, effective_from, change_kind, summary, reason, evidence_url,
+                author, sources_enabled, sources_total, enforcement_on, manifest_generated
+           from ops_policy order by seq desc limit 10`),
+      q('select hash_schema, count(*)::int as n from ops_runs group by hash_schema order by hash_schema'),
+      q(`select coalesce(sector,'UNDECLARED') as sector, count(*)::int as n
+           from ops_runs where at > ${since} group by 1 order by n desc`),
     ]);
 
     const r = runs[0] || {};
@@ -121,7 +129,14 @@ export default async function handler(req, res) {
       rights: rights,
       deletion: del[0] || {},
       people: (ppl[0] || {}).people ?? null,
-      chain: Object.assign({}, chain[0] || {}, { last_verify: lastVerify[0] || null }),
+      chain: Object.assign({}, chain[0] || {}, {
+        last_verify: lastVerify[0] || null,
+        schemas: schemas,
+      }),
+      /* The rule history. A run row cites a version; this is what that version
+         was. Without it the version string on every row points at nothing. */
+      policy: { head: policyChain[0] || null, history: policyRows },
+      by_sector: bySector,
       incidents: inc[0] || {},
     });
   } catch (e) {
