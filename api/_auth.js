@@ -42,14 +42,34 @@ export async function requireAdmin(req) {
   /* Clerk puts the primary email on the session token only when the JWT
      template is configured to include it. Both shapes are read, and if neither
      is present the answer is no rather than a guess. */
-  const email = String(claims.email || claims.primary_email_address || '').toLowerCase();
+  let email = String(claims.email || claims.primary_email_address || '').toLowerCase();
   const orgRole = String(claims.org_role || (claims.o && claims.o.rol) || '');
+
+  /* A default Clerk session token carries no email. Rather than make every
+     deployment depend on someone remembering to build a JWT template, the
+     address is read back from Clerk's own record of the verified subject.
+     This is a lookup of the token holder, never a search: claims.sub is the
+     only input, and a failed lookup leaves email empty, which denies. */
+  if (!email && claims.sub) {
+    try {
+      const r = await fetch('https://api.clerk.com/v1/users/' + encodeURIComponent(claims.sub),
+                            { headers: { Authorization: 'Bearer ' + secret } });
+      if (r.ok) {
+        const u = await r.json();
+        const list = Array.isArray(u.email_addresses) ? u.email_addresses : [];
+        const rec = list.find(e => e && e.id === u.primary_email_address_id) || list[0];
+        const addr = rec && rec.email_address ? String(rec.email_address) : '';
+        const ok = !rec || !rec.verification || rec.verification.status === 'verified';
+        if (addr && ok) email = addr.toLowerCase();
+      }
+    } catch (e) { /* leave email empty; the answer below is no */ }
+  }
 
   const byEmail = !!email && allow.includes(email);
   const byRole  = !!role && !!orgRole && orgRole === role;
   if (!byEmail && !byRole)
     return { ok: false, status: 403, error: 'not_authorised',
-             reason: email ? 'not on the allowlist' : 'the session token carries no email claim' };
+             reason: email ? 'not on the allowlist' : 'no verified email could be established for this session' };
 
   return { ok: true, subject: claims.sub, email: email || null, role: orgRole || null };
 }

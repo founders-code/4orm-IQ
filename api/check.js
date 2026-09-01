@@ -27,6 +27,29 @@ import { retrievedSources, reachedBoard, searchedBoard, applicabilityBoard, over
 import { classify, jurisdictions } from './_classify.js';
 import { applicable, TOTAL_SOURCES, BY_NAME } from './_catalogue.js';
 import { recordRun } from './_store.js';
+/* Two write sides, and the difference between them is the whole architecture.
+   _store.js holds entity-level identifiers so the operator graph can say
+   "seen before". _ops.js holds the shape of the run and nothing that names a
+   party, and it is chained so the counter can be proved. Neither one may grow
+   into the other. */
+import { recordRun as recordOps, recordSource } from './_ops.js';
+
+/* Bumped whenever a rule that governs a run changes, so a row in the log says
+   which version of the rules produced it. A log that cannot answer "what were
+   the rules that day" is a log nobody can audit. */
+const OPS_POLICY_VERSION = '2026-08-31';
+
+/* The SHAPE of the identifier, never the identifier. This is the only thing
+   about the query that reaches the operations log, and the four values are the
+   four the box accepts. */
+function opsInputType(q, domain) {
+  const v = String(q || '').trim();
+  if (/^(0x[a-fA-F0-9]{40}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{20,}|T[A-Za-z0-9]{33})$/.test(v))
+    return 'WALLET';
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'EMAIL';
+  if (domain || /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(v)) return 'WEBSITE';
+  return 'COMPANY';
+}
 
 export const config = { maxDuration: 300 };
 
@@ -539,6 +562,38 @@ export default async function handler(req, res) {
       briefChars: 0
     }).catch(e => ({ stored: false, reason: e?.message || 'store threw' }));
     payload.pipeline.store = stored;
+
+    /* The operations log. Chained, and carrying no identifier: the shape of the
+       run, never its subject. This is what the counter on the landing page and
+       the back office read, and it is deliberately a separate write from the
+       one above so that retiring either leaves the other intact. */
+    const ops = await recordOps(req, {
+      input_type: opsInputType(q, domain),
+      province: null,                       /* set when the purpose gate lands */
+      purpose: 'TRANSACTION',
+      outcome: 'COMPLETED',
+      sources_planned: sources?.length ?? 0,
+      sources_ok: call.input?.scores?.sources_checked ?? 0,
+      sources_failed: call.input?.scores?.sources_not_reached ?? 0,
+      sources_out_of_scope: payload.pipeline?.outOfScope ?? 0,
+      critical_failed: payload.pipeline?.criticalFailed ?? 0,
+      incomplete: (call.input?.scores?.sources_not_reached ?? 0) > 0,
+      suppressed_items: payload.pipeline?.suppressed ?? 0,
+      barred_items: payload.pipeline?.barred ?? 0,
+      duration_ms: Date.now() - t0,
+      policy_version: OPS_POLICY_VERSION,
+      manifest_generated: null,
+      enforcement_on: true,
+    }).catch(e => ({ ok: false, reason: e?.message || 'ops threw' }));
+    payload.pipeline.ops = { ok: ops.ok, seq: ops.seq, reason: ops.reason };
+
+    /* Per register, rolled into the day. Fire and forget: a health counter must
+       never be able to hold up a response. */
+    try {
+      for (const s of (ledger || [])) {
+        recordSource(s.id || s.name, s.ok ? 'ok' : (s.timedOut ? 'timed_out' : 'failed'), s.ms);
+      }
+    } catch {}
 
     if (stream) { emit('result', payload); try { res.end(); } catch {} return; }
     res.setHeader('Cache-Control', 'no-store');

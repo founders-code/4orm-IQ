@@ -196,14 +196,24 @@ body[data-stage="landing"] .searchbox{margin-top:22px;box-shadow:var(--sh-lg)}
 body[data-stage="landing"] .idrow{justify-content:center}
 body[data-stage="landing"] .herolock.landing-only{display:inline-flex}
 .servedrow{display:none}
-body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justify-content:center;gap:12px;
-  margin-top:30px}
-.servedn{font-family:var(--mono);font-size:clamp(26px,3.4vw,40px);font-weight:700;color:var(--ok);
-  letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 26px rgba(51,216,155,.28)}
+/* It sits at the foot now, under the disclaimer, so it reads as an instrument
+   rather than a headline. Smaller, with air above it and a rule to separate it
+   from the sentence it is evidence for. */
+body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justify-content:center;
+  gap:11px;margin:34px auto 0;padding-top:24px;max-width:34ch;
+  border-top:1px solid rgba(255,255,255,.055)}
+.servedn{font-family:var(--mono);font-size:clamp(21px,2.4vw,29px);font-weight:700;color:var(--ok);
+  letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 22px rgba(51,216,155,.26)}
 .servedl{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
   color:var(--tx-3)}
-.servedh{display:none;font-size:9.5px;letter-spacing:.1em;color:var(--tx-4);margin-left:10px}
+/* Hidden with the attribute, not with display:none in the class. Clearing an
+   inline style falls back to the stylesheet, so a class that says display:none
+   can never be un-hidden by setting style.display="" and the element stays
+   invisible while every line of code around it looks correct. */
+.servedh{font-size:9.5px;letter-spacing:.1em;color:var(--tx-4);margin-left:2px;
+  align-self:center}
+.servedh[hidden]{display:none}
 .servedn.tick{animation:servedtick .5s var(--spring)}
 @keyframes servedtick{0%{transform:translateY(5px) scale(.96);opacity:.5}100%{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.servedn.tick{animation:none}}
@@ -2560,20 +2570,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           to anyone as a live check.
         </div>
 
-        <!-- Real or absent. It renders only when the engine returns a real
-             count, and shows nothing at all otherwise. -->
-        <!-- Two words that were both wrong. Nobody is a customer, the product
-             is free and has no accounts. And one person can run several checks,
-             so a count of checks is not a count of people served. The number is
-             checks run, because that is the number we can prove: every one is a
-             row in the chained operations log and the head of that chain is
-             published beside it. -->
-        <div class="servedrow landing-only" id="servedRow" style="display:none">
-          <span class="servedn" id="servedN">0</span>
-          <span class="servedl" id="servedL">Checks run</span>
-          <span class="servedh mono" id="servedH" title="The head of the operations log this count was read from"></span>
-        </div>
-
         <!-- The five figures sit directly under the bar. They are the first
              answer, and everything below them is the working. -->
         <div class="statstrip" id="statstrip"></div>
@@ -2687,6 +2683,23 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         </div>
 
         <p class="upnote landing-only" style="color:var(--tx-3)">We check the registers, read the records, and publish every source we used and every one we could not reach. Nothing is invented, and green never means we guarantee anyone.</p>
+
+        <!-- Under the disclaimer, deliberately. The counter is evidence of the
+             claim above it, not a headline of its own: first what we do and
+             what we refuse to promise, then the odometer showing how often we
+             have done it.
+
+             Real or absent. It renders only when the engine returns a count off
+             the chained log, and shows nothing at all otherwise. Two earlier
+             words were both wrong. Nobody is a customer, the product is free and
+             has no accounts, and one person can run several checks, so a count
+             of checks is not a count of people served. The number is checks run,
+             because that is the number we can prove. -->
+        <div class="servedrow landing-only" id="servedRow" style="display:none">
+          <span class="servedn" id="servedN">0</span>
+          <span class="servedl" id="servedL">Checks run</span>
+          <span class="servedh mono" id="servedH" hidden title="The head of the operations log this count was read from"></span>
+        </div>
 
         <p class="upnote console-only"><b>Uploading a document or screenshot</b> lets us read the payment instructions and check whether the beneficiary matches the company you are being asked to trust. That is the check that saves the money. It is not enabled in this build.</p>
       </div>
@@ -7165,7 +7178,7 @@ function loadServed(){
            there so the count is attached to a state somebody can ask us to
            verify rather than a figure we typed. */
         var hh=id("servedH");
-        if(hh && j.chain && j.chain.head){ hh.textContent="log "+j.chain.head; hh.style.display=""; }
+        if(hh && j.chain && j.chain.head){ hh.textContent="log "+j.chain.head; hh.hidden=false; }
       })
       .catch(function(){ /* no number, no counter */ });
   }catch(e){ /* no number, no counter */ }

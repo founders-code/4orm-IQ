@@ -319,6 +319,16 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   if (!/head_hash/.test(cnt))
     fails.push('the counter no longer publishes the chain head it was read from');
 
+  /* An element hidden by a class rule cannot be shown by clearing its inline
+     style: the style falls back to the class and it stays invisible while every
+     line around it looks right. This shipped once. Toggle visibility with the
+     hidden attribute, and let the class style only the look. */
+  if (/\.servedh\{[^}]*display:none/.test(html))
+    fails.push('the chain head is hidden by a class rule, so it can never be shown');
+  if (/id\("servedH"\)[\s\S]{0,220}style\.display\s*=\s*""/.test(html))
+    fails.push('the chain head is un-hidden by clearing an inline style, which does not work '
+      + 'when a class rule sets display:none');
+
   /* Auth fails closed, and identity is not authorisation. */
   if (!/if \(!secret\) return \{ ok: false, status: 503/.test(auth))
     fails.push('the back office no longer fails closed when Clerk is unconfigured');
@@ -328,6 +338,37 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     fails.push('the shared admin token is back, replacing real authentication');
   if (!/requireAdmin/.test(met))
     fails.push('the metrics endpoint no longer requires an admin');
+
+  /* The allowlist is checked against an email, and a default Clerk session
+     token carries none. Without a way to establish one, every sign-in is a 403
+     and the door is welded shut rather than locked. Test the code, not the
+     comment that describes it. */
+  const authCode = strip(auth);
+  if (!/api\.clerk\.com\/v1\/users/.test(authCode) && !/template\s*:/.test(authCode))
+    fails.push('nothing establishes the email the allowlist is checked against, so no '
+      + 'account can ever be authorised');
+  if (/api\.clerk\.com\/v1\/users/.test(authCode) && !/encodeURIComponent\(claims\.sub\)/.test(authCode))
+    fails.push('the Clerk user lookup is not keyed on the verified subject, so it reads '
+      + 'somebody other than the token holder');
+  if (/api\.clerk\.com\/v1\/users/.test(authCode) && !/verification\.status === 'verified'/.test(authCode))
+    fails.push('an unverified email address can satisfy the allowlist');
+  if (!/const byEmail = !!email && allow\.includes\(email\)/.test(authCode))
+    fails.push('the allowlist check no longer requires a non-empty email, so a failed '
+      + 'lookup could pass');
+
+  /* The writer has to be called by the thing it records, which it was not for
+     a full day: _ops.js existed, was tested, and nothing invoked it. A writer
+     nobody calls is an empty table and a counter that shows nothing. */
+  const chk = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  if (!/from '\.\/_ops\.js'/.test(chk))
+    fails.push('check.js does not import the operations writer, so no run is ever recorded');
+  if (!/await recordOps\(req,/.test(chk))
+    fails.push('check.js imports the operations writer and never calls it');
+  if (!/recordSource\(/.test(chk))
+    fails.push('per-register health is never recorded, so the back office cannot show source health');
+  /* And it must record the shape, never the subject. */
+  if (/recordOps\(req,\s*\{[^}]*\b(identifier|domain|query|name)\s*:/.test(chk))
+    fails.push('the operations write carries the identifier, which is the one field it must not hold');
 }
 
 /* --------------------------------------------------- markup without styling
