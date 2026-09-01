@@ -1,0 +1,28 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const p = await b.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.waitForTimeout(1200);
+await p.evaluate(()=>{const l=document.querySelector('#room .lit'); if(l){l.style.animationPlayState='paused';l.style.animationDelay='0s';}});
+await p.screenshot({ path:'/tmp/w-landing.png' });
+await p.fill('#kbInput','atlanticglobalwealth.com');
+await p.waitForTimeout(300);
+await p.screenshot({ path:'/tmp/w-typing.png' });
+await p.click('#kbGo');
+await p.waitForTimeout(2400);
+await p.screenshot({ path:'/tmp/w-chat.png' });
+const pick = async t => { const l=p.locator('.pill',{hasText:t}).first(); await l.waitFor({timeout:8000}); await l.click(); };
+await pick('An investment'); await p.waitForTimeout(1400);
+await pick('I have not sent anything yet'); await p.waitForTimeout(3500);
+await p.screenshot({ path:'/tmp/w-wait.png' });
+const over = await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+const clip = await p.evaluate(()=>{
+  const svg=document.getElementById('netSvg'); if(!svg) return 'no svg';
+  const vb=svg.viewBox.baseVal, bad=[];
+  svg.querySelectorAll('text.nlab').forEach(t=>{const bb=t.getBBox();
+    if(bb.x<vb.x-1||bb.y<vb.y-1||bb.x+bb.width>vb.x+vb.width+1||bb.y+bb.height>vb.y+vb.height+1) bad.push(t.textContent);});
+  return {labels:svg.querySelectorAll('text.nlab').length, clipped:bad.length, first:bad[0]||null};
+});
+console.log('overflow',over,'| net',JSON.stringify(clip),'| errors',errs.length, errs[0]||'');
+await b.close();

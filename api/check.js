@@ -513,9 +513,31 @@ export default async function handler(req, res) {
     });
     emit('phase', { step: 'reason', label: 'Cross-examining the evidence' });
 
+    /* A HEARTBEAT, and the reason it exists.
+       The reasoning call below is one await that can run for minutes on a
+       heavily written-about party. During it nothing was written to the
+       response, and a response that sends no bytes is dropped as idle by the
+       platform in front of us. The reader saw three minutes of progress bar
+       and then "the stream ended before a result was produced", which is the
+       client honestly reporting a connection that died under it.
+       A line every eight seconds keeps the response alive and tells the reader
+       the wait is still ours rather than theirs. */
+    let beat = null;
+    const startBeat = () => {
+      const at = Date.now();
+      beat = setInterval(() => {
+        emit('tick', { ms: Date.now() - at, label: 'Cross-examining the evidence' });
+      }, 8000);
+      if (beat.unref) beat.unref();
+    };
+    const stopBeat = () => { if (beat) { clearInterval(beat); beat = null; } };
+
     /* Tier 3. One call. No search tool. Reasoning only. */
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const msg = await client.messages.create({
+    startBeat();
+    let msg;
+    try {
+      msg = await client.messages.create({
       model: MODEL,
       max_tokens: 16000,
       system: SEARCH_CUE + OUTPUT_INSTRUCTION,
@@ -548,8 +570,13 @@ export default async function handler(req, res) {
           'marked searched. platforms_carrying_negatives can never exceed the number\n' +
           'with pages returned, and a platform with zero pages was not read.\n' +
           ledger.map(r => `  ${r.platform} (${r.host}): searched=${r.searched} pages_returned=${r.pages}`).join('\n')
-      }]
-    });
+        }]
+      });
+    } finally {
+      /* Stopped whether the call returned, threw, or was aborted. A heartbeat
+         that outlives its request writes to a closed response forever. */
+      stopBeat();
+    }
 
     const call = msg.content.find(b => b.type === 'tool_use' && b.name === 'emit_assessment');
     if (!call) return fail(502, { error: 'no_assessment',

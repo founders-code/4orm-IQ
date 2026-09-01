@@ -19,51 +19,53 @@ const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true
 const { window } = dom, doc = window.document;
 await new Promise(r => setTimeout(r, 250));
 
-/* ---------------------------------------------------------------- the chips */
-const box = doc.getElementById('kbCtx');
-if (!box) fails.push('the context block is gone');
-if (box && !box.hidden) fails.push('the questions are showing before anything was typed');
+/* ------------------------------------------------------------- the thread */
+const chat = doc.getElementById('kbChat');
+if (!chat) fails.push('the chat thread is gone');
+if (chat && !chat.hidden) fails.push('the thread is open before anything was submitted');
 
 const input = doc.getElementById('kbInput');
 const go = doc.getElementById('kbGo');
 input.value = 'atlanticglobalwealth.com';
 input.dispatchEvent(new window.Event('input', { bubbles: true }));
-await new Promise(r => setTimeout(r, 60));
-if (box.hidden) fails.push('the questions never appear');
-const chips = doc.querySelectorAll('#kbCtx .ctxchip');
-console.log('chips offered:', chips.length);
-if (chips.length < 8) fails.push('the questions lost options');
-/* Nothing about the button may depend on an answer. */
-if (go.disabled) fails.push('the Check button waits on a question it must not wait on');
+await new Promise(r => setTimeout(r, 80));
+/* Typing must do NOTHING except enable the button. A control that appears
+   under the cursor mid-word is the page interrupting somebody. */
+if (!chat.hidden) fails.push('the questions appear while somebody is still typing');
+if (doc.querySelectorAll('#kbChat .pill').length)
+  fails.push('option pills are on the page before the identifier was submitted');
+if (go.disabled) fails.push('the Check button is disabled with a usable identifier in the bar');
 
-/* A blocked identifier must take the questions away with it. */
-input.value = 'John Smith';
-input.dispatchEvent(new window.Event('input', { bubbles: true }));
-await new Promise(r => setTimeout(r, 60));
-if (!box.hidden) fails.push('the questions stay up for an identifier we refuse');
-input.value = 'atlanticglobalwealth.com';
-input.dispatchEvent(new window.Event('input', { bubbles: true }));
-await new Promise(r => setTimeout(r, 60));
+/* Submit opens the thread. jsdom reports no reduced-motion preference, so the
+   thread runs at its real pace and the waits here have to match it. */
+doc.getElementById('kbForm').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+await new Promise(r => setTimeout(r, 1400));
+if (chat.hidden) fails.push('submitting did not open the thread');
+const shown = id => { const e = doc.getElementById(id); return e && !e.hidden; };
+if (shown('kbForm')) fails.push('the search bar is still on the page under the thread');
+if (shown('kbAccepts')) fails.push('the accepts sentence is still on the page under the thread');
+if (!/2 quick questions/i.test(chat.textContent)) fails.push('the thread never said what it wanted');
+if (/skip/i.test(chat.textContent)) fails.push('the thread offers a skip');
 
-/* The vehicle follow-up appears only for a vehicle, and is dropped on switch. */
-const tap = v => {
-  const c = [...doc.querySelectorAll('#kbCtx .ctxchip')].find(x => x.getAttribute('data-v') === v);
-  if (!c) { fails.push('no chip for ' + v); return; }
-  c.click();
+const pill = label => [...doc.querySelectorAll('#kbChat .pill')].find(b => b.textContent === label);
+const tap = async label => {
+  const b = pill(label);
+  if (!b) { fails.push('no pill for "' + label + '"'); return; }
+  b.click(); await new Promise(r => setTimeout(r, 1100));
 };
-const has = v => [...doc.querySelectorAll('#kbCtx .ctxchip')].some(x => x.getAttribute('data-v') === v);
-if (has('DEALER')) fails.push('the vehicle follow-up shows before a vehicle is chosen');
-tap('AUTO');
-if (!has('DEALER')) fails.push('the vehicle follow-up never appears');
-tap('PRIVATE');
+await new Promise(r => setTimeout(r, 1000));
+console.log('first question pills:', doc.querySelectorAll('#kbChat .pill').length);
+if (pill('A dealership')) fails.push('the vehicle follow-up is offered before a vehicle is chosen');
+await tap('A vehicle');
+if (!pill('A dealership')) fails.push('the vehicle follow-up never appeared');
+await tap('A private seller');
 if (window.__KBYS__.ctx().channel !== 'PRIVATE') fails.push('the vehicle answer did not stick');
-tap('INSURANCE');
-if (window.__KBYS__.ctx().channel !== null)
-  fails.push('a vehicle answer survived a switch to another sector, so the run carries a '
+/* The payload drops an answer whose question no longer applies. */
+window.__KBYS__.ctx().sector = 'INSURANCE';
+if ('channel' in window.__KBYS__.ctxPayload())
+  fails.push('a vehicle answer survives a switch to another sector, so the run carries a '
     + 'fact nobody stated');
-/* Tapping the chosen chip again clears it: every answer is retractable. */
-tap('INSURANCE');
-if (window.__KBYS__.ctx().sector !== null) fails.push('an answer cannot be taken back');
+window.__KBYS__.ctx().sector = 'AUTO';
 
 /* ------------------------------------------------- the escalation ladder */
 const ev = (t, reg) => ({ t, reg, src: reg });
@@ -133,7 +135,7 @@ else {
 
 /* Every class the new markup emits has to resolve to a rule. Markup without
    styling has shipped on this page before and was invisible to every test. */
-for (const cls of ['ctx', 'ctxrow', 'ctxq', 'ctxchip', 'ctxskip', 'rp-acta', 'rp-actb'])
+for (const cls of ['chat', 'bub', 'dots', 'pills', 'pill', 'rp-acta', 'rp-actb'])
   if (!new RegExp('\\.' + cls + '[{ ,:\\[]').test(html)) fails.push('.' + cls + ' has no CSS rule');
 
 if (errs.length) fails.push('page errors: ' + errs.length + ' ' + errs[0]);

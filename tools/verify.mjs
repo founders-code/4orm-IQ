@@ -393,14 +393,24 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
      a broken chip, it is a question that quietly becomes a gate on a page
      somebody reaches at eleven at night with money in a wire form.
      ---------------------------------------------------------------- */
-  if (!/var CTX_Q = \[/.test(html))
+  if (!/var ASK_STEPS = \[/.test(html))
     fails.push('the context questions are gone');
-  if (/go\.disabled\s*=[^;]*CTX/.test(html))
-    fails.push('the Check button now depends on an answer to an optional question');
-  if (!/onlyIf:\s*\{\s*sector:\s*"AUTO"\s*\}/.test(html))
+  /* They are asked after submit, in the thread. A row of controls that appears
+     while somebody is still typing is the page interrupting them, and it is
+     what this replaced. */
+  if (/input\.addEventListener\("input"[\s\S]{0,400}(ctxShow|ASK_STEPS|chatPills)/.test(html))
+    fails.push('the questions are being shown while somebody is still typing');
+  if (!/function askOpen/.test(html) || !/askOpen\(input\.value\.trim\(\)\)/.test(html))
+    fails.push('submitting the bar no longer opens the thread');
+  if (/skip/i.test((html.match(/function askNext[\s\S]{0,2200}/) || [''])[0]))
+    fails.push('a skip is back on the questions');
+  if (!/onlyIf:\s*\{\s*sector:"AUTO"\s*\}/.test(html))
     fails.push('the private-seller question is gone, so a private sale reads as an '
       + 'unlicensed dealer, which would be the largest false positive in the product');
-  if (!/if\(!ctxApplies\(q\)\) CTX\[q\.key\]=null;/.test(html))
+  /* A channel answer only means anything for a vehicle. Carried over from a
+     sector somebody switched away from, it is a fact about the run that
+     nobody stated. */
+  if (!/if\(CTX\.sector==="AUTO" && CTX\.channel\)/.test(html))
     fails.push('an answer to a question that no longer applies is carried anyway');
 
   /* Stage changes layout and never judgement. Every delivery branch must read
@@ -701,11 +711,31 @@ const vmoreRule = (styleBlock.match(/\.vmore\s*\{[^}]*\}/) || [''])[0];
 if (!/overflow-y:\s*auto/.test(vmoreRule))
   fails.push('the summary detail no longer scrolls');
 
-/* --------------------------------- two logos, both of them the real files.
-   4orm Finance sits above the headline, 4ormIQ sits inside it. Neither is
-   ever redrawn, so both must be image data and never text standing in. */
-if (!/class="herofin landing-only" src="data:image\/png;base64,/.test(html))
-  fails.push('the 4orm Finance logo above the headline is not the real image file');
+/* --------------------------------- the marks, and the one rule about them.
+   A mark is the supplied image file or it is not on the page. It is never
+   redrawn in type, never traced, never recoloured, never stood in for. The
+   standalone 4orm Finance lockup was removed from the landing on request, so
+   what is guarded is not that a mark is PRESENT but that every mark which IS
+   present is the real file, and that none has been rebuilt out of characters. */
+{
+  /* Every element that carries a mark class must either BE the real image or
+     immediately wrap it. Absent is allowed, because a mark can be removed from
+     a page on request. Faked is never allowed. */
+  const carriers = ['herofin', 'iqmark', 'rp-hlogo', 'navbrand'];
+  carriers.forEach(c => {
+    const tagRe = new RegExp('<([a-z]+)[^>]*class="[^"]*\\b' + c + '\\b[^"]*"[^>]*>', 'g');
+    let m;
+    while ((m = tagRe.exec(html)) !== null) {
+      const tag = m[0];
+      const real = /src="data:image\/png;base64,/.test(tag)
+        || /<img[^>]+src="data:image\/png;base64,/.test(html.slice(m.index, m.index + 400));
+      if (!real) fails.push('the mark at .' + c + ' is not the real image file');
+    }
+  });
+  /* The wordmark rebuilt out of letterforms. This has happened. */
+  if (/>4<\/[a-z]+>\s*orm/i.test(html) || /class="[^"]*mark[^"]*"[^>]*>\s*<[a-z]+>4</i.test(html))
+    fails.push('the 4orm wordmark has been rebuilt in markup instead of using the asset');
+}
 if (!/class="iqmark" src="data:image\/png;base64,/.test(html))
   fails.push('the 4 in the headline lockup is not the real mark file');
 if (!/<span class="iqlock"/.test(html))
@@ -719,12 +749,6 @@ if (!/font-weight:\s*600/.test(iqRule))
 const markRule = (styleBlock.match(/\.iqmark\{[^}]*\}/) || [''])[0];
 if (!/vertical-align:\s*baseline/.test(markRule))
   fails.push('the headline mark is no longer anchored to the text baseline, which is what left it sitting low');
-/* The Finance logo is deliberately off geometric centre, because the blue mark
-   carries almost no contrast on this ground and the white letters carry it all.
-   Losing the nudge puts it back to looking pushed right. */
-const finRule = (styleBlock.match(/\.herofin\.landing-only\{[^}]*\}/) || [''])[0];
-if (!/translateX\(-\d/.test(finRule))
-  fails.push('the optical nudge on the 4orm Finance logo is gone, so it will read as sitting right of centre');
 /* flex:none on .tlead. The console rule gives it flex:1 1 420px, and in a
    column flex container that basis is a height, which opens dead air under
    the paragraph. It has already done that once. */
