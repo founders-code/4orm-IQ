@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 
 const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const dom = new JSDOM(html, { runScripts:'dangerously', url:'https://x/?debug=1',
+const dom = new JSDOM(html, { runScripts:'dangerously', url:'https://x/?demo=1&debug=1',
   pretendToBeVisual:true });
 const { window } = dom;
 window.IntersectionObserver = class { observe(){} disconnect(){} unobserve(){} };
@@ -43,12 +43,36 @@ if (bad.length) { console.error('FAIL: a dot will render at zero'); process.exit
 /* And the check modal has to explain which rule fired. */
 doc.getElementById('kbInput').value = 'atlanticglobalwealth.com';
 doc.getElementById('kbForm').dispatchEvent(new window.Event('submit', {cancelable:true}));
-await new Promise(r => setTimeout(r, 2600));
-const ok = doc.getElementById('waitOk'); if (ok) { ok.click(); await new Promise(r=>setTimeout(r,300)); ok.click(); }
+/* Submitting no longer starts the check. It opens the thread, and the two
+   questions in it decide which registers can apply, so the test has to answer
+   them the way a reader does. There is no skip, by design. */
+const answer = async (text) => {
+  for (let i = 0; i < 40; i++) {
+    const pill = [...doc.querySelectorAll('.pill')].find(b => b.textContent.trim() === text);
+    if (pill) { pill.click(); await new Promise(r => setTimeout(r, 250)); return; }
+    await new Promise(r => setTimeout(r, 150));
+  }
+  console.error('FAIL: the thread never offered "' + text + '"'); process.exit(1);
+};
+await answer('An investment');
+await answer('I have not sent anything yet');
+/* Wait for the run itself, then acknowledge. Clicking through before the
+   result lands leaves CURRENT with no categories, and every assertion below
+   then fails for a reason that has nothing to do with what it is testing. */
+await new Promise(r => setTimeout(r, 6000));
+const ok = doc.getElementById('waitOk');
+ok.click(); await new Promise(r => setTimeout(r, 400)); ok.click();
 await new Promise(r => setTimeout(r, 1400));
 const tile = doc.querySelector('#tiles .tile');
 if (!tile) { console.error('FAIL: no check tiles rendered'); process.exit(1); }
 tile.click();
+await new Promise(r => setTimeout(r, 300));
+/* A tile opens the short answer first and puts the full check behind a
+   button, which is the point of progressive disclosure. The rules and the
+   register table live on the other side of it. */
+const gate = doc.querySelector('#infoBody .gateok');
+if (!gate) { console.error('FAIL: the check no longer offers its full detail'); process.exit(1); }
+gate.click();
 await new Promise(r => setTimeout(r, 300));
 const rules = [...doc.querySelectorAll('.rulerow')];
 const fired = rules.filter(r => r.classList.contains('on'));

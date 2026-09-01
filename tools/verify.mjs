@@ -942,6 +942,40 @@ if (!/What it said about this party/.test(script))
    but whether it draws depends on the parent being a flex container, which the
    stylesheet text cannot answer. It is measured in smoke18 instead. */
 
+/* -------------------------------------- the network's class names are its own
+   A class name collision is not a duplicate rule, and every duplicate-rule
+   check in this file walked straight past it: the report's narrative rows own
+   .nlab and set it to 15px bold, which won on every register name on the web
+   and blew each one to twice the width the frame was built for. Names were
+   running off the frame and into the cards above for that reason alone. So
+   every class the network creates must be declared once in this stylesheet and
+   belong to nothing else. */
+const netStart_ = script.indexOf('function netBuild');
+const netEnd_ = script.indexOf('function netPaint');
+const netSrc_ = netStart_ > -1 && netEnd_ > netStart_ ? script.slice(netStart_, netEnd_) : '';
+if (!netSrc_) fails.push('the network no longer builds: netBuild is gone');
+const netClasses_ = [...new Set([...netSrc_.matchAll(/class:"([^"]+)"/g)]
+  .flatMap(m => m[1].split(/[\s"+()?:]+/))
+  .map(c => c.trim())
+  .filter(c => /^[a-z][a-z0-9-]*$/.test(c)))];
+/* Only the base rules, anchored to the start of a line. A modifier written as
+   .netname.core and an override inside a reduced-motion media query are both
+   deliberate second mentions; a second rule of its own is the collision. */
+for (const c of netClasses_) {
+  const decls = (styleBlock.match(new RegExp('^\\.' + c + '\\s*\\{', 'gm')) || []).length;
+  if (decls > 1) fails.push('.' + c + ' is declared ' + decls + ' times in the stylesheet: '
+    + 'the network shares a class name with another component, and the later rule wins on the web');
+}
+for (const c of ['netname', 'nnode', 'nlink', 'hubring', 'hubtrack']) {
+  if (!new RegExp('^\\.' + c + '\\s*\\{', 'm').test(styleBlock))
+    fails.push('the network draws .' + c + ' and nothing styles it');
+}
+/* And the mark at the centre is the asset, never type and never redrawn. */
+if (!/var NET_MARK = "data:image\/png;base64,/.test(script))
+  fails.push('the mark at the centre of the network is not the real asset');
+if (!/netMk\("image"/.test(netSrc_))
+  fails.push('the mark at the centre of the network is no longer placed as an image');
+
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
 if (prev && fs.existsSync(prev)) {
