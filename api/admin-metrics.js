@@ -2,7 +2,7 @@
  * 4orm IQ - OPERATIONS METRICS
  *
  * GET /api/admin-metrics?days=30
- * Authorization: Bearer $ADMIN_TOKEN
+ * Authorization: Bearer <Clerk session token>
  *
  * Serves the OPS-001 s.51 metric list. Aggregates only.
  *
@@ -12,8 +12,10 @@
  * column does not exist, and the reason is written at the top of
  * db/telemetry.sql.
  *
- * With ADMIN_TOKEN unset this route is disabled outright rather than open.
+ * With Clerk unconfigured this route is disabled outright rather than left open.
  */
+
+import { requireAdmin } from './_auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -23,14 +25,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
 
-  const token = process.env.ADMIN_TOKEN;
-  if (!token) return res.status(503).json({ error: 'admin_disabled', reason: 'ADMIN_TOKEN not set' });
-
-  const given = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  /* Constant-time-ish compare. Not a substitute for putting this behind real
-     auth, and it stops the trivial case. */
-  if (given.length !== token.length || !safeEqual(given, token))
-    return res.status(401).json({ error: 'unauthorized' });
+  /* Clerk verifies identity; the allowlist decides access. Both live in
+     _auth.js, and with Clerk unconfigured this returns 503 rather than opening. */
+  const auth = await requireAdmin(req);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error, reason: auth.reason });
 
   if (!process.env.POSTGRES_URL)
     return res.status(503).json({ error: 'no_database_configured' });
@@ -51,7 +49,7 @@ export default async function handler(req, res) {
     const q = (sql, p = []) => client.query(sql, p).then(r => r.rows);
     const since = `now() - interval '${days} days'`;
 
-    const [runs, byOutcome, byInput, byDay, srcWorst, srcTotals, rights, del, inc] = await Promise.all([
+    const [runs, byOutcome, byInput, byDay, srcWorst, srcTotals, rights, del, ppl, chain, lastVerify, inc] = await Promise.all([
       q(`select
            count(*)::int                                            as attempted,
            count(*) filter (where outcome='COMPLETED')::int          as completed,
@@ -90,6 +88,10 @@ export default async function handler(req, res) {
                 count(*) filter (where not ok)::int as days_failed,
                 coalesce(sum(records_deleted),0)::int as deleted
          from ops_deletion where day > current_date - $1::int`, [days]),
+      q(`select count(distinct visitor_day) filter (where visitor_day is not null)::int as people
+         from ops_runs where at > ${since} and outcome='COMPLETED'`),
+      q("select height, head_hash, updated_at from ops_chain where name='ops_runs'"),
+      q('select at, height, intact, broken_at, ms from ops_verify order by at desc limit 1'),
       q(`select count(*)::int as total,
                 count(*) filter (where pi_involved)::int as pi,
                 count(*) filter (where rrosh)::int as rrosh,
@@ -118,6 +120,8 @@ export default async function handler(req, res) {
       },
       rights: rights,
       deletion: del[0] || {},
+      people: (ppl[0] || {}).people ?? null,
+      chain: Object.assign({}, chain[0] || {}, { last_verify: lastVerify[0] || null }),
       incidents: inc[0] || {},
     });
   } catch (e) {
@@ -127,8 +131,3 @@ export default async function handler(req, res) {
   }
 }
 
-function safeEqual(a, b) {
-  let d = 0;
-  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return d === 0;
-}

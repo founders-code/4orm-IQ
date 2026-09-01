@@ -163,9 +163,59 @@ is proved to change what a reader sees rather than only what the source says.
     psql "$POSTGRES_URL" -f db/telemetry.sql
     # then set ADMIN_TOKEN in Vercel and open /admin.html
 
-Two environment variables, both required: `POSTGRES_URL` and `ADMIN_TOKEN`. With
-`ADMIN_TOKEN` unset the route returns 503 and is disabled outright rather than
-left open.
+Environment, all required for the back office to open:
+
+| Variable | What it does |
+|---|---|
+| `POSTGRES_URL` | the operations log. Unset, nothing is recorded and the counter shows nothing |
+| `OPS_SALT` | salts the visitor-day. Unset, no visitor-day is written and the people figure is null. Never ship without it: an unsalted hash of an IP address is an IP address with extra steps |
+| `CLERK_SECRET_KEY` | verifies the session token server side |
+| `ADMIN_EMAILS` | comma separated allowlist. Clerk proves who somebody is; this decides whether they get in |
+| `ADMIN_ORG_ROLE` | optional, an org role that also grants access |
+
+The publishable Clerk key goes on the `data-clerk` attribute of the body tag in
+`admin.html`. It is public by design. The secret key never appears in a page.
+
+With Clerk unconfigured the route returns 503 and is disabled outright rather
+than left open. That direction is deliberate: a misconfigured deployment locks
+the door rather than removing it.
+
+## The evidence layer
+
+The operations log is hash chained. Every row carries the hash of the row before
+it and its own hash over that plus its own eighteen fields. Alter a row after
+the fact, delete one, or reorder them, and every hash after that point stops
+matching.
+
+    GET /api/evidence          the chain head and the last five verifications
+    GET /api/evidence?run=1    walk the chain now and report
+
+Both are admin only, because walking the chain is the expensive operation here.
+
+What it buys: the counter on the landing page stops being a number we assert and
+becomes a number somebody can check. Competition Act s.74.01(1)(b) puts the onus
+of substantiating a performance claim on us, and a chain head plus a dated
+verification run is what discharging that looks like.
+
+What it does not do: it says nothing about whether a check was right, and it does
+not establish legal admissibility.
+
+`tools/smoke21.mjs` proves the chain properties without a database. All eighteen
+fields are covered by the hash, a rewritten row is detected at its own position,
+a deleted row is detected, and an untampered chain verifies.
+
+## The public counter
+
+    GET /api/counter
+
+Serves `checks`, `people` and the chain head. `checks` is completed runs.
+`people` is distinct visitor-days, which is a floor and never a headcount, and
+it is null when `OPS_SALT` is unset.
+
+The landing page label was `Customers served` and both words were wrong: nobody
+is a customer, the product is free and has no accounts, and one person can run
+several checks. It reads **Checks run** now, with twelve characters of the chain
+head beside it.
 
 **There is no column anywhere in the operations schema for the identifier a user
 searched, the party a check was about, or the result it returned.** That is

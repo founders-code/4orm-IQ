@@ -22,9 +22,49 @@ create extension if not exists pgcrypto;
 
 -- ------------------------------------------------------------------ runs
 -- One row per attempted check. Shape of the request, never its content.
+-- ------------------------------------------------------- the evidence layer
+--
+-- 4orm sells the ability to prove a record went unaltered. It would be strange
+-- to run its own operations log on trust, so this one is chained: every row
+-- carries the hash of the row before it, and its own hash over that plus its
+-- own content. Change any row after the fact and every hash after it stops
+-- matching, which /api/evidence walks and reports.
+--
+-- What that buys, specifically: the counter on the landing page stops being a
+-- number we assert and becomes a number somebody can check. Competition Act
+-- s.74.01(1)(b) puts the onus of substantiating a performance claim on us, and
+-- a chain head plus a verification run is what discharging it looks like.
+create table if not exists ops_chain (
+  name       text primary key,        -- always 'ops_runs'
+  height     bigint not null default 0,
+  head_hash  text not null default repeat('0',64),
+  updated_at timestamptz not null default now()
+);
+insert into ops_chain (name) values ('ops_runs') on conflict do nothing;
+
+create table if not exists ops_verify (
+  id         uuid primary key default gen_random_uuid(),
+  at         timestamptz not null default now(),
+  height     bigint not null,
+  head_hash  text not null,
+  intact     boolean not null,
+  broken_at  bigint,
+  ms         int
+);
+
 create table if not exists ops_runs (
   id                   uuid primary key default gen_random_uuid(),
+  seq                  bigserial not null,
   at                   timestamptz not null default now(),
+  -- The chain. prev_hash is the head at the moment this row was written and
+  -- row_hash is sha256 over prev_hash plus this row's own fields.
+  prev_hash            text not null,
+  row_hash             text not null,
+  -- A visitor-day, not a visitor. Twelve characters of a salted hash over the
+  -- day and the requester, so two checks from one person on one day count once
+  -- and nothing here survives to the next morning or points at anybody. There
+  -- is no way back from this value to a person and that is the whole point.
+  visitor_day          text,
   input_type           text not null,        -- COMPANY | WEBSITE | EMAIL | WALLET
   province             text,                 -- province only, never a finer location
   purpose              text not null,        -- the declared purpose category
@@ -44,6 +84,8 @@ create table if not exists ops_runs (
   enforcement_on       boolean
 );
 create index if not exists ops_runs_at    on ops_runs (at desc);
+create index if not exists ops_runs_seq   on ops_runs (seq);
+create index if not exists ops_runs_vday  on ops_runs (visitor_day);
 create index if not exists ops_runs_out   on ops_runs (outcome, at desc);
 
 -- ---------------------------------------------------------- source health

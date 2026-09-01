@@ -119,6 +119,37 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     fails.push('OPS-001 s.8: "Phone" is offered as a search type again');
   if (/placeholder="[^"]*person[^"]*"/i.test(src))
     fails.push('OPS-001 s.8: the search box still invites a person name');
+
+  /* The gate blocks the input. It cannot block the copy above the input, and
+     for two weeks the landing page offered "a company, person, website, email,
+     phone number or wallet" while the box refused two of the six. A reader who
+     accepted the invitation was turned away by the product that made it.
+
+     So: no landing copy, no meta description, and no headline may name a
+     blocked type, and the sentence that lists what the box takes is generated
+     from ID_TYPES rather than typed. */
+  {
+    const head = (src.match(/<meta name="description"[^>]*>/i) || [''])[0];
+    const landing = (src.match(/class="cb(deck|sub)[^"]*"[^>]*>([^<]*)</g) || []).join(' ');
+    const hero = (src.match(/<h1[\s\S]*?<\/h1>/gi) || []).join(' ');
+    for (const [word, why] of [
+      ['person', 'a person name is not an accepted input'],
+      ['phone',  'a phone lookup is not an accepted input'],
+    ]) {
+      const re = new RegExp('\\b' + word, 'i');
+      if (re.test(head))    fails.push('the meta description offers "' + word + '": ' + why);
+      if (re.test(landing)) fails.push('landing copy offers "' + word + '": ' + why);
+      if (re.test(hero))    fails.push('the headline offers "' + word + '": ' + why);
+    }
+    if (!/id="kbAccepts"/.test(src))
+      fails.push('the accepted-types sentence is typed again instead of generated from ID_TYPES');
+    if (!/ID_TYPES\.map/.test(src))
+      fails.push('the accepted-types sentence no longer reads ID_TYPES, so it can drift again');
+    /* And "a name" on its own reads as a person's name, which is the one search
+       the product refuses. */
+    if (/>\s*A name is enough/i.test(src))
+      fails.push('the deck line reads "A name is enough", which invites a person name');
+  }
   if (!/function inputAllowed\(/.test(src))
     fails.push('OPS-001 s.8: the input gate function is gone');
   if (!/BLOCKED_INPUT/.test(src))
@@ -207,6 +238,96 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     fails.push('the six month notification promise is back, and retention cannot support it');
   if (/two business days/.test(src) && /acknowledge/.test(src))
     fails.push('the two business day acknowledgement is back without instrumentation');
+}
+
+/* ------------------------------------------------------------- the room
+   A flickering light on a screen is a seizure risk. WCAG 2.3.1 draws the line
+   at three flashes a second, and the only safe version of this effect is one
+   that never flashes: a slow, shallow drift with a long cycle, off entirely
+   under prefers-reduced-motion. These guards measure that rather than trust it,
+   because "make the flicker punchier" is a note somebody will give one day and
+   the person acting on it needs the suite to stop them. */
+{
+  const kf = (html.match(/@keyframes roomflicker\{[\s\S]*?\n\}/) || [''])[0];
+  if (!kf) fails.push('the room flicker keyframes are gone');
+  else {
+    const ops = [...kf.matchAll(/opacity:\s*([\d.]+)/g)].map(m => Number(m[1]));
+    const lowest = Math.min(...ops);
+    if (lowest < 0.6)
+      fails.push('the room light dims to ' + lowest + '. Below 0.6 the change reads as a flash '
+        + 'rather than a flicker, which is the seizure risk this effect has to stay clear of');
+    /* Flashes per second. Count the crossings back to full brightness and
+       divide by the cycle length. */
+    const dur = Number((html.match(/animation:roomflicker\s+([\d.]+)s/) || [0, 0])[1]);
+    if (!dur) fails.push('the room flicker has no readable duration');
+    else {
+      const returns = ops.filter(o => o >= 0.999).length;
+      const perSec = returns / dur;
+      if (perSec > 2)
+        fails.push('the room light returns to full ' + perSec.toFixed(1) + ' times a second. '
+          + 'WCAG 2.3.1 allows three; anything near it is a strobe and this must stay well under');
+    }
+  }
+  if (!/@media \(prefers-reduced-motion: reduce\)\{\s*\n?\s*#room \.lit\{animation:none/.test(html))
+    fails.push('the room light still flickers under prefers-reduced-motion');
+  if (!/body\[data-stage="report"\] #room\{display:none\}/.test(html))
+    fails.push('the dark room is drawn over the report, which is a white document');
+  if (!/pointer: coarse/.test(html))
+    fails.push('the lamp sway runs on touch, where there is no pointer to follow');
+
+}
+
+/* ------------------------------------------------- the evidence layer
+   4orm sells the ability to prove a record went unaltered. Running its own
+   operations log on trust would be strange, so the log is chained and these
+   guards keep it that way. */
+{
+  const ops  = fs.readFileSync(new URL('../api/_ops.js', import.meta.url), 'utf8');
+  const sql  = fs.readFileSync(new URL('../db/telemetry.sql', import.meta.url), 'utf8');
+  /* Comments describe what the file refuses to do, and a guard that reads them
+     flags the promise instead of the breach. This is the third time in this
+     suite: strip comments, test code. */
+  const strip = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const cnt  = strip(fs.readFileSync(new URL('../api/counter.js', import.meta.url), 'utf8'));
+  const auth = fs.readFileSync(new URL('../api/_auth.js', import.meta.url), 'utf8');
+  const met  = fs.readFileSync(new URL('../api/admin-metrics.js', import.meta.url), 'utf8');
+
+  if (!/export function rowHash/.test(ops)) fails.push('the row hash function is gone');
+  if (!/for update/i.test(ops))
+    fails.push('the chain head is advanced without locking it, so two checks in the same '
+      + 'millisecond can fork the chain');
+  if (!/prev_hash/.test(sql) || !/row_hash/.test(sql) || !/ops_chain/.test(sql))
+    fails.push('the operations schema is no longer chained');
+  /* The visitor-day must never be written without a salt, or an IP address is
+     recoverable from it by trying four billion of them. */
+  if (!/if \(!salt\) return null/.test(ops))
+    fails.push('the visitor-day no longer requires OPS_SALT, so it is a reversible IP hash');
+  if (!/OPS_SALT/.test(ops)) fails.push('the visitor-day salt is gone');
+
+  /* The counter serves a real number or none. */
+  /* The hazard is a number that did not come from the log: a seed, a floor, a
+     base to add on. A `|| 0` guarding a missing chain height is not that, which
+     is what the first version of this guard could not tell apart. */
+  if (/\b(checks|people)\s*:\s*\d/.test(cnt))
+    fails.push('the counter assigns a literal number to checks or people');
+  if (/\b(seed|baseline|startAt|floor|offset)\b/i.test(cnt))
+    fails.push('the counter has a seed or an offset, so it does not start at what happened');
+  if (/Math\.(random|max)\s*\(/.test(cnt))
+    fails.push('the counter computes rather than reads');
+  if (!/available: false/.test(cnt))
+    fails.push('the counter no longer has an unavailable state');
+  if (!/head_hash/.test(cnt))
+    fails.push('the counter no longer publishes the chain head it was read from');
+
+  /* Auth fails closed, and identity is not authorisation. */
+  if (!/if \(!secret\) return \{ ok: false, status: 503/.test(auth))
+    fails.push('the back office no longer fails closed when Clerk is unconfigured');
+  if (!/ADMIN_EMAILS/.test(auth))
+    fails.push('the admin allowlist is gone, so anybody Clerk authenticates gets in');
+  if (/ADMIN_TOKEN/.test(met))
+    fails.push('the shared admin token is back, replacing real authentication');
+  if (!/requireAdmin/.test(met))
+    fails.push('the metrics endpoint no longer requires an admin');
 }
 
 /* --------------------------------------------------- markup without styling

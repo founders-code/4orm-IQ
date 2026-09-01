@@ -79,19 +79,44 @@ td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-num
 .pill i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
 .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)} .pill.mut{color:var(--ink3)}
 
+.ctl .ghost{background:#fff;color:var(--ink2);border-color:var(--edge2)}
+.ctl .ghost:hover{background:var(--sunk)}
+.who{font-size:12px;color:var(--ink3);margin-right:4px}
+.gate{background:#fff;border:1px solid var(--edge);border-radius:12px;padding:34px 36px;
+  max-width:520px;margin:10px 0 26px}
+.gate h2{font-size:20px;font-weight:700;margin-bottom:10px}
+.gate p{font-size:14px;color:var(--ink2);line-height:1.6}
+.gate .sm{margin-top:16px;font-size:12.5px;color:var(--ink3)}
+#clerkMount{margin-top:20px;min-height:40px}
+
+/* the evidence layer */
+.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
+.chip{border:1px solid var(--edge);border-radius:10px;padding:14px 16px;background:var(--sunk)}
+.chip .l{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink3)}
+.chip .v{margin-top:8px;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums;
+  word-break:break-all;line-height:1.25}
+.chip .v.h{font-family:var(--mono);font-size:12.5px;font-weight:500}
+.chip[data-s="ok"]{border-color:var(--ok);background:#EDF7F2}
+.chip[data-s="ok"] .v{color:var(--ok)}
+.chip[data-s="bad"]{border-color:var(--bad);background:#FDF0F2}
+.chip[data-s="bad"] .v{color:var(--bad)}
 .tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;
   padding:7px 10px;border-radius:7px;opacity:0;transition:opacity .12s;font-family:var(--mono)}
 .tip.on{opacity:1}
 footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--edge);font-size:12.5px;
   color:var(--ink3);line-height:1.6}
-</style></head><body>
+</style></head><!-- The Clerk publishable key. It is public by design; the secret key never
+     appears in a page. Replace at build or inject at deploy. -->
+<body data-clerk="">
 <div class="wrap">
 
 <header class="top">
   <div><span class="eb">4orm IQ</span><h1>Operations</h1></div>
   <div class="spacer"></div>
   <div class="ctl">
-    <input id="tok" type="password" placeholder="Admin token" autocomplete="off" style="width:190px">
+    <span class="who mono" id="who"></span>
+    <button id="out" type="button" class="ghost" hidden>Sign out</button>
     <select id="days">
       <option value="7">7 days</option><option value="30" selected>30 days</option>
       <option value="90">90 days</option><option value="365">12 months</option>
@@ -108,8 +133,15 @@ footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--edge);font-si
   What it buys is that there is nothing here to disclose on an access request and nothing to breach.
 </div>
 
+<div id="gate" class="gate" hidden>
+  <h2>Sign in</h2>
+  <p>The back office is behind Clerk. Your account has to be on the allowlist as well as
+     signed in, because being able to prove who you are is not the same as being allowed in here.</p>
+  <div id="clerkMount"></div>
+  <p class="sm" id="gateNote"></p>
+</div>
 <div id="err" class="notice err" hidden></div>
-<main id="out" hidden></main>
+<main id="panel" hidden></main>
 <div class="tip" id="tip"></div>
 
 <footer>
@@ -171,11 +203,41 @@ function ranked(rows){
   }).join('')+'</div>';
 }
 
+function chainPanel(c){
+  if(!c || !c.height) return '<div class="card"><h2>The evidence layer</h2>'
+    +'<div class="sub">Nothing recorded yet. The chain starts at the first completed check.</div></div>';
+  var lv=c.last_verify;
+  var okv = lv && lv.intact;
+  return '<div class="card"><h2>The evidence layer</h2>'
+    +'<div class="sub">Every run is a row, and every row carries the hash of the one before it. '
+    +'Alter a row after the fact and every hash after it stops matching. That is what makes the '
+    +'counter on the landing page a number somebody can check rather than a number we assert.</div>'
+    +'<div class="chain">'
+    +'<div class="chip"><div class="l">Chain height</div><div class="v">'+num(c.height)+'</div></div>'
+    +'<div class="chip"><div class="l">Head</div><div class="v h">'+esc(String(c.head_hash||'').slice(0,16))+'</div></div>'
+    +'<div class="chip" data-s="'+(lv?(okv?'ok':'bad'):'')+'"><div class="l">Last verification</div>'
+      +'<div class="v">'+(lv?(okv?'Intact':'BROKEN'):'Never run')+'</div></div>'
+    +'<div class="chip"><div class="l">Verified at</div><div class="v h">'
+      +(lv?esc(String(lv.at).slice(0,19).replace('T',' ')):'—').replace('—','not yet')+'</div></div>'
+    +'</div>'
+    +(lv&&!okv?'<p style="color:var(--bad);font-size:13.5px;margin-bottom:14px"><b>The chain does not '
+      +'verify.</b> A row at sequence '+num(lv.broken_at)+' does not match its predecessor. Do not '
+      +'publish any figure drawn from this log until that is explained.</p>':'')
+    +'<button id="verify" type="button">Verify the chain now</button>'
+    +'<span id="vout" style="margin-left:14px;font-size:13px;color:var(--ink3)"></span>'
+    +'</div>';
+}
+
+/* Exposed so the render path can be exercised without standing up Clerk. What
+   the suite tests is the panel, not the auth library. */
+window.render = render;
 function render(d){
   var r=d.runs||{}, s=d.sources||{}, del=d.deletion||{}, inc=d.incidents||{};
   var h='';
+  h+=chainPanel(d.chain);
   h+='<div class="grid">'
     +tile(num(r.attempted),"","Checks attempted","Every request that reached the gates")
+    +tile(num(d.people),"","People helped","Distinct visitor-days. A floor, never a headcount")
     +tile(d.completion_pct==null?"—":d.completion_pct,"%","Completed",
           num(r.completed)+" of "+num(r.attempted),
           d.completion_pct==null?null:(d.completion_pct>=95?"ok":(d.completion_pct>=85?"warn":"bad")))
@@ -237,8 +299,21 @@ function render(d){
 
   h+='<p style="font-size:12.5px;color:var(--ink3);margin-top:6px">Window: '+esc(d.window_days)
     +' days. Generated '+esc((d.generated||"").slice(0,19).replace("T"," "))+' UTC.</p>';
-  $("#out").innerHTML=h; $("#out").hidden=false;
+  $("#panel").innerHTML=h; $("#panel").hidden=false;
   wireTips();
+  var vb=document.getElementById("verify");
+  if(vb) vb.addEventListener("click",function(){
+    var o=document.getElementById("vout");
+    o.textContent="Walking the chain...";
+    api("/api/evidence?run=1").then(function(res){
+      if(!res.ok){ o.textContent="Could not verify: "+(res.j&&res.j.error||res.status); return; }
+      var v=res.j;
+      o.textContent = v.intact && v.head_matches
+        ? ("Intact. "+num(v.checked)+" rows checked in "+v.ms+"ms, head matches.")
+        : ("BROKEN at sequence "+v.broken_at+". "+num(v.checked)+" rows checked before the break.");
+      o.style.color = (v.intact && v.head_matches) ? "var(--ok)" : "var(--bad)";
+    });
+  });
 }
 
 function wireTips(){
@@ -252,31 +327,93 @@ function wireTips(){
   });
 }
 
-function load(){
-  var t=$("#tok").value.trim(), d=$("#days").value;
-  $("#err").hidden=true; 
-  if(!t){ fail("Enter the admin token. It is the ADMIN_TOKEN environment variable on the deployment."); return; }
-  try{ sessionStorage.setItem("4orm_admin_tok", t); }catch(e){}
-  fetch("/api/admin-metrics?days="+encodeURIComponent(d),{headers:{Authorization:"Bearer "+t}})
-    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
-    .then(function(res){
-      if(!res.ok){
-        if(res.status===401) return fail("That token was not accepted.");
-        if(res.j&&res.j.error==="admin_disabled")
-          return fail("This endpoint is switched off. ADMIN_TOKEN is not set on the deployment, which "
-            +"disables it outright rather than leaving it open.");
-        if(res.j&&res.j.error==="no_database_configured")
-          return fail("POSTGRES_URL is not set, so there is nothing recorded to report on yet. "
-            +"Run db/telemetry.sql once the database is attached.");
-        return fail("Request failed: "+(res.j&&res.j.detail||res.status));
-      }
-      render(res.j);
-    })
-    .catch(function(e){ fail("Could not reach the metrics endpoint. "+e.message); });
+/* ------------------------------------------------------------------ auth
+   Clerk carries the sign-in. Every call to the back office sends the session
+   token, and the server checks the allowlist separately, because being able to
+   prove who you are is not the same as being allowed in here. */
+var CLERK_KEY = document.body.getAttribute("data-clerk") || "";
+
+function api(path){
+  return (window.Clerk && window.Clerk.session
+            ? window.Clerk.session.getToken()
+            : Promise.resolve(null))
+    .then(function(t){
+      if(!t) return {ok:false,status:401,j:{error:"no_session"}};
+      return fetch(path,{headers:{Authorization:"Bearer "+t}})
+        .then(function(r){ return r.json().catch(function(){return {};})
+          .then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); });
+    });
 }
-function fail(m){ var e=$("#err"); e.textContent=m; e.hidden=false; $("#out").hidden=true; }
-$("#go").addEventListener("click",load);
-$("#tok").addEventListener("keydown",function(e){ if(e.key==="Enter") load(); });
-try{ var s=sessionStorage.getItem("4orm_admin_tok"); if(s){ $("#tok").value=s; load(); } }catch(e){}
+
+function load(){
+  var d=$("#days").value;
+  $("#err").hidden=true;
+  api("/api/admin-metrics?days="+encodeURIComponent(d)).then(function(res){
+    if(!res.ok){
+      if(res.status===401) return fail("Your session was not accepted. Sign in again.");
+      if(res.status===403) return fail("You are signed in, and this account is not on the admin "
+        +"allowlist. Add the address to ADMIN_EMAILS on the deployment.");
+      if(res.j&&res.j.error==="admin_disabled")
+        return fail("The back office is switched off. "+(res.j.reason||"")+". It fails closed rather "
+          +"than open, so this is the safe direction.");
+      if(res.j&&res.j.error==="no_database_configured")
+        return fail("POSTGRES_URL is not set, so nothing has been recorded yet. Run db/telemetry.sql "
+          +"once the database is attached.");
+      return fail("Request failed: "+(res.j&&res.j.detail||res.status));
+    }
+    render(res.j);
+  }).catch(function(e){ fail("Could not reach the back office. "+e.message); });
+}
+function fail(m){ var e=$("#err"); e.textContent=m; e.hidden=false; $("#panel").hidden=true; }
+
+function signedIn(){
+  var u=window.Clerk && window.Clerk.user;
+  $("#gate").hidden=true;
+  $("#out").hidden=false;
+  $("#who").textContent = u && u.primaryEmailAddress ? u.primaryEmailAddress.emailAddress : "";
+  load();
+}
+function signedOut(){
+  $("#gate").hidden=false;
+  $("#panel").hidden=true;
+  $("#out").hidden=true;
+  $("#who").textContent="";
+  if(window.Clerk) window.Clerk.mountSignIn(document.getElementById("clerkMount"));
+}
+
+$("#days").addEventListener("change",function(){ if(!$("#panel").hidden) load(); });
+$("#out").addEventListener("click",function(){ if(window.Clerk) window.Clerk.signOut(); });
+
+if(!CLERK_KEY){
+  $("#gate").hidden=false;
+  document.getElementById("gateNote").textContent =
+    "Clerk is not configured on this build. Set the publishable key on the body tag "
+    + "(data-clerk) and CLERK_SECRET_KEY plus ADMIN_EMAILS on the deployment.";
+}else{
+  var sc=document.createElement("script");
+  sc.setAttribute("data-clerk-publishable-key", CLERK_KEY);
+  sc.async=true; sc.crossOrigin="anonymous";
+  /* Clerk resolves its own frontend host from the publishable key, so the
+     versioned CDN build is all that has to be loaded here. Pinned to a major
+     rather than latest, because an auth screen is not somewhere to discover a
+     breaking change on a Tuesday. */
+  sc.src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js";
+  sc.onload=function(){
+    window.Clerk.load({}).then(function(){
+      window.Clerk.addListener(function(){
+        if(window.Clerk.user) signedIn(); else signedOut();
+      });
+      if(window.Clerk.user) signedIn(); else signedOut();
+    }).catch(function(e){
+      $("#gate").hidden=false;
+      document.getElementById("gateNote").textContent="Clerk failed to load: "+e.message;
+    });
+  };
+  sc.onerror=function(){
+    $("#gate").hidden=false;
+    document.getElementById("gateNote").textContent="Clerk script could not be loaded.";
+  };
+  document.head.appendChild(sc);
+}
 </script>
 </body></html>

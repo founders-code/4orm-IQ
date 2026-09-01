@@ -18,16 +18,23 @@ const payload={window_days:30,generated:new Date().toISOString(),
           {source_id:"Companies House",attempts:1710,ok:1625,failed:85,ok_pct:95.0}]},
  rights:[{kind:"CHALLENGE",opened:7,closed:6,avg_days:11.4},{kind:"ACCESS",opened:3,closed:3,avg_days:8.0}],
  deletion:{days_run:30,days_failed:0,deleted:41200},
- incidents:{total:1,pi:0,rrosh:0,reported:0}};
+ incidents:{total:1,pi:0,rrosh:0,reported:0},
+ people:1103,
+ chain:{height:1842,head_hash:"9f2c4ae1bb70d3f5a8c19e4472bd6013fe8a2c5d7b41903e6ca8df2145b7ce80",
+        updated_at:new Date().toISOString(),
+        last_verify:{at:new Date().toISOString(),height:1842,intact:true,broken_at:null,ms:412}}};
 const errs=[];
 const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/admin.html',
  beforeParse(w){ w.fetch=()=>Promise.resolve({ok:true,status:200,json:()=>Promise.resolve(payload)});
   w.addEventListener('error',e=>errs.push(e.error?.stack||e.message)); }});
 const {window}=dom, doc=window.document;
 await new Promise(r=>setTimeout(r,200));
-doc.getElementById('tok').value='x'; doc.getElementById('go').click();
-await new Promise(r=>setTimeout(r,300));
-const out=doc.getElementById('out');
+/* Clerk is not present in the test, so the page is driven through its own
+   render path rather than through sign-in. What is being tested is the panel,
+   not the auth library. */
+window.render(payload);
+await new Promise(r=>setTimeout(r,120));
+const out=doc.getElementById('panel');
 console.log('rendered:', !out.hidden);
 console.log('stat tiles:', doc.querySelectorAll('.tile').length);
 console.log('bars in the series:', doc.querySelectorAll('rect.bar').length);
@@ -45,7 +52,15 @@ for(const bad of ['identifier','searched for','looked up','party name','query va
 /* The assertions. */
 const fails=[];
 if(out.hidden) fails.push('the page did not render');
-if(doc.querySelectorAll('.tile').length < 6) fails.push('the stat row lost a tile');
+if(doc.querySelectorAll('.tile').length < 7) fails.push('the stat row lost a tile');
+/* The evidence layer has to be on the page and has to show the head. */
+if(!/evidence layer/i.test(out.textContent)) fails.push('the evidence panel is gone');
+if(!/9f2c4ae1bb70/.test(out.textContent)) fails.push('the chain head is not shown');
+if(!doc.getElementById('verify')) fails.push('there is no way to verify the chain from the page');
+/* Auth: no shared secret may reappear on the page. */
+const asrc = fs.readFileSync('/home/claude/kbys/build/4orm-iq/admin.html','utf8');
+if(/type="password"/.test(asrc)) fails.push('a shared secret box is back on the admin page');
+if(!/Clerk/.test(asrc)) fails.push('Clerk sign-in is gone from the admin page');
 if(doc.querySelectorAll('rect.bar').length !== 30) fails.push('the daily series did not draw every day');
 if(doc.querySelectorAll('rect.hit').length !== doc.querySelectorAll('rect.bar').length)
   fails.push('the series has bars with no hover target');
@@ -61,7 +76,7 @@ if(doc.querySelectorAll('.rrow').length < 4) fails.push('the register ranking is
       new one has to be added deliberately, which is the moment somebody has to
       think about whether it carries a subject. */
 const ALLOWED = new Set(['window_days','generated','runs','completion_pct','incomplete_pct',
-  'by_outcome','by_input','by_day','sources','rights','deletion','incidents']);
+  'by_outcome','by_input','by_day','sources','rights','deletion','incidents','people','chain']);
 const extra = Object.keys(payload).filter(k => !ALLOWED.has(k));
 if(extra.length) fails.push('the metrics response has grown key(s) nobody vetted: '+extra.join(', '));
 

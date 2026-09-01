@@ -11,6 +11,7 @@
     "@anthropic-ai/sdk": "^0.71.2",
     "jsdom": "^30.0.1",
     "pg": "^8.13.1",
-    "playwright": "^1.62.1"
+    "playwright": "^1.62.1",
+    "@clerk/backend": "^1.28.0"
   }
 }
