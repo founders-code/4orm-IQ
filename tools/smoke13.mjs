@@ -50,8 +50,21 @@ const card = doc.getElementById('eduCard');
 console.log('cards:', window.__KBYS__.cards());
 console.log('first card:', card.querySelector('.ek').textContent,
             '|', card.querySelector('.et').textContent);
-if (window.__KBYS__.cards() > 12)
-  fails.push('the card deck was not cut back, so the wait is still a reading list');
+/* The ceiling moved from twelve to eighteen, and the reason is on the record:
+   the cut from twenty-three to eleven removed cards that said the same thing in
+   a different currency. The five added since say something no other card says,
+   which is who is doing this check and what it costs the people it is for. The
+   rule was never a number. It is that no two cards cover the same ground, so
+   that is what is measured, alongside a ceiling that keeps the deck walkable
+   inside one run. */
+if (window.__KBYS__.cards() > 18)
+  fails.push('the card deck is longer than a reader can get through in one run');
+{
+  const titles = [...doc.querySelectorAll('#eduDots button')].map(b => b.getAttribute('aria-label'));
+  const subject = titles.map(t => String(t).split(', ').slice(1).join(', ').toLowerCase());
+  const dupe = subject.filter((v, i) => subject.indexOf(v) !== i);
+  if (dupe.length) fails.push('two cards on the waiting deck cover the same ground: ' + dupe[0]);
+}
 if (!card.querySelector('.ek')) fails.push('the cards no longer render');
 
 /* The arrows and the "n of m" counter went with the rest of the chrome. The
@@ -88,7 +101,11 @@ if (!fine || !/not advice/i.test(fine.textContent))
   fails.push('the "research tool, not advice" line is gone from the waiting screen entirely');
 
 /* Every class the new markup emits must resolve to a rule. */
-for (const c of ['netlegend', 'lgc', 'net', 'netcap', 'nlink', 'nnode', 'nlab', 'hub', 'pkt'])
+/* netname, not nlab. The network's label class was renamed off .nlab because
+   the report's narrative rows already owned that name and were silently
+   resizing every register name on the web. Checking the old name here would
+   have passed on the report's rule and proved nothing. */
+for (const c of ['netlegend', 'lgc', 'net', 'netcap', 'nlink', 'nnode', 'netname', 'hub', 'pkt'])
   if (!new RegExp('\\.' + c + '[{ ,:\\[]').test(html)) fails.push('.' + c + ' has no CSS rule');
 
 if (errs.length) fails.push('page errors: ' + errs.length + ' ' + errs[0]);

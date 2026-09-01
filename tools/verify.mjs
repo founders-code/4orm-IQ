@@ -976,6 +976,155 @@ if (!/var NET_MARK = "data:image\/png;base64,/.test(script))
 if (!/netMk\("image"/.test(netSrc_))
   fails.push('the mark at the centre of the network is no longer placed as an image');
 
+/* -------------------------------------- the report is four screens
+   It was one long page, and the reader who needed the second half had to scroll
+   past the half that had already told them what to do. Each screen now has one
+   job, and each is carved out of the same markup, so the check that matters is
+   that every block ended up on the screen whose job it belongs to. A block that
+   drifts back onto the first screen is not a cosmetic problem: the first screen
+   is what somebody reads at eleven at night before they send money. */
+const sheet_ = id => {
+  const a = html.indexOf('<div class="rp-sheet" id="' + id + '"');
+  if (a < 0) return '';
+  const rest = html.slice(a + 10);
+  const b = rest.indexOf('<div class="rp-sheet" id="');
+  return b < 0 ? html.slice(a) : html.slice(a, a + 10 + b);
+};
+const SHEETS_ = ['rpReport', 'rpFound', 'rpAct', 'rpSources'];
+const sheets_ = {};
+for (const x of SHEETS_) {
+  sheets_[x] = sheet_(x);
+  if (!sheets_[x]) fails.push('the report screen ' + x + ' is gone');
+}
+/* Only the result is up at rest. Two screens showing at once is the old
+   one-page report with extra headings. */
+for (const x of SHEETS_.slice(1))
+  if (!new RegExp('id="' + x + '" hidden').test(html))
+    fails.push(x + ' is not hidden at rest, so two report screens show at once');
+if (/id="rpReport" hidden/.test(html))
+  fails.push('the result screen starts hidden, so a finished check lands on nothing');
+
+const belongs_ = (needle, on, what) => {
+  const where = SHEETS_.filter(x => sheets_[x].includes(needle));
+  if (!where.length) fails.push(what + ' is not on any report screen');
+  else if (where.length > 1) fails.push(what + ' is on more than one report screen: ' + where.join(', '));
+  else if (where[0] !== on) fails.push(what + ' is on ' + where[0] + ', it belongs on ' + on);
+};
+belongs_('What we could not answer', 'rpReport', 'the gap note');
+belongs_('id="rpAlready"', 'rpReport', 'the door for somebody who has already paid');
+belongs_('id="rpToFound"', 'rpReport', 'the way on to what we found');
+belongs_('id="rpFindsSec"', 'rpFound', 'the findings');
+belongs_('id="rpOpenRecord"', 'rpFound', 'where we looked');
+belongs_('id="rpTwoWays"', 'rpFound', 'the two things a pattern of complaints can mean');
+belongs_('id="rpToAct"', 'rpFound', 'the way on to what to do');
+belongs_('id="rpStepsSec"', 'rpAct', 'the three things to do now');
+belongs_('id="rpBundle"', 'rpAct', 'what to have ready before the call');
+belongs_('id="rpPaks"', 'rpAct', 'who to tell');
+belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
+
+/* The gap note reads as the last thing the result screen could not tell them,
+   which is exactly the thought that should precede the door for somebody who
+   has already sent the money. Order, not presence. */
+{
+  const r = sheets_.rpReport;
+  if (r.indexOf('What we could not answer') > r.indexOf('id="rpAlready"'))
+    fails.push('what we could not answer sits below the already-sent door, it belongs just above it');
+  if (r.indexOf('id="rpAlready"') > r.indexOf('id="rpToFound"'))
+    fails.push('the way on to what we found sits above the already-sent door');
+}
+
+/* THE TWO PILLS, on the landing and on every screen. */
+for (const x of SHEETS_) {
+  if (!/Sources and method/.test(sheets_[x])) fails.push(x + ' has lost the sources and method pill');
+  if (!/Find support/.test(sheets_[x])) fails.push(x + ' has lost the find support pill');
+}
+{
+  const nav = html.slice(html.indexOf('<div class="navactions">'), html.indexOf('</nav>', html.indexOf('<div class="navactions">')));
+  const a = nav.indexOf('Sources and method'), b = nav.indexOf('Find support');
+  if (a < 0) fails.push('the landing has no sources and method pill');
+  else if (b < 0) fails.push('the landing has no find support pill');
+  else if (nav.slice(Math.min(a, b), Math.max(a, b)).split('<button').length > 2)
+    fails.push('sources and method and find support are not next to each other on the landing');
+}
+
+/* THE BAR MUST NEVER PARK, AND MUST NEVER GO BACKWARDS.
+   It arrived at ninety on the first byte of the reasoning call and sat there for
+   the two minutes that call takes, which reads as a page that has died. */
+if (!/function waitCreep/.test(script))
+  fails.push('nothing moves the progress bar through the reasoning call, so it parks at ninety');
+{
+  const tickAt = script.indexOf('else if(ev.t==="tick")');
+  const tick = tickAt < 0 ? '' : script.slice(tickAt, script.indexOf('else if(ev.t==="partial")', tickAt));
+  if (!/waitCreep\(/.test(tick))
+    fails.push('the heartbeat does not move the bar, which is the only thing that can during the reasoning call');
+}
+if (!/if\(pct<barShown\) return;/.test(script))
+  fails.push('the bar at the top of the window can go backwards when a late event carries a smaller number');
+if (!/if\(pct < waitShown\) return;/.test(script))
+  fails.push('the bar on the waiting screen can go backwards when a late event carries a smaller number');
+if (!/WAIT_CREEP_TO\s*=\s*99/.test(script))
+  fails.push('the creep is allowed to reach a hundred before the result exists');
+
+/* -------------------------------------- what to do, closed
+   Open, the four sections ran to eight screens and somebody who came for their
+   bank's phone number scrolled past a table of fields to reach it. All four
+   closed means all four titles are on one screen. */
+{
+  const act = sheets_.rpAct || '';
+  const opens = (act.match(/<details[^>]*>/g) || []);
+  if (opens.length !== 4)
+    fails.push('what to do has ' + opens.length + ' collapsible sections, it should have four');
+  if (opens.some(t => /\bopen\b/.test(t)))
+    fails.push('a section on what to do starts open, so the four titles are not all visible at once');
+  if (!/#rpt \.rp-acch::-webkit-details-marker\{display:none\}/.test(styleBlock))
+    fails.push('the browser disclosure triangle is still drawn beside our own chevron');
+}
+
+/* The pattern note runs the full measure. It was capped at 72ch and sat
+   stranded between two full width blocks, which reads as a failed load. */
+{
+  const tw = (styleBlock.match(/#rpt \.rp-twoways\{[^}]*\}/) || [''])[0];
+  if (/max-width:\s*\d+ch/.test(tw))
+    fails.push('the pattern note is capped narrower than the blocks it sits between');
+  if (!/max-width:\s*none/.test(tw))
+    fails.push('the pattern note does not run the full measure');
+}
+
+/* THE PILL PAIR IS GREEN AND GOLD, AND THE WAITING SCREEN CARRIES IT TOO. */
+if (!/<button class="navbtn green" type="button" id="navSources">/.test(html))
+  fails.push('sources and method is not the green pill on the landing');
+if (!/<button class="navbtn green" type="button" id="waitSources">/.test(html))
+  fails.push('the waiting screen has no sources and method pill');
+{
+  const a = html.indexOf('<span class="waitpills">');
+  const wb = a < 0 ? '' : html.slice(a, html.indexOf('</span>\n  </div>', a));
+  if (!/Find support/.test(wb)) fails.push('the waiting screen has no find support pill');
+}
+if (/rp-pill-blue/.test(html))
+  fails.push('a report screen still carries the old blue sources pill');
+/* An invisible overlay must not be clickable. .navbtn carries
+   pointer-events:auto so it can be clicked through a nav that has none, and
+   inherited into the closed waiting overlay it swallowed every click on the
+   landing underneath. */
+if (!/\.waitbox:not\(\.on\) \.waitpills \.navbtn\{pointer-events:none\}/.test(styleBlock))
+  fails.push('the closed waiting overlay keeps live controls over the landing');
+
+/* WHAT WE PUT IN FRONT OF SOMEBODY WHILE THEY WAIT.
+   Every card carries a source, including the ones that are our own testimony,
+   because a product built on "check it yourself" cannot put an unattributed
+   claim on the one screen a frightened reader stares at longest. */
+{
+  const eduAt = script.indexOf('var EDU = [');
+  const edu = script.slice(eduAt, script.indexOf('\n];', eduAt));
+  const cards = (edu.match(/\{tone:/g) || []).length;
+  if (cards < 16) fails.push('the waiting deck is down to ' + cards + ' cards');
+  const srcs = (edu.match(/\n\s*src:"/g) || []).length;
+  if (srcs !== cards) fails.push(cards + ' cards on the waiting deck and only ' + srcs + ' carry a source');
+  for (const need of ['Why we built this', 'What it actually costs', 'What comes after',
+                      'What keeps people quiet', 'Why we keep doing it'])
+    if (!edu.includes(need)) fails.push('the waiting deck has lost the card "' + need + '"');
+}
+
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];
 if (prev && fs.existsSync(prev)) {
