@@ -329,6 +329,16 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     fails.push('the chain head is un-hidden by clearing an inline style, which does not work '
       + 'when a class rule sets display:none');
 
+  /* The console must run live by default. It shipped for a day defaulting to
+     the seeded corpus, which meant a visitor sent the bare link got a canned
+     answer that looked exactly like a check and wrote nothing to the log. The
+     demo is now the thing you have to ask for. */
+  if (!/var LIVE = !\/\[\?&\]demo=1/.test(html))
+    fails.push('the console no longer runs live by default, so a visitor sent the bare '
+      + 'link gets the seeded corpus instead of a check');
+  if (!/if\(LIVE\) bumpServed\(\);/.test(html))
+    fails.push('the demo can move the public counter');
+
   /* Auth fails closed, and identity is not authorisation. */
   if (!/if \(!secret\) return \{ ok: false, status: 503/.test(auth))
     fails.push('the back office no longer fails closed when Clerk is unconfigured');

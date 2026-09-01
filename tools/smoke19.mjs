@@ -10,7 +10,7 @@ const base = fs.readFileSync('/home/claude/kbys/build/4orm-iq/index.html','utf8'
 async function run(enforce){
   const html = base.replace(/var SR001_ENFORCE = (true|false);/,'var SR001_ENFORCE = '+enforce+';');
   const errs=[];
-  const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/?debug=1',
+  const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/?demo=1&debug=1',
     beforeParse(w){ w.IntersectionObserver=class{observe(){}unobserve(){}disconnect(){}};
       w.matchMedia=()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});
       w.scrollTo=()=>{}; w.requestAnimationFrame=cb=>setTimeout(()=>cb(Date.now()),0);

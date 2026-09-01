@@ -6693,13 +6693,19 @@ function toResult(d,label){
 
 /* ------------------------------------------------------------------ *
  * LIVE MODE
- * Off by default. Add ?live=1 to the URL and the console posts the
- * identifier to /api/check instead of reading the seeded corpus.
+ * On by default. The console posts the identifier to /api/check and
+ * renders what comes back. Add ?demo=1 to read the seeded corpus
+ * instead, which is for showing the console without spending a check.
  * The endpoint returns the same render payload, so nothing else here
  * changes. With no ANTHROPIC_API_KEY set it answers 503 and the console
  * says so plainly rather than falling back to something that looks real.
  * ------------------------------------------------------------------ */
-var LIVE = /[?&]live=1\b/.test(window.location.search);
+/* Production runs live. A visitor who was sent this link gets a real check,
+   because a canned answer dressed as a check is the one thing this product
+   must never serve. ?demo=1 reads the built-in corpus instead, for showing
+   the console without spending a check, and ?live=1 stays valid so links
+   already in circulation keep working. */
+var LIVE = !/[?&]demo=1\b/.test(window.location.search);
 
 function errorResult(q, msg){
   var g={}; for(var k in GREY) g[k]=GREY[k];

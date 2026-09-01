@@ -3,7 +3,7 @@ import fs from 'fs'; import { JSDOM } from 'jsdom';
 const P='/home/claude/kbys/build/4orm-iq/index.html';
 const html=fs.readFileSync(P,'utf8');
 const errs=[];
-const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/?debug=1',
+const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/?demo=1&debug=1',
  beforeParse(w){ w.IntersectionObserver=class{observe(){}unobserve(){}disconnect(){}};
   w.matchMedia=()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});
   w.scrollTo=()=>{}; w.requestAnimationFrame=cb=>setTimeout(()=>cb(Date.now()),0);
