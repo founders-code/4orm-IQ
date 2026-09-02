@@ -654,6 +654,10 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 /* The seed row is gone. The six identifier chips are what sits under the bar. */
 .upnote{margin-top:16px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:74ch}
 .upnote b{color:var(--tx-2);font-weight:600}
+/* Tucked under the line above it rather than given equal air: it is the
+   qualification on that sentence, not a second sentence. */
+.upadv{margin-top:12px}
+body[data-stage="landing"] .upadv{margin-top:14px}
 
 /* stat strip */
 .statstrip{
@@ -2310,6 +2314,14 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .footin .fl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);line-height:2}
 .footin a.fl:hover{color:var(--tx-2)}
 .foot .note{margin-top:26px;font-size:11.5px;color:var(--tx-4);line-height:1.7;max-width:82ch}
+/* The document row. Deliberately the quietest thing on the landing page: it
+   has to be findable and must never compete with the search bar. */
+.docrow{margin:18px auto 0;display:flex;justify-content:center;align-items:center;gap:11px}
+.docrow button{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx-4);background:none;border:0;cursor:pointer;padding:4px 2px}
+.docrow button:hover{color:var(--tx-2)}
+.docrow span{color:var(--tx-4);font-size:10px}
+.foot .docrow{justify-content:flex-start;margin:20px 0 0}
 
 /* ------------------------------------------------------------- the report stage
    The answer comes first and the working sits behind it. Both are built from one
@@ -3215,6 +3227,95 @@ body[data-stage="report"] .foot{display:none}
 #rpSources .rp-never i{width:24px;height:24px}
 #rpSources .rp-never span{font-size:14.5px;line-height:1.6}
 #rpSources .rp-never span b{font-size:15.5px;margin-bottom:7px}
+
+/* ============================== COMPLIANCE, AND THE LAW UNDER IT ==========
+   Two blocks that appear on the sources page and again, at length, on the two
+   standing documents. The disclaimer is set as one panel because it is one
+   statement and splitting it into cards would invite a reader to take the
+   comfortable half. The statutes are cards because they are a list a reader
+   scans for the one that applies to them.
+
+   Every class emitted below resolves to a rule here. That has been the
+   recurring defect in this file and it is checked by the build. */
+/* The panel is capped to its own text rather than run to the column edge.
+   Left full width, a 78ch measure inside a 1216px panel put half the frame
+   around nothing, which is the same defect as a grid showing its own ground
+   through an empty cell. The frame ends where the sentence ends. */
+#rpt .rp-dis{margin-top:30px;border:1.5px solid var(--border-strong);
+  border-radius:var(--r);background:var(--surface-2);
+  padding:clamp(26px,2.6vw,38px);max-width:min(100%,88ch)}
+#rpt .rp-dis .rp-disk{font-family:var(--rmono);font-size:9.5px;font-weight:700;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--bad-dp)}
+#rpt .rp-dis p{margin-top:14px;font-size:14.5px;line-height:1.66;color:var(--tx-2)}
+#rpt .rp-dis p:first-of-type{margin-top:16px;font-size:16px;color:var(--tx);font-weight:600}
+#rpt .rp-dis p b{color:var(--tx);font-weight:650}
+
+/* The cards. Each one is a statute, what it does to us, and the link to read
+   it. The frame is on the card, never on the grid: a grid with an odd count
+   shows its own ground through the empty cell, which is the bug this file has
+   already shipped once. */
+#rpt .rp-lawg{margin-top:34px}
+#rpt .rp-lawg + .rp-lawg{margin-top:38px}
+#rpt .rp-lawgk{font-family:var(--rmono);font-size:9.5px;font-weight:700;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--blue-dp);
+  padding-bottom:11px;border-bottom:1.5px solid var(--border-strong)}
+#rpt .rp-laws{margin-top:16px;display:grid;gap:14px;
+  grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:900px){#rpt .rp-laws{grid-template-columns:1fr}}
+#rpt .rp-laws .rp-law:last-child:nth-child(odd){grid-column:1 / -1}
+@media(max-width:900px){#rpt .rp-laws .rp-law:last-child:nth-child(odd){grid-column:auto}}
+#rpt .rp-law{border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  background:var(--surface);padding:22px 24px 20px;
+  display:flex;flex-direction:column}
+#rpt .rp-lawn{font-size:15.5px;font-weight:700;letter-spacing:-.012em;color:var(--tx);
+  line-height:1.34}
+#rpt .rp-lawc{margin-top:7px;font-family:var(--rmono);font-size:10.5px;
+  letter-spacing:.05em;color:var(--tx-3)}
+#rpt .rp-lawx{margin-top:13px;font-size:13.5px;line-height:1.62;color:var(--tx-2)}
+/* Pushed to the foot of the card so that two cards of different text length
+   still line their links up, which is what makes the row read as a row. */
+#rpt .rp-lawl{margin-top:auto;padding-top:15px;font-family:var(--rmono);
+  font-size:10.5px;letter-spacing:.05em;color:var(--blue);text-decoration:none;
+  display:inline-flex;align-items:center;gap:7px;align-self:flex-start}
+#rpt .rp-lawl:hover{color:var(--blue-dp);text-decoration:underline}
+#rpt .rp-lawl svg{width:12px;height:12px;flex:0 0 auto;fill:none;
+  stroke:currentColor;stroke-width:2}
+
+/* ================================ THE TWO STANDING DOCUMENTS =============
+   Compliance and privacy. One column, because they are read start to finish
+   rather than scanned, and a two column statute page is a wall. */
+#rpt .rp-doc{max-width:82ch;margin:0 auto}
+#rpt .rp-doc .rp-stitle{margin-top:0}
+#rpt .rp-docmeta{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px 26px;
+  padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+#rpt .rp-docmeta span{font-family:var(--rmono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-docmeta b{color:var(--tx-2);font-weight:700}
+#rpt .rp-dsec{margin-top:clamp(38px,3.6vw,54px)}
+#rpt .rp-dsec h3{font-size:clamp(19px,1.7vw,23px);font-weight:750;letter-spacing:-.022em;
+  color:var(--tx);line-height:1.26}
+#rpt .rp-dsec h3 i{font-style:normal;font-family:var(--rmono);font-size:11px;
+  font-weight:700;letter-spacing:.1em;color:var(--blue-dp);
+  display:block;margin-bottom:10px}
+#rpt .rp-dsec p{margin-top:14px;font-size:14.5px;line-height:1.68;color:var(--tx-2)}
+#rpt .rp-dsec p b{color:var(--tx);font-weight:650}
+#rpt .rp-dsec a{color:var(--blue);text-decoration:none}
+#rpt .rp-dsec a:hover{text-decoration:underline}
+#rpt .rp-dl{margin-top:16px;display:flex;flex-direction:column;gap:0}
+#rpt .rp-dl .rp-dli{display:grid;grid-template-columns:190px minmax(0,1fr);gap:18px;
+  padding:15px 0;border-top:1px solid var(--border)}
+#rpt .rp-dl .rp-dli:last-child{border-bottom:1px solid var(--border)}
+@media(max-width:760px){#rpt .rp-dl .rp-dli{grid-template-columns:1fr;gap:7px}}
+#rpt .rp-dlk{font-family:var(--rmono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--blue-dp);padding-top:3px}
+#rpt .rp-dlv{font-size:14px;line-height:1.62;color:var(--tx-2)}
+#rpt .rp-dlv b{color:var(--tx);font-weight:650}
+/* The links out of a document, to the other one and to the method page. */
+#rpt .rp-docnav{margin-top:clamp(46px,4.4vw,64px);display:flex;flex-wrap:wrap;gap:12px}
+#rpt .rp-docnav button{border:1px solid var(--border-strong);border-radius:999px;
+  padding:11px 20px;font-family:var(--rmono);font-size:10.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx-2);background:var(--surface)}
+#rpt .rp-docnav button:hover{border-color:var(--blue);color:var(--blue-dp)}
 #rpt .rp-nevers{margin-top:32px;display:grid;gap:2px;grid-template-columns:repeat(2,1fr);
   background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
 #rpt .rp-never{display:flex;gap:14px;align-items:flex-start;background:var(--surface);
@@ -3839,6 +3940,24 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
         <p class="upnote landing-only" style="color:var(--tx-3)">We check the registers, read the records, and publish every source we used and every one we could not reach. Nothing is invented, and green never means we guarantee anyone.</p>
 
+        <!-- ADVICE, AND THE ABSENCE OF IT.
+             Its own paragraph, and not folded into the line above, because the
+             line above is swapped out wholesale when live checking is on. A
+             disclaimer that disappears the moment the product starts doing the
+             thing it disclaims is not a disclaimer. This one is never rewritten
+             by anything. -->
+        <p class="upnote upadv landing-only" style="color:var(--tx-3)"><b>This is not financial advice.</b> We do not advise, recommend or endorse anyone. We present third party evidence, name the source and the date beside every line, and leave the decision with you.</p>
+
+        <!-- The way to the two standing documents from the first screen. The
+             site footer carries them too, but it is hidden on the landing
+             stage, and somebody looking for a privacy notice is usually
+             looking for it before they have typed anything. -->
+        <p class="docrow landing-only">
+          <button type="button" data-doc="compliance">Compliance statement</button>
+          <span aria-hidden="true">&middot;</span>
+          <button type="button" data-doc="privacy">Privacy notice</button>
+        </p>
+
         <!-- Under the disclaimer, deliberately. The counter is evidence of the
              claim above it, not a headline of its own: first what we do and
              what we refuse to promise, then the odometer showing how often we
@@ -4058,6 +4177,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
         <span><button type="button" class="rp-lk" id="rpToSourcesR">How we decide</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
@@ -4152,6 +4273,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
         <span><button type="button" class="rp-lk" id="rpToSourcesF">How we decide</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
@@ -4305,6 +4428,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
         <span><button type="button" class="rp-lk" id="rpToSourcesA">How we decide</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
@@ -4354,7 +4479,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <button type="button" data-goto="srcCall"><i>02</i>What a pile of complaints is worth</button>
         <button type="button" data-goto="srcLimits"><i>03</i>Four things we will not do</button>
         <button type="button" data-goto="srcLawful"><i>04</i>What we owe a company we name</button>
-        <button type="button" data-goto="srcCatalogue"><i>05</i>The catalogue, and what each level may do</button>
+        <button type="button" data-goto="srcLaw"><i>05</i>The law we are built on, and what we are not</button>
+        <button type="button" data-goto="srcCatalogue"><i>06</i>The catalogue, and what each level may do</button>
       </nav>
      </div>
 
@@ -4462,6 +4588,47 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-rows" id="rpLawful"></div>
     </div>
 
+    <!-- COMPLIANCE, AND THE STATUTES UNDERNEATH IT.
+         Last before the catalogue on purpose. Everything above this page tells
+         a reader how a result is made. This tells them what a result is not,
+         and names the law that makes each of those sentences binding rather
+         than a promise. Every statute carries its citation and a link to the
+         official text, because a compliance page that asks to be believed is
+         the same failure as a register result with no source beside it. -->
+    <div class="rp-sec" id="srcLaw">
+      <div class="rp-kick">Compliance</div>
+      <h2 class="rp-h2">What this is not, and the law that makes that binding.</h2>
+      <p class="rp-sub">Read this before you act on anything in a result. Every statute below is
+        linked to the official text, so none of it has to be taken on our word.</p>
+
+      <div class="rp-dis">
+        <div class="rp-disk">The disclaimer</div>
+        <p>4orm IQ is a research tool. It reads public records and reports what they say.</p>
+        <p><b>This is not financial, investment, tax or legal advice.</b> We do not advise,
+          recommend or endorse anyone, and nothing in a result is a suggestion to deal with a
+          party or to refuse to. We present third party evidence, name the source and the date
+          beside every line, and leave the decision with you.</p>
+        <p><b>A red result is not a finding that any law has been broken.</b> It reports that
+          material contradictions were found in the records we checked. It is not an accusation
+          and not a determination of wrongdoing by any person or company.</p>
+        <p><b>Green is not clearance.</b> It means the registers we reached answered with nothing
+          adverse on the day we asked. It is not certification, it is not a guarantee, and the
+          absence of a record is never proof that there is nothing to find.</p>
+        <p><b>We hold no money and take no fee from any party we report on.</b> Nobody can pay to
+          change what a result says, to have an entry removed, or to be checked more kindly.</p>
+        <p><b>If you are named in a result and a record has been read wrongly, tell us.</b> Send
+          the register and the entry and we will read it again against the source. Where the
+          source itself is wrong, only the body that published it can correct it, and we will
+          point you to that route.</p>
+      </div>
+
+      <div id="rpLaws"></div>
+
+      <p class="rp-spec">This list is what governs the product as it is built today. It is not
+        exhaustive legal advice about your own position, and it does not create a solicitor and
+        client relationship with anyone.</p>
+    </div>
+
     <div class="rp-sec" id="srcCatalogue">
       <div class="rp-kick">The sources</div>
       <h2 class="rp-h2" id="rpCatH2">The catalogue, in five levels of authority.</h2>
@@ -4474,7 +4641,9 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         have held a record for that party, never against the whole catalogue.</p>
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
-        <span>4ormiq.com</span>
+        <span><button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
+          &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
 
@@ -4482,6 +4651,281 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 </div>
 
 
+
+<!-- ==================================================== THE COMPLIANCE STATEMENT
+     A standing document, not a section. It is reachable from the foot of every
+     screen and from the two other documents, because somebody looking for it
+     is usually looking for it before they have run anything at all.
+
+     The logo is set from the sources sheet at boot rather than inlined a third
+     time. The mark is a file and is never redrawn. -->
+<div class="rp-sheet" id="rpCompliance" hidden>
+  <div class="rp-wash"></div>
+  <div class="rp-wrap">
+    <div class="rp-head">
+      <div class="rp-hlogo"><img alt="4orm Finance" data-logo="1"></div>
+      <div class="rp-navmid">
+        <button class="rp-navb rp-back" type="button" id="rpCompBack">
+          <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="rpCompBackT">Back</span>
+        </button>
+      </div>
+      <nav class="rp-nav" aria-label="Around this report">
+        <span class="rp-pill rp-pill-green rp-on" aria-current="page">
+          <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v18H6.5A2.5 2.5 0 014 18.5zM20 5.5A2.5 2.5 0 0017.5 3H12v18h5.5a2.5 2.5 0 002.5-2.5z" stroke-linejoin="round"/></svg>
+          Compliance
+        </span>
+        <button class="rp-pill rp-pill-gold" type="button" data-dir="open">
+          <span class="rp-flag" aria-hidden="true">&#9873;</span>
+          Find support
+        </button>
+      </nav>
+    </div>
+
+    <div class="rp-doc">
+      <h1 class="rp-stitle">Compliance statement.</h1>
+      <p class="rp-slead">What 4orm IQ does, what it refuses to do, and the law that makes each
+        of those sentences binding rather than a promise.</p>
+
+      <div class="rp-docmeta">
+        <span>4orm Finance <b>Alberta, Canada</b></span>
+        <span>Applies to <b>4ormiq.com</b></span>
+        <span>Last reviewed <b id="rpCompDate">September 2026</b></span>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>01</i>What this is</h3>
+        <p>4orm IQ reads public records about a company and reports what those records say. It
+          asks a set of registers, prints what each one returned, prints which ones it could not
+          reach, and shows you the source and the date beside every line so you can open the
+          record yourself.</p>
+        <p>It is free, it has no accounts, and it is not sold to any party it reports on.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>02</i>What this is not</h3>
+        <p><b>This is not financial, investment, tax or legal advice.</b> We do not advise,
+          recommend or endorse anyone, and nothing in a result is a suggestion to deal with a
+          party or to refuse to. We present third party evidence and leave the decision with
+          you.</p>
+        <p><b>A red result is not a finding that any law has been broken.</b> It reports that
+          material contradictions were found in the records we checked. It is not an accusation,
+          and it is not a determination of wrongdoing by any person or company.</p>
+        <p><b>Green is not clearance.</b> It means the registers we reached answered with nothing
+          adverse on the day we asked. Regulators say plainly that their own lists are incomplete.
+          The absence of a record is never proof that there is nothing to find.</p>
+        <p><b>It is not a consumer report and not a background check on a person.</b> Results are
+          about companies. It may not be used to decide anybody's eligibility for credit,
+          tenancy, insurance or employment.</p>
+        <p><b>It does not discharge a regulated firm's own obligations.</b> A check is not a know
+          your customer or anti money laundering determination, and it is not an independent
+          review of anything.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>03</i>The limits we hold ourselves to</h3>
+        <div class="rp-dl">
+          <div class="rp-dli"><div class="rp-dlk">No score</div><div class="rp-dlv">We never combine
+            what we found with how much we reached into a single number. Two numbers are
+            published and they are never blended: how confident we are that the records describe
+            one party, and how much of the catalogue actually answered.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">No invention</div><div class="rp-dlv">No licence
+            number, registry reference, case number or filing date is ever generated. If a
+            register did not say it, it does not appear.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">No named individuals</div><div class="rp-dlv">A
+            person's name found in a company record is withheld from every output, including the
+            printed sheet. The finding stays, the name does not.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">A shared identifier is a fact. A shared operator
+            is a conclusion.</div><div class="rp-dlv">We report the first and never assert the
+            second. Two companies using one wallet, address or document is a fact about the
+            records. Who is behind them is not something a register can tell us.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">Gaps are published</div><div class="rp-dlv">Every
+            register we could not reach is printed beside the ones we did. Coverage is counted
+            off the retrieval log, never asserted.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">Nobody can pay</div><div class="rp-dlv">No party
+            can pay to change what a result says, to have an entry removed, or to be checked more
+            kindly. We take no fee from any party we report on.</div></div>
+        </div>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>04</i>The law we are built on</h3>
+        <p>Every statute below is linked to its official text. None of it has to be taken on our
+          word, which is the same standard we hold a register result to.</p>
+      </div>
+      <div id="rpLaws2"></div>
+
+      <div class="rp-dsec">
+        <h3><i>05</i>If a result is about you</h3>
+        <p>Write to us with the register and the entry. We will read it again against the source.
+          Anything we cannot stand up against a source comes off while we are looking, not at the
+          end. If we still disagree with you, your reply is attached to the result so that anybody
+          reading it sees both sides.</p>
+        <p>Where the source itself is wrong, only the body that published it can correct it, and
+          we will point you to that route. We keep no stored copy of a past result to go back and
+          amend: every check is run fresh against the registers on the day it is asked, so when a
+          register corrects itself, the next check reads the correction rather than our memory of
+          it.</p>
+        <p>We aim to reply within five working days and to finish re-checking within thirty.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>06</i>How to reach us</h3>
+        <p>Write to <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>. For anything
+          about personal information, the privacy notice sets out the route and the regulators you
+          can go to instead of us.</p>
+      </div>
+
+      <nav class="rp-docnav" aria-label="Other documents">
+        <button type="button" data-doc="privacy">Privacy notice</button>
+        <button type="button" data-doc="sources">Sources and method</button>
+      </nav>
+
+      <div class="rp-foot">
+        <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
+        <span>4ormiq.com</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================= THE PRIVACY NOTICE
+     Written against what the code actually records, not against what a privacy
+     notice usually says. Every line here is checkable in api/_ops.js, and the
+     build fails if this page claims something the schema contradicts. -->
+<div class="rp-sheet" id="rpPrivacy" hidden>
+  <div class="rp-wash"></div>
+  <div class="rp-wrap">
+    <div class="rp-head">
+      <div class="rp-hlogo"><img alt="4orm Finance" data-logo="1"></div>
+      <div class="rp-navmid">
+        <button class="rp-navb rp-back" type="button" id="rpPrivBack">
+          <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="rpPrivBackT">Back</span>
+        </button>
+      </div>
+      <nav class="rp-nav" aria-label="Around this report">
+        <span class="rp-pill rp-pill-green rp-on" aria-current="page">
+          <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v18H6.5A2.5 2.5 0 014 18.5zM20 5.5A2.5 2.5 0 0017.5 3H12v18h5.5a2.5 2.5 0 002.5-2.5z" stroke-linejoin="round"/></svg>
+          Privacy
+        </span>
+        <button class="rp-pill rp-pill-gold" type="button" data-dir="open">
+          <span class="rp-flag" aria-hidden="true">&#9873;</span>
+          Find support
+        </button>
+      </nav>
+    </div>
+
+    <div class="rp-doc">
+      <h1 class="rp-stitle">Privacy notice.</h1>
+      <p class="rp-slead">What we collect when you run a check, what we do not, and what you can
+        make us do about it.</p>
+
+      <div class="rp-docmeta">
+        <span>4orm Finance <b>Alberta, Canada</b></span>
+        <span>Applies to <b>4ormiq.com</b></span>
+        <span>Last reviewed <b id="rpPrivDate">September 2026</b></span>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>01</i>The short version</h3>
+        <p>There are no accounts and there is no login. <b>We do not store what you typed, who you
+          checked, or what the check returned.</b> What we keep is the shape of the run: what kind
+          of identifier it was, which province it came from, why you said you were checking, how
+          it ended, and how the registers behaved. That record is what lets us publish a count of
+          checks that can be proved rather than asserted.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>02</i>What we record, exactly</h3>
+        <div class="rp-dl">
+          <div class="rp-dli"><div class="rp-dlk">The kind of identifier</div><div class="rp-dlv">That
+            it was a company name, a website, an email address or a wallet. <b>Never the
+            identifier itself.</b></div></div>
+          <div class="rp-dli"><div class="rp-dlk">Province and purpose</div><div class="rp-dlv">The
+            province you selected and the reason you gave for checking, both from the two
+            questions asked before a run.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">How it ended</div><div class="rp-dlv">Whether the
+            run completed, and how many registers answered, failed, or did not apply. Never what
+            any of them said.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">How long it took</div><div class="rp-dlv">The
+            duration of the run, and which version of our own rules governed it.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">A visitor-day</div><div class="rp-dlv">A one way
+            hash of your network address and browser, mixed with a secret and cut to twelve
+            characters. <b>It is rolled at midnight every day</b>, so it cannot follow anybody
+            from one day to the next, and the address cannot be recovered from it. Without the
+            secret configured, nothing is written at all.</div></div>
+        </div>
+        <p>Each of those records is chained to the one before it, so a row cannot be altered or
+          removed later without breaking every row after it. That is the only reason the log
+          exists.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>03</i>What we never record</h3>
+        <p><b>The identifier you searched. The party the check was about. The result it
+          returned.</b> None of the three is written anywhere, and the build refuses to ship if a
+          column with one of those names appears in the schema. This is not a policy that can be
+          quietly relaxed later; it is a test that has to be deleted first.</p>
+        <p>We do not sell anything to anybody, we run no advertising, and we place no tracking
+          across other websites.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>04</i>Why we are allowed to hold it, and for how long</h3>
+        <p>The lawful basis is our legitimate interest in running the service, counting its use
+          honestly, and being able to show later that a check happened the way we said it did.
+          None of what is kept identifies a person, so it is held for as long as the count it
+          supports is published.</p>
+        <p>Results themselves are not retained at all. A check is run fresh against the registers
+          every time and is not filed away for anybody to read later.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>05</i>Where it is held, and who else sees it</h3>
+        <p>The service runs on infrastructure in Canada and the United States. The registers we
+          query are third party bodies, mostly regulators and official registries, and querying
+          one sends it the identifier you asked about, in the same way that opening its website
+          and typing the name would. It does not receive anything about you.</p>
+        <p>We share nothing with any party we report on, and we hand nothing to anybody for
+          marketing. We disclose only where a law or a court order requires it.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>06</i>What you can ask us to do</h3>
+        <p>Under <a href="https://laws-lois.justice.gc.ca/eng/acts/P-8.6/" target="_blank"
+          rel="noopener noreferrer">PIPEDA</a>, and under the Quebec, Alberta and British Columbia
+          statutes where they apply, you can ask what we hold about you, ask for it to be
+          corrected, and complain about how we handled it. Write to
+          <a href="mailto:privacy@4ormiq.com">privacy@4ormiq.com</a>.</p>
+        <p>In practice the honest answer to most access requests will be that we hold nothing
+          tied to you, because nothing we keep is tied to a person. We will say so plainly rather
+          than send a form back.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>07</i>If we get it wrong</h3>
+        <p>Tell us first, so we have the chance to fix it. If we do not, you can take it to the
+          <a href="https://www.priv.gc.ca/en/report-a-concern/" target="_blank"
+          rel="noopener noreferrer">Office of the Privacy Commissioner of Canada</a>, or to the
+          provincial commissioner in Quebec, Alberta or British Columbia. You do not need our
+          permission and you do not need to tell us you are doing it.</p>
+      </div>
+
+      <nav class="rp-docnav" aria-label="Other documents">
+        <button type="button" data-doc="compliance">Compliance statement</button>
+        <button type="button" data-doc="sources">Sources and method</button>
+      </nav>
+
+      <div class="rp-foot">
+        <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
+        <span>4ormiq.com</span>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <section class="rp-pv" id="rpPv" role="dialog" aria-modal="true" aria-labelledby="rpPvName" hidden>
   <div class="rp-pvsheet">
@@ -4688,6 +5132,13 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div><div class="lbl gold">4orm Finance</div><div class="fl" style="margin-top:9px">Know before you send</div></div>
 
     </div>
+    <p class="docrow">
+      <button type="button" data-doc="compliance">Compliance statement</button>
+      <span aria-hidden="true">&middot;</span>
+      <button type="button" data-doc="privacy">Privacy notice</button>
+      <span aria-hidden="true">&middot;</span>
+      <button type="button" data-doc="sources">Sources and method</button>
+    </p>
     <p class="note">4orm reports what public records show. A red result means material contradictions were found in the records checked. It is not a legal finding, an accusation, or a determination of wrongdoing by any person.</p>
   </div>
 </footer>
@@ -8146,7 +8597,9 @@ function askOpen(q){
   CTX={ sector:null, stage:null, channel:null }; askIdx=0;
   id("kbForm").hidden=true;
   var acc=id("kbAccepts"); if(acc) acc.hidden=true;
-  var up=document.querySelector(".upnote"); if(up) up.hidden=true;
+  /* Both of them. The advice line is a second .upnote and querySelector takes
+     only the first, which left it stranded under an open conversation. */
+  upNotes(true);
   /* This line tells the reader what the search bar accepts. The bar is gone the
      moment the thread opens, so it is answering a question nobody is being
      asked any more, and it was the thing sitting hard against the line above
@@ -8158,6 +8611,12 @@ function askOpen(q){
     askNext(q);
   });
 }
+/* The landing carries two notes under the search bar: what we do, and the fact
+   that none of it is advice. Both hide together when the thread opens. */
+function upNotes(hide){
+  var n=document.querySelectorAll(".upnote"), i;
+  for(i=0;i<n.length;i++) n[i].hidden=!!hide;
+}
 function askReset(){
   document.body.removeAttribute("data-chat");
   /* The assertion belonged to the identifier that has just been cleared. */
@@ -8167,7 +8626,7 @@ function askReset(){
   if(kbChat){ kbChat.hidden=true; kbChat.innerHTML=""; }
   var f=id("kbForm"); if(f) f.hidden=false;
   var acc=id("kbAccepts"); if(acc) acc.hidden=false;
-  var up=document.querySelector(".upnote"); if(up) up.hidden=false;
+  upNotes(false);
 }
 
 /* Every check runs on every search. enabledChecks stays as the single place
@@ -10941,6 +11400,75 @@ var RP_METHOD = [["What we look at", "We ask every register we can reach, one by
 var RP_WHYSOFT = [["What a pile of complaints is worth", "It is real information. A group of people describing the same problem, in their own words, is often the first sign of something a regulator has not caught up with yet. We read it for the thing that repeats, not for how many there are. Ten people describing one problem tells you more than a hundred scores out of five."], ["What it is not", "It is not proof. Nobody in a review has been questioned, nothing in it has been tested, and a complaint site has no duty to be fair to the company it names. That is why a pattern of complaints never turns a result red on its own, whatever the number."], ["The half nobody says out loud", "We have sat with people who lost money on a platform that had broken no rule at all. Nobody had explained what they were actually buying, the product was never right for them, and by the time that was clear the money had gone. The loss was real. The distress was real. The firm was not at fault. That looks exactly like the other kind in a review score."], ["Why we will not choose for you", "From the outside we usually cannot tell which of those two we are looking at. So we show you what people are reporting, how many report the same thing, and whether any authority has acted. The judgement stays with you."], ["The other half of the job", "A sound business and a customer who did not understand what they were buying is a gap, and it costs people money without anybody doing anything wrong. Closing that gap is work 4orm is doing directly. Warning people away from fraud is only half of what this is for."]];
 var RP_NEVERS = [["We never invent evidence", "No licence number, registry reference, case number or date ever appears here unless we read it off a source you can open yourself."], ["We never give a trust score", "No number out of a hundred, no letter grade, no stars. One number gets read as permission, and it hides whichever half of it is weak."], ["We never call a failure a clean result", "If we cannot reach a register, we say we could not reach it. A register we could not open never becomes “we looked and found nothing”."], ["We never decide for you", "This is a research summary. It is not a legal finding, it is not advice, and it is not a decision that anybody has done anything wrong."]];
 var RP_LAWFUL = [["What being in this report does not mean", "It does not mean we have decided anybody broke the law, and it does not mean any authority has made a finding. We report what public records showed on a stated day, with the source printed beside every item."], ["An empty register does not clear anybody", "A company missing from a warning list is not cleared by being missing. The regulators say so themselves: names go on those lists as they become known. No entry on the day we looked is a fact about that day, not a verdict."], ["Getting it right is an ongoing job", "Where a result names a person, that is personal information, and keeping it accurate is something we owe continuously rather than only when somebody complains."], ["If this report is about you", "Write to us and we will check the record again. If we cannot stand an item up against a source, we take it off. If we still disagree with you, your reply is attached to the result so that anybody reading it sees both sides."], ["Why there is no old copy to correct", "We do not keep results. Every check is run fresh against the registers on the day you ask, and the answer is not filed away and handed to somebody else later. So there is no old report sitting anywhere that we would have to go back and fix. When the record changes, the next check reads the record, not our memory of it."], ["What we commit to on timing", "We aim to reply to a challenge within five working days and to finish re-checking within thirty. Anything we cannot stand up against a source comes off while we are looking, not at the end."]];
+/* ================================ THE STATUTES ===========================
+   Four groups, twelve entries. Each is [name, citation, what it does to us,
+   url, the host as the reader will see it].
+
+   The rule for this list is the same rule the board runs on: nothing is
+   asserted, everything is linked. Each citation was read off the official
+   text, and the last two groups are as important as the first two. Saying
+   what we are NOT is the part a reader can check against a statute; saying
+   what we are is the part they would have to take on trust. */
+var RP_LAWS = [
+  ["Privacy, and what we may hold about you", [
+    ["Personal Information Protection and Electronic Documents Act",
+     "S.C. 2000, c. 5 (PIPEDA)",
+     "The federal rule for how a private business collects, uses and discloses personal information in the course of commercial activity. It is why we ask for the least we need to run a check, why nothing you type is sold or handed on, and why you can ask us what we hold.",
+     "https://laws-lois.justice.gc.ca/eng/acts/P-8.6/", "laws-lois.justice.gc.ca"],
+    ["Act respecting the protection of personal information in the private sector",
+     "CQLR c. P-39.1, as amended by Law 25",
+     "Quebec's private sector privacy statute. Its 2021 amendments set the strictest standard in the country on consent, transparency and what has to be told to a person about a decision made about them, and it is the standard we build to.",
+     "https://www.legisquebec.gouv.qc.ca/en/version/cs/P-39.1", "legisquebec.gouv.qc.ca"],
+    ["Personal Information Protection Act (Alberta)",
+     "S.A. 2003, c. P-6.5",
+     "The provincial statute where 4orm Finance is incorporated. It governs the same ground as PIPEDA for a private business operating in Alberta.",
+     "https://kings-printer.alberta.ca/documents/Acts/P06P5.pdf", "kings-printer.alberta.ca"],
+    ["Personal Information Protection Act (British Columbia)",
+     "S.B.C. 2003, c. 63",
+     "The British Columbia equivalent, and the one that applies to a reader running a check from that province.",
+     "https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/00_03063_01", "bclaws.gov.bc.ca"]
+  ]],
+  ["What we may publish about a party we name", [
+    ["Defamation Act (Alberta), and the common law across Canada",
+     "R.S.A. 2000, c. D-7",
+     "In Canada, publishing something damaging about a named party presumes both falsity and damage the moment it is published, and truth is the complete defence. That single rule is why every line in a result is the register's own words with its source and date beside it, and why we never summarise a record into a conclusion of our own.",
+     "https://kings-printer.alberta.ca/documents/Acts/D07.pdf", "kings-printer.alberta.ca"],
+    ["Grant v. Torstar Corp.",
+     "2009 SCC 61, [2009] 3 S.C.R. 640",
+     "The Supreme Court of Canada's defence of responsible communication on matters of public interest. It sets out the diligence expected of anybody who publishes about a named party: the seriousness of the allegation, the reliability of the source, and whether the party's side was sought and reported. It is the standard this product is measured against.",
+     "https://decisions.scc-csc.ca/scc-csc/scc-csc/en/item/7837/index.do", "decisions.scc-csc.ca"],
+    ["Competition Act, false or misleading representations",
+     "R.S.C. 1985, c. C-34, s. 52",
+     "It catches our own claims, not only those of the parties we check. It is why we never describe a check as complete, never let a green result be read as clearance, and publish every register we could not reach beside the ones we did.",
+     "https://laws-lois.justice.gc.ca/eng/acts/C-34/section-52.html", "laws-lois.justice.gc.ca"]
+  ]],
+  ["What we are not, and cannot be used as", [
+    ["Consumer Reporting Act (Ontario), and its provincial equivalents",
+     "R.S.O. 1990, c. C.33",
+     "A consumer report under this Act is about a consumer, and the Act defines a consumer as a natural person, excluding a person acting in the course of carrying on a business. 4orm IQ reports on companies. It furnishes no consumer reports and is not a consumer reporting agency, and a result may not be used to decide anybody's eligibility for credit, tenancy or employment.",
+     "https://www.ontario.ca/laws/statute/90c33", "ontario.ca"],
+    ["Fair Credit Reporting Act (United States)",
+     "15 U.S.C. s. 1681",
+     "The American equivalent, where a consumer is defined as an individual. Nothing in a 4orm IQ result is output about a named individual, so a result is not a consumer report and carries none of the permissible purposes that Act attaches to one.",
+     "https://www.law.cornell.edu/uscode/text/15/1681a", "law.cornell.edu"],
+    ["Retail Payment Activities Act",
+     "S.C. 2021, c. 23, s. 177",
+     "We perform none of the five payment functions this Act defines. We hold no end user funds, and we are not registered with the Bank of Canada as a payment service provider.",
+     "https://laws-lois.justice.gc.ca/eng/acts/R-7.36/", "laws-lois.justice.gc.ca"],
+    ["Proceeds of Crime (Money Laundering) and Terrorist Financing Act",
+     "S.C. 2000, c. 17",
+     "We neither hold nor transfer money for anybody, so we are not a money services business and we are not registered with FINTRAC. A check is not a know your customer determination, and running one discharges none of the obligations this Act puts on a regulated firm.",
+     "https://laws-lois.justice.gc.ca/eng/acts/P-24.501/", "laws-lois.justice.gc.ca"]
+  ]],
+  ["How we may contact you", [
+    ["Canada's anti-spam legislation",
+     "S.C. 2010, c. 23 (CASL)",
+     "It governs commercial electronic messages sent to anybody in Canada. Running a check puts you on no mailing list, because there is no mailing list and no account. We send nothing off the back of a search.",
+     "https://laws-lois.justice.gc.ca/eng/acts/E-1.6/", "laws-lois.justice.gc.ca"]
+  ]]
+];
+var RP_EXTICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
 /* FIVE LEVELS, NOT FOUR. The board has always carried our own corpus as its
    own level, and this page listed four, so the page and the board disagreed in
    front of the reader. Each one carries the letter the board uses, what it may
@@ -12025,6 +12553,7 @@ function rpSourcesFill(){
       +'<span class="rp-rv">'+rpEsc(RP_LAWFUL[i][1])+'</span></div>';
   }
   id("rpLawful").innerHTML=out;
+  rpLawsFill();
   out="";
   for(i=0;i<RP_CATLIST.length;i++){
     var t=RP_CATLIST[i], cnt=rpTierCount(t[0]);
@@ -12037,6 +12566,31 @@ function rpSourcesFill(){
       +'<div class="rp-cmay">'+rpEsc(t[4])+'</div></div>';
   }
   id("rpCats").innerHTML=out;
+}
+/* The statutes, grouped. Rendered rather than typed into the markup because
+   the same list is printed on the compliance document, and one list printed
+   twice from two places is a list that goes out of step. */
+function rpLawsFill(){
+  var h="", i, j, g, L;
+  for(i=0;i<RP_LAWS.length;i++){
+    g=RP_LAWS[i];
+    h+='<div class="rp-lawg"><div class="rp-lawgk">'+rpEsc(g[0])+'</div><div class="rp-laws">';
+    for(j=0;j<g[1].length;j++){
+      L=g[1][j];
+      h+='<div class="rp-law">'
+       +   '<div class="rp-lawn">'+rpEsc(L[0])+'</div>'
+       +   '<div class="rp-lawc">'+rpEsc(L[1])+'</div>'
+       +   '<p class="rp-lawx">'+rpEsc(L[2])+'</p>'
+       +   '<a class="rp-lawl" href="'+rpEsc(L[3])+'" target="_blank" rel="noopener noreferrer">'
+       +     RP_EXTICON+rpEsc(L[4])
+       +   '</a>'
+       + '</div>';
+    }
+    h+='</div></div>';
+  }
+  var a=id("rpLaws"), b=id("rpLaws2");
+  if(a) a.innerHTML=h;
+  if(b) b.innerHTML=h;
 }
 
 /* ------------------------------------------------------------- the renderer */
@@ -12643,7 +13197,13 @@ function rpTop(){
      act     what to do, what to have ready, who to tell, and their words set
              against the records
      sources how we decide, and what we will not say                       */
-var RP_SCREENS = { result:"rpReport", found:"rpFound", act:"rpAct", sources:"rpSources" };
+var RP_SCREENS = { result:"rpReport", found:"rpFound", act:"rpAct", sources:"rpSources",
+                   compliance:"rpCompliance", privacy:"rpPrivacy" };
+/* The three that are reachable from ANYWHERE, including from the landing page
+   where there is no result to go back to. Everything else in RP_SCREENS is part
+   of a report and its back button already knows its own destination. */
+var RP_DOCS = { sources:1, compliance:1, privacy:1 };
+var RP_DOCBACK = { sources:"rpBackToReport", compliance:"rpCompBack", privacy:"rpPrivBack" };
 var RP_AT = "result";
 function rpShow(which){
   if(!RP_SCREENS[which]) which="result";
@@ -12695,35 +13255,55 @@ function rpEnter(d,label){
 var RP_FROM = "result";
 /* How far down the data room somebody was when they left it. */
 var RP_CONSOLE_Y = 0;
-function rpSources(){
+function rpDoc(which){
   /* WHERE THE READER CAME FROM DECIDES WHERE BACK GOES.
-     Sources and method is reachable from the landing, from the waiting screen,
-     from any of the three report screens and from the data room. Every one of
-     those is a different place to be returned to, and the data room was the
-     one it did not know about: opening this from the console dropped somebody
-     on the report with no way back to the board they had been reading. The
-     button is named for its destination in every case, because a back control
-     that does not say where it goes is a control people stop pressing. */
-  RP_FROM = (document.body.getAttribute("data-stage")==="console")
-    ? "console"
-    : (RP ? (RP_AT==="sources" ? "result" : RP_AT) : "landing");
+     These three documents are reachable from the landing, from the waiting
+     screen, from any of the three report screens and from the data room. Every
+     one of those is a different place to be returned to, and the data room was
+     the one it did not know about: opening this from the console dropped
+     somebody on the report with no way back to the board they had been reading.
+     The button is named for its destination in every case, because a back
+     control that does not say where it goes is a control people stop pressing.
+
+     One function serves all three. Three copies of this routing is three places
+     for the next destination to be forgotten in two of them. */
+  if(!RP_DOCS[which]) which="sources";
+  var here = document.body.getAttribute("data-stage");
+  /* Moving between the documents must not overwrite where the reader came from,
+     or "back" ends up pointing at the document they just left. */
+  if(!(here==="report" && RP_DOCS[RP_AT])){
+    RP_FROM = (here==="console") ? "console" : (RP ? RP_AT : "landing");
+  }
   rpSourcesFill();
+  /* Named for its destination in every case. A bare "Back" was what this said
+     when a document was opened from the landing page, and a control that does
+     not say where it goes is a control people stop pressing. */
   var RP_BACKNAME = { result:"Back to the report", found:"Back to what we found",
-                      act:"Back to what to do", console:"Back to the data room" };
-  id("rpBackToReportT").textContent =
-    (RP_FROM==="console") ? RP_BACKNAME.console
-                          : (RP ? (RP_BACKNAME[RP_FROM] || "Back to the report") : "Back");
-  rpShow("sources");
-  setTimeout(function(){ id("rpBackToReport").focus(); },60);
+                      act:"Back to what to do", console:"Back to the data room",
+                      landing:"Back to the search", wait:"Back to your check" };
+  var label = RP_BACKNAME[RP_FROM] || (RP ? "Back to the report" : "Back to the search");
+  var btn = RP_DOCBACK[which];
+  id(btn+"T").textContent = label;
+  rpShow(which);
+  setTimeout(function(){ var e=id(btn); if(e) e.focus(); },60);
 }
-/* The back button on the sources screen, and only that one. */
+function rpSources(){ rpDoc("sources"); }
+function rpCompliance(){ rpDoc("compliance"); }
+function rpPrivacy(){ rpDoc("privacy"); }
+/* All three documents down. Which one is open depends on where the reader
+   went, and the branches below leave the report stage entirely, so leaving any
+   of them shown puts a stale sheet over the landing page. */
+function rpDocsHide(){
+  for(var k in RP_DOCS){ var e=id(RP_SCREENS[k]); if(e) e.hidden=true; }
+}
+/* The back button on the three standing documents. */
 function rpSourcesBack(){
   /* Back to the board, on the screen it was open at. rpConsole would put them
      at the top of a page they had already read half of, so the scroll is kept
      and restored rather than reset. */
   if(RP_FROM==="console"){
     var y = RP_CONSOLE_Y || 0;
-    id("rpSources").hidden=true;
+    rpDocsHide();
     var root=document.documentElement, prev=root.style.scrollBehavior;
     root.style.scrollBehavior="auto";
     document.body.setAttribute("data-stage","console");
@@ -12738,7 +13318,7 @@ function rpSourcesBack(){
      landed while they were reading, the result is what they go back to. */
   if(RP_FROM==="wait"){
     document.body.classList.remove("over-wait");
-    id("rpSources").hidden=true;
+    rpDocsHide();
     if(waitDone && waitRender){ var r=waitRender; waitRender=null; r(); return; }
     document.body.setAttribute("data-stage","landing");
     waitAck=false;
@@ -12746,7 +13326,7 @@ function rpSourcesBack(){
     return;
   }
   if(RP_FROM==="landing" || !RP){
-    id("rpSources").hidden=true;
+    rpDocsHide();
     document.body.setAttribute("data-stage","landing");
     rpTop();
     return;
@@ -13028,6 +13608,44 @@ id("rpSources").addEventListener("click", function(e){
     sec.scrollIntoView({ behavior: reduceMotion()?"auto":"smooth", block:"start" });
 });
 id("rpBackToReport").addEventListener("click", rpSourcesBack);
+id("rpCompBack").addEventListener("click", rpSourcesBack);
+id("rpPrivBack").addEventListener("click", rpSourcesBack);
+/* THE MARK IS A FILE, AND IT IS INLINED ONCE.
+   The two documents carry the same header as the sources sheet. Pasting the
+   base64 into them a third and fourth time would add 50KB to every page load
+   for one image the browser already has, so their <img> is filled from the
+   one that is already in the document. It is never redrawn and never
+   substituted. */
+(function(){
+  var src = document.querySelector("#rpSources .rp-hlogo img");
+  if(!src || !src.getAttribute("src")) return;
+  var n = document.querySelectorAll(".rp-hlogo img[data-logo]"), i;
+  for(i=0;i<n.length;i++) n[i].setAttribute("src", src.getAttribute("src"));
+})();
+/* The month the two documents were last reviewed. Written from the build date
+   rather than typed, so a document cannot ship claiming a stale review. */
+(function(){
+  var M=["January","February","March","April","May","June","July","August",
+         "September","October","November","December"];
+  var d=new Date(), t=M[d.getMonth()]+" "+d.getFullYear(), e;
+  e=id("rpCompDate"); if(e) e.textContent=t;
+  e=id("rpPrivDate"); if(e) e.textContent=t;
+})();
+/* Every route into the two documents, from anywhere: the links between them,
+   the report footers and the foot of the landing page. */
+document.addEventListener("click", function(e){
+  var t=e.target;
+  while(t && t!==document && !(t.getAttribute && t.getAttribute("data-doc"))) t=t.parentNode;
+  if(!t || t===document || !t.getAttribute) return;
+  var w=t.getAttribute("data-doc");
+  if(!RP_DOCS[w]) return;
+  e.preventDefault();
+  /* The data room keeps its place, the same way the sources link does, so
+     going to a document and back does not lose the reader's position. */
+  if(document.body.getAttribute("data-stage")==="console")
+    RP_CONSOLE_Y = window.pageYOffset || document.documentElement.scrollTop || 0;
+  rpDoc(w);
+});
 id("navSources").addEventListener("click", function(){
   if(document.body.getAttribute("data-stage")==="console")
     RP_CONSOLE_Y = window.scrollY || 0;
