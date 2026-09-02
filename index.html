@@ -196,7 +196,10 @@ body[data-stage="landing"] .cbar{
   border:none;background:none;box-shadow:none;overflow:visible;
   max-width:820px;margin:0 auto;width:100%;
 }
-body[data-stage="landing"] .cbmain{padding:110px 0 60px;text-align:center}
+/* The hero starts lower. It was sitting hard against the top of the window,
+   which reads as a page that has been scrolled rather than one that has
+   opened. */
+body[data-stage="landing"] .cbmain{padding:152px 0 64px;text-align:center}
 /* the landing variant is declared beside the base rule, further down */
 /* One line, whatever the width. The size is tied to the viewport so it
    shrinks to fit rather than breaking the sentence in half. */
@@ -228,7 +231,9 @@ body[data-stage="landing"] .cbh1{
 /* The middle line. Big enough to be the second thing read, small enough that
    it never competes with the headline. */
 body[data-stage="landing"] .cbdeck{
-  margin:92px auto 0;font-size:clamp(20px,2.6vw,30px);font-weight:700;letter-spacing:-.03em;
+  /* Closer to the headline. At ninety two it read as a second section rather
+     than as the line under the title. */
+  margin:52px auto 0;font-size:clamp(20px,2.6vw,30px);font-weight:700;letter-spacing:-.03em;
   color:var(--tx);line-height:1.2;
 }
 /* The line is set to stay on one line at the size it was approved at, so on a
@@ -259,19 +264,19 @@ body[data-stage="landing"] .cbh1{width:max-content;max-width:96vw;position:relat
    max-width:56ch;line-height:1.62}. Taken as written, so the two heroes are
    set to one scale rather than two that nearly agree. */
 body[data-stage="landing"] .cbsub{
-  margin:30px auto 0;font-size:clamp(16px,1.5vw,19px);color:var(--tx-2);max-width:56ch;line-height:1.62;
+  margin:20px auto 0;font-size:clamp(16px,1.5vw,19px);color:var(--tx-2);max-width:56ch;line-height:1.62;
 }
 /* Its own line, and lighter than the sentence above it: it is a reassurance,
    not a second headline. */
 .cbtwo{display:block;margin-top:12px;font-family:var(--mono);font-size:11px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;color:var(--tx-3)}
-body[data-stage="landing"] .searchbox{margin-top:22px;box-shadow:var(--sh-lg)}
+body[data-stage="landing"] .searchbox{margin-top:26px;box-shadow:var(--sh-lg)}
 .servedrow{display:none}
 /* It sits at the foot now, under the disclaimer, so it reads as an instrument
    rather than a headline. Smaller, with air above it and a rule to separate it
    from the sentence it is evidence for. */
 body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justify-content:center;
-  gap:11px;margin:48px auto 0;padding-top:28px;max-width:34ch;
+  gap:11px;margin:16px auto 0;padding-top:26px;max-width:34ch;
   border-top:1px solid rgba(255,255,255,.055)}
 .servedn{font-family:var(--mono);font-size:clamp(21px,2.4vw,29px);font-weight:700;color:var(--ok);
   letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;
@@ -669,16 +674,23 @@ body[data-stage="landing"] .upadv{margin-top:14px}
    what centres them one under the other, so it is cleared inside the grid and
    the column does the measuring instead. */
 body[data-stage="landing"] .noteg{
-  /* The whole block sits well clear of the bar. The bar is the only control on
-     the screen and everything under it is a footnote to it, so the gap has to
-     read as a break rather than as the next line of the same paragraph. */
-  /* The pair squares off with the search bar rather than floating inset under
+  /* Close under the bar. They qualify the control directly above them, so the
+     gap is a breath, not a break. The long gap belongs further down, between
+     them and the link row.
+
+     The pair squares off with the search bar rather than floating inset under
      it: at this measure the group reaches the edge of the same column the bar
      sits in, so the two read as one stack instead of two objects of different
      widths. It clamps to the column on anything narrower. */
-  margin:64px auto 0;max-width:92ch;
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  margin:40px auto 0;max-width:92ch;
+  /* Stretch, not start. The two sentences are different lengths and at this
+     size one wraps a line further than the other, so left to their natural
+     heights the pair sits with one frame ending short of its neighbour. */
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
 body[data-stage="landing"] .noteg .upnote{
+  /* A step under the body size. These are the footnotes on the screen and
+     they should read as footnotes, not as the copy above them. */
+  font-size:11.2px;line-height:1.6;
   margin:0;text-align:left;max-width:none;
   background:rgba(255,255,255,.022);
   border:1px solid rgba(255,255,255,.06);
@@ -686,7 +698,7 @@ body[data-stage="landing"] .noteg .upnote{
 /* One column on a phone, where two would give each panel a twenty character
    measure and every sentence would break four times. */
 @media(max-width:760px){
-  body[data-stage="landing"] .noteg{grid-template-columns:1fr;gap:12px;margin-top:44px}
+  body[data-stage="landing"] .noteg{grid-template-columns:1fr;gap:12px;margin-top:30px}
 }
 /* Hidden with the pair, not on their own. The thread hides .upnote by element,
    which leaves two empty framed panels sitting under the conversation. */
@@ -2349,7 +2361,10 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .foot .note{margin-top:26px;font-size:11.5px;color:var(--tx-4);line-height:1.7;max-width:82ch}
 /* The document row. Deliberately the quietest thing on the landing page: it
    has to be findable and must never compete with the search bar. */
-.docrow{margin:34px auto 0;display:flex;justify-content:center;align-items:center;gap:11px}
+/* Down, and hard against the rule under it. These two belong with the counter
+   at the foot of the screen, not with the panels above them: a link row
+   floating halfway between the two reads as a third statement. */
+.docrow{margin:66px auto 0;display:flex;justify-content:center;align-items:center;gap:11px}
 .docrow button{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--tx-4);background:none;border:0;cursor:pointer;padding:4px 2px}
 .docrow button:hover{color:var(--tx-2)}
