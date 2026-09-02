@@ -200,8 +200,27 @@ body[data-stage="landing"] .cbmain{padding:110px 0 60px;text-align:center}
 /* the landing variant is declared beside the base rule, further down */
 /* One line, whatever the width. The size is tied to the viewport so it
    shrinks to fit rather than breaking the sentence in half. */
+/* SIZED OFF THE SITE, NOT OFF ITSELF.
+   4ormfinance.com sets its hero at:
+
+     h1{letter-spacing:-.033em;font-weight:750;line-height:1.04}
+     h1{font-size:clamp(38px,5.8vw,70px)}
+
+   The console was capped at 74px on 5vw, so at any wide screen it was four
+   pixels taller than the site's largest headline and, because this line never
+   wraps, it ran the full width of the sheet while the site's wraps inside
+   fifteen characters. Two headlines that are meant to be the same thing were
+   not close.
+
+   The cap, the weight, the tracking and the leading are now the site's
+   exactly. The only value that differs is the viewport step, and it differs
+   for one reason: this line carries the 4ormIQ lockup and stays on one line,
+   so the step has to be low enough that the sentence still fits the sheet at
+   every width. 4.6vw is the largest that does. The floor stays low for the
+   same reason, and below 1080 the base rule lets it wrap. */
 body[data-stage="landing"] .cbh1{
-  white-space:nowrap;font-size:clamp(13.5px,5vw,74px);letter-spacing:-.045em;line-height:1.04;margin-top:34px;
+  white-space:nowrap;font-size:clamp(13.5px,4.6vw,70px);letter-spacing:-.033em;
+  font-weight:750;line-height:1.04;margin-top:34px;
 }
 /* The middle line. Big enough to be the second thing read, small enough that
    it never competes with the headline. */
@@ -215,10 +234,26 @@ body[data-stage="landing"] .cbdeck{
    whole hero off centre and takes the logo above it along. Sized to its own
    content and centred, it overflows evenly and everything stays on the axis. */
 body[data-stage="landing"] .cbh1{width:max-content;max-width:96vw;position:relative;left:50%;transform:translateX(-50%)}
+/* AND BELOW THE DESK IT WRAPS, EXACTLY AS THE SITE'S DOES.
+   One line is right while there is a line to have. Held to it on a phone the
+   sentence had to shrink to sixteen pixels to fit, which is smaller than the
+   body copy under it and is not a hero by any reading. Below 1080 it takes the
+   site's own clamp, wraps inside fifteen characters the way .hero h1 does, and
+   nothing splits mid-lockup because .iqlock is itself nowrap. */
+@media(max-width:1080px){
+  body[data-stage="landing"] .cbh1{
+    white-space:normal;width:auto;max-width:15ch;left:auto;transform:none;
+    margin-left:auto;margin-right:auto;
+    font-size:clamp(38px,5.8vw,70px);text-wrap:balance;
+  }
+}
 /* Down a little from the deck, because the four identifier chips that used to
    sit between them are gone and the sentence now carries that job alone. */
+/* The site's own hero lead: .hero .sub{font-size:clamp(16px,1.5vw,19px);
+   max-width:56ch;line-height:1.62}. Taken as written, so the two heroes are
+   set to one scale rather than two that nearly agree. */
 body[data-stage="landing"] .cbsub{
-  margin:30px auto 0;font-size:clamp(15px,1.8vw,17.5px);color:var(--tx-2);max-width:52ch;line-height:1.55;
+  margin:30px auto 0;font-size:clamp(16px,1.5vw,19px);color:var(--tx-2);max-width:56ch;line-height:1.62;
 }
 /* Its own line, and lighter than the sentence above it: it is a reassurance,
    not a second headline. */
