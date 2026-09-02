@@ -33,6 +33,7 @@ import { recordRun } from './_store.js';
    party, and it is chained so the counter can be proved. Neither one may grow
    into the other. */
 import { recordRun as recordOps, recordSource, recordPolicy } from './_ops.js';
+import { recordRegister, classifyForRegister } from './_register.js';
 import { POLICY } from './_policy.js';
 
 /* The version of the rules a run cites. It lives in _policy.js beside the rules
@@ -679,6 +680,17 @@ export default async function handler(req, res) {
        the layout today, and it will reach routing the day those registers are
        classified. */
     payload.pipeline.context = ask;
+
+    /* THE PUBLIC REGISTER.
+       A party earns a row only where an authority has acted, or where the same
+       kind of report appears on three or more independent platforms. Everything
+       else clears an existing row rather than creating one, which is how a
+       party whose alert was withdrawn comes off the list without anybody having
+       to ask. Fire and forget, and never able to hold up a response. */
+    try {
+      const reg = classifyForRegister(payload);
+      recordRegister(reg).then(r => { payload.pipeline.register = r; }).catch(() => {});
+    } catch (e) { }
 
     /* Per register, rolled into the day. Fire and forget: a health counter must
        never be able to hold up a response. */
