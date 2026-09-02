@@ -97,10 +97,26 @@ const CANON = {
     r.policy_version || '', r.manifest_generated || '', r.enforcement_on ? '1' : '0',
     r.sector || '',
   ].join('|'),
+
+  /* v3: adds the reader's own assertion, appended so v1 and v2 stay intact.
+     The console refuses an identifier that reads as a person's name. Plenty of
+     real companies read that way, so the reader can say so and run it anyway.
+     That assertion is theirs, not ours, and it changes what the system was
+     willing to do, so it belongs in the chain: a run that only happened
+     because somebody overrode the gate has to be distinguishable later from a
+     run the gate never questioned. Empty on every ordinary run. */
+  v3: r => [
+    r.at, r.visitor_day || '', r.input_type, r.province || '', r.purpose, r.outcome,
+    r.sources_planned, r.sources_ok, r.sources_failed, r.sources_out_of_scope,
+    r.critical_failed, r.incomplete ? '1' : '0', r.suppressed_items, r.barred_items,
+    r.duration_ms == null ? '' : r.duration_ms,
+    r.policy_version || '', r.manifest_generated || '', r.enforcement_on ? '1' : '0',
+    r.sector || '', r.user_assert || '',
+  ].join('|'),
 };
 
 /** The version new rows are written under. Moving this is a deliberate act. */
-export const HASH_SCHEMA = 'v2';
+export const HASH_SCHEMA = 'v3';
 
 export function rowHash(prevHash, r, schema) {
   const fn = CANON[schema || HASH_SCHEMA];
@@ -152,6 +168,10 @@ export async function recordRun(req, run) {
       manifest_generated: run.manifest_generated || null,
       enforcement_on: run.enforcement_on !== false,
       sector: run.sector || null,
+      /* What the reader asserted in order to run this at all. One value today:
+         NOT_A_PERSON, set when they told the console that an identifier it
+         read as a person's name is a company. Null on every ordinary run. */
+      user_assert: run.user_assert || null,
     };
     const hash = rowHash(prev, r, HASH_SCHEMA);
 
@@ -160,13 +180,13 @@ export async function recordRun(req, run) {
         (at, prev_hash, row_hash, hash_schema, visitor_day, input_type, province, purpose, outcome,
          sources_planned, sources_ok, sources_failed, sources_out_of_scope, critical_failed,
          incomplete, suppressed_items, barred_items, duration_ms,
-         policy_version, manifest_generated, enforcement_on, sector)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+         policy_version, manifest_generated, enforcement_on, sector, user_assert)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
        returning seq`,
       [r.at, prev, hash, HASH_SCHEMA, r.visitor_day, r.input_type, r.province, r.purpose, r.outcome,
        r.sources_planned, r.sources_ok, r.sources_failed, r.sources_out_of_scope,
        r.critical_failed, r.incomplete, r.suppressed_items, r.barred_items, r.duration_ms,
-       r.policy_version, r.manifest_generated, r.enforcement_on, r.sector]);
+       r.policy_version, r.manifest_generated, r.enforcement_on, r.sector, r.user_assert]);
 
     await client.query(
       "update ops_chain set height=height+1, head_hash=$1, updated_at=now() where name='ops_runs'",

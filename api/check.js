@@ -356,6 +356,12 @@ export default async function handler(req, res) {
     sector:  ONE_OF(body?.sector,  ['INVESTMENT', 'MORTGAGE', 'AUTO', 'INSURANCE', 'OTHER']),
     stage:   ONE_OF(body?.stage,   ['BEFORE', 'SENT', 'DILIGENCE']),
     channel: ONE_OF(body?.channel, ['DEALER', 'PRIVATE']),
+    /* What the reader asserted in order to run this at all. The console
+       refuses an identifier that reads as a person's name; plenty of real
+       companies read that way, so the reader can say so and run it anyway.
+       Allow-listed like everything else here: a free string from a browser
+       never reaches a hashed column. */
+    assert:  ONE_OF(body?.assert,  ['NOT_A_PERSON']),
   };
   /* A channel answer only means anything for a vehicle. Carried over from a
      sector somebody switched away from, it would be a fact about the run that
@@ -658,6 +664,7 @@ export default async function handler(req, res) {
       manifest_generated: POLICY.manifest_generated,
       enforcement_on: POLICY.enforcement_on,
       sector: ask.sector,
+      user_assert: ask.assert,
     }).catch(e => ({ ok: false, reason: e?.message || 'ops threw' }));
     payload.pipeline.ops = {
       /* The row hash goes back to the page. The report card prints it beside

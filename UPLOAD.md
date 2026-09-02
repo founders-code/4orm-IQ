@@ -1,6 +1,6 @@
 # Upload this to GitHub
 
-24 files. Every one of them runs. Nothing here is documentation, a test or a
+25 files. Every one of them runs. Nothing here is documentation, a test or a
 leftover, so if a file is in this folder it is because the site stops working
 without it.
 
@@ -14,9 +14,24 @@ without it.
    vercel.json
    package.json
    api/     (19 files)
-   db/      (register.neon.sql)
+   db/      (register.neon.sql, migrate-003.neon.sql)
 
 5. Commit to `main`. Vercel sees the push and deploys on its own.
+
+## One database migration, before or after the deploy
+
+`db/migrate-003.neon.sql` adds one column to `ops_runs`. Run it in the Neon SQL
+editor. It is safe to run twice and safe to run before the deploy.
+
+It exists because the console now lets somebody say "this is a company, not a
+person" when it has refused their identifier, and that assertion goes into the
+operations chain rather than living only in the browser. Rows written before it
+keep hash schema v2 and verify under v2 forever; new rows are written under v3.
+Nothing already in the chain is re-hashed.
+
+Until the migration runs, checks still work. The chain write for a run will
+fail with an unknown column and the report card will say the run was not
+logged, which is the honest thing for it to say.
 
 GitHub replaces files with the same name. It does not remove files you do not
 upload, so the `docs/` and `tools/` folders already in the repo stay exactly
