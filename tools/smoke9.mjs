@@ -49,13 +49,36 @@ console.log('  plain tier word not Tier A:', !b.includes('>Tier A<'));
 doc.getElementById('infoClose').click();
 
 // check modal leads with the finding
+/* THE MODAL IS TWO STEPS NOW.
+   A tile opens the short read: the question, what was found, and how much was
+   behind it. The full working, with the rules and the table of records, is
+   behind "Open the full check". These probes were reading the short read and
+   looking for the full one, so both printed false on every run for builds.
+   They now click through, which is also what a reader does. */
+const MISS9=[];
+const say9=(label,ok)=>{ console.log((ok?'  ok      ':'  FAILED  ')+label); if(!ok) MISS9.push(label); };
 doc.querySelectorAll('#tiles .tile')[3].click();
 await new Promise(r=>setTimeout(r,60));
-b=doc.getElementById('infoBody').innerHTML;
-const m=b.match(/\d+ records? found/); const iFind=m?b.indexOf(m[0]):-1;
-const iRule=b.indexOf('How this check is decided');
-console.log('\ncheck modal: records before rules:', iFind>-1 && iFind<iRule);
-console.log('  plain tier words in the table:', b.includes('Official record')||b.includes('Customer reports'));
+{
+  const short=doc.getElementById('infoBody').textContent;
+  say9('the short read says what was found before anything else',
+    /\d+ records? behind this, from \d+ registers? in scope/.test(short));
+  const open=[...doc.querySelectorAll('#infoBody button')].find(x=>/Open the full check/.test(x.textContent));
+  say9('the short read offers the full working', !!open);
+  if(open){
+    open.click();
+    await new Promise(r=>setTimeout(r,90));
+    b=doc.getElementById('infoBody').innerHTML;
+    const t=doc.getElementById('infoBody').textContent;
+    const m=t.match(/\d+ records? found|\d+ records? behind/);
+    const iFind=m?t.indexOf(m[0]):-1;
+    const iRule=t.search(/How this check is decided|How this is decided|The rule/i);
+    say9('the full check puts the records before the rules',
+      iFind>-1 && (iRule===-1 || iFind<iRule));
+    say9('the tiers are in plain words, not letters',
+      (/Official record|Customer reports|Verified data|Open web/.test(t)) && !/>Tier [ABCD]</.test(b));
+  }
+}
 doc.getElementById('infoClose').click();
 
 // reviews label
@@ -63,4 +86,7 @@ const revCard=[...rail.children].find(c=>c.querySelector('.n').textContent.inclu
 console.log('\nreviews label:', revCard.querySelector('.n').textContent);
 
 console.log('\n--- errors: '+errs.length+' ---'); errs.forEach(e=>console.log(e.slice(0,300)));
-process.exit(errs.length?1:0);
+if(errs.length) MISS9.push('page errors: '+errs[0].slice(0,120));
+console.log('\n' + (MISS9.length ? 'FAILED' : 'PASSED'));
+MISS9.forEach(f=>console.log('  '+f));
+process.exit(MISS9.length?1:0);

@@ -14,20 +14,36 @@ window.Element.prototype.scrollTo=function(){};
 Object.defineProperty(window.HTMLElement.prototype,'offsetTop',{get(){return 0;},configurable:true});
 await new Promise(r=>setTimeout(r,900));
 
+const FAIL=[];
+const say=(label,ok,detail)=>{ console.log('  '+label+': '+(detail===undefined?ok:detail));
+  if(!ok) FAIL.push(label); };
+
 console.log('BRAND');
-console.log('  hero mark is inside the title block:', !!doc.querySelector('.cbtitle .tlead img.heromark'));
-console.log('  hero mark is centred on landing:', html.includes('body[data-stage="landing"] .heromark{display:block;height:120px;width:auto;margin:0 auto 26px}'));
-console.log('  corner mark hidden on landing:', html.includes('body[data-stage="landing"] .navpill{display:none}'));
-console.log('  corner mark is 4x on the console:', html.includes('.navpill img{height:88px'));
-console.log('  find support carries the mark, bigger:', html.includes('.dirbrand img{height:44px;width:44px'));
+/* Every one of these is the real file. Nothing here may ever be redrawn. */
+const lock=doc.querySelector('.cbtitle .tlead h1 .iqlock img.iqmark');
+say('the 4ormIQ lockup is in the headline', !!lock);
+say('and it is the asset, not a redrawing',
+    !!lock && /^data:image\/png;base64,/.test(lock.getAttribute('src')||''));
+say('the corner mark is the asset too',
+    !!doc.querySelector('.navpill img[src^="data:image/png;base64,"]'));
+say('the corner mark is hidden while the lockup is up',
+    /body\[data-stage="landing"\] \.navpill\{display:none\}/.test(html));
+say('the corner mark has a size on the console',
+    /\.navpill img\{height:\d+px/.test(html));
+say('find support carries the mark',
+    /\.dirbrand img\{height:\d+px;width:\d+px/.test(html));
+/* The chips and the type pills came off on purpose. If either comes back it is
+   a revert, not a feature, and this is where it gets caught. */
+say('the identifier chips are still gone', !doc.querySelector('.idchip'));
+say('the type pills are still gone', !doc.querySelector('.tbtn'));
 
 console.log('\nHEADER');
-console.log('  chips sit above the bar:',
-  doc.querySelector('.cbtitle #kbIds') && (doc.getElementById('kbIds').compareDocumentPosition(doc.getElementById('kbForm')) & 4) ? true : false);
-console.log('  chips:', [...doc.querySelectorAll('#kbIds .idchip')].map(c=>c.textContent).join(', '));
-console.log('  five figures sit under the bar:',
-  (doc.getElementById('kbForm').compareDocumentPosition(doc.getElementById('statstrip')) & 4) ? true : false);
-console.log('  metarow gone:', !doc.querySelector('.metarow'));
+say('the figures sit under the bar',
+  !!(doc.getElementById('kbForm').compareDocumentPosition(doc.getElementById('statstrip')) & 4));
+say('the sentence under the bar still lists what it takes',
+  /company[\s\S]*website[\s\S]*email[\s\S]*wallet/i.test(
+    (doc.getElementById('kbAccepts')||{textContent:''}).textContent));
+say('metarow gone', !doc.querySelector('.metarow'));
 
 // wait screen: every card, then leave
 window.__KBYS__.check('investhelm.com');
@@ -60,8 +76,10 @@ console.log('  captions are toned:', [...new Set(cells.map(c=>c.getAttribute('da
 
 console.log('\nTRIAGE');
 doc.querySelector('[data-dir="open"]').click(); await new Promise(r=>setTimeout(r,320));
-console.log('  pill text size:', html.includes('.tbtn .tt{font-size:17px'));
-console.log('  pills:', doc.querySelectorAll('.tbtn').length);
 
 console.log('\n--- errors: '+errs.length+' ---'); errs.forEach(e=>console.log('  '+e.slice(0,200)));
-dom.window.close(); process.exit(0);
+if(errs.length) FAIL.push('page errors: '+errs[0].slice(0,140));
+dom.window.close();
+console.log('\n' + (FAIL.length ? 'FAILED' : 'PASSED'));
+FAIL.forEach(f=>console.log('  '+f));
+process.exit(FAIL.length?1:0);

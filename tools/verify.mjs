@@ -962,10 +962,28 @@ const netClasses_ = [...new Set([...netSrc_.matchAll(/class:"([^"]+)"/g)]
 /* Only the base rules, anchored to the start of a line. A modifier written as
    .netname.core and an override inside a reduced-motion media query are both
    deliberate second mentions; a second rule of its own is the collision. */
-for (const c of netClasses_) {
+/* The same check, on every class the REGISTER draws. It shipped with .rt and
+   .rn2, and a bare .rt rule three thousand lines away put a border and padding
+   round the panel's own heading. Two components, one short name, and the later
+   rule wins: this is the third time that has happened on this page. */
+const regStart_ = script.indexOf('function regItem(');
+const regEnd_ = script.indexOf('var regReturn');
+const regSrc_ = regStart_ > -1 && regEnd_ > regStart_ ? script.slice(regStart_, regEnd_) : '';
+if (!regSrc_) fails.push('the register no longer renders');
+const regHtml_ = html.slice(html.indexOf('<div class="regscrim"'), html.indexOf('<div class="dirbox"'));
+const drawn_ = [...new Set(
+  [...regSrc_.matchAll(/class="([a-z0-9 -]+)"/g)].concat(
+   [...regHtml_.matchAll(/class="([a-z0-9 -]+)"/g)])
+  .flatMap(m => m[1].split(/\s+/)).filter(Boolean))];
+for (const c of drawn_)
+  if (!/^reg/.test(c))
+    fails.push('the register draws .' + c + ', which is not prefixed and can collide with '
+      + 'another component that owns the same short name');
+
+for (const c of netClasses_.concat(drawn_)) {
   const decls = (styleBlock.match(new RegExp('^\\.' + c + '\\s*\\{', 'gm')) || []).length;
   if (decls > 1) fails.push('.' + c + ' is declared ' + decls + ' times in the stylesheet: '
-    + 'the network shares a class name with another component, and the later rule wins on the web');
+    + 'two components share a class name, and the later rule wins on the web');
 }
 for (const c of ['netname', 'nnode', 'nlink', 'hubring', 'hubtrack']) {
   if (!new RegExp('^\\.' + c + '\\s*\\{', 'm').test(styleBlock))
@@ -1041,10 +1059,48 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
     fails.push('the way on to what we found sits above the already-sent door');
 }
 
-/* THE TWO PILLS, on the landing and on every screen. */
-for (const x of SHEETS_) {
+/* THE TWO PILLS, and the ONE screen that does not carry them.
+   What we found is the middle of a read. A reader gets there by choosing to go
+   deeper, and the only thing they should be offered at the top is the way back;
+   the way on is the door at the foot of the page. Three ways off a screen whose
+   whole job is to be read to the bottom is two too many. Everywhere else the
+   pair stays, side by side, hard right. */
+const PILLED_ = ['rpReport', 'rpAct', 'rpSources'];
+for (const x of PILLED_) {
   if (!/Sources and method/.test(sheets_[x])) fails.push(x + ' has lost the sources and method pill');
   if (!/Find support/.test(sheets_[x])) fails.push(x + ' has lost the find support pill');
+}
+{
+  const f = sheets_.rpFound;
+  if (/Sources and method/.test(f) || /Find support/.test(f))
+    fails.push('what we found has the pills back in its header, and it is meant to offer only the way back');
+  const backs = (f.match(/class="rp-navb rp-back"/g) || []).length;
+  if (backs !== 1) fails.push('what we found has ' + backs + ' controls in its header and should have exactly one');
+}
+
+/* THE REFERENCE IS NOT PRINTED TWICE.
+   It is the first line of the report card, at eighteen points, which is where
+   somebody reads it down a phone to a fraud desk. A second copy in ten point
+   mono in the corner of every screen said the same thing smaller and took the
+   corner the pills belong in. */
+if (/class="rp-stamp"/.test(html))
+  fails.push('the reference stamp is back in the top right corner');
+if (/rpStamp/.test(script) && /innerHTML\s*=\s*stamp/.test(script))
+  fails.push('something still writes the corner stamp');
+
+/* AND THE PILLS OWN THE RIGHT EDGE, ON EVERY SCREEN THAT HAS THEM.
+   The way back used to sit in the same flex row, so on the act screen the two
+   fought for the right edge and on sources they wrapped onto a second line. */
+if (!/#rpt \.rp-head\{[^}]*grid-template-columns:1fr auto 1fr/.test(styleBlock))
+  fails.push('the report header is no longer three columns, so the way back and the pills share an edge again');
+if (!/#rpt \.rp-navmid\{[^}]*justify-self:center/.test(styleBlock))
+  fails.push('the way back is no longer centred on the page');
+if (!/#rpt \.rp-nav\{[^}]*flex-wrap:nowrap/.test(styleBlock))
+  fails.push('the two pills may wrap onto two rows again');
+for (const x of ['rpAct', 'rpSources']) {
+  const h = sheets_[x].slice(0, sheets_[x].indexOf('</div>', sheets_[x].indexOf('rp-nav')));
+  if (!/rp-navmid/.test(sheets_[x]))
+    fails.push(x + ' does not put its way back in the middle column');
 }
 {
   const nav = html.slice(html.indexOf('<div class="navactions">'), html.indexOf('</nav>', html.indexOf('<div class="navactions">')));
@@ -1053,6 +1109,129 @@ for (const x of SHEETS_) {
   else if (b < 0) fails.push('the landing has no find support pill');
   else if (nav.slice(Math.min(a, b), Math.max(a, b)).split('<button').length > 2)
     fails.push('sources and method and find support are not next to each other on the landing');
+}
+
+/* THE THREE DOORS ARE ONE CONTROL IN THREE PLACES.
+   Already sent money, What we found, Do this right now. They carried byte
+   identical geometry, written out twice three hundred lines apart under a
+   comment claiming it lived in one place, and they drifted twice anyway. The
+   shape is declared ONCE now and only the colour is declared per door, so a
+   change to one is a change to all three by construction rather than by
+   discipline. The height went 110 (a note), 220 (a billboard), and is 147:
+   two thirds of double, and a door. */
+{
+  const shape = (styleBlock.match(/#rpt \.rp-alreadybtn,#rpt \.rp-onbtn\{\n?[^}]*\}/) || [''])[0];
+  if (!shape) fails.push('the three doors no longer share one shape rule, so they will drift apart again');
+  else {
+    const h = (shape.match(/min-height:(\d+)px/) || [])[1];
+    if (h !== '147') fails.push('the doors are ' + h + 'px. 147 is two thirds of the doubled size and is what was asked for');
+    for (const prop of ['padding', 'grid-template-columns', 'gap'])
+      if (!new RegExp(prop + ':').test(shape))
+        fails.push('the shared door rule no longer declares ' + prop + ', so each door sets its own');
+  }
+  /* And no door declares a dimension ALONE. A rule naming both is the shared
+     one and is the point; a rule naming one is the drift starting again. */
+  /* Comments out first. A comment sitting above a rule gets swept into the
+     selector capture, and one of them contained the word "colour, which" with a
+     comma in it, so every rule under it read as a multi-selector and the whole
+     check silently passed on the thing it exists to catch. */
+  const cssNoComments = styleBlock.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of cssNoComments.matchAll(/([^{}]+?)\{([^}]*)\}/g)) {
+    const sel = m[1].trim(), decl = m[2];
+    if (!/\.rp-(alreadybtn|onbtn)/.test(sel)) continue;
+    if (sel.includes(',')) continue;                       /* names both: shared */
+    if (/:hover|:focus|\.rp-open/.test(sel)) continue;      /* states carry no size */
+    const geo = decl.match(/(?:^|;)\s*(padding|min-height|width|height|font-size|gap|grid-template-columns)\s*:/);
+    if (geo) fails.push('"' + sel + '" sets its own ' + geo[1] + ', and the doors are meant to share every dimension');
+  }
+}
+
+/* THE THREAD BELONGS TO THE LANDING, AND NOWHERE ELSE.
+   .chat carried a bare display:flex that applied at every stage. .landing-only
+   sets display:none at one class of specificity and .chat matches it exactly,
+   so the later rule won and the whole conversation sat behind the record. That
+   is the SIXTH time this cascade has cost this file a bug, and the warning was
+   the comment directly above the rule. Only the landing-scoped rule may set
+   display on the thread. */
+{
+  const bare = (styleBlock.match(/\n\.chat\{[^}]*\}/) || [''])[0];
+  if (/display:/.test(bare))
+    fails.push('the bare .chat rule sets display again, so the thread shows behind the whole record');
+  if (!/body\[data-stage="landing"\] \.chat\.landing-only\{display:flex\}/.test(styleBlock))
+    fails.push('nothing shows the thread on the landing');
+}
+
+/* THE ONE PAGE SUMMARY COMES BEFORE THE WHOLE RECORD.
+   The summary is what a reader hands to a bank. The record is for somebody who
+   wants the working. Ordering them the other way asked everybody to walk past
+   the hard thing to reach the useful one. */
+{
+  const a = sheets_.rpAct;
+  if (!/id="rpDownloadSummary"/.test(a))
+    fails.push('the act screen no longer offers the one page summary');
+  else if (a.indexOf('id="rpDownloadSummary"') > a.indexOf('id="rpOpenRecord"'))
+    fails.push('the whole record sits above the one page summary, and the summary is the one most readers need');
+}
+
+/* "NOBODY IS NAMED ANYWHERE WE LOOKED" MUST NOT BE PRINTED WHEN SOMEBODY IS.
+   RP_PERSON_OUTPUT_SOURCES is empty by design: no source is cleared for person
+   level output until counsel signs it off. So the name scan returns nothing and
+   the card fell through to the "we found nothing" branch, on a page that prints
+   the regulator's own words naming a chief executive two paragraphs above.
+   We do not publish it is a different sentence from it does not exist, and
+   printing the second when the first is true is the exact class of small lie
+   this product exists not to tell. */
+if (!/function rpNamesWithheld/.test(script))
+  fails.push('nothing counts the names we found and did not publish, so the card cannot tell a withheld name from no name');
+if (!/We do not publish individuals/.test(script))
+  fails.push('the report card no longer says a name was found and withheld');
+{
+  /* And the gate itself is still shut. This is the line counsel has to move. */
+  const gate = (script.match(/var RP_PERSON_OUTPUT_SOURCES\s*=\s*\{([^}]*)\}/) || [])[1];
+  if (gate === undefined) fails.push('the person-output gate is gone');
+  else if (gate.trim()) warn.push('a source is now cleared for person level output: ' + gate.trim() +
+    '  (correct only if counsel has signed that source off in SR-001)');
+}
+
+/* THE LANDING LEADS WITH THE HEADLINE, AND THE MARK IS SIZED OFF IT.
+   The 4ormIQ lockup is set in em against this line, so the two can never fall
+   out of step. The inch of air under the deck pushes the bar, the sentence
+   under it and the five figures down together, because the margin is on the
+   deck and they are all its siblings. */
+{
+  const h1 = (styleBlock.match(/body\[data-stage="landing"\] \.cbh1\{[^}]*\}/) || [''])[0];
+  const cap = (h1.match(/clamp\([^,]+,[^,]+,(\d+)px\)/) || [])[1];
+  if (!cap) fails.push('the landing headline has no size cap');
+  else if (Number(cap) < 70) fails.push('the landing headline is capped at ' + cap + 'px and was asked to be bigger');
+  if (!/white-space:nowrap/.test(h1))
+    fails.push('the landing headline may wrap, which breaks the lockup off its own line');
+  if (!/\.iqmark\{[^}]*height:1\.356em/.test(styleBlock))
+    fails.push('the 4ormIQ mark is no longer sized in em off the headline, so the two can drift apart');
+  const deck = (styleBlock.match(/body\[data-stage="landing"\] \.cbdeck\{\n?\s*margin:(\d+)px/) || [])[1];
+  if (!deck) fails.push('the landing deck has no top margin, so nothing separates it from the headline');
+  else if (Number(deck) < 90)
+    fails.push('the landing deck sits ' + deck + 'px under the headline and was asked for about an inch');
+}
+
+/* AND THE BAR DOES NOT SPEND THE LONGEST PART OF THE RUN IN THE NINETIES.
+   The reasoning call is where most of a two minute check goes, and its ceiling
+   was ninety, so all of that wait was walked out inside a nine point band while
+   the phases that take seconds had the other ninety points. It opened on
+   seventy two now, which is twenty seven points of travel where the waiting
+   actually is. */
+{
+  const map = (script.match(/var PHASE_PCT = \{([^}]*)\}/) || [])[1] || '';
+  const reason = (map.match(/reason:(\d+)/) || [])[1];
+  if (!reason) fails.push('the reasoning phase has no ceiling');
+  else if (Number(reason) > 80)
+    fails.push('the reasoning call opens at ' + reason + '%, so the longest part of the run is walked out inside a ' +
+      (99 - Number(reason)) + ' point band');
+  const from = (script.match(/WAIT_CREEP_FROM = (\d+)/) || [])[1];
+  if (from !== reason)
+    fails.push('the creep starts at ' + from + ' and the reasoning phase opens at ' + reason + ', so the bar jumps between them');
+  const partial = (script.match(/waitProgress\((\d+), \(c2\.registers_reached/) || [])[1];
+  if (partial && Number(partial) > Number(reason))
+    fails.push('the partial result pushes the bar to ' + partial + ', past the ceiling the reasoning call opens on');
 }
 
 /* THE BAR MUST NEVER PARK, AND MUST NEVER GO BACKWARDS.
@@ -1068,8 +1247,14 @@ if (!/function waitCreep/.test(script))
 }
 if (!/if\(pct<barShown\) return;/.test(script))
   fails.push('the bar at the top of the window can go backwards when a late event carries a smaller number');
-if (!/if\(pct < waitShown\) return;/.test(script))
+if (!/if\(c > waitCeil\) waitCeil = c;/.test(script))
   fails.push('the bar on the waiting screen can go backwards when a late event carries a smaller number');
+/* And it is a ticker, not a set of steps: a bar that stands still between
+   phases and then jumps reads as a page that has stopped. */
+if (!/function waitDrive/.test(script))
+  fails.push('the waiting bar steps between phases again instead of walking continuously');
+if (!/waitShown=1; waitCeil=6;/.test(script))
+  fails.push('the waiting bar no longer starts at one');
 if (!/WAIT_CREEP_TO\s*=\s*99/.test(script))
   fails.push('the creep is allowed to reach a hundred before the result exists');
 
@@ -1088,14 +1273,59 @@ if (!/WAIT_CREEP_TO\s*=\s*99/.test(script))
     fails.push('the browser disclosure triangle is still drawn beside our own chevron');
 }
 
-/* The pattern note runs the full measure. It was capped at 72ch and sat
-   stranded between two full width blocks, which reads as a failed load. */
+/* THE FRAME AND THE TEXT INSIDE IT END TOGETHER.
+   This is the rule the whole measure pass turns on, and it was got wrong twice
+   in the same afternoon in opposite directions. A block that draws its own
+   border, background or rule must carry its own cap: cap the TEXT inside one
+   and the border keeps going, so the reader gets a hairline running three
+   hundred pixels past the last word, or a rule that crosses half a panel and
+   stops in mid-air. Cap the BLOCK and everything inside it ends where it does. */
 {
-  const tw = (styleBlock.match(/#rpt \.rp-twoways\{[^}]*\}/) || [''])[0];
-  if (/max-width:\s*\d+ch/.test(tw))
-    fails.push('the pattern note is capped narrower than the blocks it sits between');
-  if (!/max-width:\s*none/.test(tw))
-    fails.push('the pattern note does not run the full measure');
+  /* .rp-claims is not here on purpose. It sits inside an accordion beside
+     .rp-bundle and .rp-pak, which are 1179 wide, and capping it made it the one
+     odd block on that screen. It earns its width instead: the row is now two
+     columns, their words against the record's, so both sides carry text and
+     nothing is stranded. The two-column rule is what is guarded below. */
+  const framed = { '#rpt .rp-why': 760 };
+  for (const [sel, want] of Object.entries(framed)) {
+    const re = new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{[^}]*\\}');
+    const rule = (styleBlock.match(re) || [''])[0];
+    if (!rule) { fails.push('the rule for ' + sel + ' is gone'); continue; }
+    if (/max-width:\s*\d+ch/.test(rule))
+      fails.push(sel + ' is capped in characters. A block that draws a border is capped in pixels, or the border and the text disagree');
+    const px = (rule.match(/max-width:(\d+)px/) || [])[1];
+    if (!px) fails.push(sel + ' draws a border with no cap on the block, so the border runs past the text inside it');
+    else if (Number(px) !== want)
+      fails.push(sel + ' is capped at ' + px + 'px and the column it sits in is ' + want + 'px');
+  }
+  /* And nothing inside a framed block carries a cap of its own, because that is
+     the thing that puts the border and the last word in different places. */
+  const inside = ['#rpt .rp-claim .rp-q', '#rpt .rp-claim .rp-r', '#rpt .rp-row .rp-rv',
+                  '#rpt .rp-why .rp-x'];
+  /* .rp-twoways is the third answer to the same question and the right one.
+     Capping the text left a hairline crossing half a filled panel and stopping;
+     capping the panel made it the only block on the screen that did not reach
+     the edges its neighbours reach. The separator is drawn by a pseudo element
+     that spans the panel, and the sentence under it keeps a measure. A
+     border-top back on .rp-last is the first mistake returning. */
+  if (/#rpt \.rp-twoways \.rp-last\{[^}]*border-top:/.test(styleBlock))
+    fails.push('the pattern note draws its rule with a border again, so the rule is only as wide as the paragraph');
+  if (!/#rpt \.rp-twoways \.rp-last::before\{/.test(styleBlock))
+    fails.push('the pattern note has no separator spanning its panel');
+  if (!/#rpt \.rp-twoways\{[^}]*max-width:none/.test(styleBlock))
+    fails.push('the pattern note is capped narrower than the blocks above and below it');
+  /* And the claim row stays a comparison. Stacked, it filled a third of a row
+     that draws a border across all of it. */
+  if (!/#rpt \.rp-claim\{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(0,1\.15fr\)/.test(styleBlock))
+    fails.push('the claim rows are stacked again, so the border runs past the text in them');
+  if (!/class="rp-rside"/.test(html))
+    fails.push('the claim rows have no right side, so what the record says has no column of its own');
+  for (const sel of inside) {
+    const re = new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{[^}]*\\}');
+    const rule = (styleBlock.match(re) || [''])[0];
+    if (rule && /max-width:\s*\d+ch/.test(rule))
+      fails.push(sel + ' is capped inside a block that already carries a border. Cap the block, not the text in it');
+  }
 }
 
 /* THE PILL PAIR IS GREEN AND GOLD, AND THE WAITING SCREEN CARRIES IT TOO. */
@@ -1184,6 +1414,126 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
   }
 }
 
+/* -------------------------------------- the whitespace scale
+   The report ran nine band values between fifty-four and ninety-two pixels, and
+   the eye reads nine near-identical gaps as no system at all. There are two now,
+   ninety-six between subjects and forty-eight inside one, and this is what stops
+   a third appearing the next time somebody nudges a section apart. */
+{
+  const bands = {
+    'rp-sec':          /#rpt \.rp-sec\{[^}]*padding:(\d+)px 0 0\}/,
+    'rp-sec.rp-tight': /#rpt \.rp-sec\.rp-tight\{padding-top:(\d+)px\}/,
+    'rp-behind':       /#rpt \.rp-behind\{[^}]*margin:(\d+)px 0 0\}/,
+    'rp-already':      /#rpt \.rp-already\{[^}]*margin-top:(\d+)px\}/,
+    'rp-accs':         /#rpt \.rp-accs\{[^}]*margin-top:(\d+)px;/,
+    'rp-why':          /#rpt \.rp-why\{margin-top:(\d+)px;/,
+    'rp-clock':        /#rpt \.rp-clock\{[^}]*margin-top:(\d+)px;/,
+    'rp-figs':         /#rpt \.rp-figs\{[^}]*margin-top:(\d+)px;/,
+    'rp-foot':         /#rpt \.rp-foot\{[^}]*margin-top:(\d+)px;/,
+    'rp-stitle':       /#rpt \.rp-stitle\{margin-top:(\d+)px;/,
+  };
+  for (const [name, re] of Object.entries(bands)) {
+    const m = styleBlock.match(re);
+    if (!m) { fails.push('the band value for .' + name + ' cannot be read, so it cannot be held to the scale'); continue; }
+    const v = Number(m[1]);
+    if (v !== 96 && v !== 48)
+      fails.push('.' + name + ' sits at ' + v + 'px. The report has two band values, 96 and 48, and this is a third');
+  }
+  /* The heading, its kicker and its standfirst step by one number. */
+  const h2 = (styleBlock.match(/#rpt \.rp-h2\{margin-top:(\d+)px/) || [])[1];
+  const sub = (styleBlock.match(/#rpt \.rp-sub\{margin-top:(\d+)px/) || [])[1];
+  if (h2 !== '12' || sub !== '12')
+    fails.push('the heading rhythm is uneven: .rp-h2 steps by ' + h2 + ' and .rp-sub by ' + sub + ', and both should be 12');
+}
+
+/* THE MEASURE. Nothing a person reads runs past about seventy characters.
+   Every one of these ran between eighty-six and a hundred and thirty-three. */
+{
+  const caps = {
+    '#rpt .rp-spec':          80,
+    '#rpt .rp-pakfoot':       80,
+    '#rpt .rp-dom':           80,
+    '#rpt .rp-find .rp-t':    80,
+  };
+  for (const [sel, ceil] of Object.entries(caps)) {
+    const re = new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{[^}]*\\}');
+    const rule = (styleBlock.match(re) || [''])[0];
+    if (!rule) { fails.push('the rule for ' + sel + ' is gone, so its measure is unbounded'); continue; }
+    const mw = (rule.match(/max-width:(\d+)ch/) || [])[1];
+    if (!mw) fails.push(sel + ' has no measure cap, so its line can run the whole column');
+    else if (Number(mw) > ceil)
+      fails.push(sel + ' is capped at ' + mw + 'ch, past the ' + ceil + 'ch a person reads comfortably');
+  }
+}
+
+/* SOURCES AND METHOD IS ONE COLUMN.
+   It is prose and rows and nothing else, and running the rows to the full sheet
+   while the sentences inside them stopped two-thirds of the way across gave the
+   page two right-hand edges. One column, and the tables end where the text does. */
+{
+  if (!/#rpSources \.rp-sec\{max-width:900px;/.test(styleBlock))
+    fails.push('the sources page is back on the full sheet width, so its tables outrun its sentences again');
+  /* The header is NOT in that column, and that is deliberate. The two pills
+     have to sit in the same corner on every screen or they stop being a fixed
+     thing a reader can reach for. Body has a measure; chrome has an edge. */
+  if (/#rpSources \.rp-head[,{]/.test(styleBlock))
+    fails.push('the sources header has been pulled into the 900 column, so its pills no longer line up with the other screens');
+  /* Every section on it states its stakes under the heading. One did not. */
+  const src = sheets_['rpSources'] || '';
+  const secs = src.split('<div class="rp-sec"').slice(1);
+  if (secs.length < 5) fails.push('the sources page has ' + secs.length + ' sections, and it had five');
+  secs.forEach((sec, i) => {
+    if (!/class="rp-sub"/.test(sec))
+      fails.push('section ' + (i + 1) + ' of sources and method has a heading and then a grid, with nothing saying why it is there');
+  });
+  /* The four nevers are one thing with four parts, framed like every other
+     block of rows on the page, not four cards floating in the gutter. */
+  const nevers = (styleBlock.match(/#rpt \.rp-nevers\{[^}]*\}/) || [''])[0];
+  const never  = (styleBlock.match(/#rpt \.rp-never\{[^}]*\}/) || [''])[0];
+  if (!/background:var\(--border\)/.test(nevers) || !/border:1px solid var\(--border\)/.test(nevers))
+    fails.push('the four nevers have lost the hairline frame every other block of rows on the page has');
+  if (/border:1px/.test(never) || /box-shadow:var\(/.test(never))
+    fails.push('the nevers are boxed again, which makes them the only boxed section on a page of hairline rows');
+}
+
+/* THE GUTTER DOES NOT MOVE WHEN THE CHECK FINISHES.
+   The waiting screen ran a 54px gutter on a full-width box and the report ran a
+   1360 column with a 72px gutter, so the network sat 49px left of the report
+   that replaced it and the handover read as the page sliding sideways. */
+{
+  const wb = (styleBlock.match(/\.waitbox\{[^}]*\}/) || [''])[0];
+  const wr = (styleBlock.match(/#rpt \.rp-wrap\{[^}]*\}/) || [''])[0];
+  const mw = s2 => (s2.match(/max-width:(\d+)px/) || [])[1];
+  const pad = s2 => (s2.match(/padding:0 (clamp\([^)]*\))/) || [])[1];
+  if (!wb || !wr) fails.push('the waiting box or the report wrap has no rule, so their gutters cannot be compared');
+  else if (mw(wb) !== mw(wr) || pad(wb) !== pad(wr))
+    fails.push('the waiting screen and the report no longer share a gutter (' +
+      mw(wb) + '/' + pad(wb) + ' against ' + mw(wr) + '/' + pad(wr) +
+      '), so the content edge jumps when the result opens');
+}
+
+/* -------------------------------------- the markup closes what it opens
+   Two orphaned </span> sat in the headline for four builds, left behind when
+   the .herolock wrapper came off the landing. A browser closes them against
+   the h1 and the page looks right, so nothing ever caught them. */
+{
+  const bodyAt = html.indexOf('<body>');
+  let body = html.slice(bodyAt)
+    .replace(/<script[\s\S]*?<\/script>/g, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
+  for (const t of ['span','div','p','h1','h2','h3','button','section','nav','details','summary','b','i','em','strong','ul','li','table','tr','td','th','form','label','header','footer','main','article','aside','figure','svg','g','text']) {
+    const o = (body.match(new RegExp('<' + t + '[\\s>]', 'g')) || []).length;
+    const c = (body.match(new RegExp('<\\/' + t + '>', 'g')) || []).length;
+    if (o !== c) fails.push('the markup opens ' + o + ' <' + t + '> and closes ' + c);
+  }
+  /* And there is no closing tag before anything has opened. */
+  let depth = 0;
+  for (const m of body.matchAll(/<span[\s>]|<\/span>/g)) {
+    depth += m[0] === '</span>' ? -1 : 1;
+    if (depth < 0) { fails.push('a </span> closes something that was never opened'); break; }
+  }
+}
+
 /* -------------------------------------- the back office comes back to itself
    Clerk navigates to "/" after a sign in unless it is told otherwise, and "/"
    is the consumer landing page. That is why the back office opened for a second
@@ -1196,6 +1546,71 @@ if (!/data-boot/.test(admin))
   fails.push('the back office renders its shell before it knows whether anybody is signed in');
 if (/[\u2014\u2013]/.test(admin))
   fails.push('an em dash or en dash is present in the back office');
+
+/* -------------------------------------- the register names real businesses
+   In Canadian defamation the plaintiff does not have to prove falsity. Say
+   something that lowers a company's reputation and the burden is on us to make
+   out a defence. Everything below is what the defences actually require, kept
+   in one place so a change to the page cannot quietly remove one of them. */
+{
+  const reg = fs.readFileSync(path.join(root, 'api', '_register.js'), 'utf8');
+
+  /* The naming gate lives on the server, on the way out of the database, so a
+     bug in the page cannot publish a name the reply window has not released. */
+  if (!/const named = !!x\.named_at;/.test(reg))
+    fails.push('the register read path no longer gates on named_at, so an unreplied party can be named');
+  if (!/name: named \? x\.display_name : null/.test(reg))
+    fails.push('the register sends a name for a party it has not named');
+  if (!/domain: named \? x\.domain : null/.test(reg))
+    fails.push('the register sends a domain for a party it has not named, which names them anyway');
+  if (!/contacted_at is not null/.test(reg))
+    fails.push('the register can name a party nobody has written to');
+  if (!/export const REPLY_DAYS/.test(reg))
+    fails.push('the reply window is gone');
+
+  /* A pattern row is never created off one platform, however loud it is. */
+  if (!/hosts\.size >= PATTERN_PLATFORMS/.test(reg))
+    fails.push('the register no longer requires independent platforms for a pattern');
+
+  /* A party with nothing against it never gets a row, and a party that stops
+     carrying one comes off by itself. */
+  if (!/cleared_at = now\(\)/.test(reg))
+    fails.push('the register has no delisting path, so a withdrawn alert stays published');
+
+  /* And this table must never learn who did the searching. */
+  const sql = fs.readFileSync(path.join(root, 'db', 'register.neon.sql'), 'utf8')
+    .split('\n').filter(l => !/^\s*--/.test(l)).join('\n');
+  for (const col of ['visitor', 'ip', 'user_agent', 'session', 'email'])
+    if (new RegExp('\\b' + col + '\\w*\\s+(text|inet|uuid|varchar)', 'i').test(sql))
+      fails.push('the register schema has a "' + col + '" column, which rebuilds the person level file');
+}
+
+/* The page itself. What a court would look at. */
+{
+  const fn = script.indexOf('function regItem(');
+  const item = fn < 0 ? '' : script.slice(fn, script.indexOf('\nfunction regRender', fn));
+  if (!item) fails.push('the register no longer renders its entries');
+  if (!/No regulator has acted/.test(item))
+    fails.push('a pattern entry no longer says on its own line that no regulator has acted');
+  if (!/x\.authorityUrl/.test(item))
+    fails.push('an official entry no longer links to the authority, which is the whole defence');
+  if (!/x\.reply/.test(item))
+    fails.push('a reply we were sent is no longer printed beside the entry');
+  const rend = script.slice(script.indexOf('function regRender'), script.indexOf('var regReturn'));
+  /* The gate is enforced twice on purpose. The server nulls the name, and the
+     page refuses on the flag as well, because one place is one bug away from
+     publishing a name we have no defence for. */
+  if (!/x\.named !== false && !!x\.name/.test(rend))
+    fails.push('the register page no longer checks the naming flag when it filters entries');
+  if (!/if\(!x \|\| x\.named === false \|\| !x\.name\) return "";/.test(item))
+    fails.push('the register entry renderer will draw an entry the server did not name');
+  if (!/register@4ormfinance\.com/.test(rend))
+    fails.push('the register has no right of reply address');
+  /* No verdict word may appear anywhere in the register's own copy. */
+  for (const w of ['scam', 'fraudster', 'fraudulent', 'criminal', 'dishonest', 'ripoff', 'crook'])
+    if (new RegExp('\\b' + w + '\\b', 'i').test(rend + item))
+      fails.push('the register copy uses the word "' + w + '" on a page that names real companies');
+}
 
 /* -------------------------------------- declaration diff against a prior build */
 const prev = process.argv[2];

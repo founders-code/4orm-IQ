@@ -7,6 +7,8 @@ const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'h
   w.scrollTo=()=>{}; w.requestAnimationFrame=cb=>setTimeout(cb,0);
   w.addEventListener('error',e=>errs.push('window.error: '+(e.error?.stack||e.message)));}});
 const {window}=dom, doc=window.document;
+/* A probe that prints MISSING and exits zero is not a probe. */
+const MISS=[];
 window.console.error=(...a)=>errs.push('console.error: '+a.join(' '));
 window.Element.prototype.scrollTo=function(){};
 await new Promise(r=>setTimeout(r,900));
@@ -39,8 +41,23 @@ body=doc.getElementById('infoBody').innerHTML;
 console.log('\ncategory modal open:', doc.getElementById('infoBox').classList.contains('on'));
 console.log('  kind:', doc.getElementById('infoKind').textContent, '| title:', doc.getElementById('infoTitle').textContent);
 console.log('  state:', doc.getElementById('infoState').textContent);
-['How this check is decided','records found','registers behind this check','ICANN RDAP']
-  .forEach(t=>console.log((body.includes(t)?'  found  ':'  MISSING')+'  '+t));
+/* Read the text, not the markup. The counts are wrapped in their own spans, so
+   any literal spanning a number and the words after it can never match the
+   innerHTML however current the copy is. */
+{
+  const txt = doc.getElementById('infoBody').textContent;
+  const want = [
+    ['the question this check asks',   /Could the story this party tells/],
+    ['what the record said',           /did not exist until/],
+    ['how much was behind it',         /\d+ records? behind this, from \d+ registers? in scope/],
+    ['the way through to the working', /Open the full check/],
+  ];
+  for(const [label, re] of want){
+    const ok = re.test(txt);
+    if(!ok) MISS.push('category modal: '+label);
+    console.log((ok?'  found  ':'  MISSING')+'  '+label);
+  }
+}
 doc.getElementById('infoClose').click();
 
 // register that carries a result now
@@ -48,7 +65,16 @@ doc.querySelector('#brows .src[data-reg="ICANN RDAP Date"]').click();
 await new Promise(r=>setTimeout(r,60));
 body=doc.getElementById('infoBody').innerHTML;
 console.log('\nlit register modal state:', doc.getElementById('infoState').textContent);
-console.log('  carries the record:', body.includes('2026-02-22'));
+/* Whatever it returned, the brief tells the reader how to read it and where to
+   go and check it themselves. Those two are the reason this modal exists. */
+for(const t of ['How to read this one','Open this register yourself']){
+  const ok = body.includes(t);
+  if(!ok) MISS.push('register modal: '+t);
+  console.log((ok?'  found  ':'  MISSING')+'  '+t);
+}
 
 console.log('\n--- errors: '+errs.length+' ---'); errs.forEach(e=>console.log(e.slice(0,300)));
-process.exit(errs.length?1:0);
+if(errs.length) MISS.push('page errors: '+errs[0].slice(0,120));
+console.log('\n' + (MISS.length ? 'FAILED' : 'PASSED'));
+MISS.forEach(m=>console.log('  '+m));
+process.exit(MISS.length?1:0);

@@ -66,8 +66,18 @@ console.log('  never says they lied:', !/\blied\b|\bliar\b|did not exist\b/i.tes
 doc.getElementById('infoClose').click(); await new Promise(r=>setTimeout(r,30));
 
 // check 9 offers the graph
+/* Through the short read first, the way this file already does it for check 10.
+   The graph button lives in the full working, so reading the short read for it
+   printed false on every run. */
 tiles[8].click(); await new Promise(r=>setTimeout(r,60));
-console.log('\ncheck 9 offers the graph:', doc.getElementById('infoBody').innerHTML.includes('openGraph'));
+{
+  const open=[...doc.querySelectorAll('#infoBody button')].find(x=>/Open the full check/.test(x.textContent));
+  if(!open) throw new Error('check 9 short read does not offer the full check');
+  open.click(); await new Promise(r=>setTimeout(r,90));
+  const has=doc.getElementById('infoBody').innerHTML.includes('openGraph');
+  console.log('\ncheck 9 offers the graph:', has);
+  if(!has) throw new Error('check 9 no longer offers the operator graph');
+}
 doc.getElementById('infoClose').click();
 
 const audit=window.__KBYS__.buildAudit(d);

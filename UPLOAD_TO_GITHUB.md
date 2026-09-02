@@ -8,178 +8,150 @@ Everything in this folder replaces what is in the repo now.
 4. Drag in ALL of these, from inside the unzipped folder:
 
    index.html
+   admin.html
    vercel.json
    package.json
-   .gitignore
-   .env.example
    README.md
-   api/            (the whole folder: 7 files)
-   db/             (schema.sql)
-   docs/           (6 files)
+   api/            (the whole folder: 21 files)
+   db/             (6 files, including register.neon.sql)
+   docs/           (7 files)
    assets/
+   tools/          (optional. The checks. Nothing serves from here.)
 
 5. Commit to `main`.
 
 GitHub replaces files that have the same name, so nothing duplicates.
 Vercel sees the push and deploys on its own.
 
-## One environment variable to change
+## Environment variables
 
-`KBYS_MAX_SEARCHES` is currently `8`. Change it to `10`.
+`KBYS_MAX_SEARCHES` should be `10`. The review sweep is three pinned searches
+rather than one, so the plan has ten in it. At 8 the two open sweeps at the end
+get dropped.
 
-The review sweep is now three separate pinned searches instead of one, so the
-plan has ten searches in it. At 8 the two open sweeps at the end get dropped.
+`POSTGRES_URL` switches on the write side, the operations chain and the public
+register. See `docs/STORAGE.md`. Until it is set, storage is skipped, the audit
+report says so, and the register returns an empty list. Checks are unaffected.
 
-## One environment variable to add, when you are ready
+## The one thing to run by hand, once
 
-`POSTGRES_URL` switches on the write side. See `docs/STORAGE.md`. Until it is
-set, storage is skipped and the audit report says so. Checks are unaffected.
+`db/register.neon.sql` creates the register table. Run it in the Neon SQL
+editor. Nothing else needs a migration.
 
-## What changed in this build
+---
 
-**The back office stopped bouncing you to the landing page.** Clerk navigates to
-"/" after a sign in unless it is told otherwise, and "/" is the consumer landing
-page. That is the whole of it: the sign in was succeeding and Clerk was
-navigating away from the page that asked for it. Every redirect Clerk can take
-is now pinned to `/admin.html`, and the page holds its shell back until Clerk
-has answered, so a hard reload no longer flashes.
+# What changed in this build
 
-**The flash on the way to the waiting screen is gone.** The scrim faded in over
-four hundred and fifty milliseconds while the console was being laid out
-underneath it, so for a third of a second the reader watched an empty board
-build behind a half transparent sheet. It opens instantly now and fades only on
-the way out.
+## The reference is printed once
 
-**The address bar stays at 4ormiq.com.** `?live=1` was how somebody used to opt
-into a real check. Live is the default now and `?demo=1` is the escape hatch, so
-the old parameter means nothing and is taken out of the URL without a
-navigation. Nothing else in the query is touched. Every button in the search
-form also declares its type, because a button in a form with no type is a submit
-button, and a submit is a page load.
+It is the first line of the report card, at eighteen points, which is where
+somebody reads it down a phone to a fraud desk. A second copy in ten point mono
+in the top right corner of every screen said the same thing smaller, and it was
+sitting in the corner the two pills belong in. It is gone from all four screens.
 
-**The progress bar.** No change from the last build: it is driven by the
-heartbeat from ninety to ninety-nine and cannot go backwards. If it stalls again
-it is worth checking the browser console, because nothing in the page can
-navigate on its own any more.
+## The header is three parts, and each owns its edge
 
-**Open the whole record moved to the very bottom of Do this right now,** after
-everything a reader can act on without it.
+The mark on the left, the way back centred on the page, the two pills hard
+right. They used to share one flex row, so on "Do this right now" the back
+button and the pills fought for the right edge and on "Sources and method" they
+wrapped onto a second line. An empty column collapses, so the result screen,
+which has no way back, still puts its pills in exactly the same place.
 
-**The two doors are twice the size.** The red one for somebody who has already
-sent money and the green ones that carry the reader on. One pair of rules, so
-they cannot drift apart.
+The back button also names the screen it returns to now, rather than always
+saying "back to the report".
 
-**The pills are back on the right,** in the same place on the report as on the
-landing, rather than centred.
+## What we found offers one thing
 
-**The identity plate is a report card.** The reference is at the top, where
-somebody reads it down a phone to a fraud desk, followed by the date the records
-were read, the log entry and the record hash from the operations chain. A run
-that was not logged says so rather than showing a blank. Every field on the card
-is what the nine document packs are built from.
+A reader reaches that screen by choosing to go deeper. The only thing at the top
+is the way back; the way on is the door at the foot of the page. Three ways off
+a screen whose whole job is to be read to the bottom is two too many, so the
+sources and support pills come off it.
 
-**What we found reads as one page.** The pattern note runs the full measure
-instead of sitting stranded at 72 characters between two full width blocks.
+## The three doors are two thirds the size
 
-**Do this right now shows all four titles at once,** collapsed by default on
-native disclosure elements.
+They went 110, which read as a note, then 220, which read as a billboard. They
+are 147 now.
 
-**Find support is rebuilt as a light document.** It was a dark panel, which is
-the wrong register entirely for the page somebody opens after the money has
-gone. Pale blue grey ground, white cards, every telephone number in ink, the
-index full height beside it, and web addresses wide enough to read back down a
-phone. Every number is still the one published on that organisation's own
-contact page, and no individual lawyer, firm or recovery service is named.
+More to the point, the geometry was written out TWICE, identically, three
+hundred lines apart, under a comment in each place claiming it lived in one
+place so the doors could not drift. They drifted twice. There is now one rule
+for the shape and one line each for the colour, and a check that fails if any
+single door sets a dimension of its own.
 
-**Five new cards on the waiting screen,** sixteen in all: who is doing this check
-and what it costs the people it is for.
+## "Nobody is named anywhere we looked" was not true
 
+Two paragraphs above that line the report prints the regulator's own words:
+"Goliath Ventures and its CEO Christopher Delgado have been charged by the SEC
+and the CFTC". A person IS named, in a record we read, and the card said we
+looked and found nobody.
 
-**What we found reads as one page again.** The pattern note ran at 72 characters
-and sat stranded between a full width row of findings and a full width door,
-which reads as a box that failed to load rather than a considered aside. It now
-runs the full measure, and the two readings of the same evidence sit side by
-side, which is what they are. Where we looked is a proper section with its own
-heading rather than a card wearing the footer's margin.
+The card was not wrong about the policy. No source in SR-001 is cleared for
+person level output until counsel signs it off, so the name scan returns nothing
+and the card fell through to its "we found nothing" branch. But **we do not
+publish this** and **this does not exist** are different sentences, and printing
+the second when the first is true is exactly the class of small lie this product
+exists not to tell.
 
-**Do this right now shows all four titles at once.** Open, those four sections
-ran to eight screens, and somebody who came for their bank's phone number had to
-scroll past a table of fields to reach it. They are collapsed by default now, on
-native disclosure elements, so the whole of what to do fits on one screen and the
-reader opens the one they need.
+The scan runs twice now: once gated, which is what may be printed, and once
+ungated, which is only ever counted. Where a name exists and is withheld the
+card says so: "One person is named in the records below. We do not publish
+individuals."
 
-**Sources and method is a green pill beside the gold Find support pill.** On the
-landing, on every screen of the report, and on the dark waiting screen, which is
-the one screen a reader spends the longest looking at and the one where they are
-most likely to want to know how this is decided or who to ring.
+## The whole record no longer has the chat in it
 
-**Five new cards on the waiting screen.** Who is doing this check and why they
-care: that we have sat with hundreds of people on the worst day of their year,
-that for most of them it was never spare money, that what follows is months of
-sending the same documents to anybody who will take them, that shame is what
-closes the last door, and that what would have stopped it was on the public
-record the whole time. Every one carries its source, our own testimony included.
+`.chat` carried a bare `display:flex` that applied at every stage. `.landing-only`
+sets `display:none` at one class of specificity and `.chat` matches it exactly,
+so the later rule won and the entire conversation sat behind the record.
 
+That is the sixth time this cascade has cost this file a bug, and the warning
+was the comment directly above the rule. The console opens on the five figures
+and nothing else.
 
-**The report is four screens instead of one long page.** The result screen ends
-with what we could not answer, then the door for anybody who has already sent
-money, then a green pill to what we found. That screen carries the findings,
-where we looked, and the two things a pattern of complaints can mean, then a
-green pill to what to do. That screen carries the three things to do now, what
-to have ready before you ring, who to tell, and their words set against the
-records. Every screen goes back one step, and the whole report now sits inside a
-bordered panel that is wider than the old column.
+## The one page summary comes before the whole record
 
-**Sources and method sits next to Find support, everywhere.** On the landing,
-and in the same place on every screen of the report. Sources and method opens
-from the landing too, before any check has been run, and the way out of it knows
-whether there is a report to go back to.
+The summary is the thing most readers actually need: one printable page with the
+reference and the date on it, to hand to a bank. The whole record is for
+somebody who wants the working. Ordering them the other way asked everybody to
+walk past the hard thing to reach the useful one.
 
-**The progress bar no longer parks at ninety.** The reasoning step is one call
-that can run for two or three minutes, and the bar used to arrive at ninety on
-its first byte and sit there for the rest of it. It is now driven by the
-heartbeat: ninety is the floor, ninety-nine is a ceiling it approaches and never
-reaches, and only a finished result writes a hundred. Neither bar can go
-backwards, which it could when the partial result claiming eighty landed after
-the reasoning phase claiming ninety.
+## The landing leads with the headline
 
-**The network moved down and away from the cards above it.** The top row of
-register names was sitting against the education card and read as part of it.
+"Know before you send with 4ormIQ" is capped at 74px rather than 58. The lockup
+is sized in em against that line, so the mark grows by exactly the same
+proportion and the two cannot fall out of step.
 
-**The landing asks its questions in the thread, after you submit.** Typing a name
-no longer makes anything appear under the cursor. You put in a company, a
-website, an email address or a wallet, press the button, and the page answers the
-way a person would: a pause, then "2 quick questions", then the questions
-themselves with the answers as buttons. There is no skip, because the answers
-decide which registers can apply, and a private seller who holds no licence must
-never be read as a party hiding one.
+Everything from "A company name is enough to start" sits an inch lower. The
+margin is on that line and the search bar, the sentence under it and the five
+figures are all its siblings, so they move together.
 
-**The waiting screen is the network.** All 104 registers drawn as a web: an inner
-ring of the eighteen whose answer can carry a finding on its own, an outer ring
-of everything else, nine faint ellipses through both, and a spoke from every
-register to the centre. A register lights, a packet travels back along its spoke,
-and the node then takes the colour of what the board says came back. The mark
-sits at the centre with a ring that fills as the record comes in.
+## The bar does not spend the run in the nineties
 
-Nothing on that screen invents a result. Motion is motion; colour comes only from
-the board.
+Last build fixed a seven and a half second freeze. This one fixes what was left,
+which was a different problem with the same symptom: the reasoning call, where
+most of a two minute check is actually spent, had a ceiling of ninety. So all of
+that wait was walked out inside a nine point band, while the phases that take
+seconds had the other ninety points between them. The bar was not lying. It was
+telling the truth in the wrong units: it looked finished, and then nothing
+happened for a long time.
 
-**A failed check now says it failed.** A run that dies mid-flight used to print
-"Do not send anything tonight", which dressed our own failure as a finding about
-somebody else. It now says the check did not finish, that nothing here is a
-finding in either direction, and it names the registers you can open yourself.
+The phases are re-cut against how long they take. Retrieval, which reads a
+hundred and four registers, gets the first two thirds. The reasoning call opens
+at seventy two, so it has twenty seven points to walk rather than nine. The walk
+toward each ceiling is also half the old rate: eleven per cent of the remaining
+distance every ninety milliseconds closed most of any gap inside a second, which
+is why the bar kept arriving and then standing there.
 
-**A long run no longer drops.** The stream sends a heartbeat every eight seconds,
-because a response that sends no bytes gets closed as idle by the platform in
-front of us.
+Measured over a forty second reasoning call: **326 distinct widths, longest
+stall 292ms**, against 170 and 900ms before, and it never enters the nineties
+while the work is still running.
 
-**Delivery follows the evidence, not the box you ticked.** Telling us you have
-already sent money never promotes a verdict. It changes only what we say once the
-evidence is in: a regulator that has acted leads to your bank tonight; a handful
-of poor reviews gets a summary and no instruction. Three independent platforms
-carrying the same complaint is a pattern. Volume on one board is one board.
+## The checks
 
-**Rules can change without breaking the chain.** Each recorded row carries the
-version of the fields it was hashed under, and each run commits to a policy
-version rather than to the policy text, so the rules can be edited and the
-history still verifies.
+37 now, all green. Ten new guards this round, every one proved by breaking its
+subject and watching the check fail:
+
+    node tools/verify.mjs          the source, about 145 guards
+    node tools/spacecheck.mjs      the gutter and the measure, in a real engine
+    node tools/waitstable.mjs      nothing moves during a run, 7 viewports
+    node tools/smallscreen.mjs     phones, and short windows, which differ
+    node tools/smoke.mjs           and smoke2 through smoke32

@@ -10,6 +10,8 @@ const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'h
   w.URL.createObjectURL=()=> 'blob:test'; w.URL.revokeObjectURL=()=>{};
   w.addEventListener('error',e=>errs.push('window.error: '+(e.error?.stack||e.message)));}});
 const {window}=dom, doc=window.document;
+/* A probe that prints MISSING and exits zero is not a probe. */
+const MISS=[];
 window.console.error=(...a)=>errs.push('console.error: '+a.join(' '));
 window.Element.prototype.scrollTo=function(){};
 await new Promise(r=>setTimeout(r,900));
@@ -28,7 +30,8 @@ console.log('\nsections present:');
 ['Know before you send','The check, in numbers','The party, and the dates on the record',
  'Names found in the records','The main hits','Before you send anything, do these',
  'If money has already gone','Read this before you rely on any of it']
- .forEach(x=>console.log((t.includes(x)?'  found  ':'  MISSING')+'  '+x));
+ .forEach(x=>{ const ok=t.includes(x); if(!ok) MISS.push(x);
+    console.log((ok?'  found  ':'  MISSING')+'  '+x); });
 
 console.log('\ncarries the ask:');
 [['the disclaimer names what it is not', /not financial, investment, legal or tax advice/.test(t)],
@@ -68,4 +71,8 @@ doc.getElementById('sumClose').click();
 console.log('closes:', !doc.getElementById('sumBox').classList.contains('on'));
 
 console.log('\n--- errors: '+errs.length+' ---'); errs.forEach(e=>console.log('  '+e.slice(0,200)));
-dom.window.close(); process.exit(0);
+dom.window.close();
+if (errs.length) MISS.push('page errors: ' + errs[0].slice(0,120));
+console.log('\n' + (MISS.length ? 'FAILED' : 'PASSED'));
+MISS.forEach(m=>console.log('  missing: '+m));
+process.exit(MISS.length?1:0);

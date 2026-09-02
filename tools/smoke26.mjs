@@ -67,7 +67,20 @@ await pillPair('the result screen');
 
 /* Forward. */
 await p.click('#rpToFound'); await p.waitForTimeout(500); await one('rpFound', 'the way on to what we found');
-await pillPair('the findings screen');
+/* WHAT WE FOUND IS THE ONE SCREEN WITHOUT THEM.
+   A reader gets here by choosing to go deeper, and the only thing offered at
+   the top is the way back; the way on is the door at the foot of the page.
+   Three ways off a screen whose whole job is to be read to the bottom is two
+   too many. */
+{
+  const n = await p.evaluate(() => {
+    const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
+    return { pills: s.querySelectorAll('.rp-nav .rp-pill').length,
+             backs: s.querySelectorAll('.rp-navb.rp-back').length };
+  });
+  if (n.pills) fail('what we found has ' + n.pills + ' pills in its header and should have none');
+  if (n.backs !== 1) fail('what we found has ' + n.backs + ' ways back and should have exactly one');
+}
 await p.click('#rpToAct');   await p.waitForTimeout(500); await one('rpAct', 'the way on to what to do');
 await pillPair('the act screen');
 
@@ -75,16 +88,34 @@ await pillPair('the act screen');
 await p.click('#rpActBack');   await p.waitForTimeout(500); await one('rpFound', 'back from what to do');
 await p.click('#rpFoundBack'); await p.waitForTimeout(500); await one('rpReport', 'back from what we found');
 
-/* Out to sources from the middle of the report, and back to where they were. */
+/* Out to sources from the middle of the report, and back to where they were.
+   From the ACT screen now: what we found no longer carries the pill. */
 await p.click('#rpToFound'); await p.waitForTimeout(400);
-await p.click('#rpToSources_found'); await p.waitForTimeout(400);
-await one('rpSources', 'sources from the findings screen');
-if ((await p.textContent('#rpBackToReportT')).trim() !== 'Back to the report')
-  fail('the way out of sources does not offer the report a reader is halfway through');
+await p.click('#rpToAct'); await p.waitForTimeout(400);
+await p.click('#rpToSources_act'); await p.waitForTimeout(400);
+await one('rpSources', 'sources from the act screen');
+/* The label names the screen it returns to. It used to say "Back to the
+   report" from all three, and from "Do this right now" that is a label and a
+   destination that do not agree. */
+{
+  const t = (await p.textContent('#rpBackToReportT')).trim();
+  if (t !== 'Back to what to do')
+    fail('the way out of sources says "' + t + '" and goes back to what to do');
+}
 await p.click('#rpBackToReport'); await p.waitForTimeout(400);
-await one('rpFound', 'back from sources');
+await one('rpAct', 'back from sources');
+
+/* THE REFERENCE IS NOT PRINTED IN THE CORNER OF ANY SCREEN.
+   It is the first line of the report card, at eighteen points, which is where
+   somebody quotes it from. A second copy in ten point mono in the corner said
+   the same thing smaller and took the corner the pills belong in. */
+{
+  const stamps = await p.evaluate(() => document.querySelectorAll('#rpt .rp-stamp').length);
+  if (stamps) fail(stamps + ' reference stamps are back in the top right corner');
+}
 
 /* The order on the result screen, read off the rendered page. */
+await p.click('#rpActBack'); await p.waitForTimeout(400);
 await p.click('#rpFoundBack'); await p.waitForTimeout(400);
 await one('rpReport', 'back to the result before reading its order');
 const order = await p.evaluate(() => {
