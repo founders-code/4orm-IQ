@@ -42,116 +42,126 @@ editor. Nothing else needs a migration.
 
 # What changed in this build
 
-## The reference is printed once
+## The nine packs were never finished
 
-It is the first line of the report card, at eighteen points, which is where
-somebody reads it down a phone to a fraud desk. A second copy in ten point mono
-in the top right corner of every screen said the same thing smaller, and it was
-sitting in the corner the two pills belong in. It is gone from all four screens.
+Eight of the classes that view writes had **no CSS rule at all**: the write-on
+lines, the numbered chips, the pre-filled rows, the notes, the small print. The
+markup was right, the words were right, and it rendered as a wall of unbroken
+sentences with a stray digit in front of some of them. It read like a text file
+somebody forgot to finish, which is what it was.
 
-## The header is three parts, and each owns its edge
+They are four numbered steps now, in the order they happen, one job in each:
+what we already filled in (shaded, so it is obvious there is nothing to do
+there), what they will ask you (with a line to write on), what to have with you,
+and what is worth knowing before you call. Every phone number, email and web
+address is a link. Every one of the nine has been rewritten in plain words: no
+adjudicates, no drawn down, no chargeback against the merchant's acquirer.
 
-The mark on the left, the way back centred on the page, the two pills hard
-right. They used to share one flex row, so on "Do this right now" the back
-button and the pills fought for the right edge and on "Sources and method" they
-wrapped onto a second line. An empty column collapses, so the result screen,
-which has no way back, still puts its pills in exactly the same place.
+## The check that would have caught it
 
-The back button also names the screen it returns to now, rather than always
-saying "back to the report".
+No test that reads behaviour can see that a page looks unfinished. This one
+reads intent: **if the page writes a class, somebody meant it to look like
+something.** It compares every class the markup and the script emit against
+every class the stylesheet declares.
 
-## What we found offers one thing
+It found ten more on its first run, all real: the table in the audit sheet with
+no table styling, the category dot and its state word, the paragraph inside
+every explanatory modal, a 720px table with nothing to scroll it, the mark in
+the top left of the landing, a phone number with no link to dial sitting bare in
+a row of pills, and the paragraph that tells a reader we found something and
+did not print it, which is the most important line in the report.
 
-A reader reaches that screen by choosing to go deeper. The only thing at the top
-is the way back; the way on is the door at the foot of the page. Three ways off
-a screen whose whole job is to be read to the bottom is two too many, so the
-sources and support pills come off it.
+## And the check for the other half of it
 
-## The three doors are two thirds the size
+A second one for a fault that has now appeared three times: a container painted
+the border colour with children painted the surface, so the gaps read as
+hairlines. If the children do not cover the container the border colour shows
+through as a slab of grey where content should be. It caught the figures row on
+the result screen, which had three fixed columns and, for a company with a thin
+record, one figure to put in them. Nine hundred pixels of exposed grey beside a
+single number.
 
-They went 110, which read as a note, then 220, which read as a billboard. They
-are 147 now.
+Both checks run against a SPARSE result as well as a full one, because that is
+the only state in which most of these can fail.
 
-More to the point, the geometry was written out TWICE, identically, three
-hundred lines apart, under a comment in each place claiming it lived in one
-place so the doors could not drift. They drifted twice. There is now one rule
-for the shape and one line each for the colour, and a check that fails if any
-single door sets a dimension of its own.
+## What we found was blank for a thin record
 
-## "Nobody is named anywhere we looked" was not true
+Both its sections hide when they have nothing in them, so a company with no
+adverse record AND nothing in its favour got a headline, a standfirst and a
+button on an empty page. It read as a page that had failed to load.
 
-Two paragraphs above that line the report prints the regulator's own words:
-"Goliath Ventures and its CEO Christopher Delgado have been charged by the SEC
-and the CFTC". A person IS named, in a record we read, and the card said we
-looked and found nobody.
+It now says so: we did not find anything either way, this is not the same as a
+clean result, here is how much of the register we actually reached, and here is
+what to ask them in writing before you send anything.
 
-The card was not wrong about the policy. No source in SR-001 is cleared for
-person level output until counsel signs it off, so the name scan returns nothing
-and the card fell through to its "we found nothing" branch. But **we do not
-publish this** and **this does not exist** are different sentences, and printing
-the second when the first is true is exactly the class of small lie this product
-exists not to tell.
+## The bar is a clock now
 
-The scan runs twice now: once gated, which is what may be printed, and once
-ungated, which is only ever counted. Where a name exists and is withheld the
-card says so: "One person is named in the records below. We do not publish
-individuals."
+Three builds of this were a ceiling per phase, and each had the same fault in a
+different place, because the phases do not take the time their ceilings imply.
+It reached seventy in fifteen seconds and then spent a minute on the next
+thirty. Re-cutting the ceilings moved the lump; it could never remove it,
+because a ceiling is a guess about duration wearing the clothes of a
+measurement.
 
-## The whole record no longer has the chat in it
+So it stops guessing. It walks from one to ninety nine at a constant rate over
+the two minutes a check takes. Events change the words underneath it, which is
+what they are for. Measured over a forty second run: **19.7 points in the first
+half, 19.3 in the second. 0.824 points a second.** A run that finishes early
+jumps to a hundred. A run that goes long eases toward ninety nine and never
+arrives, because only a finished assessment writes a hundred.
 
-`.chat` carried a bare `display:flex` that applied at every stage. `.landing-only`
-sets `display:none` at one class of specificity and `.chat` matches it exactly,
-so the later rule won and the entire conversation sat behind the record.
+## The dark flash between the wait and the result
 
-That is the sixth time this cascade has cost this file a bug, and the warning
-was the comment directly above the rule. The console opens on the five figures
-and nothing else.
+The overlay faded out first and the report was rendered 240ms later, so for a
+quarter of a second the reader watched the dark console through a fading sheet
+and then a white document appeared on top of it. The order was wrong. The report
+is rendered first, underneath an overlay still at full opacity, and only then
+does the overlay lift. Sampled every animation frame across the handover: **zero
+dark frames.**
 
-## The one page summary comes before the whole record
+## Sources and method, in plain words
 
-The summary is the thing most readers actually need: one printable page with the
-reference and the date on it, to hand to a bank. The whole record is for
-somebody who wants the working. Ordering them the other way asked everybody to
-walk past the hard thing to reach the useful one.
+Same facts, same attributions, half the syllables. Retrieval decides what was
+reached became finding a record and reading it are two different jobs. Dark is
+three things became an empty register means three different things. Inclusion of
+a party in a 4orm result became what being in this report does not mean.
 
-## The landing leads with the headline
+## The landing
 
-"Know before you send with 4ormIQ" is capped at 74px rather than 58. The lockup
-is sized in em against that line, so the mark grows by exactly the same
-proportion and the two cannot fall out of step.
-
-Everything from "A company name is enough to start" sits an inch lower. The
+The headline and the 4ormIQ mark are back where they were vertically, and
+everything from "A company name is enough to start" sits an inch lower. The
 margin is on that line and the search bar, the sentence under it and the five
 figures are all its siblings, so they move together.
 
-## The bar does not spend the run in the nineties
+When the thread opens, the line explaining what the search bar takes comes off,
+because the bar is gone and it is answering a question nobody is being asked.
 
-Last build fixed a seven and a half second freeze. This one fixes what was left,
-which was a different problem with the same symptom: the reasoning call, where
-most of a two minute check is actually spent, had a ceiling of ninety. So all of
-that wait was walked out inside a nine point band, while the phases that take
-seconds had the other ninety points between them. The bar was not lying. It was
-telling the truth in the wrong units: it looked finished, and then nothing
-happened for a long time.
+## Smaller
 
-The phases are re-cut against how long they take. Retrieval, which reads a
-hundred and four registers, gets the first two thirds. The reasoning call opens
-at seventy two, so it has twenty seven points to walk rather than nine. The walk
-toward each ceiling is also half the old rate: eleven per cent of the remaining
-distance every ninety milliseconds closed most of any gap inside a second, which
-is why the bar kept arriving and then standing there.
-
-Measured over a forty second reasoning call: **326 distinct widths, longest
-stall 292ms**, against 170 and 900ms before, and it never enters the nineties
-while the work is still running.
+- The reference stamp is gone from the top right of every screen. It is the
+  first line of the report card, which is where somebody quotes it from.
+- The mono on the report card is up a step, on the card people read down a
+  phone to a fraud desk.
+- The yellow wash behind the first two things to do in Find support was a gold
+  seam colour showing through a two pixel grid gap. Ordinary border colour now.
+- Open the whole record is See the technical data room.
+- Six of the classes fixed above were in the console and the audit sheet, which
+  nobody had looked at in months.
 
 ## The checks
 
-37 now, all green. Ten new guards this round, every one proved by breaking its
-subject and watching the check fail:
+40 now, all green:
 
-    node tools/verify.mjs          the source, about 145 guards
+    node tools/verify.mjs          the source, about 155 guards
+    node tools/frames.mjs          no frame shows its own ground
+    node tools/handover.mjs        no dark frame between wait and report
     node tools/spacecheck.mjs      the gutter and the measure, in a real engine
     node tools/waitstable.mjs      nothing moves during a run, 7 viewports
     node tools/smallscreen.mjs     phones, and short windows, which differ
+    node tools/contactsheet.mjs    every screen and every state, as pictures
     node tools/smoke.mjs           and smoke2 through smoke32
+
+`contactsheet.mjs` is the new one and it is not a test. It produces a picture of
+every screen and every state, including all nine packs, and a person looks at
+them before anything ships. That is what was missing: thirty seven checks passed
+on a page whose nine document packs rendered as plain text.

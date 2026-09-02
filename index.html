@@ -98,6 +98,7 @@ svg{display:block}
 /* The mark is the brand. At four times the size it no longer needs a pill
    drawn around it, so the pill is gone and the logo simply sits there. */
 .navpill{pointer-events:auto;display:flex;align-items:center}
+.navbrand{display:flex;align-items:center;pointer-events:auto}
 @media(max-width:620px){.navpill img{height:56px}}
 .navpill img{height:88px;width:auto;display:block}
 .dirbrand{flex:none;display:flex;align-items:center;padding-right:18px;margin-right:2px;border-right:1px solid var(--border)}
@@ -177,7 +178,7 @@ body[data-stage="landing"] .cbar{
   border:none;background:none;box-shadow:none;overflow:visible;
   max-width:820px;margin:0 auto;width:100%;
 }
-body[data-stage="landing"] .cbmain{padding:0 0 60px;text-align:center}
+body[data-stage="landing"] .cbmain{padding:110px 0 60px;text-align:center}
 /* the landing variant is declared beside the base rule, further down */
 /* One line, whatever the width. The size is tied to the viewport so it
    shrinks to fit rather than breaking the sentence in half. */
@@ -509,7 +510,7 @@ body[data-stage="landing"] .tlead{display:block}
    display:none at one class of specificity and .chat matches it exactly, so the
    later rule won and the thread stayed on screen behind the whole record. The
    only rule here that sets DISPLAY is the one scoped to the landing. */
-.chat{width:min(680px,100%);margin:26px auto 0;text-align:left;
+.chat{width:min(680px,100%);margin:64px auto 0;text-align:left;
   flex-direction:column;gap:12px}
 body[data-stage="landing"] .chat.landing-only{display:flex}
 .chat[hidden]{display:none!important}
@@ -789,11 +790,28 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 .armeter .m3 i{display:block;height:100%;border-radius:3px}
 .arcat{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:14px}
 .arcath{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--bg-2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.catdot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--tx-4)}
+.catdot[data-s="RED"]{background:var(--bad)}
+.catdot[data-s="AMBER"],.catdot[data-s="YELLOW"]{background:var(--warn)}
+.catdot[data-s="GREEN"]{background:var(--ok)}
+.catstate{margin-left:auto;flex:none;font-family:var(--mono);font-size:8.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx-4);
+  border:1px solid var(--border);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.catstate[data-s="RED"]{color:var(--bad);border-color:var(--bad-br)}
+.catstate[data-s="AMBER"],.catstate[data-s="YELLOW"]{color:var(--warn);border-color:var(--warn-br)}
+.catstate[data-s="GREEN"]{color:var(--ok);border-color:var(--ok-br)}
 .arcath .cn{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;flex:none;color:var(--tx)}
 .arcath .cs{flex:1;min-width:min(100%,220px);font-size:13px;color:var(--tx-2);line-height:1.5}
 .arcatb{padding:14px 18px;display:grid;gap:11px;background:var(--surface)}
 .arboard{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:16px}
 .arnone{font-size:13px;color:var(--tx-4);line-height:1.6}
+.artbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.artbl th{text-align:left;padding:9px 12px;font-family:var(--mono);font-size:8.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx-4);
+  border-bottom:1px solid var(--border);background:var(--bg-2);white-space:nowrap}
+.artbl td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--tx-2);
+  vertical-align:top;line-height:1.5}
+.artbl tr:last-child td{border-bottom:none}
 
 /* ================= the register ================= */
 /* One dot, one phrase, one number. It is the only thing on the landing page
@@ -1565,6 +1583,9 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .infobody{overflow-y:auto;overscroll-behavior:contain;padding:22px}
 .infoq{font-size:15px;font-weight:650;color:var(--tx);line-height:1.45;letter-spacing:-.015em}
 .infop{font-size:13.5px;color:var(--tx-2);line-height:1.65;margin-top:10px;max-width:84ch}
+.ib-p{margin:0 0 11px;font-size:14px;line-height:1.65;color:var(--tx-2);max-width:76ch}
+.ib-p:last-child{margin-bottom:0}
+.ib-p b{color:var(--tx-1);font-weight:700}
 .infometa{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:14px}
 .infochip{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
   padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface-2);color:var(--tx-3)}
@@ -1643,13 +1664,23 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 }
 /* ---- directory: one continuous surface, nothing behind a click ---- */
 .rail{position:sticky;top:0;align-self:start;max-height:100%}
-.actnow{padding:22px 24px;border-bottom:1px solid var(--warn-br);background:var(--gold-50)}
+/* NO YELLOW GROUND.
+   The two things to do first are urgent, and the way to say that is the gold
+   rule down the left and the gold label, not a wash of colour behind the whole
+   band. A page somebody opens after their money has gone should not shout at
+   them; it should be legible. */
+.actnow{padding:22px 24px 26px;border-bottom:1px solid var(--border);
+  border-left:3px solid var(--gold-dp);background:var(--surface)}
 .actnow .anh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
 .actnow .anx{font-size:12.5px;color:var(--warn);line-height:1.6}
-.anrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2px;margin-top:14px;
-  background:var(--warn-br);border:1px solid var(--warn-br);border-radius:var(--r-lg);overflow:hidden}
+/* The gold was the seam colour showing through a two pixel grid gap, which on
+   a band this size reads as a yellow wash rather than a hairline. Ordinary
+   border colour, like every other pair of cards in the product. */
+.anrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;margin-top:14px;
+  background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
 .ancard{background:var(--surface);padding:16px 18px;display:flex;gap:13px;align-items:flex-start}
 .ancard .ann{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--gold-dp);flex:none;padding-top:2px}
+.anb{flex:1;min-width:0}
 .ancard .ant{font-size:14px;font-weight:700;letter-spacing:-.018em;color:var(--tx);line-height:1.35}
 .ancard .anw{font-size:12.5px;color:var(--tx-2);line-height:1.62;margin-top:6px;max-width:60ch}
 .ancontacts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:11px}
@@ -1866,7 +1897,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .rule .rx{font-size:13px;color:var(--tx-2);line-height:1.62}
 .rule .rx b{color:var(--tx);font-weight:600}
 
-.srcscroll{overflow-x:auto}
+.srcscroll,.srcwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .srctbl{width:100%;border-collapse:collapse;min-width:720px}
 .srctbl th{
   text-align:left;padding:11px 14px;font-family:var(--mono);font-size:8.5px;font-weight:700;
@@ -2225,22 +2256,94 @@ body[data-stage="report"] .foot{display:none}
   cursor:pointer;color:var(--tx-3);transition:background .16s,color .16s}
 #rpt .rp-pvx:hover{background:var(--surface-2);color:var(--tx)}
 #rpt .rp-pvx svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
-#rpt .rp-pvbody{flex:1;overflow-y:auto;padding:24px 26px 28px}
-#rpt .rp-pvlead{margin:0 0 20px;font-size:14.5px;line-height:1.6;color:var(--tx-2)}
-#rpt .rp-pvsec{margin-top:22px;padding-top:20px;border-top:1px solid var(--border)}
-#rpt .rp-pvsec:first-of-type{margin-top:0;padding-top:0;border-top:none}
-#rpt .rp-pvk{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;
-  text-transform:uppercase;color:var(--tx-3);margin-bottom:11px}
-#rpt .rp-pvp{margin:0;font-size:14.5px;line-height:1.62;color:var(--tx-2)}
-#rpt .rp-pvr{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:10px 18px;
-  padding:9px 0;border-bottom:1px solid var(--border-soft,var(--border))}
-#rpt .rp-pvr:last-child{border-bottom:none}
-#rpt .rp-pvr .rp-k{font-size:13px;font-weight:600;color:var(--tx)}
-#rpt .rp-pvr .rp-v{font-size:13.5px;line-height:1.55;color:var(--tx-2);word-break:break-word}
-#rpt .rp-pvclock{margin-top:20px;padding:15px 18px;border-radius:var(--r);
-  background:var(--gold-50,#FBF6EA);border:1px solid var(--gold-br,#E6D3A6)}
-#rpt .rp-pvclock .rp-k{color:var(--gold-dp,#8A6A1E);margin-bottom:8px}
-#rpt .rp-pvclock p{margin:0;font-size:14px;line-height:1.58;color:var(--tx-2)}
+/* ------------------------------------------------------------------ *
+ * THE NINE PACKS
+ *
+ * A person opens one of these on the worst day of their year, often on a phone,
+ * often about to make a call they have never made before. Eight of the classes
+ * this view emitted had no rule at all, so it rendered as a wall of unbroken
+ * sentences with a stray digit in front of some of them. It read like a text
+ * file somebody forgot to finish, which is what it was.
+ *
+ * What it is now: four numbered steps in order, one thing to do in each.
+ * Everything we already know is filled in and shaded, so it is obvious the
+ * reader does not have to find it. Everything they have to supply has a line to
+ * write on. Nothing is longer than it needs to be.
+ * ------------------------------------------------------------------ */
+#rpt .rp-pvbody{flex:1;overflow-y:auto;padding:0 0 24px}
+#rpt .rp-pvlead{margin:0;padding:20px 26px;background:var(--surface-2);
+  border-bottom:1px solid var(--border);
+  font-size:15px;line-height:1.55;color:var(--tx-2)}
+#rpt .rp-pvlead b{color:var(--tx);font-weight:700}
+
+/* a step */
+#rpt .rp-pvsec{margin:26px 26px 0}
+#rpt .rp-pvk{display:flex;align-items:center;gap:11px;margin-bottom:13px;
+  font-size:15.5px;font-weight:700;letter-spacing:-.015em;color:var(--tx)}
+#rpt .rp-pvk::before{content:attr(data-n);flex:none;width:23px;height:23px;border-radius:50%;
+  background:var(--blue);color:#fff;font-family:var(--rmono);font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center}
+#rpt .rp-pvk[data-n=""]::before{display:none}
+#rpt .rp-pvsm{margin:-6px 0 13px 34px;font-size:13.5px;line-height:1.55;color:var(--tx-3)}
+#rpt .rp-pvp{margin:0;font-size:14.5px;line-height:1.6;color:var(--tx-2)}
+
+/* how to reach them: every row that is a link is a link */
+#rpt .rp-pvr{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);gap:4px 16px;
+  align-items:baseline;padding:11px 0;border-bottom:1px solid var(--border)}
+#rpt .rp-pvr:first-of-type{padding-top:0}
+#rpt .rp-pvr:last-child{border-bottom:none;padding-bottom:0}
+#rpt .rp-pvr .rp-k{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-pvr .rp-v{font-size:14px;line-height:1.5;color:var(--tx);overflow-wrap:anywhere}
+#rpt .rp-pvr a{color:var(--blue);font-weight:600;text-decoration:none;
+  border-bottom:1px solid var(--blue-100)}
+#rpt .rp-pvr a:hover{border-bottom-color:var(--blue)}
+
+/* the clock */
+#rpt .rp-pvclock{margin:20px 26px 0;padding:14px 16px;border-radius:var(--r);
+  border-left:3px solid var(--gold-dp,#8A6A1E);background:var(--gold-50,#FBF6EA)}
+#rpt .rp-pvclock .rp-k{margin-bottom:5px;font-size:13px;font-weight:800;color:var(--gold-dp,#8A6A1E)}
+#rpt .rp-pvclock .rp-k::before{display:none}
+#rpt .rp-pvclock p{margin:0;font-size:14px;line-height:1.55;color:#5C4712}
+
+/* STEP 1: what we already know. Shaded, because the point of the shading is
+   that the reader can see at a glance they have nothing to do here. */
+#rpt .rp-pvh{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);gap:4px 16px;
+  align-items:baseline;padding:10px 14px;background:var(--surface-2);
+  border:1px solid var(--border);border-bottom:none}
+#rpt .rp-pvh:first-of-type{border-radius:var(--r) var(--r) 0 0}
+#rpt .rp-pvh:last-of-type{border-bottom:1px solid var(--border);border-radius:0 0 var(--r) var(--r)}
+#rpt .rp-pvh .rp-k{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-pvh .rp-v{font-size:14px;line-height:1.5;color:var(--tx);font-weight:600;
+  overflow-wrap:anywhere}
+
+/* STEP 2: what only they can answer. A ruled line is an instruction: write here. */
+#rpt .rp-pva{display:flex;align-items:baseline;gap:12px;padding:11px 0}
+#rpt .rp-pva + .rp-pva{border-top:1px solid var(--border)}
+#rpt .rp-pva .rp-q{flex:none;max-width:64%;font-size:14px;line-height:1.45;color:var(--tx)}
+#rpt .rp-pva .rp-ln{flex:1;min-width:60px;border-bottom:1px dashed var(--border-strong);
+  transform:translateY(-3px)}
+
+/* STEP 3: what to bring */
+#rpt .rp-pvt{display:flex;align-items:flex-start;gap:12px;padding:9px 0}
+#rpt .rp-pvt .rp-i{flex:none;width:21px;height:21px;border-radius:50%;
+  background:var(--surface-2);border:1px solid var(--border-strong);
+  font-family:var(--rmono);font-size:10.5px;font-weight:800;color:var(--tx-2);
+  display:flex;align-items:center;justify-content:center}
+#rpt .rp-pvt .rp-q{font-size:14px;line-height:1.5;color:var(--tx)}
+
+/* STEP 4: what to say, and what not to expect */
+#rpt .rp-pvn{position:relative;margin:0 0 10px;padding-left:20px;
+  font-size:14px;line-height:1.55;color:var(--tx-2)}
+#rpt .rp-pvn:last-child{margin-bottom:0}
+#rpt .rp-pvn::before{content:"";position:absolute;left:3px;top:9px;width:5px;height:5px;
+  border-radius:50%;background:var(--blue)}
+#rpt .rp-pvn b{color:var(--tx);font-weight:700}
+
+/* the small print, last, quiet */
+#rpt .rp-pvfoot{margin:26px 26px 0;padding-top:16px;border-top:1px solid var(--border);
+  font-size:12.5px;line-height:1.55;color:var(--tx-3)}
 #rpt .rp-pvft{display:flex;align-items:center;gap:16px;padding:16px 26px;
   border-top:1px solid var(--border);background:var(--surface-2)}
 #rpt .rp-pvfn{flex:1;min-width:0;font-family:var(--mono);font-size:11.5px;color:var(--tx-3);
@@ -2257,9 +2360,16 @@ body[data-stage="report"] .foot{display:none}
 @media (max-width:640px){
   #rpt .rp-pv{padding:0}
   #rpt .rp-pvsheet{width:100%;max-height:100vh;border-radius:0}
-  #rpt .rp-pvr{grid-template-columns:1fr;gap:4px}
-  #rpt .rp-pvft{flex-wrap:wrap}
-  #rpt .rp-pvfn{width:100%;order:2}
+  #rpt .rp-pvr,#rpt .rp-pvh{grid-template-columns:1fr;gap:3px}
+  #rpt .rp-pva{flex-direction:column;align-items:stretch;gap:6px}
+  #rpt .rp-pva .rp-q{max-width:none}
+  #rpt .rp-pva .rp-ln{min-height:16px;transform:none}
+  #rpt .rp-pvft{flex-wrap:wrap;gap:10px}
+  /* The file name is on the file. On a phone it was competing with the two
+     buttons for a row that has no room for three things, and losing. */
+  #rpt .rp-pvfn{display:none}
+  #rpt .rp-pvb{width:100%}
+  #rpt .rp-pvdl{flex:1;justify-content:center}
 }
 /* One rule, not two. A second .rp-sheet block further up would have had its
    padding silently overridden by this one, which is how the last two layout
@@ -2402,15 +2512,15 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-idplate{background:var(--surface);border-radius:calc(var(--r-lg) - 6px);padding:18px 22px 16px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(16,32,64,.04)}
 #rpt .rp-cardhd{padding-bottom:16px;border-bottom:1px solid var(--border-strong);margin-bottom:14px}
-#rpt .rp-cardk{font-family:var(--rmono);font-size:8.5px;font-weight:800;letter-spacing:.18em;
+#rpt .rp-cardk{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
   text-transform:uppercase;color:var(--gold-dp)}
 #rpt .rp-cardref{margin-top:8px;font-family:var(--rmono);font-size:clamp(17px,1.9vw,21px);
   font-weight:800;letter-spacing:.03em;color:var(--tx);word-break:break-all}
 #rpt .rp-cardmeta{margin-top:12px;display:grid;gap:7px}
 #rpt .rp-cardmeta .rp-cm{display:flex;align-items:baseline;gap:10px;justify-content:space-between}
-#rpt .rp-cardmeta .rp-ck{font-family:var(--rmono);font-size:8.5px;font-weight:700;letter-spacing:.14em;
+#rpt .rp-cardmeta .rp-ck{font-family:var(--rmono);font-size:9.5px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx-3);flex:none}
-#rpt .rp-cardmeta .rp-cv{font-family:var(--rmono);font-size:11px;color:var(--tx);text-align:right;
+#rpt .rp-cardmeta .rp-cv{font-family:var(--rmono);font-size:12.5px;color:var(--tx);text-align:right;
   word-break:break-all}
 #rpt .rp-cardmeta .rp-cv.rp-none{color:var(--tx-3)}
 #rpt .rp-cardfoot{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);
@@ -2452,16 +2562,23 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-src-l svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex:none}
 
 /* the three figures */
+/* AS MANY COLUMNS AS THERE ARE FIGURES.
+   Three fixed columns meant a party with one figure to report got that figure
+   in the left third and two thirds of exposed border colour beside it: a nine
+   hundred pixel grey slab that reads as a panel that failed to load. The same
+   fault as the four wrapper grids on sources and method, in a different place.
+   Auto columns make the row fit whatever it is given. */
 #rpt .rp-figs{position:relative;z-index:2;display:grid;gap:2px;margin-top:48px;
-  grid-template-columns:repeat(3,1fr);background:var(--border);
+  grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);background:var(--border);
   border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+@media(max-width:620px){#rpt .rp-figs{grid-auto-flow:row;grid-auto-columns:auto}}
 #rpt .rp-fig{background:var(--surface);padding:26px 24px 24px}
 #rpt .rp-fig .rp-v{font-family:var(--rmono);font-size:clamp(28px,3.4vw,40px);font-weight:700;
   letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums;color:var(--tx);
   white-space:nowrap}
 #rpt .rp-fig .rp-v.rp-bad{color:var(--bad)} #rpt .rp-fig .rp-v.rp-warn{color:var(--warn)}
 #rpt .rp-fig .rp-l{margin-top:14px;font-size:13.5px;line-height:1.52;color:var(--tx-2);max-width:28ch}
-@media(max-width:620px){#rpt .rp-figs{grid-template-columns:1fr}}
+
 
 /* sections */
 #rpt .rp-sec{position:relative;z-index:2;padding:96px 0 0}
@@ -2509,6 +2626,13 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-tel a:hover{transform:translateY(-1px);border-color:var(--bad)}
 #rpt .rp-tel a em{font-style:normal;color:var(--tx-3);font-weight:700;letter-spacing:.12em;font-size:8.5px;
   text-transform:uppercase}
+/* A number with nothing to dial, on a desktop or where no tel link exists. It
+   is the same pill without the affordance, rather than bare text in the row. */
+#rpt .rp-telx{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:10px 16px;
+  border:1px solid var(--border-strong);background:var(--surface-2);color:var(--tx);
+  font-family:var(--rmono);font-size:11px;font-weight:800;letter-spacing:.06em}
+#rpt .rp-telx em{font-style:normal;color:var(--tx-3);font-weight:700;letter-spacing:.12em;
+  font-size:8.5px;text-transform:uppercase}
 
 /* ------------------------------------------------------------- findings */
 #rpt .rp-finds{margin-top:32px;display:grid;gap:14px}
@@ -2655,11 +2779,12 @@ body[data-stage="report"] .foot{display:none}
 /* The summary sits above the whole record, so the two read as a pair with the
    useful one first. */
 #rpt .rp-sec > .rp-behindin.rp-sumfirst{margin-bottom:14px}
-/* The arrow stays the same dark as the record door below it. These two are the
-   same class of control, a way through to somewhere else in the product, and
-   colouring one of them differently would say they were different things. A
-   rule setting it green sat here and did nothing, because .rp-behindbtn .rp-go
-   is declared later at the same specificity. Seventh time. */
+/* The summary door and the record door are the same control with a different
+   destination, so the summary carries no geometry of its own: only the label on
+   its own line, which keeps the pair reading as a pair. A rule colouring its
+   arrow green sat here and did nothing, because .rp-behindbtn .rp-go is
+   declared later at the same specificity. */
+#rpt .rp-sumbtn .rp-t{color:var(--tx)}
 #rpt .rp-behindbtn{width:100%;display:flex;align-items:center;gap:26px;text-align:left;
   background:var(--surface);border-radius:calc(var(--r-xl) - 7px);padding:29px 32px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
@@ -2953,6 +3078,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-shame{margin-top:20px;padding:15px 18px;border-radius:var(--r-sm);
   background:var(--surface-2);border:1px solid var(--border);font-size:14.5px;
   line-height:1.6;color:var(--tx-2);max-width:68ch}
+/* WHAT WE FOUND AND DID NOT PRINT.
+   This is the page telling the reader that a rule we set ourselves cost them
+   something. It is the most important paragraph in the report and it had no
+   rule of its own, so it read as an afterthought in body copy. */
+#rpt .rp-held{margin-top:20px;padding:15px 18px;border-left:3px solid var(--gold-dp);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--gold-50,#FBF6EA);
+  font-size:14px;line-height:1.6;color:#5C4712;max-width:68ch}
+#rpt .rp-held b{color:#3E300C;font-weight:700}
 
 /* Where a finding came from, said on the finding. Green when the source is
    strong enough on its own, amber when it never is. */
@@ -3519,6 +3652,25 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-finds" id="rpFinds"></div>
     </div>
 
+    <!-- Nothing against them AND nothing in their favour. Both sections hide,
+         and without this the reader is left with a heading and a button on an
+         empty page, which reads as a page that failed rather than an answer. -->
+    <div class="rp-sec rp-tight" id="rpNoneSec" style="display:none">
+      <h2 class="rp-h2">We did not find anything either way.</h2>
+      <p class="rp-sub">No register we reached had an adverse record about this company, and none
+        of them had anything in its favour either.</p>
+      <div class="rp-gapnote">
+        <div class="rp-t">This is not the same as a clean result</div>
+        <div class="rp-x">A company can be missing from every register because it is new, because
+          it trades under a different name, or because it has never come to anybody's attention
+          yet. None of those is a reason to relax.</div>
+        <div class="rp-x" id="rpNoneCov"></div>
+        <div class="rp-x">If you are about to send money, the safest thing you can do with a result
+          like this is ask them, in writing, which regulator they are registered with and under
+          what name, and then look that up yourself.</div>
+      </div>
+    </div>
+
     <div class="rp-sec rp-tight">
       <!-- Only where a finding rests on what customers said. A pattern of
            complaints is real information and it is also, sometimes, a mismatch
@@ -3693,7 +3845,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-behindin">
         <button class="rp-behindbtn" id="rpOpenRecord" type="button">
           <span class="rp-b">
-            <span class="rp-t">Open the whole record</span>
+            <span class="rp-t">See the technical data room</span>
             <span class="rp-x">The board of all 104 registers, what each one returned, the ten
               checks behind the verdict, and the audit trail for this run.</span>
           </span>
@@ -3741,8 +3893,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     </div>
 
     <h1 class="rp-stitle">How we decide, and what we will not say.</h1>
-    <p class="rp-slead">A page like this usually exists because a lawyer asked for it. This one exists
-      because of the people we built it for.</p>
+    <p class="rp-slead">A page like this usually exists because a lawyer asked for it. This one
+      exists because of the people we built it for.</p>
 
     <div class="rp-why">
       <div class="rp-k">Why this exists</div>
@@ -3762,42 +3914,42 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
     <div class="rp-sec">
       <div class="rp-kick">The logic</div>
-      <h2 class="rp-h2">Retrieval decides what was reached. Judgement decides what it means.</h2>
-      <p class="rp-sub">Those two steps are kept apart on purpose. Mixing them is how a service ends up
-        confident about something it never actually looked at.</p>
+      <h2 class="rp-h2">Finding a record and reading it are two different jobs.</h2>
+      <p class="rp-sub">We keep them apart on purpose. Mixing them up is how a service ends up sounding
+        certain about something it never actually looked at.</p>
       <div class="rp-rows" id="rpMethod"></div>
     </div>
 
     <div class="rp-sec">
       <div class="rp-kick">The hardest call we make</div>
-      <h2 class="rp-h2">A complaint can be a warning or a mismatch, and both are real.</h2>
-      <p class="rp-sub">This is the judgement we get asked about most, and the one we refuse to
-        make on a reader's behalf.</p>
+      <h2 class="rp-h2">A pile of complaints can mean two very different things.</h2>
+      <p class="rp-sub">This is the call we get asked about most, and the one we will not make for
+        you.</p>
       <div class="rp-rows" id="rpWhySoft"></div>
     </div>
 
     <div class="rp-sec">
       <div class="rp-kick">The limits we set on ourselves</div>
       <h2 class="rp-h2">Four things we will not do, whatever it costs us.</h2>
-      <p class="rp-sub">Each of these would make the product look more certain than it is. That is
-        exactly why none of them is here.</p>
+      <p class="rp-sub">Every one of them would make this look more certain than it is. That is exactly
+        why none of them is here.</p>
       <div class="rp-nevers" id="rpNevers"></div>
     </div>
 
     <div class="rp-sec">
       <div class="rp-kick">Lawful considerations</div>
-      <h2 class="rp-h2">Naming a real business carries a duty, and here is ours.</h2>
-      <p class="rp-sub">Regulators publish caution lists with no route of appeal, because they have
-        statutory protection we do not have and should not pretend to. We hold ourselves to the
-        standard that applies to anybody who publishes adverse information about a named party.</p>
+      <h2 class="rp-h2">Naming a real company comes with a duty. Here is ours.</h2>
+      <p class="rp-sub">Regulators can publish a warning list with no way to appeal it, because the law
+        protects them in a way it does not protect us. We hold ourselves to the standard that
+        applies to anybody who publishes something damaging about a named company.</p>
       <div class="rp-rows" id="rpLawful"></div>
     </div>
 
     <div class="rp-sec">
       <div class="rp-kick">The sources</div>
-      <h2 class="rp-h2">One hundred and four, in four tiers of authority.</h2>
-      <p class="rp-sub">A source's tier decides what a finding from it is allowed to do. Consumer reports
-        and open web material corroborate. They never turn a result red on their own.</p>
+      <h2 class="rp-h2">One hundred and four sources, in four levels of authority.</h2>
+      <p class="rp-sub">Where a source sits decides what it is allowed to do. Customer reports and
+        anything off the open web can back a finding up. They can never cause one.</p>
       <div class="rp-cat" id="rpCats"></div>
       <p class="rp-spec">The full catalogue, and which of its sources applied to any given party, is
         published inside every result. Coverage is always measured against the sources that could
@@ -7303,6 +7455,11 @@ function askOpen(q){
   id("kbForm").hidden=true;
   var acc=id("kbAccepts"); if(acc) acc.hidden=true;
   var up=document.querySelector(".upnote"); if(up) up.hidden=true;
+  /* This line tells the reader what the search bar accepts. The bar is gone the
+     moment the thread opens, so it is answering a question nobody is being
+     asked any more, and it was the thing sitting hard against the line above
+     the conversation. */
+  var blk=id("kbBlocked"); if(blk) blk.style.display="none";
   chatBub("me", q);
   chatThink(900, function(){
     chatBub("them","2 quick questions.");
@@ -7343,6 +7500,7 @@ function onLiveEvent(ev){
               : "";
     id("modeLbl").textContent = v.label + extra;
     id("boardT").textContent = v.label;
+    waitExpectLive();
     if(PHASE_PCT[v.step]){ topBar(PHASE_PCT[v.step]); waitProgress(PHASE_PCT[v.step], v.label); }
   }
   else if(ev.t==="tick"){
@@ -9668,7 +9826,10 @@ function waitOpen(q){
   id("waitPhase").textContent="Starting the sweep";
   /* One, not zero. A bar at nothing reads as a page that has not started. */
   clearInterval(waitStepT); waitStepT=null;
-  waitShown=1; waitCeil=6; waitPaint(); waitDrive();
+  /* One, not zero, and the clock starts here. */
+  waitShown=1; waitCeil=1; waitT0=Date.now(); waitCreepT0=0;
+  waitExpectMs = LIVE ? WAIT_LIVE_MS : WAIT_SEED_MS;
+  waitPaint(); waitDrive();
   runClockStart();
   id("waitFine").className="waitfine";
   /* The disclaimer stays put for the whole wait. It used to be replaced by a
@@ -9709,7 +9870,27 @@ function waitOpen(q){
    there is always visible movement and the number is never a claim that more
    has happened than has. It starts at one, because zero looks like nothing has
    begun, and only a finished result writes a hundred. */
-var waitCeil=1, waitShown=1, waitStepT=null, waitCreepT0=0;
+var waitCeil=1, waitShown=1, waitStepT=null, waitCreepT0=0, waitT0=0;
+/* How long a check takes. Two minutes is the live figure; the seeded
+   walkthrough is over in about three seconds and would otherwise sit at two per
+   cent and then jump to a hundred.
+   Set when the screen opens, and RAISED the moment a real server event proves
+   this is a real run whatever the page was loaded as. The clock is re-anchored
+   when that happens so the bar carries on from exactly where it is rather than
+   stopping dead while the new, longer curve catches up. */
+var WAIT_LIVE_MS = 120000, WAIT_SEED_MS = 3400;
+var waitExpectMs = WAIT_LIVE_MS;
+function waitExpected(){ return waitExpectMs; }
+function waitExpectLive(){
+  if(waitExpectMs >= WAIT_LIVE_MS || waitDone) return;
+  waitExpectMs = WAIT_LIVE_MS;
+  /* Where the bar is now, expressed as a position on the new curve. Read off
+     the CEILING, not the shown value: the shown value lags behind the ceiling
+     by design, so anchoring to it put the clock ten seconds behind where the
+     bar already was and the ceiling stood still until the clock caught up. */
+  var frac = Math.max(0, Math.min(1, (waitCeil - 1) / 98));
+  waitT0 = Date.now() - frac * waitExpectMs;
+}
 function waitPaint(){
   var v=Math.max(1, Math.min(100, waitShown));
   id("waitBar").style.width=v+"%";
@@ -9724,9 +9905,16 @@ function waitDrive(){
      half per cent for two and a third seconds and then jumped. */
   if(waitStepT) return;
   waitStepT=setInterval(function(){
-    /* The reasoning call is a wait with no events in it. The ceiling has to be
-       recomputed here, from the clock, or the bar parks between heartbeats. */
-    if(waitCreepT0 && !waitDone) waitCreepAt(Date.now() - waitCreepT0);
+    /* THE CLOCK IS THE ONLY THING THAT MOVES THE BAR.
+       Linear to ninety nine over the expected duration, then easing at a tenth
+       of the rate so a long run still creeps rather than parking. */
+    if(waitT0 && !waitDone){
+      var el = Date.now() - waitT0, ex = waitExpected(), t;
+      if(el <= ex) t = el / ex;
+      else t = 1 + (el - ex) / (ex * 10);
+      var target = 1 + 98 * Math.min(1, t);
+      if(target > waitCeil) waitCeil = target;
+    }
     if(waitShown >= waitCeil - 0.05){
       waitShown = Math.min(waitShown, waitCeil); waitPaint();
       /* Landed on a hundred. The run is over and there is nothing left to
@@ -9737,42 +9925,34 @@ function waitDrive(){
     /* Never past ninety nine while a result does not exist yet. Only the
        finished assessment writes a hundred. */
     var cap = waitDone ? 100 : Math.min(waitCeil, 99);
-    /* Six per cent of what is left, with a floor so the last stretch of a long
-       phase still moves rather than creeping to a standstill. It was eleven,
-       which closed most of any gap inside a second: the bar kept arriving at
-       its ceiling and then standing there, which is the thing that reads as
-       stuck. Half the rate is twice the travel time and the same destination. */
-    var step = Math.max(0.05, (cap - waitShown) * 0.06);
+    /* The ceiling now moves at the pace the bar is meant to travel, so this is
+       no longer the pace: it is only what closes a gap when something jumps the
+       ceiling, and it has to be fast enough to keep up with the clock. */
+    var step = Math.max(0.04, (cap - waitShown) * 0.25);
     waitShown = Math.min(cap, waitShown + step);
     waitPaint();
     netProgress(waitShown);
     topBar(waitShown);
   }, 90);
 }
+/* The events change the WORDS. They no longer touch the bar, because a phase
+   ceiling is a guess about duration wearing the clothes of a measurement, and
+   every version of that guess put the lump in a different place. The number the
+   callers pass is ignored on purpose; the signature is kept so the twenty odd
+   call sites read the same as they always did. */
 function waitProgress(pct, label){
   if(label) id("waitPhase").textContent=label;
-  /* A later event carrying a smaller number is a later event, not a smaller
-     amount of work done. The partial result claims eighty and can land after
-     the reasoning phase claimed ninety. */
-  var c=Math.max(0, Math.min(100, pct||0));
-  if(c > waitCeil) waitCeil = c;
   waitDrive();
 }
-/* The floor, the ceiling, and how long the curve takes to flatten. Ninety
-   seconds is roughly where a real run's reasoning call sits, so the bar has
-   covered most of the remaining ground by then and keeps creeping after. */
-var WAIT_CREEP_FROM = 72, WAIT_CREEP_TO = 99, WAIT_CREEP_TAU = 75000;
-function waitCreepAt(ms){
-  var f = 1 - Math.exp(-Math.max(0, ms) / WAIT_CREEP_TAU);
-  var pct = WAIT_CREEP_FROM + (WAIT_CREEP_TO - WAIT_CREEP_FROM) * f;
-  if(pct > waitCeil) waitCeil = pct;
-}
-/* The heartbeat carries the server's own elapsed milliseconds. It is used to
-   set the clock the ticker reads, not to move the bar, so a slow or a missed
-   heartbeat costs accuracy and never costs movement. */
+/* THE HEARTBEAT SETS THE CLOCK, NOT THE BAR.
+   The server reports how long IT has been working. That is a better clock than
+   the browser's own, because it survives a slow page load, so the heartbeat
+   re-anchors the start time and nothing else. If no heartbeat ever arrives the
+   browser's clock carries the whole run on its own. */
 function waitCreep(ms){
-  waitCreepT0 = Date.now() - Math.max(0, ms);
-  waitCreepAt(ms);
+  waitExpectLive();
+  var t0 = Date.now() - Math.max(0, ms);
+  if(!waitT0 || t0 < waitT0) waitT0 = t0;
   waitDrive();
 }
 
@@ -9807,7 +9987,7 @@ function waitFinish(render){
   netProgress(100);
   if(waitPayload && waitPayload.board) netPaint(waitPayload.board);
   var ms=runClockStop();
-  waitCreepT0=0; waitCeil=100; waitDrive(); waitPaint();
+  waitCreepT0=0; waitT0=0; waitCeil=100; waitDrive(); waitPaint();
   id("waitPhase").textContent="Assessment ready";
   var ok=id("waitOk");
   var f=id("waitFine");
@@ -9851,7 +10031,6 @@ function waitClose(){
   /* Only stop the clock when the run itself is finished. Dismissing the panel
      early must not stamp a partial duration on a check that is still going. */
   if(waitDone) runClockStop();
-  waitScrim.classList.remove("on"); waitBox.classList.remove("on");
   document.body.style.overflow="";
   if(waitReturn && waitReturn.focus){ try{ waitReturn.focus(); }catch(e){} }
   waitReturn=null;
@@ -9863,10 +10042,23 @@ function waitClose(){
        The way back becomes the way forward. */
     if(document.body.classList.contains("over-wait")){
       id("rpBackToReportT").textContent = "Show the result";
+      /* The waiting screen behind them comes down, because the check is done.
+         over-wait stays: it is what keeps the sheet they are reading on top,
+         and rpSourcesBack clears it when they leave. */
+      waitScrim.classList.remove("on"); waitBox.classList.remove("on");
       return;
     }
-    var r=waitRender; waitRender=null; setTimeout(r,240);
+    /* Render UNDER the overlay, let the browser paint it, and only then take
+       the overlay away. Fading first showed the dark console for a quarter of a
+       second before the white document arrived on top of it. */
+    var r=waitRender; waitRender=null;
+    r();
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      waitScrim.classList.remove("on"); waitBox.classList.remove("on");
+    }); });
+    return;
   }
+  waitScrim.classList.remove("on"); waitBox.classList.remove("on");
   /* Nothing is over the waiting screen any more, so neither is the class that
      says so. It only raises a z-index today, which is one change away from
      mattering. */
@@ -9931,36 +10123,12 @@ var RP_OPENING = false;
 var RP_LABEL = "";
 var RP_WINDOWS = [["now", "The first hours", "Call the bank or card issuer that sent it. Ask them to attempt a recall and give you a case number. A transfer caught within hours can often be stopped."], ["soon", "The first three days", "For an international wire, this is the window in which a recall through law enforcement is realistic. Report it now, not after the weekend."], ["after", "After that", "Card and PayPal disputes still have deadlines, so ask your issuer for yours in writing. Bank transfer and crypto have no recovery path once settled."]];
 var RP_TELS = [["Canada", "1-888-495-8501", "tel:18884958501"], ["United States", "1-877-382-4357", "tel:18773824357"], ["Your bank", "The number on your card", ""]];
-var RP_PACKS = [{"id": "bank", "n": 1, "name": "Your bank or credit union", "sub": "They can try to recall the payment. This is the only call that can move money.", "tone": "act", "act": "Handles your case", "does": "Your bank adjudicates your claim and, if the money has not yet been drawn down, may be able to attempt a recall. This is the one report on this page with a chance of getting funds back, and its chance falls every hour.", "route": [["Where", "The number on the back of your card, or your bank's app"], ["Published guidance", "cba.ca/article/financialfraudpreventiontips"], ["Interac phishing samples", "phishing@interac.ca"]], "clock": "No bank publishes a numeric deadline. Every one of them publishes the word immediately. Make this call before you finish reading this page.", "ask": ["Amount and currency sent", "Date and exact time of each payment", "How you paid: wire, e-Transfer, card, bill payment, crypto purchase", "Name on the receiving account, exactly as you typed it", "Receiving institution and country", "The account or reference number the payment went to", "Whether any further payment is scheduled or promised", "Whether you gave them remote access to any device", "Whether you gave them any banking credential, code or one time passcode"], "attach": ["Your payment confirmation or wire receipt", "The screen or message that told you where to send the money", "This report"], "note": ["Ask the bank to record this as a fraud claim, not a disputed purchase, and ask for the claim number before you hang up.", "The Canadian Bankers Association publishes that you should contact your bank immediately and keep every communication related to the scam.", "TD publishes that reporting to the police will not change the speed or priority of your bank claim. Do both, in either order, but do not delay the bank call waiting for a police file number."]}, {"id": "card", "n": 2, "name": "Your card issuer", "sub": "A card payment has a dispute route a transfer does not. It has the only hard deadline.", "tone": "act", "act": "Handles your case", "does": "Your issuer investigates the claim and, where it qualifies, raises a chargeback against the merchant's acquirer. Visa and Mastercard do not take cardholder disputes themselves; both publish that you must go to the institution that issued your card.", "route": [["Where", "The number on the back of your card, or your issuer's app"], ["Mastercard Assistance Center", "1-800-627-8372"], ["Regulator guidance", "canada.ca, Financial Consumer Agency of Canada, protection from unauthorized transactions"]], "clock": "This is the one published deadline on this page. CIBC publishes: submit the dispute within 30 days of your statement date at the latest. Other issuers vary. Treat 30 days from the statement as the outside limit and file well inside it.", "ask": ["The exact amount, date and merchant descriptor as it appears on your statement", "Every related transaction on the same card, including small test charges", "Whether you authorised the transaction at all, or authorised it having been deceived", "Whether you still physically hold the card", "Whether anyone else is an authorised user on the account", "What you were told you were buying", "What attempt you made to resolve it with the merchant, and when", "A current mailing address for a replacement card"], "attach": ["The statement line, circled", "Any order confirmation, receipt or invoice they sent you", "Your messages with them", "This report"], "note": ["RBC publishes that you should try the merchant first and allow 15 to 20 business days for a credit before raising the dispute. That guidance is written for an ordinary merchant dispute. Where a securities regulator has published a caution about the party, say so on the call and ask the issuer whether the fraud route applies instead.", "Zero liability protection covers unauthorised use. A payment you were deceived into authorising is a different category and is decided case by case. Describe what happened plainly and let the issuer classify it."]}, {"id": "police", "n": 3, "name": "Your local police", "sub": "The only body that investigates your case, and the source of the file number everyone else asks for.", "tone": "act", "act": "Investigates", "does": "Local police investigate the individual matter. The Canadian Anti-Fraud Centre publishes plainly that it is the role of your local police to investigate. Every other body on this page will ask you for the file number this report generates.", "route": [["Where", "Your local police service, in person or by their non emergency line"], ["Toronto Police non emergency", "416-808-2222"], ["Guidance", "sfo.opp.ca/reporting-fraud"]], "clock": "No deadline and no minimum loss threshold is published. Report it even if the amount feels too small to bother them with.", "ask": ["A detailed chronology of events, in order, with dates", "Personal identification you handed over during the fraud", "How they first reached you, and on what platform", "Every name, phone number, email address and handle they used", "Every payment: amount, date, method and destination", "Whether you have had any contact since"], "attach": ["Receipts, correspondence, financial documents and statements", "Emails, text messages and social media exchanges", "Screenshots of the website and of anything since taken down", "This report"], "note": ["The Ontario Provincial Police Serious Fraud Office publishes exactly three requirements: identification you provided during the fraud, supporting documents, and a detailed chronology. The chronology is the one you have to write yourself. Write it before you go in.", "Ask for the file number and write it down. Do not leave without it."]}, {"id": "cafc", "n": 4, "name": "Canadian Anti-Fraud Centre", "sub": "The national record. It does not investigate, and the record is still worth making.", "tone": "intel", "act": "Records and refers", "does": "The CAFC maintains the central repository that law enforcement draws on. It publishes that it does not investigate your case. What your report does is put this party into the national picture, which is how the next person gets warned.", "route": [["Phone", "1-888-495-8501, Monday to Friday, 10am to 4:45pm Eastern"], ["Online", "reportcyberandfraud.canada.ca"], ["Guidance", "antifraudcentre-centreantifraude.ca"]], "clock": null, "ask": ["Your police file number, which the CAFC asks you to obtain first", "The name of the person or business that approached you", "How they first made contact, and on what platform", "What they asked you to do", "Every amount sent, with dates and method", "The financial institution that transferred the money", "Whether anyone has since contacted you offering to recover it"], "attach": ["Documents and receipts", "Copies of emails and text messages", "Screenshots", "This report"], "note": ["The CAFC publishes a warning that belongs on this page more than any other: fraudsters often target victims a second or third time with the promise of recovering money. Nobody legitimate will ask you to pay to get your money back. Not a lawyer, not a recovery firm, not somebody claiming to be from the CAFC itself.", "Report to your financial institution and your local police first. The CAFC's own published order puts both ahead of them."]}, {"id": "bureau", "n": 5, "name": "Competition Bureau Canada", "sub": "For the advertising and the marketing that reached you. It publishes the fullest list of what to gather.", "tone": "intel", "act": "Enforcement, not redress", "does": "The Bureau enforces the Competition Act. It publishes plainly that it is not a consumer protection agency, cannot act on your behalf to obtain reimbursement, and does not provide legal advice. Its interest is the deceptive marketing itself.", "route": [["Phone", "1-800-348-5358"], ["Online", "competition-bureau.canada.ca, complaint form"], ["Guidance", "competition-bureau.canada.ca, how to report fraud and scams in Canada"]], "clock": null, "ask": ["The name of the person who approached you, what they were trying to get you to do, and when it happened", "The phone number they used, if they called", "The exact website address, written or pasted in full", "The sender's IP address from the email header, if you can find it", "The search terms you used, if you found them through a search engine, and whether you clicked a link or a banner advert", "A detailed description of the complaint", "Whether you are a victim, and the dollar amount if so"], "attach": ["Printouts or screenshots of key web pages: the product or service, the terms and conditions, and the payment page", "Receipts for mail, card payments, wire transfers and money orders", "Cancelled cheques, phone bills, shipping envelopes", "Copies of emails, text messages and chat logs", "This report"], "note": ["That list is the Bureau's own, and it is the most complete evidence checklist any Canadian body publishes. Gathering it once covers most of what every other recipient on this page will ask for.", "Take the screenshots today. A site named on a caution list often disappears within weeks, and a page you did not capture is a page that never existed."]}, {"id": "bcsc", "n": 6, "name": "British Columbia Securities Commission", "sub": "The regulator that published the caution about this party. It can assess and investigate.", "tone": "act", "act": "May investigate", "does": "The BCSC assesses complaints with a connection to British Columbia, meaning illegal activity affecting BC residents or occurring in BC. It publishes four possible outcomes: it contacts you for more, closes the file, refers it to another regulator, or points you to police.", "route": [["Phone", "604-899-6854, or toll free 1-800-373-6393"], ["Email", "inquiries@bcsc.bc.ca"], ["Online", "bcsc.bc.ca, filing a complaint with the BCSC"]], "clock": null, "ask": ["A detailed summary of what happened", "The names of every individual, company or entity you came into contact with", "How the investment was described to you, and what return you were promised", "Where you are resident, and where you were when you were approached", "Every amount sent, with dates and method", "Whether you were told the party was registered or licensed anywhere"], "attach": ["Correspondence and paperwork", "Screenshots and photographs", "Account statements, if an account was opened", "Emails, text messages and other written communication", "This report"], "note": ["This party is already on the BCSC Investment Caution List, added 14 July 2026. Your report is not telling them something they do not know about the name. It is telling them the name is still operating and still reaching people, which is what moves a listing along.", "A caution list entry is a warning, not a finding that any law has been broken."]}, {"id": "ic3", "n": 7, "name": "FBI Internet Crime Complaint Center", "sub": "For a United States connection. It publishes its required fields exactly.", "tone": "intel", "act": "Records and refers", "does": "IC3 takes the complaint, analyses it, and may refer it onward. It publishes that you will not be contacted by IC3 and that any investigation is at the discretion of the agency receiving it.", "route": [["Online", "complaint.ic3.gov"], ["Field list", "ic3.gov, frequently asked questions"]], "clock": "No numeric window is published. IC3 does describe a Recovery Asset Team that works with financial institutions to freeze funds, and speed is the whole basis of it.", "ask": ["Your name, address, telephone and email", "Financial transaction information: account information, transaction date and amount, and who received the money", "The total amount of your loss", "The subject's name, address, telephone, email, website and IP address", "Specific details of what happened", "Email headers, if available"], "attach": ["Email headers in full, which is more than the visible message", "Transaction records", "This report"], "note": ["IC3 publishes that its ability to address the complaint depends on the accuracy and completeness of what you give it. The subject's IP address and the full email headers are the two fields most people leave blank, and they are the two that make a complaint traceable."]}, {"id": "ftc", "n": 8, "name": "United States Federal Trade Commission", "sub": "For a United States connection. The report reaches thousands of enforcers at once.", "tone": "intel", "act": "Records and refers", "does": "The FTC publishes that it uses reports to investigate, bring law enforcement cases and alert companies and consumers, and that a report made through its portal is instantly available to more than three thousand federal, state and local law enforcers.", "route": [["Online", "reportfraud.ftc.gov"], ["Phone", "1-877-382-4357"], ["Guidance", "consumer.ftc.gov, what to do if you were scammed"]], "clock": null, "ask": ["The name of the company", "Contact details for the person who dealt with you", "The amount you paid", "The payment method", "When you paid", "How you first heard about it", "What was offered to you", "A description of events in your own words"], "attach": ["Your own written account, prepared before you start the form", "Payment records", "This report"], "note": ["The FTC's own instruction for money already sent is to go to the payment channel first: your bank for a transfer, the wire company for a wire, the card issuer for a card, the gift card issuer for a gift card, the exchange for crypto. The FTC report does not recover money and does not claim to.", "Check reportfraud.ftc.gov is available before you begin. It has been intermittently offline, in which case consumer.ftc.gov carries the guidance."]}, {"id": "crypto", "n": 9, "name": "The crypto exchange or platform", "sub": "Only if funds moved through crypto. Read the first line of this one before you hope.", "tone": "intel", "act": "Secures your account", "does": "An exchange can secure your account, act on its own fraud intelligence and give you a paper trail. Kraken publishes the sentence that matters: cryptocurrency transactions are irreversible, once a transaction leaves your account funds cannot be recovered, and the exchange is unable to reverse or recover funds for you.", "route": [["Where", "Your exchange's own support or complaint form"], ["Kraken complaints", "support.kraken.com, complaint handling process"], ["Coinbase", "help.coinbase.com, report an unauthorized transaction"]], "clock": "Kraken publishes its own handling times: acknowledgment within 5 business days, response within 15, and up to 30 to 35 business days for a complex investigation.", "ask": ["Your full name and the email address on the account", "Your country of residence", "A detailed description of the issue", "The dates and events involved", "Any existing support ticket number", "The transaction hash or TXID of every transfer out", "The destination wallet address", "The network each transfer was sent on"], "attach": ["Screenshots of the transaction history", "The instructions you were given about where to send it", "This report"], "note": ["The last three fields are not a published form requirement. Neither Coinbase nor Kraken publishes a scam report field list. They are here because the transaction hash, the destination address and the network are what any investigator or exchange actually uses to follow a transfer, and both exchanges describe the hash in exactly those terms.", "Lock the account before you write anything. Coinbase publishes a lock account page for this. Change the password and check for any device or session you do not recognise."]}];
-var RP_METHOD = [["What is retrieved", "Every register we can reach is asked directly, and every page that comes back is kept with the address it came from and the date it was read. <b>What was reached is counted from that log</b>, not asserted by anything downstream of it."], ["What is judged", "Reading a record is a separate step from retrieving it. Judgement can say a register that answered means something worse than it first appeared. It can never light a register that returned nothing."], ["The two numbers", "<b>Identity confidence</b> is how sure we are that every record describes the same party. <b>Evidence coverage</b> is how much of what could have applied was actually reached. They are published side by side and never combined, because one number out of a hundred gets read as permission."], ["Dark is three things", "A register can be dark because it was asked and held nothing, because it could never have held a record for this party, or because nobody reached it. Only the last is a gap, and the board keeps them apart."], ["How current it is", "Every page carries the date the records were read. Registers change. A result is a photograph of the public record on one day, and we say which day on every screen."]];
-var RP_WHYSOFT = [
- ["What a pattern of complaints is worth",
-  "It is real information. A group of people describing the same problem, in their own words, is "
-  +"often the first sign of something a regulator has not reached yet. We read it for the "
-  +"repeated thing, not for the volume, because ten people describing one problem tells you more "
-  +"than a hundred scores out of five."],
- ["What it is not",
-  "It is not a finding. Nobody in a review has been cross examined, nothing in it has been tested, "
-  +"and a complaint board has no duty to be fair to the party it names. That is why a pattern can "
-  +"never turn a result red on its own, whatever the number."],
- ["The half nobody says out loud",
-  "We have sat with people who lost money on a platform that had broken no rule. Nobody "
-  +"had explained what they were actually taking on, the product was never right for them, and by "
-  +"the time that was clear the money had gone. The loss was real. The distress was real. The firm "
-  +"was not at fault. That complaint looks exactly like the other kind in a review score."],
- ["Why we will not choose for you",
-  "From outside a business we usually cannot tell which of those two we are looking at. So we "
-  +"publish what people are reporting, how many report the same thing, and whether any authority "
-  +"has acted, and we leave the judgement where it belongs. Presenting either reading as certain "
-  +"would be the same failure, pointed in two different directions."],
- ["The other half of the job",
-  "A sound business and a customer who did not understand what they were buying is a gap, and it "
-  +"costs people money without anybody doing anything wrong. Closing it is work 4orm is doing "
-  +"directly. Warning people away from fraud is only half of what this is for."]
-];
-var RP_NEVERS = [["We never invent evidence", "No licence number, registry reference, case number or filing date is ever produced that we did not read off a source you can open."], ["We never publish a trust score", "No single number out of a hundred, no letter grade, no stars. A composite is read as permission and it hides which half of it is weak."], ["We never call an outage a clean result", "If a register cannot be reached, it is reported as not reached. A missing key never becomes \u201cwe looked and found nothing\u201d."], ["We never decide for you", "This is a research summary. It is not a legal finding, not advice, and not a determination that anybody has done anything wrong."]];
-var RP_LAWFUL = [["What this is not", "Inclusion of a party in a 4orm result does not mean we have concluded that any law has been broken, or that any authority has made a finding. We report what public records showed on a stated date, with the source beside each item."], ["Absence proves nothing", "A party missing from a caution list is not cleared by that absence. Regulators say so themselves: entities are added as they become known. A register with no entry on the day we looked is a fact about that day, not a verdict."], ["Accuracy is an ongoing duty", "Where a result names a person, that is personal information and we treat accuracy as a continuing obligation rather than something we fix only when challenged."], ["If you are the party named", "Write to us and we will re-check the record. If an item cannot be verified against a source, we remove it. If we disagree, your response is attached to the result so anybody reading it sees both."], ["Why there is no old copy to correct", "We do not keep results. Every check is run fresh against the registers on the day you ask, and the answer is not stored and served to somebody else later. That is why this page carries no promise to go back and notify people who read an old result: there is no old result in the world to notify them about. A correction lands the moment the record changes, because the next check reads the record and not our memory of it."], ["Our commitment on timing", "We aim to acknowledge a challenge within five business days and to finish the re-check within thirty. Items we cannot verify against a source come off while we are looking, not at the end."]];
-var RP_CATLIST = [["Official record", "Regulators, courts, registries", "Government, regulator, court and registry sources. Can carry a red result on their own."], ["Verified data", "Certificates, chain, infrastructure", "Independent structured data: certificate logs, domain records, threat feeds, chain explorers."], ["Customer reports", "Complaint boards, review platforms", "What customers say, read for a repeated pattern rather than for volume. Never decides alone."], ["Public chatter", "Open web", "Labelled as community intelligence and never as verified fact. Corroborates, never concludes."]];
+var RP_PACKS = [{"id": "bank", "n": 1, "name": "Your bank or credit union", "sub": "They can try to pull the payment back. This is the only call that can move money.", "tone": "act", "act": "Handles your case", "does": "decides your claim, and if the money has not been taken out at the other end yet, they may be able to pull it back. This is the only thing on this page that can get money returned to you, and the chance drops every hour.", "route": [["Where", "The number on the back of your card, or your bank's app"], ["Published guidance", "cba.ca/article/financialfraudpreventiontips"], ["Interac phishing samples", "phishing@interac.ca"]], "clock": "No bank publishes a deadline. Every one of them says to call immediately. Make this call before you finish reading this page.", "ask": ["Amount and currency sent", "Date and exact time of each payment", "How you paid: wire, e-Transfer, card, bill payment, crypto purchase", "Name on the receiving account, exactly as you typed it", "Receiving institution and country", "The account or reference number the payment went to", "Whether any further payment is scheduled or promised", "Whether you gave them remote access to any device", "Whether you gave them any banking credential, code or one time passcode"], "attach": ["Your payment confirmation or wire receipt", "The screen or message that told you where to send the money", "This report"], "note": ["Say the words fraud claim, not disputed purchase. They are handled by different teams. Ask for your claim number before you hang up and write it down.", "The Canadian Bankers Association says to contact your bank straight away and to keep every message, email and screenshot connected to what happened.", "TD says that going to the police first will not make your bank claim any faster. Do both, in whichever order suits you, but do not wait for a police file number before you call the bank."]}, {"id": "card", "n": 2, "name": "Your card issuer", "sub": "A card payment can be disputed in a way a bank transfer cannot. It also has the only real deadline.", "tone": "act", "act": "Handles your case", "does": "looks at your claim and, if it qualifies, tries to claw the money back from the seller's bank. That is called a chargeback. Visa and Mastercard do not handle this themselves. Both say to go to whoever issued your card.", "route": [["Where", "The number on the back of your card, or your issuer's app"], ["Mastercard Assistance Center", "1-800-627-8372"], ["Regulator guidance", "canada.ca, Financial Consumer Agency of Canada, protection from unauthorized transactions"]], "clock": "This is the one real deadline on this page. CIBC says to file within 30 days of your statement date at the very latest. Other card companies differ. Treat 30 days as the outside limit and file well before it.", "ask": ["The exact amount, date and merchant descriptor as it appears on your statement", "Every related transaction on the same card, including small test charges", "Whether you authorised the transaction at all, or authorised it having been deceived", "Whether you still physically hold the card", "Whether anyone else is an authorised user on the account", "What you were told you were buying", "What attempt you made to resolve it with the merchant, and when", "A current mailing address for a replacement card"], "attach": ["The statement line, circled", "Any order confirmation, receipt or invoice they sent you", "Your messages with them", "This report"], "note": ["RBC says to try the seller first and give them 15 to 20 business days. That advice is written for an ordinary shopping dispute. If a regulator has already published a warning about this company, say so on the call and ask whether the fraud route applies instead.", "Zero liability covers a payment you never made. A payment you were tricked into making yourself is treated differently and is decided case by case. Just describe what happened in your own words and let them decide which it is."]}, {"id": "police", "n": 3, "name": "Your local police", "sub": "The only people who will actually investigate. They give you the file number everyone else asks for.", "tone": "act", "act": "Investigates", "does": "investigates what happened to you. The Canadian Anti-Fraud Centre says plainly that this is your local police force's job, not theirs. Almost everyone else on this list will ask you for the file number the police give you.", "route": [["Where", "Your local police service, in person or by their non emergency line"], ["Toronto Police non emergency", "416-808-2222"], ["Guidance", "sfo.opp.ca/reporting-fraud"]], "clock": "There is no deadline and no minimum amount. Report it even if the sum feels too small to bother them with.", "ask": ["A detailed chronology of events, in order, with dates", "Personal identification you handed over during the fraud", "How they first reached you, and on what platform", "Every name, phone number, email address and handle they used", "Every payment: amount, date, method and destination", "Whether you have had any contact since"], "attach": ["Receipts, correspondence, financial documents and statements", "Emails, text messages and social media exchanges", "Screenshots of the website and of anything since taken down", "This report"], "note": ["The Ontario Provincial Police fraud office asks for three things: any ID you handed over, your documents, and a step by step account of what happened and when. The account is the only part you have to write yourself. Write it before you go in.", "Ask for the file number and write it down. Do not leave without it."]}, {"id": "cafc", "n": 4, "name": "Canadian Anti-Fraud Centre", "sub": "The national record. They do not investigate, and the report is still worth making.", "tone": "intel", "act": "Records and refers", "does": "keeps the national record that police forces across Canada draw on. They say clearly that they do not investigate your case. What your report does is put this company into the national picture, and that is how the next person gets warned.", "route": [["Phone", "1-888-495-8501, Monday to Friday, 10am to 4:45pm Eastern"], ["Online", "reportcyberandfraud.canada.ca"], ["Guidance", "antifraudcentre-centreantifraude.ca"]], "ask": ["Your police file number, which the CAFC asks you to obtain first", "The name of the person or business that approached you", "How they first made contact, and on what platform", "What they asked you to do", "Every amount sent, with dates and method", "The financial institution that transferred the money", "Whether anyone has since contacted you offering to recover it"], "attach": ["Documents and receipts", "Copies of emails and text messages", "Screenshots", "This report"], "note": ["Read this one twice. The Anti-Fraud Centre warns that people who have been scammed once are often targeted again by someone offering to get the money back. Nobody legitimate will ever ask you to pay to recover your money. Not a lawyer, not a recovery company, and not somebody claiming to be from the Anti-Fraud Centre.", "Call your bank and your local police first. That is the order the Anti-Fraud Centre publishes itself."]}, {"id": "bureau", "n": 5, "name": "Competition Bureau Canada", "sub": "For the adverts and the sales pitch that reached you. They publish the best list of what to keep.", "tone": "intel", "act": "Enforcement, not redress", "does": "enforces the law on misleading advertising. They say plainly that they are not a consumer help line, they cannot get your money back for you, and they do not give legal advice. What they care about is the marketing itself.", "route": [["Phone", "1-800-348-5358"], ["Online", "competition-bureau.canada.ca, complaint form"], ["Guidance", "competition-bureau.canada.ca, how to report fraud and scams in Canada"]], "ask": ["The name of the person who approached you, what they were trying to get you to do, and when it happened", "The phone number they used, if they called", "The exact website address, written or pasted in full", "The sender's IP address from the email header, if you can find it", "The search terms you used, if you found them through a search engine, and whether you clicked a link or a banner advert", "A detailed description of the complaint", "Whether you are a victim, and the dollar amount if so"], "attach": ["Printouts or screenshots of key web pages: the product or service, the terms and conditions, and the payment page", "Receipts for mail, card payments, wire transfers and money orders", "Cancelled cheques, phone bills, shipping envelopes", "Copies of emails, text messages and chat logs", "This report"], "note": ["The list above is the Bureau's own, and it is the most complete evidence checklist any Canadian body publishes. Gather it once and you will have most of what everyone else on this page asks for.", "Take the screenshots today. A website named on a warning list often disappears within weeks, and a page you did not save is a page that never existed."]}, {"id": "bcsc", "n": 6, "name": "British Columbia Securities Commission", "sub": "The regulator that published the warning about this company. They can look into it.", "tone": "act", "act": "May investigate", "does": "looks at complaints connected to British Columbia, meaning something that affected people in BC or happened in BC. They publish four things that can follow: they contact you for more, they close the file, they pass it to another regulator, or they point you to the police.", "route": [["Phone", "604-899-6854, or toll free 1-800-373-6393"], ["Email", "inquiries@bcsc.bc.ca"], ["Online", "bcsc.bc.ca, filing a complaint with the BCSC"]], "ask": ["A detailed summary of what happened", "The names of every individual, company or entity you came into contact with", "How the investment was described to you, and what return you were promised", "Where you are resident, and where you were when you were approached", "Every amount sent, with dates and method", "Whether you were told the party was registered or licensed anywhere"], "attach": ["Correspondence and paperwork", "Screenshots and photographs", "Account statements, if an account was opened", "Emails, text messages and other written communication", "This report"], "note": ["This company is already on the BCSC Investment Caution List, added 14 July 2026. Your report is not telling them a name they have never heard. It is telling them the name is still trading and still reaching people, and that is what moves a listing forward.", "Being on a caution list is a warning. It is not a finding that anybody has broken the law."]}, {"id": "ic3", "n": 7, "name": "FBI Internet Crime Complaint Center", "sub": "For anything with a United States connection. They publish exactly what they need.", "tone": "intel", "act": "Records and refers", "does": "takes your complaint, reads it, and may pass it to an agency that can act. They say up front that they will not contact you back, and that whether anything is investigated is up to whichever agency receives it.", "route": [["Online", "complaint.ic3.gov"], ["Field list", "ic3.gov, frequently asked questions"]], "clock": "No deadline is published. They do run a Recovery Asset Team that works with banks to freeze money, and speed is the whole point of it.", "ask": ["Your name, address, telephone and email", "Financial transaction information: account information, transaction date and amount, and who received the money", "The total amount of your loss", "The subject's name, address, telephone, email, website and IP address", "Specific details of what happened", "Email headers, if available"], "attach": ["Email headers in full, which is more than the visible message", "Transaction records", "This report"], "note": ["They say the help they can give depends on how complete your report is. The two boxes most people leave empty are the sender's IP address and the full email headers, and those are the two that make a report possible to trace. If you do not know how to find email headers, search your email provider's name and the words view full headers."]}, {"id": "ftc", "n": 8, "name": "United States Federal Trade Commission", "sub": "For anything with a United States connection. One report reaches thousands of investigators.", "tone": "intel", "act": "Records and refers", "does": "uses reports to investigate, to bring cases, and to warn companies and the public. They say a report filed on their site is immediately visible to more than three thousand federal, state and local law enforcement staff.", "route": [["Online", "reportfraud.ftc.gov"], ["Phone", "1-877-382-4357"], ["Guidance", "consumer.ftc.gov, what to do if you were scammed"]], "ask": ["The name of the company", "Contact details for the person who dealt with you", "The amount you paid", "The payment method", "When you paid", "How you first heard about it", "What was offered to you", "A description of events in your own words"], "attach": ["Your own written account, prepared before you start the form", "Payment records", "This report"], "note": ["If money has already gone, the FTC's own advice is to go to whoever moved it first: your bank for a transfer, the wire company for a wire, the card company for a card, the gift card company for a gift card, the exchange for crypto. The FTC report does not get money back and does not claim to.", "Check reportfraud.ftc.gov loads before you start writing. It has been down at times. If it is, consumer.ftc.gov has the same guidance."]}, {"id": "crypto", "n": 9, "name": "The crypto exchange or platform", "sub": "Only if the money went through crypto. Read the first line of this one before you get your hopes up.", "tone": "intel", "act": "Secures your account", "does": "can lock your account, act on what they know about the receiving wallet, and give you a written record. Read Kraken's own words first: crypto payments cannot be reversed, once a payment leaves your account the money cannot be recovered, and the exchange cannot reverse it or get it back for you.", "route": [["Where", "Your exchange's own support or complaint form"], ["Kraken complaints", "support.kraken.com, complaint handling process"], ["Coinbase", "help.coinbase.com, report an unauthorized transaction"]], "clock": "Kraken publishes its own timings: they confirm they have your report within 5 working days, reply within 15, and take up to 30 to 35 working days if it is complicated.", "ask": ["Your full name and the email address on the account", "Your country of residence", "A detailed description of the issue", "The dates and events involved", "Any existing support ticket number", "The transaction hash or TXID of every transfer out", "The destination wallet address", "The network each transfer was sent on"], "attach": ["Screenshots of the transaction history", "The instructions you were given about where to send it", "This report"], "note": ["Lock the account before you write anything else. Coinbase has a page for exactly this. Change the password, and check for any device or login you do not recognise.", "The last three boxes are not something either exchange asks for on a form. They are here because the transaction hash, the receiving address and the network are what anyone tracing a crypto payment actually uses, and both Coinbase and Kraken describe the hash in those words."]}];
+var RP_METHOD = [["What we look at", "We ask every register we can reach, one by one. Every page that comes back is saved with the web address it came from and the date we read it. <b>The count of what we reached comes from that saved list</b>, not from us."], ["Reading is a separate step", "Finding a record and deciding what it means are two different jobs, and we keep them apart. Reading a record can make a result worse. It can never turn an empty register into a good sign."], ["The two numbers, and why we never add them up", "<b>Identity confidence</b> is how sure we are that all these records are about the same company. <b>Evidence coverage</b> is how much of what we could have checked we actually reached. We show both, side by side, and we never turn them into one score. A single number out of a hundred gets read as permission."], ["An empty register means three different things", "We asked and it held nothing. It could never have held anything about this company in the first place. Or nobody could get in. Only the last one is a gap in what we know, and the board keeps the three apart so you can see which is which."], ["Everything here has a date on it", "Registers change. What you are reading is a photograph of the public record on one day, and we put that day on every screen."]];
+var RP_WHYSOFT = [["What a pile of complaints is worth", "It is real information. A group of people describing the same problem, in their own words, is often the first sign of something a regulator has not caught up with yet. We read it for the thing that repeats, not for how many there are. Ten people describing one problem tells you more than a hundred scores out of five."], ["What it is not", "It is not proof. Nobody in a review has been questioned, nothing in it has been tested, and a complaint site has no duty to be fair to the company it names. That is why a pattern of complaints never turns a result red on its own, whatever the number."], ["The half nobody says out loud", "We have sat with people who lost money on a platform that had broken no rule at all. Nobody had explained what they were actually buying, the product was never right for them, and by the time that was clear the money had gone. The loss was real. The distress was real. The firm was not at fault. That looks exactly like the other kind in a review score."], ["Why we will not choose for you", "From the outside we usually cannot tell which of those two we are looking at. So we show you what people are reporting, how many report the same thing, and whether any authority has acted. The judgement stays with you."], ["The other half of the job", "A sound business and a customer who did not understand what they were buying is a gap, and it costs people money without anybody doing anything wrong. Closing that gap is work 4orm is doing directly. Warning people away from fraud is only half of what this is for."]];
+var RP_NEVERS = [["We never invent evidence", "No licence number, registry reference, case number or date ever appears here unless we read it off a source you can open yourself."], ["We never give a trust score", "No number out of a hundred, no letter grade, no stars. One number gets read as permission, and it hides whichever half of it is weak."], ["We never call a failure a clean result", "If we cannot reach a register, we say we could not reach it. A register we could not open never becomes “we looked and found nothing”."], ["We never decide for you", "This is a research summary. It is not a legal finding, it is not advice, and it is not a decision that anybody has done anything wrong."]];
+var RP_LAWFUL = [["What being in this report does not mean", "It does not mean we have decided anybody broke the law, and it does not mean any authority has made a finding. We report what public records showed on a stated day, with the source printed beside every item."], ["An empty register does not clear anybody", "A company missing from a warning list is not cleared by being missing. The regulators say so themselves: names go on those lists as they become known. No entry on the day we looked is a fact about that day, not a verdict."], ["Getting it right is an ongoing job", "Where a result names a person, that is personal information, and keeping it accurate is something we owe continuously rather than only when somebody complains."], ["If this report is about you", "Write to us and we will check the record again. If we cannot stand an item up against a source, we take it off. If we still disagree with you, your reply is attached to the result so that anybody reading it sees both sides."], ["Why there is no old copy to correct", "We do not keep results. Every check is run fresh against the registers on the day you ask, and the answer is not filed away and handed to somebody else later. So there is no old report sitting anywhere that we would have to go back and fix. When the record changes, the next check reads the record, not our memory of it."], ["What we commit to on timing", "We aim to reply to a challenge within five working days and to finish re-checking within thirty. Anything we cannot stand up against a source comes off while we are looking, not at the end."]];
+var RP_CATLIST = [["Official record", "Regulators, courts, registries", "Governments, regulators, courts and official registries. These can turn a result red on their own."], ["Verified data", "Certificates, domains, blockchain", "Independent technical records: security certificates, domain registrations, threat feeds, blockchain explorers."], ["Customer reports", "Complaint boards, review sites", "What customers say. We read it for a repeated problem, not for volume. It never decides a result by itself."], ["Public chatter", "The open web", "Everything else people have written. Always labelled as chatter, never as fact. It can back something up. It can never be the reason."]];
 var RP_ARROW = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7 17L17 7M9 7h8v8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
 var RP_CROSS = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 6l12 12M18 6L6 18\" stroke-linecap=\"round\"/></svg>";
 var RP_MONTHS = ["January","February","March","April","May","June","July","August",
@@ -10647,49 +10815,71 @@ function rpBundle(d){
 
 /* The preview is the document. Both are written from the same tables and the
    same run, so what a person reads is what lands in their downloads. */
+/* THE PACK, AS A THING A FRIGHTENED PERSON CAN FOLLOW.
+   Four numbered steps, in the order they happen, with one job in each. What we
+   already know is shaded so it is obvious there is nothing to do there. What
+   only they can answer has a line to write on. Every contact that can be
+   clicked is clicked. Nothing is longer than it has to be. */
+function rpPvLink(v){
+  var t = String(v||"");
+  if(/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(t))
+    return '<a href="mailto:'+rpEsc(t)+'">'+rpEsc(t)+'</a>';
+  if(/^1[-\s]?\d{3}[-\s]?\d{3}[-\s]?\d{4}$/.test(t.replace(/\s/g,"")) || /^\d{3}-\d{3}-\d{4}$/.test(t))
+    return '<a href="tel:'+rpEsc(t.replace(/[^\d+]/g,""))+'">'+rpEsc(t)+'</a>';
+  if(/^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(t) && /\.(ca|com|gov|org|net|uk)\b/.test(t))
+    return '<a href="'+rpEsc(/^https?:/.test(t)?t:"https://"+t)+'" target="_blank" rel="noopener noreferrer">'+rpEsc(t)+'</a>';
+  return rpEsc(t);
+}
 function rpPvHtml(d,p){
-  var out='<p class="rp-pvlead">This is the document. Everything the record holds is already '
-    +'filled in. The ruled lines are the answers only you have, and writing them down before you '
-    +'make contact is what turns a long call into a short one.</p>';
-  out+='<div class="rp-pvsec"><div class="rp-pvk">What this recipient does with it</div>'
-    +'<p class="rp-pvp">'+rpEsc(p.does)+'</p></div>';
-  out+='<div class="rp-pvsec"><div class="rp-pvk">How to reach them</div>';
-  for(var i=0;i<p.route.length;i++){
+  var i;
+  var out='<p class="rp-pvlead"><b>'+rpEsc(p.name)+'</b> '+rpEsc(p.does)+'</p>';
+
+  out+='<div class="rp-pvsec"><div class="rp-pvk" data-n="">How to reach them</div>';
+  for(i=0;i<p.route.length;i++){
     out+='<div class="rp-pvr"><span class="rp-k">'+rpEsc(p.route[i][0])+'</span>'
-      +'<span class="rp-v">'+rpEsc(p.route[i][1])+'</span></div>';
+      +'<span class="rp-v">'+rpPvLink(p.route[i][1])+'</span></div>';
   }
   out+='</div>';
+
   if(p.clock){
-    out+='<div class="rp-pvclock"><div class="rp-k">The clock</div><p>'+rpEsc(p.clock)+'</p></div>';
+    out+='<div class="rp-pvclock"><div class="rp-k">Do this today</div><p>'
+      +rpEsc(p.clock)+'</p></div>';
   }
-  out+='<div class="rp-pvsec"><div class="rp-pvk">Section 1. What the record already shows</div>'
-    +'<p class="rp-pvsm">Read from public sources'+(d.asOf?" on "+rpEsc(d.asOf):"")
-    +' and not re-read since. Every item can be checked against the source named in the full '
-    +'report.</p>';
+
+  out+='<div class="rp-pvsec"><div class="rp-pvk" data-n="1">We have filled this in for you</div>'
+    +'<p class="rp-pvsm">Read off public records'+(d.asOf?" on "+rpEsc(d.asOf):"")
+    +'. You do not need to look any of it up.</p>';
   var h=rpHold(d);
   for(i=0;i<h.length;i++){
     out+='<div class="rp-pvh"><span class="rp-k">'+rpEsc(h[i][0])+'</span>'
       +'<span class="rp-v">'+rpEsc(h[i][1])+'</span></div>';
   }
-  out+='</div><div class="rp-pvsec"><div class="rp-pvk">Section 2. What only you can answer</div>'
-    +'<p class="rp-pvsm">These are the things '+rpEsc(p.name.toLowerCase())
-    +' will ask you for.</p>';
+  out+='</div>';
+
+  out+='<div class="rp-pvsec"><div class="rp-pvk" data-n="2">They will ask you these</div>'
+    +'<p class="rp-pvsm">Write the answers on the lines before you call. It turns a long call '
+    +'into a short one.</p>';
   for(i=0;i<p.ask.length;i++){
     out+='<div class="rp-pva"><span class="rp-q">'+rpEsc(p.ask[i])+'</span>'
       +'<span class="rp-ln"></span></div>';
   }
-  out+='</div><div class="rp-pvsec"><div class="rp-pvk">Section 3. What to bring with it</div>';
+  out+='</div>';
+
+  out+='<div class="rp-pvsec"><div class="rp-pvk" data-n="3">Have these with you</div>';
   for(i=0;i<p.attach.length;i++){
     out+='<div class="rp-pvt"><span class="rp-i">'+(i+1)+'</span>'
       +'<span class="rp-q">'+rpEsc(p.attach[i])+'</span></div>';
   }
-  out+='</div><div class="rp-pvsec"><div class="rp-pvk">Section 4. Before you send this</div>';
+  out+='</div>';
+
+  out+='<div class="rp-pvsec"><div class="rp-pvk" data-n="4">Worth knowing before you call</div>';
   for(i=0;i<p.note.length;i++) out+='<p class="rp-pvn">'+rpEsc(p.note[i])+'</p>';
-  out+='</div><p class="rp-pvfoot">Nothing in this pack is a finding that any law has been broken, '
-    +'and nothing in it is legal advice. It reports what public records showed'
-    +(d.asOf?" on "+rpEsc(d.asOf):"")+', with the source named beside each item, so that you and '
-    +'the recipient can open them and judge for yourselves. Nobody legitimate will ask you to pay '
-    +'money to get your money back.</p>';
+  out+='</div>';
+
+  out+='<p class="rp-pvfoot">This pack says what public records showed'
+    +(d.asOf?" on "+rpEsc(d.asOf):"")+', with the source named beside each item. It is not a '
+    +'finding that anyone broke the law, and it is not legal advice. Nobody legitimate will ever '
+    +'ask you to pay money to get your money back.</p>';
   return out;
 }
 
@@ -11165,6 +11355,16 @@ function renderReport(d){
     +(Math.min(4,c.issues)===1?" thing. ":" things. ")+"Worst first."
     :"Nothing came back against them.");
   id("rpFindsSec").style.display=f?"":"none";
+  /* Both empty means the page has nothing to show, and the reader is owed a
+     sentence rather than a blank. */
+  var none = !f && !g;
+  id("rpNoneSec").style.display = none ? "" : "none";
+  if(none){
+    id("rpNoneCov").textContent = "We reached " + c.reached + " of the " + c.applic
+      + " registers that could have held a record for this company"
+      + (c.unreached ? ", and " + c.unreached + " we could not open. Every one of those is named "
+        + "in the working." : ". None of them was out of reach.");
+  }
   var soft=false, ff=(d.issues||[]).slice(0,4);
   for(var fi=0; fi<ff.length; fi++){
     var ft=ff[fi].tier;

@@ -16,7 +16,7 @@ import { chromium } from 'playwright';
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1440, height: 950 } });
 const errs = []; p.on('pageerror', e => errs.push(String(e)));
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?debug=1');
 await p.waitForTimeout(900);
 
 await p.evaluate(() => {
@@ -73,8 +73,31 @@ else {
     fails.push('the bar stands still for the last ' + tail + 'ms of the run, at ' + lastV.toFixed(2) + '%');
   if (lastV >= 100)
     fails.push('the bar reached 100% while the run was still going. Only a finished result writes a hundred');
-  if (distinct < 80)
-    fails.push('only ' + distinct + ' distinct widths across a forty second reasoning call, which is a bar that steps rather than moves');
+  if (distinct < 300)
+    fails.push('only ' + distinct + ' distinct widths across a forty second run, which is a bar that steps rather than walks');
+
+  /* ONE PACE, START TO FINISH.
+     This is the whole point of the rewrite, so it is measured rather than
+     assumed: split the run in half and compare how far the bar travelled in
+     each half. Every ceiling-per-phase build failed this badly, covering
+     seventy points in the first fifteen seconds and thirty in the next sixty. */
+  const half = W[W.length - 1][0] / 2;
+  const mid = W.find(x => x[0] >= half);
+  const firstHalf = mid[1] - W[0][1];
+  const secondHalf = W[W.length - 1][1] - mid[1];
+  const ratio = firstHalf / Math.max(0.001, secondHalf);
+  console.log('first half ' + firstHalf.toFixed(1) + ' points, second half ' + secondHalf.toFixed(1) +
+    ' points, ratio ' + ratio.toFixed(2));
+  if (ratio > 1.35 || ratio < 0.74)
+    fails.push('the bar does not run at one pace: ' + firstHalf.toFixed(1) + ' points in the first half of the run and ' +
+      secondHalf.toFixed(1) + ' in the second');
+
+  /* And it is walking the two minute curve, not a shorter one. Roughly 0.82
+     points a second, so a forty second run lands in the thirties or forties. */
+  const rate = (W[W.length - 1][1] - 1) / (W[W.length - 1][0] / 1000);
+  console.log('rate ' + rate.toFixed(3) + ' points per second (two minute pace is 0.82)');
+  if (rate > 1.2)
+    fails.push('the bar is running at ' + rate.toFixed(2) + ' points a second, faster than the two minute pace it is meant to keep');
 
   console.log('start ' + (first ? first[1] : 0) + '%, longest stall ' + worst.d + 'ms at ' +
     worst.v.toFixed(2) + '%, trailing ' + tail + 'ms, ' + distinct + ' distinct widths, ends at ' +

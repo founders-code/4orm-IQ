@@ -1213,50 +1213,72 @@ if (!/We do not publish individuals/.test(script))
     fails.push('the landing deck sits ' + deck + 'px under the headline and was asked for about an inch');
 }
 
-/* AND THE BAR DOES NOT SPEND THE LONGEST PART OF THE RUN IN THE NINETIES.
-   The reasoning call is where most of a two minute check goes, and its ceiling
-   was ninety, so all of that wait was walked out inside a nine point band while
-   the phases that take seconds had the other ninety points. It opened on
-   seventy two now, which is twenty seven points of travel where the waiting
-   actually is. */
+/* The phase map only names the steps now. It used to carry a ceiling each, and
+   those ceilings are what made the bar sprint and then park; the bar is a clock
+   and does not read them. Kept because the labels come off them. */
 {
-  const map = (script.match(/var PHASE_PCT = \{([^}]*)\}/) || [])[1] || '';
-  const reason = (map.match(/reason:(\d+)/) || [])[1];
-  if (!reason) fails.push('the reasoning phase has no ceiling');
-  else if (Number(reason) > 80)
-    fails.push('the reasoning call opens at ' + reason + '%, so the longest part of the run is walked out inside a ' +
-      (99 - Number(reason)) + ' point band');
-  const from = (script.match(/WAIT_CREEP_FROM = (\d+)/) || [])[1];
-  if (from !== reason)
-    fails.push('the creep starts at ' + from + ' and the reasoning phase opens at ' + reason + ', so the bar jumps between them');
-  const partial = (script.match(/waitProgress\((\d+), \(c2\.registers_reached/) || [])[1];
-  if (partial && Number(partial) > Number(reason))
-    fails.push('the partial result pushes the bar to ' + partial + ', past the ceiling the reasoning call opens on');
+  const map = (script.match(/var PHASE_PCT = \{([^}]*)\}/) || [])[1];
+  if (map === undefined) fails.push('the phase map is gone, so the waiting screen has no labels');
 }
 
-/* THE BAR MUST NEVER PARK, AND MUST NEVER GO BACKWARDS.
-   It arrived at ninety on the first byte of the reasoning call and sat there for
-   the two minutes that call takes, which reads as a page that has died. */
-if (!/function waitCreep/.test(script))
-  fails.push('nothing moves the progress bar through the reasoning call, so it parks at ninety');
+/* THE BAR IS A CLOCK.
+   Three builds of this were a ceiling per phase, and each one had the same
+   fault in a different place: the phases do not take the time their ceilings
+   imply. It reached seventy in fifteen seconds and then spent a minute on the
+   next thirty points, because retrieval is fast and the reasoning call is not.
+   Re-cutting the ceilings moved the lump; it could never remove it, because a
+   ceiling is a guess about duration wearing the clothes of a measurement.
+
+   So the bar stops guessing. It walks from one to ninety nine at a constant
+   rate over the time a check actually takes. Events change the words under it,
+   which is what they are for. A run that finishes early jumps to a hundred; a
+   run that goes long eases toward ninety nine and never arrives, because only
+   a finished assessment writes a hundred. */
+if (!/function waitExpected\(\)/.test(script))
+  fails.push('the bar has no expected duration, so it is back to guessing from phase ceilings');
 {
-  const tickAt = script.indexOf('else if(ev.t==="tick")');
-  const tick = tickAt < 0 ? '' : script.slice(tickAt, script.indexOf('else if(ev.t==="partial")', tickAt));
-  if (!/waitCreep\(/.test(tick))
-    fails.push('the heartbeat does not move the bar, which is the only thing that can during the reasoning call');
+  const live = (script.match(/var WAIT_LIVE_MS = (\d+)/) || [])[1];
+  if (!live) fails.push('the expected duration for a live run cannot be read');
+  else if (Number(live) < 60000)
+    fails.push('a live check is expected to take ' + live + 'ms, which will race the bar to the end and leave it parked');
+  /* And a page loaded as the walkthrough that then receives real server events
+     is a real run: the clock is raised and re-anchored so the bar carries on
+     from where it is rather than standing still while the longer curve catches
+     up. Anchoring off the shown value rather than the ceiling did exactly that
+     for ten seconds. */
+  if (!/function waitExpectLive/.test(script))
+    fails.push('a run cannot raise its own expected duration, so a live run on a seeded page keeps the three second clock');
+  if (!/\(waitCeil - 1\) \/ 98/.test(script))
+    fails.push('the clock is re-anchored off the lagging shown value, which stops the ceiling until it catches up');
+  /* The ticker, and nothing else, advances the ceiling. */
+  const drive = script.slice(script.indexOf('function waitDrive'), script.indexOf('function waitProgress'));
+  if (!/waitT0 && !waitDone/.test(drive))
+    fails.push('the ticker no longer reads the clock, so the bar is event driven again');
+  if (!/target > waitCeil/.test(drive))
+    fails.push('the bar can go backwards: the clock is allowed to lower the ceiling');
+  if (!/Math\.min\(1, t\)/.test(drive) || !/1 \+ 98 \*/.test(drive))
+    fails.push('the bar no longer walks one to ninety nine');
+  /* And an event may not touch it. That is the whole change. */
+  const prog = script.slice(script.indexOf('function waitProgress'), script.indexOf('function waitCreep'));
+  if (/waitCeil\s*=/.test(prog))
+    fails.push('an event sets the bar again, which is how the lump kept moving from one phase to another');
 }
 if (!/if\(pct<barShown\) return;/.test(script))
   fails.push('the bar at the top of the window can go backwards when a late event carries a smaller number');
-if (!/if\(c > waitCeil\) waitCeil = c;/.test(script))
-  fails.push('the bar on the waiting screen can go backwards when a late event carries a smaller number');
-/* And it is a ticker, not a set of steps: a bar that stands still between
-   phases and then jumps reads as a page that has stopped. */
 if (!/function waitDrive/.test(script))
   fails.push('the waiting bar steps between phases again instead of walking continuously');
-if (!/waitShown=1; waitCeil=6;/.test(script))
-  fails.push('the waiting bar no longer starts at one');
-if (!/WAIT_CREEP_TO\s*=\s*99/.test(script))
-  fails.push('the creep is allowed to reach a hundred before the result exists');
+if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
+  fails.push('the waiting bar does not start at one with the clock running');
+{
+  /* The heartbeat re-anchors the clock and never moves the bar. */
+  const tickAt = script.indexOf('else if(ev.t==="tick")');
+  const tick = tickAt < 0 ? '' : script.slice(tickAt, script.indexOf('else if(ev.t==="partial")', tickAt));
+  if (!/waitCreep\(/.test(tick))
+    fails.push('the heartbeat no longer sets the clock, so a slow page load costs the bar its accuracy');
+  const creep = script.slice(script.indexOf('function waitCreep'), script.indexOf('function waitCreep') + 400);
+  if (/waitCeil/.test(creep))
+    fails.push('the heartbeat moves the bar again rather than only setting the clock it runs on');
+}
 
 /* -------------------------------------- what to do, closed
    Open, the four sections ran to eight screens and somebody who came for their
@@ -1510,6 +1532,64 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
     fails.push('the waiting screen and the report no longer share a gutter (' +
       mw(wb) + '/' + pad(wb) + ' against ' + mw(wr) + '/' + pad(wr) +
       '), so the content edge jumps when the result opens');
+}
+
+/* -------------------------------------- EVERY CLASS THE PAGE EMITS HAS A RULE
+   This is the check that should have existed from the first build.
+
+   The nine document packs shipped for weeks with EIGHT of their classes having
+   no CSS rule at all: .rp-pva, .rp-pvh, .rp-pvt, .rp-pvn, .rp-pvsm, .rp-pvfoot,
+   .rp-ln and .rp-i. The markup was correct, the copy was correct, every one of
+   the thirty-odd other checks passed, and the page rendered as a wall of
+   unbroken sentences with a stray digit in front of some of them. It read like
+   a text file somebody forgot to finish, because that is exactly what an
+   element with no rule is.
+
+   No test that reads behaviour can catch that. This one reads intent: if the
+   page writes a class, somebody meant it to look like something. */
+{
+  const declared = new Set();
+  for (const m of styleBlock.matchAll(/\.([A-Za-z][\w-]*)/g)) declared.add(m[1]);
+  /* The page also builds two standalone documents in script, the one page
+     summary and the audit sheet, and each ships its own stylesheet inside a
+     string. A class styled there is styled. */
+  for (const m of script.matchAll(/\.([A-Za-z][\w-]*)\s*(?:,|\{)/g)) declared.add(m[1]);
+
+  /* Classes the page emits: the static markup, and every class= inside a
+     template string in the script. */
+  const emitted = new Map();          /* class -> a sample of where it came from */
+  const scan = (text, where) => {
+    for (const m of text.matchAll(/class=(?:"|\\")([^"\\]+)/g))
+      for (const c of m[1].trim().split(/\s+/))
+        /* A plain class name and nothing else. Half of these are built by
+           string concatenation, so a capture can end mid-expression; those
+           fragments are not classes and must not be reported as missing. */
+        if (/^[a-zA-Z][\w-]*$/.test(c) && !emitted.has(c)) emitted.set(c, where);
+    /* classList.add("x") and setAttribute("class","x") */
+    for (const m of text.matchAll(/classList\.(?:add|toggle)\(\s*"([\w -]+)"/g))
+      for (const c of m[1].trim().split(/\s+/))
+        if (/^[a-zA-Z][\w-]*$/.test(c) && !emitted.has(c)) emitted.set(c, where);
+  };
+  scan(html.slice(html.indexOf('<body>')).replace(/<script[\s\S]*?<\/script>/g, ''), 'the markup');
+  scan(script, 'the script');
+
+  /* Classes that carry meaning to JS or to a test rather than to the eye. A
+     class here is deliberately styleless and says so. */
+  const STYLELESS = new Set([
+    'landing-only', 'console-only', 'no-print', 'sr-only', 'hidden',
+  ]);
+
+  const orphans = [...emitted.keys()]
+    .filter(c => !declared.has(c) && !STYLELESS.has(c))
+    /* A token ending in a hyphen is the stem of a class built by concatenation
+       ("done-" + state), not a class. */
+    .filter(c => !c.endsWith('-'))
+    .sort();
+  if (orphans.length)
+    fails.push('the page writes ' + orphans.length + ' class' + (orphans.length === 1 ? '' : 'es') +
+      ' that no CSS rule matches, so whatever they were meant to look like, they look like nothing: ' +
+      orphans.slice(0, 12).join(', ') + (orphans.length > 12 ? ', and ' + (orphans.length - 12) + ' more' : '') +
+      '  (first seen in ' + emitted.get(orphans[0]) + ')');
 }
 
 /* -------------------------------------- the markup closes what it opens
