@@ -42,7 +42,8 @@ BEGIN
     policy_version       text,                 -- WHICH rules governed, never what they said
     manifest_generated   date,
     enforcement_on       boolean,
-    sector               text                  -- AUTO | MORTGAGE | INSURANCE | INVESTMENT | OTHER
+    sector               text,                 -- AUTO | MORTGAGE | INSURANCE | INVESTMENT | OTHER
+    user_assert          text                  -- NOT_A_PERSON, where the reader overrode the gate
   );
   create index if not exists ops_runs_at    on ops_runs (at desc);
   create index if not exists ops_runs_seq   on ops_runs (seq);
