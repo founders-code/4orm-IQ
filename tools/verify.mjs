@@ -728,11 +728,30 @@ if (!/overflow-y:\s*auto/.test(vmoreRule))
     let m;
     while ((m = tagRe.exec(html)) !== null) {
       const tag = m[0];
+      const near = html.slice(m.index, m.index + 400);
       const real = /src="data:image\/png;base64,/.test(tag)
-        || /<img[^>]+src="data:image\/png;base64,/.test(html.slice(m.index, m.index + 400));
-      if (!real) fails.push('the mark at .' + c + ' is not the real image file');
+        || /<img[^>]+src="data:image\/png;base64,/.test(near);
+      /* THE ONE PERMITTED EXCEPTION, AND IT IS NOT A SUBSTITUTE.
+         The two standing documents carry the same header as the sources sheet.
+         A third and fourth copy of the same 25KB base64 is 50KB on every page
+         load for a picture the browser already holds, so their <img> is marked
+         data-logo and filled AT BOOT from the real one that is already in the
+         document. It is still the supplied file and nothing else: no type, no
+         trace, no stand-in. The filler is checked below, so a document can
+         never ship with an empty frame where the mark should be. */
+      const deferred = /<img[^>]+data-logo=/.test(near);
+      if (!real && !deferred) fails.push('the mark at .' + c + ' is not the real image file');
     }
   });
+  /* A deferred mark is only allowed because something fills it. If the filler
+     goes, so does the exception, and every data-logo frame ships empty. */
+  const deferredCount = (html.match(/<img[^>]+data-logo=/g) || []).length;
+  if (deferredCount) {
+    if (!/querySelectorAll\("\.rp-hlogo img\[data-logo\]"\)/.test(html))
+      fails.push('marks are deferred with data-logo but nothing fills them at boot');
+    if (!/querySelector\("#rpSources \.rp-hlogo img"\)/.test(html))
+      fails.push('the deferred marks are not filled from the real image already on the page');
+  }
   /* The wordmark rebuilt out of letterforms. This has happened. */
   if (/>4<\/[a-z]+>\s*orm/i.test(html) || /class="[^"]*mark[^"]*"[^>]*>\s*<[a-z]+>4</i.test(html))
     fails.push('the 4orm wordmark has been rebuilt in markup instead of using the asset');
@@ -2020,6 +2039,122 @@ if (/[\u2014\u2013]/.test(admin))
   for (const w of ['scam', 'fraudster', 'fraudulent', 'criminal', 'dishonest', 'ripoff', 'crook'])
     if (new RegExp('\\b' + w + '\\b', 'i').test(rend + item))
       fails.push('the register copy uses the word "' + w + '" on a page that names real companies');
+}
+
+/* ================= COMPLIANCE, PRIVACY, AND THE STATUTES ==================
+   Three things ship together here and each one is load bearing: a disclaimer
+   that cannot be quietly swapped out, a statute list where every entry links
+   to the official text, and two standing documents reachable from anywhere. */
+{
+  /* 1. THE ADVICE LINE ON THE LANDING PAGE.
+     It is its own paragraph on purpose. The note above it is rewritten
+     wholesale when live checking is on, and a disclaimer that vanishes the
+     moment the product starts doing the thing it disclaims is not one. */
+  const adv = (html.match(/<p class="upnote upadv[^"]*"[^>]*>([\s\S]*?)<\/p>/) || [])[1] || '';
+  if (!adv) fails.push('the landing page has no separate advice disclaimer under the search bar');
+  else {
+    for (const phrase of ['not financial advice', 'do not advise', 'third party evidence'])
+      if (!new RegExp(phrase, 'i').test(adv))
+        fails.push('the landing advice disclaimer no longer says "' + phrase + '"');
+  }
+  /* And the live override must still target only the first note. If it ever
+     learns to rewrite both, the line above disappears on the live build and
+     nobody would see it in a local one. */
+  const live = (script.match(/document\.querySelector\("\.upnote"\)\.innerHTML=[\s\S]{0,400}?;/) || [''])[0];
+  if (/upadv/.test(live))
+    fails.push('the live-checking override now rewrites the advice disclaimer as well');
+  if (!/function upNotes\(/.test(script))
+    fails.push('the two landing notes are no longer hidden together when the thread opens');
+
+  /* 2. THE STATUTES. Every entry: a name, a citation, an https link to the
+     official text, and the host printed so a reader sees where it goes. */
+  const lawsBlock = (script.match(/var RP_LAWS = \[[\s\S]*?\n\];/) || [''])[0];
+  if (!lawsBlock) fails.push('the statute list RP_LAWS is gone');
+  else {
+    const entries = [...lawsBlock.matchAll(/\n    \["([^"]+)",\n     "([^"]+)",\n     "([^"]*)",\n     "(https?:[^"]+)", "([^"]+)"\]/g)];
+    if (entries.length < 10)
+      fails.push('the statute list carries only ' + entries.length + ' entries, and the compliance page needs the full set');
+    /* The four groups it has to cover. Dropping one is how a compliance page
+       ends up listing only the flattering half. */
+    for (const g of ['Privacy', 'publish about a party', 'What we are not', 'contact you'])
+      if (!lawsBlock.includes(g))
+        fails.push('the statute list no longer carries the group "' + g + '"');
+    entries.forEach(e => {
+      const [, name, cite, what, url, host] = e;
+      if (!/^https:/.test(url))
+        fails.push('the link for "' + name + '" is not https');
+      if (!url.includes(host.replace(/^www\./, '')))
+        fails.push('the host printed beside "' + name + '" does not match its link');
+      if (!/\b(S\.?C\.?|R\.?S\.?C\.?|S\.?A\.?|S\.?B\.?C\.?|R\.?S\.?A\.?|R\.?S\.?O\.?|CQLR|U\.S\.C|SCC)\b/.test(cite))
+        fails.push('"' + name + '" has no statutory citation beside it');
+      if (what.length < 80)
+        fails.push('"' + name + '" does not say what it does to us');
+    });
+    /* Every one of these must be the body's own site or the official reporter.
+       A statute cited to a law firm's summary is the same failure as a
+       register result cited to a blog. */
+    const ok = ['laws-lois.justice.gc.ca', 'legisquebec.gouv.qc.ca', 'kings-printer.alberta.ca',
+                'bclaws.gov.bc.ca', 'decisions.scc-csc.ca', 'ontario.ca', 'law.cornell.edu'];
+    entries.forEach(e => {
+      if (!ok.some(d => e[4].includes(d)))
+        fails.push('the link for "' + e[1] + '" is not an official source');
+    });
+    if (!/id\("rpLaws"\)/.test(script) || !/id\("rpLaws2"\)/.test(script))
+      fails.push('the statute list is no longer printed on both the method page and the compliance document');
+  }
+
+  /* 3. THE DISCLAIMER PANEL on the method page. Each of these sentences is one
+     somebody has asked us to soften at some point. */
+  const dis = (html.match(/<div class="rp-dis">[\s\S]*?<\/div>\s*\n\s*<div id="rpLaws">/) || [''])[0];
+  if (!dis) fails.push('the compliance disclaimer is gone from the sources and method page');
+  else for (const phrase of ['not financial, investment, tax or legal advice',
+                             'not a finding that any law has been broken',
+                             'Green is not clearance',
+                             'no fee from any party we report on']) {
+    if (!dis.includes(phrase))
+      fails.push('the disclaimer no longer says "' + phrase + '"');
+  }
+
+  /* 4. THE TWO STANDING DOCUMENTS, and the routing that reaches them. */
+  for (const [id, back] of [['rpCompliance', 'rpCompBack'], ['rpPrivacy', 'rpPrivBack']]) {
+    if (!new RegExp('<div class="rp-sheet" id="' + id + '"').test(html))
+      fails.push('the ' + id + ' document is gone');
+    if (!new RegExp('id="' + back + '"').test(html) || !new RegExp('id="' + back + 'T"').test(html))
+      fails.push(id + ' has no named back button');
+    if (!new RegExp('id\\("' + back + '"\\)\\.addEventListener').test(script))
+      fails.push(back + ' is not wired to anything');
+  }
+  if (!/RP_DOCS = \{ sources:1, compliance:1, privacy:1 \}/.test(script))
+    fails.push('the three reachable-from-anywhere documents are no longer declared together');
+  if (!/compliance:"rpCompliance", privacy:"rpPrivacy"/.test(script))
+    fails.push('the two documents are not registered as screens, so rpShow cannot switch to them');
+  if (!/function rpDocsHide\(/.test(script))
+    fails.push('leaving a document no longer hides all three, so a stale sheet can sit over the landing');
+  /* Back has to name where it goes, from every one of the five origins. */
+  const bn = (script.match(/var RP_BACKNAME = \{[\s\S]*?\};/) || [''])[0];
+  for (const k of ['result', 'found', 'act', 'console', 'landing', 'wait'])
+    if (!new RegExp('\\b' + k + ':"Back').test(bn))
+      fails.push('the back button has no name for a reader who arrived from "' + k + '"');
+  /* Reachable from the landing, from the data room and from every report foot. */
+  const routes = (html.match(/data-doc="(compliance|privacy|sources)"/g) || []).length;
+  if (routes < 10)
+    fails.push('there are only ' + routes + ' routes into the documents, so they are not reachable from every screen');
+  if (!/document\.addEventListener\("click", function\(e\)\{[\s\S]{0,600}?data-doc/.test(script))
+    fails.push('nothing listens for the document links, so they are decoration');
+
+  /* 5. THE PRIVACY NOTICE MUST MATCH THE CODE, not the other way round. */
+  const priv = (html.match(/<div class="rp-sheet" id="rpPrivacy"[\s\S]*?\n<\/div>\n\n/) || [''])[0];
+  for (const phrase of ['no accounts', 'do not store what you typed',
+                        'rolled at midnight', 'Results themselves are not retained'])
+    if (!new RegExp(phrase, 'i').test(priv))
+      fails.push('the privacy notice no longer says "' + phrase + '"');
+  const ops = fs.readFileSync(path.join(root, 'api', '_ops.js'), 'utf8');
+  if (!/never will be: the identifier itself/.test(ops))
+    fails.push('the operations log no longer promises what the privacy notice tells readers it promises');
+  if (!/\.slice\(0, 12\)/.test(ops) || !/toISOString\(\)\.slice\(0, 10\)/.test(ops))
+    fails.push('the visitor-day is no longer truncated and rolled daily, which the privacy notice states as fact');
+  if (!/priv\.gc\.ca/.test(priv))
+    fails.push('the privacy notice gives the reader no route to the Privacy Commissioner');
 }
 
 /* -------------------------------------- declaration diff against a prior build */
