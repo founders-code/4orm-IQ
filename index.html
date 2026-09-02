@@ -196,10 +196,12 @@ body[data-stage="landing"] .cbar{
   border:none;background:none;box-shadow:none;overflow:visible;
   max-width:820px;margin:0 auto;width:100%;
 }
-/* The hero starts lower. It was sitting hard against the top of the window,
-   which reads as a page that has been scrolled rather than one that has
-   opened. */
-body[data-stage="landing"] .cbmain{padding:152px 0 64px;text-align:center}
+/* THE WHOLE STACK MOVES ON THIS ONE NUMBER.
+   Every gap from the headline to the counter is set relative to the element
+   above it, so the block travels as one piece and this is the only value that
+   moves it. Changing anything else changes the rhythm inside it, which is not
+   what was asked for. */
+body[data-stage="landing"] .cbmain{padding:228px 0 64px;text-align:center}
 /* the landing variant is declared beside the base rule, further down */
 /* One line, whatever the width. The size is tied to the viewport so it
    shrinks to fit rather than breaking the sentence in half. */
