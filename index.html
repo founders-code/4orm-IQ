@@ -202,6 +202,10 @@ body[data-stage="landing"] .cbh1{width:max-content;max-width:96vw;position:relat
 body[data-stage="landing"] .cbsub{
   margin:30px auto 0;font-size:clamp(15px,1.8vw,17.5px);color:var(--tx-2);max-width:52ch;line-height:1.55;
 }
+/* Its own line, and lighter than the sentence above it: it is a reassurance,
+   not a second headline. */
+.cbtwo{display:block;margin-top:12px;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx-3)}
 body[data-stage="landing"] .searchbox{margin-top:22px;box-shadow:var(--sh-lg)}
 .servedrow{display:none}
 /* It sits at the foot now, under the disclaimer, so it reads as an instrument
@@ -1197,6 +1201,14 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 .waitmeta #waitPct{min-width:5.5ch}
 .waitmeta span:last-child{color:var(--gold)}
 .waitmeta .wclock{color:var(--tx-3);font-variant-numeric:tabular-nums}
+.waitforming{display:flex;align-items:baseline;justify-content:flex-end;gap:8px;
+  margin-top:9px;min-height:19px;font-size:13px;color:var(--tx-2);letter-spacing:-.005em}
+.waitforming[hidden]{display:none}
+/* The lockup at reading size, so the mark sits on the same baseline as the
+   words after it, exactly as it does in the headline. */
+.waitforming .iqlock{font-size:15px;font-weight:700}
+.waitforming .wf-t{color:var(--tx-3)}
+@media(max-width:640px){.waitforming{font-size:12px}.waitforming .iqlock{font-size:13.5px}}
 /* One screen. Cards at the top, network below, and neither scrolls: a sweep
    you have to scroll through is a sweep nobody watches. */
 .waitbody{flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 0 8px;overflow:hidden}
@@ -2893,11 +2905,49 @@ body[data-stage="report"] .foot{display:none}
    do and here, or they stop being a fixed thing a reader can reach for and
    become something that moves when the page does. So the column is 900 and the
    header runs the sheet, which is the ordinary shape of a page with a measure. */
-#rpSources .rp-sec{max-width:900px;margin-left:0;margin-right:auto}
-/* The title and the lead keep their own measure, which is narrower than the
-   column and is meant to be. They are held here only so nothing on the page
-   can be WIDER than the column. */
-#rpt #rpSources .rp-stitle,#rpt #rpSources .rp-slead{max-width:900px}
+/* THE SOURCES PAGE, REBUILT.
+   It was a nine hundred pixel column of key and value rows pinned to the left
+   of a thirteen hundred pixel sheet: four identical lists, four thousand eight
+   hundred pixels tall, with four hundred and sixty pixels of empty paper down
+   the right of every one of them. Nothing on it was wrong and all of it read
+   as unfinished, which on the one page that explains why anybody should
+   believe us is the worst thing it could read as.
+
+   What changed: the sheet is used, the four lists become cards that sit two
+   and three across, the hero puts the dark panel beside the title instead of
+   under it, and the levels of authority are five coloured blocks carrying
+   their own count and their own limit. Same words. Half the height. */
+#rpSources .rp-sec{max-width:none;margin-left:0;margin-right:0}
+#rpt #rpSources .rp-slead{max-width:60ch}
+
+/* The hero. Title and lead on the left, the reason the product exists on the
+   right, because they are one argument and stacking them made the reader
+   scroll past the first half to reach the second. */
+#rpSources .rp-hero2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);
+  gap:clamp(32px,4vw,64px);align-items:start;margin-top:44px}
+#rpSources .rp-hero2 .rp-stitle{margin-top:0}
+#rpt #rpSources .rp-why{margin-top:0;max-width:none;padding:clamp(30px,3vw,44px)}
+@media(max-width:1020px){
+  #rpSources .rp-hero2{grid-template-columns:1fr;gap:36px}
+  #rpt #rpSources .rp-why{max-width:760px}
+}
+/* The contents list. Quiet, because it is a way in rather than a thing to
+   read, and every row states the question that section answers rather than
+   the name of the section. */
+#rpt .rp-toc{margin-top:40px;display:flex;flex-direction:column;gap:2px;
+  background:var(--border);border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;max-width:56ch}
+#rpt .rp-tock{background:var(--surface-2);padding:11px 18px;font-family:var(--rmono);
+  font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-toc button{display:flex;align-items:baseline;gap:14px;width:100%;text-align:left;
+  background:var(--surface);padding:14px 18px;font-size:14px;line-height:1.4;color:var(--tx-2);
+  transition:background .2s var(--ease),color .2s var(--ease)}
+#rpt .rp-toc button i{flex:none;font-family:var(--rmono);font-size:9.5px;font-weight:800;
+  letter-spacing:.1em;color:var(--tx-4,#8B97AC);font-style:normal}
+#rpt .rp-toc button:hover{background:var(--blue-50);color:var(--blue-dp)}
+#rpt .rp-toc button:hover i{color:var(--blue)}
+#rpt .rp-toc button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+@media(max-width:1020px){#rpt .rp-toc{max-width:none}}
 #rpt .rp-stitle{margin-top:48px;font-size:clamp(34px,5vw,58px);font-weight:800;letter-spacing:-.04em;
   line-height:1.04;max-width:20ch;text-wrap:balance}
 #rpt .rp-slead{margin-top:24px;font-size:clamp(17px,2vw,21px);line-height:1.5;color:var(--tx-2);
@@ -2928,6 +2978,36 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-row .rp-rv{font-size:14px;line-height:1.6;color:var(--tx-2)}
 #rpt .rp-row .rp-rv b{color:var(--tx);font-weight:600}
 @media(max-width:680px){#rpt .rp-row{grid-template-columns:1fr;gap:7px;padding:18px 20px}}
+/* THE SAME ROWS, AS CARDS.
+   A key and value row is right when the keys line up and the reader is
+   comparing them. Here they are five, six and five separate ideas that happen
+   to have a label, and stacked full width they made three identical grey
+   ladders. As cards they sit two across, the label reads as a heading rather
+   than a column, and the section fits on a screen. */
+/* AND THE GRID STOPS PAINTING ITS OWN GROUND.
+   The one-column version used a hairline frame made of the grid's own
+   background showing through 2px gaps, which works only while every cell is
+   filled. Five and six items in two columns leave an empty cell, and that cell
+   rendered as twelve hundred pixels of flat grey. So on this page the frame
+   moves onto the cards themselves and the grid carries nothing behind them. */
+#rpSources .rp-rows{grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;background:none;border:0;border-radius:0;overflow:visible}
+#rpSources .rp-row{grid-template-columns:1fr;gap:10px;align-content:start;
+  padding:24px 26px 26px;border:1px solid var(--border);border-radius:var(--r)}
+/* An odd number of cards leaves the last one alone in a two column row with a
+   hole beside it. It takes the whole row instead, which closes the section
+   rather than trailing off. */
+#rpSources .rp-row:last-child:nth-child(odd){grid-column:1 / -1}
+@media(max-width:900px){#rpSources .rp-row:last-child:nth-child(odd){grid-column:auto}}
+#rpSources .rp-row .rp-rk{font-size:9.5px;letter-spacing:.15em;color:var(--blue-dp)}
+#rpSources .rp-row .rp-rv{font-size:14.5px;line-height:1.62}
+@media(max-width:900px){#rpSources .rp-rows{grid-template-columns:1fr}}
+
+/* The four limits, given the weight of the sentence they are making. */
+#rpSources .rp-never{padding:26px}
+#rpSources .rp-never i{width:24px;height:24px}
+#rpSources .rp-never span{font-size:14.5px;line-height:1.6}
+#rpSources .rp-never span b{font-size:15.5px;margin-bottom:7px}
 #rpt .rp-nevers{margin-top:32px;display:grid;gap:2px;grid-template-columns:repeat(2,1fr);
   background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
 #rpt .rp-never{display:flex;gap:14px;align-items:flex-start;background:var(--surface);
@@ -2940,16 +3020,40 @@ body[data-stage="report"] .foot{display:none}
 /* Two columns, not "as many as fit". The heading says four tiers, and auto-fill
    produced five columns at a desktop width, which is a layout disagreeing with
    the sentence above it. */
-#rpt .rp-cat{margin-top:32px;display:grid;gap:2px;grid-template-columns:repeat(2,1fr);
-  background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-/* AFTER the base rule, not before it. This lived above .rp-cat at the same
-   specificity, so the later rule won and the catalogue never collapsed. */
-@media(max-width:760px){#rpt .rp-nevers,#rpt .rp-cat{grid-template-columns:1fr}}
-#rpt .rp-catc{background:var(--surface);padding:17px 20px}
-#rpt .rp-catc .rp-cn{font-family:var(--rmono);font-size:8.5px;font-weight:800;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--tx-3)}
-#rpt .rp-catc .rp-cv{margin-top:9px;font-size:13.5px;line-height:1.5;color:var(--tx);font-weight:600}
-#rpt .rp-catc .rp-cx{margin-top:6px;font-size:12px;line-height:1.5;color:var(--tx-3)}
+/* FIVE BLOCKS, IN THE BOARD'S OWN COLOURS.
+   The levels used to be four grey boxes, which asked the reader to hold the
+   difference between them in their head while looking at nothing that showed
+   it. They are five, they carry the letter the board carries, they count their
+   own registers, and each one ends with the line that actually matters: what
+   that level is allowed to do. The colour is the board's, so a reader who has
+   seen a result recognises it here. */
+#rpt .rp-cat{margin-top:32px;display:grid;gap:14px;
+  grid-template-columns:repeat(5,minmax(0,1fr));background:none;border:0}
+@media(max-width:1180px){#rpt .rp-cat{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){#rpt .rp-nevers{grid-template-columns:1fr}
+  #rpt .rp-cat{grid-template-columns:1fr}}
+#rpt .rp-catc{background:var(--surface);padding:20px 20px 22px;border-radius:var(--r);
+  border:1px solid var(--border);border-top:3px solid var(--tier,var(--border-strong));
+  display:flex;flex-direction:column}
+#rpt .rp-catc[data-t="a"]{--tier:#2E6BF2;--tierbg:#EAF1FE;--tierink:#1B4ABE}
+#rpt .rp-catc[data-t="b"]{--tier:#1B7BB5;--tierbg:#E4F2F9;--tierink:#125A85}
+#rpt .rp-catc[data-t="own"]{--tier:#7C5CC6;--tierbg:#F0EAFA;--tierink:#5B3EA0}
+#rpt .rp-catc[data-t="c"]{--tier:#E08B2C;--tierbg:#FCF0DF;--tierink:#8F5C12}
+#rpt .rp-catc[data-t="d"]{--tier:#5E6E88;--tierbg:#EEF1F6;--tierink:#46556E}
+#rpt .rp-catc .rp-ctop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#rpt .rp-catc .rp-clet{display:inline-flex;align-items:center;justify-content:center;
+  min-width:30px;height:24px;padding:0 8px;border-radius:8px;
+  background:var(--tierbg);color:var(--tierink);
+  font-family:var(--rmono);font-size:11px;font-weight:800;letter-spacing:.06em}
+#rpt .rp-catc .rp-ccount{font-family:var(--rmono);font-size:9px;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--tx-3);white-space:nowrap}
+#rpt .rp-catc .rp-cname{margin-top:15px;font-size:16px;font-weight:700;letter-spacing:-.02em;
+  color:var(--tx);line-height:1.25}
+#rpt .rp-catc .rp-cn{margin-top:6px;font-family:var(--rmono);font-size:8.5px;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-catc .rp-cx{margin-top:12px;font-size:12.5px;line-height:1.55;color:var(--tx-2);flex:1}
+#rpt .rp-catc .rp-cmay{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);
+  font-size:12.5px;line-height:1.45;font-weight:600;color:var(--tierink)}
 
 /* ------------------------------------------- the console, once a result exists
    The board is the working behind an answer the reader has already been given,
@@ -3984,9 +4088,27 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </nav>
     </div>
 
-    <h1 class="rp-stitle">How we decide, and what we will not say.</h1>
-    <p class="rp-slead">A page like this usually exists because a lawyer asked for it. This one
-      exists because of the people we built it for.</p>
+    <!-- Title, lead and the reason the product exists, side by side. They are
+         one argument, and stacking them made a reader scroll past the first
+         half to reach the second. -->
+    <div class="rp-hero2">
+     <div>
+      <h1 class="rp-stitle">How we decide, and what we will not say.</h1>
+      <p class="rp-slead">A page like this usually exists because a lawyer asked for it. This one
+        exists because of the people we built it for.</p>
+      <!-- The panel beside this is tall, and an empty half column under a lead
+           reads as a page that stopped. This is the useful thing to put there:
+           the page is long, and somebody who came here with one question
+           should be able to go straight to it. -->
+      <nav class="rp-toc" aria-label="On this page">
+        <div class="rp-tock">On this page</div>
+        <button type="button" data-goto="srcLogic"><i>01</i>How a record is found, and who reads it</button>
+        <button type="button" data-goto="srcCall"><i>02</i>What a pile of complaints is worth</button>
+        <button type="button" data-goto="srcLimits"><i>03</i>Four things we will not do</button>
+        <button type="button" data-goto="srcLawful"><i>04</i>What we owe a company we name</button>
+        <button type="button" data-goto="srcCatalogue"><i>05</i>The catalogue, and what each level may do</button>
+      </nav>
+     </div>
 
     <div class="rp-why">
       <div class="rp-k">Why this exists</div>
@@ -4003,8 +4125,9 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         person deciding whether to send their savings deserves the truth about what the record says,
         what it does not say, and which of the two we are giving them.</p>
     </div>
+    </div>
 
-    <div class="rp-sec">
+    <div class="rp-sec" id="srcLogic">
       <div class="rp-kick">The logic</div>
       <h2 class="rp-h2">Finding a record and reading it are two different jobs.</h2>
       <p class="rp-sub">We keep them apart on purpose. Mixing them up is how a service ends up sounding
@@ -4012,7 +4135,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-rows" id="rpMethod"></div>
     </div>
 
-    <div class="rp-sec">
+    <div class="rp-sec" id="srcCall">
       <div class="rp-kick">The hardest call we make</div>
       <h2 class="rp-h2">A pile of complaints can mean two very different things.</h2>
       <p class="rp-sub">This is the call we get asked about most, and the one we will not make for
@@ -4020,7 +4143,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-rows" id="rpWhySoft"></div>
     </div>
 
-    <div class="rp-sec">
+    <div class="rp-sec" id="srcLimits">
       <div class="rp-kick">The limits we set on ourselves</div>
       <h2 class="rp-h2">Four things we will not do, whatever it costs us.</h2>
       <p class="rp-sub">Every one of them would make this look more certain than it is. That is exactly
@@ -4028,7 +4151,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-nevers" id="rpNevers"></div>
     </div>
 
-    <div class="rp-sec">
+    <div class="rp-sec" id="srcLawful">
       <div class="rp-kick">Lawful considerations</div>
       <h2 class="rp-h2">Naming a real company comes with a duty. Here is ours.</h2>
       <p class="rp-sub">Regulators can publish a warning list with no way to appeal it, because the law
@@ -4037,11 +4160,12 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-rows" id="rpLawful"></div>
     </div>
 
-    <div class="rp-sec">
+    <div class="rp-sec" id="srcCatalogue">
       <div class="rp-kick">The sources</div>
-      <h2 class="rp-h2">One hundred and four sources, in four levels of authority.</h2>
-      <p class="rp-sub">Where a source sits decides what it is allowed to do. Customer reports and
-        anything off the open web can back a finding up. They can never cause one.</p>
+      <h2 class="rp-h2" id="rpCatH2">The catalogue, in five levels of authority.</h2>
+      <p class="rp-sub">Where a source sits decides what it is allowed to do, and the limit is
+        printed on each one below. Customer reports and anything off the open web can back a
+        finding up. Neither can ever cause one.</p>
       <div class="rp-cat" id="rpCats"></div>
       <p class="rp-spec">The full catalogue, and which of its sources applied to any given party, is
         published inside every result. Coverage is always measured against the sources that could
@@ -4143,6 +4267,11 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
   <div class="waitprog">
     <div class="waitbar" role="progressbar" aria-label="Check progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="waitBarWrap"><i id="waitBar"></i></div>
     <div class="waitmeta"><span id="waitPhase" aria-live="polite">Starting the sweep</span><span class="wclock" id="waitClock">0s</span><span id="waitPct">0%</span></div>
+    <!-- Under the bar, on the right. Two minutes of a moving bar and a rising
+         percentage says a machine is busy. This says who is busy and what they
+         are doing, in the product's own name, using the logo file itself and
+         nothing redrawn. It goes when the answer is ready. -->
+    <div class="waitforming" id="waitForming"><span class="iqlock" role="img" aria-label="4orm IQ"><img class="iqmark" src="data:image/png;base64,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" alt=""><span class="iqiq">IQ</span></span><span class="wf-t">is slowly forming your answer</span></div>
   </div>
 
   <div class="waitbody">
@@ -7491,8 +7620,12 @@ function inputAllowed(t){ return !!t && !BLOCKED_INPUT[t]; }
              Email:"an email address", Wallet:"a wallet"})[t] || t.toLowerCase();
   });
   var last=words.pop();
-  el2.textContent="Give us "+words.join(", ")+" or "+last
-    +". We will show you what the public record can, and cannot, verify.";
+  /* The cost of starting, stated before anybody has to guess at it. Two
+     questions is the whole commitment, and somebody weighing up whether to
+     begin should not have to find that out by beginning. */
+  el2.innerHTML="Give us "+rpEsc(words.join(", "))+" or "+rpEsc(last)
+    +". We will show you what the public record can, and cannot, verify."
+    +'<b class="cbtwo">Two questions to get started, then we read the registers.</b>';
 })();
 
 var input=id("kbInput"), go=id("kbGo");
@@ -9563,11 +9696,23 @@ function jumpTo(n){
 function buildDirectory(){
   var h='';
 
-  /* The first hour matters more than the category. Two things get promoted
-     out of the list because they are what to do before reading anything. */
+  /* THE FIRST THING ON THE PAGE.
+     It used to sit under the emergency band, which put a wall of instructions
+     in front of somebody who had not yet said what happened to them. The five
+     answers are the fastest way to find out which of those instructions is
+     theirs, so they come first and the band follows. */
+  h+='<div class="triage"><div class="lbl gold">Start here</div><div class="tq">What has already happened?</div><div class="trow">';
+  TRIAGE.forEach(function(t,i){
+    h+='<button class="tbtn" type="button" data-tone="'+esc(t.tone||"")+'" data-t="'+i+'"><span class="tx">'+esc(t.x)+'</span><span class="tt">'+esc(t.t)+'</span></button>';
+  });
+  h+='</div><div class="tnote" id="dirCtx"></div></div>';
+
+  /* Then the first hour, which matters more than the category. These are
+     promoted out of the list because they are what to do before reading
+     anything else. */
   h+='<div class="actnow">'+
      '<div class="anh"><span class="lbl gold">If money has already left</span>'+
-     '<span class="anx">Do these two things before you read anything else on this page.</span></div>'+
+     '<span class="anx">Do these three things before you read anything else on this page.</span></div>'+
      '<div class="anrow">'+
        '<div class="ancard"><div class="ann">01</div><div class="anb">'+
          '<div class="ant">Call the bank or card issuer that sent it</div>'+
@@ -9575,20 +9720,27 @@ function buildDirectory(){
        '</div></div>'+
        '<div class="ancard"><div class="ann">02</div><div class="anb">'+
          '<div class="ant">Report to the Canadian Anti-Fraud Centre</div>'+
-         '<div class="anw">The national collection point. Report even if you are not sure it was a fraud. A file number is what your bank, your card issuer and any lawyer will ask you for first.</div>'+
+         '<div class="anw">The national collection point. They do not investigate your case and the report is still worth making: it is how the next person gets warned, and the file number is what your bank, your card issuer and any lawyer will ask you for first.</div>'+
          '<div class="ancontacts">'+contactHTML(["Canada","1-888-495-8501","tel"])+
            contactHTML(["US","1-877-382-4357","tel"])+
            contactHTML(["Report, CA","https://reportcyberandfraud.canada.ca/"])+
            contactHTML(["Report, US","https://reportfraud.ftc.gov/"])+'</div>'+
        '</div></div>'+
+       /* The third call, and the one everything downstream depends on. The
+          Anti-Fraud Centre says plainly that investigating is the local
+          force's job, not theirs, and almost every other body on this page
+          asks for the file number only the police can give. Leaving it out of
+          the band meant the one number everybody needs was buried in a
+          section further down. */
+       '<div class="ancard"><div class="ann">03</div><div class="anb">'+
+         '<div class="ant">Tell your local police</div>'+
+         '<div class="anw">The only people who will actually investigate, and the only ones who can give you a file number. There is no minimum amount and no deadline. Most of Canada is policed by the RCMP, Ontario and Quebec by their provincial force, and the big cities by their own service. If somebody is in danger right now, call 911.</div>'+
+         '<div class="ancontacts">'+contactHTML(["Every detachment","https://rcmp.ca/en/corporate-information/rcmp-locations"])+
+           contactHTML(["Ontario, OPP","1-888-310-1122","tel"])+
+           contactHTML(["Quebec, SQ","514-598-4141","tel"])+
+           contactHTML(["Emergency","911"])+'</div>'+
+       '</div></div>'+
      '</div></div>';
-
-  /* Triage. A shortcut down the page, never a gate in front of it. */
-  h+='<div class="triage"><div class="lbl gold">Start here</div><div class="tq">What has already happened?</div><div class="trow">';
-  TRIAGE.forEach(function(t,i){
-    h+='<button class="tbtn" type="button" data-tone="'+esc(t.tone||"")+'" data-t="'+i+'"><span class="tx">'+esc(t.x)+'</span><span class="tt">'+esc(t.t)+'</span></button>';
-  });
-  h+='</div><div class="tnote" id="dirCtx"></div></div>';
 
   h+='<div class="dirintro"><div class="di">Every telephone number below was read off that organisation\'s own published contact page. '+
      'No individual lawyer, firm or recovery service is named anywhere in it, and nobody pays to be listed. '+
@@ -10074,6 +10226,7 @@ function waitOpen(q){
   var hl=id("waitLeft"); if(hl){ hl.style.display=""; hl.textContent="0 / "+EDU.length+" read"; }
   id("waitQ").textContent=q;
   id("waitPhase").textContent="Starting the sweep";
+  var wf0=id("waitForming"); if(wf0) wf0.hidden=false;
   /* One, not zero. A bar at nothing reads as a page that has not started. */
   clearInterval(waitStepT); waitStepT=null;
   /* One, not zero, and the clock starts here. */
@@ -10246,6 +10399,9 @@ function waitFinish(render){
   f.innerHTML = WAIT_DISCLAIMER;
   f.className = "waitfine";
   id("waitPhase").textContent = "Assessment ready in "+fmtDur(ms);
+  /* Nothing is forming any more. A line that keeps saying so after the answer
+     has landed is the page talking over its own result. */
+  var wf=id("waitForming"); if(wf) wf.hidden=true;
   ok.disabled=false; ok.textContent="Show the result";
   if(waitAck){ waitClose(); return; }
   /* Nobody clicked anything and the sweep has landed. The screen does not sit
@@ -10378,7 +10534,36 @@ var RP_METHOD = [["What we look at", "We ask every register we can reach, one by
 var RP_WHYSOFT = [["What a pile of complaints is worth", "It is real information. A group of people describing the same problem, in their own words, is often the first sign of something a regulator has not caught up with yet. We read it for the thing that repeats, not for how many there are. Ten people describing one problem tells you more than a hundred scores out of five."], ["What it is not", "It is not proof. Nobody in a review has been questioned, nothing in it has been tested, and a complaint site has no duty to be fair to the company it names. That is why a pattern of complaints never turns a result red on its own, whatever the number."], ["The half nobody says out loud", "We have sat with people who lost money on a platform that had broken no rule at all. Nobody had explained what they were actually buying, the product was never right for them, and by the time that was clear the money had gone. The loss was real. The distress was real. The firm was not at fault. That looks exactly like the other kind in a review score."], ["Why we will not choose for you", "From the outside we usually cannot tell which of those two we are looking at. So we show you what people are reporting, how many report the same thing, and whether any authority has acted. The judgement stays with you."], ["The other half of the job", "A sound business and a customer who did not understand what they were buying is a gap, and it costs people money without anybody doing anything wrong. Closing that gap is work 4orm is doing directly. Warning people away from fraud is only half of what this is for."]];
 var RP_NEVERS = [["We never invent evidence", "No licence number, registry reference, case number or date ever appears here unless we read it off a source you can open yourself."], ["We never give a trust score", "No number out of a hundred, no letter grade, no stars. One number gets read as permission, and it hides whichever half of it is weak."], ["We never call a failure a clean result", "If we cannot reach a register, we say we could not reach it. A register we could not open never becomes “we looked and found nothing”."], ["We never decide for you", "This is a research summary. It is not a legal finding, it is not advice, and it is not a decision that anybody has done anything wrong."]];
 var RP_LAWFUL = [["What being in this report does not mean", "It does not mean we have decided anybody broke the law, and it does not mean any authority has made a finding. We report what public records showed on a stated day, with the source printed beside every item."], ["An empty register does not clear anybody", "A company missing from a warning list is not cleared by being missing. The regulators say so themselves: names go on those lists as they become known. No entry on the day we looked is a fact about that day, not a verdict."], ["Getting it right is an ongoing job", "Where a result names a person, that is personal information, and keeping it accurate is something we owe continuously rather than only when somebody complains."], ["If this report is about you", "Write to us and we will check the record again. If we cannot stand an item up against a source, we take it off. If we still disagree with you, your reply is attached to the result so that anybody reading it sees both sides."], ["Why there is no old copy to correct", "We do not keep results. Every check is run fresh against the registers on the day you ask, and the answer is not filed away and handed to somebody else later. So there is no old report sitting anywhere that we would have to go back and fix. When the record changes, the next check reads the record, not our memory of it."], ["What we commit to on timing", "We aim to reply to a challenge within five working days and to finish re-checking within thirty. Anything we cannot stand up against a source comes off while we are looking, not at the end."]];
-var RP_CATLIST = [["Official record", "Regulators, courts, registries", "Governments, regulators, courts and official registries. These can turn a result red on their own."], ["Verified data", "Certificates, domains, blockchain", "Independent technical records: security certificates, domain registrations, threat feeds, blockchain explorers."], ["Customer reports", "Complaint boards, review sites", "What customers say. We read it for a repeated problem, not for volume. It never decides a result by itself."], ["Public chatter", "The open web", "Everything else people have written. Always labelled as chatter, never as fact. It can back something up. It can never be the reason."]];
+/* FIVE LEVELS, NOT FOUR. The board has always carried our own corpus as its
+   own level, and this page listed four, so the page and the board disagreed in
+   front of the reader. Each one carries the letter the board uses, what it may
+   do, and what it may never do, because "where a source sits" is only useful
+   if the limit is stated beside it. The count comes off REGINFO at render
+   time: a number typed here is a number that goes stale the next time a
+   register is added. */
+var RP_CATLIST = [
+  ["A", "Official record", "Regulators, courts, registries",
+   "Governments, regulators, courts and official registries.",
+   "Can turn a result red on its own.", "a"],
+  ["B", "Verified data", "Certificates, domains, blockchain",
+   "Independent technical records: security certificates, domain registrations, threat feeds, blockchain explorers.",
+   "Two together, or one alongside an official record.", "b"],
+  ["4orm", "Our own corpus", "What we have seen before",
+   "Identifiers we have already seen on a party somebody was warned about: a shared wallet, a shared address, the same document.",
+   "Reports a shared identifier. Never a shared operator.", "own"],
+  ["C", "Customer reports", "Complaint boards, review sites",
+   "What customers say. We read it for a repeated problem, not for volume.",
+   "Corroborates. Never causes a finding.", "c"],
+  ["D", "Public chatter", "The open web",
+   "Everything else people have written, always labelled as chatter.",
+   "Context only. Never the reason for anything.", "d"]
+];
+/* How many registers sit at each level, counted rather than claimed. */
+function rpTierCount(letter){
+  var n=0;
+  for(var k in REGINFO) if(String(REGINFO[k][1])===letter) n++;
+  return n;
+}
 var RP_ARROW = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7 17L17 7M9 7h8v8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>";
 var RP_CROSS = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 6l12 12M18 6L6 18\" stroke-linecap=\"round\"/></svg>";
 var RP_MONTHS = ["January","February","March","April","May","June","July","August",
@@ -11385,9 +11570,14 @@ function rpSourcesFill(){
   id("rpLawful").innerHTML=out;
   out="";
   for(i=0;i<RP_CATLIST.length;i++){
-    out+='<div class="rp-catc"><div class="rp-cn">'+rpEsc(RP_CATLIST[i][0])+'</div>'
-      +'<div class="rp-cv">'+rpEsc(RP_CATLIST[i][1])+'</div>'
-      +'<div class="rp-cx">'+rpEsc(RP_CATLIST[i][2])+'</div></div>';
+    var t=RP_CATLIST[i], cnt=rpTierCount(t[0]);
+    out+='<div class="rp-catc" data-t="'+rpEsc(t[5])+'">'
+      +'<div class="rp-ctop"><span class="rp-clet">'+rpEsc(t[0])+'</span>'
+      +'<span class="rp-ccount">'+cnt+' register'+(cnt===1?'':'s')+'</span></div>'
+      +'<div class="rp-cname">'+rpEsc(t[1])+'</div>'
+      +'<div class="rp-cn">'+rpEsc(t[2])+'</div>'
+      +'<div class="rp-cx">'+rpEsc(t[3])+'</div>'
+      +'<div class="rp-cmay">'+rpEsc(t[4])+'</div></div>';
   }
   id("rpCats").innerHTML=out;
 }
@@ -12064,11 +12254,26 @@ function rpFound(){ rpShow("found"); }
 function rpAct(){ rpShow("act"); }
 function rpConsole(){
   rpPvHide();
+  /* THE DATA ROOM OPENS AT THE TOP.
+     It was opening part way down, which reads as a page that has already been
+     scrolled and lost. The cause is ordinary and worth writing down: the
+     report is a tall document, the reader is a long way down it, and switching
+     stage swaps one tall page for another while the browser holds the old
+     scroll position. A single scrollTo fired at that moment lands before the
+     new layout exists and the browser puts the old offset back.
+     So it is set now, again after the browser has laid the new page out, and
+     once more after the sweep has filled it, since filling it changes the
+     height a third time. Cheap, and it is the only thing that holds. */
   document.body.setAttribute("data-stage","console");
-  window.scrollTo(0,0);
+  /* A pack left the scroll locked; an unlocked page cannot be scrolled. */
+  document.body.style.overflow="";
+  var top=function(){ window.scrollTo(0,0); };
+  top();
+  if(window.requestAnimationFrame)
+    requestAnimationFrame(function(){ top(); requestAnimationFrame(top); });
   sweep(); observeAll();
-  var b=id("summaryBand");
-  if(b&&b.scrollIntoView) setTimeout(function(){ sweep(); },40);
+  setTimeout(function(){ sweep(); top(); },40);
+  setTimeout(top,240);
 }
 function rpBackFromConsole(){
   if(!RP) return;
@@ -12089,6 +12294,15 @@ id("rpAlreadyBtn").addEventListener("click", function(){
 ["rpToSources_report","rpToSources_found","rpToSources_act",
  "rpToSourcesR","rpToSourcesF","rpToSourcesA"].forEach(function(x){
   var b=id(x); if(b) b.addEventListener("click", rpSources);
+});
+/* Delegated on the sheet, so it survives anything rewritten inside it. */
+id("rpSources").addEventListener("click", function(e){
+  var t=e.target;
+  while(t && t!==this && !(t.getAttribute && t.getAttribute("data-goto"))) t=t.parentNode;
+  if(!t || t===this || !t.getAttribute) return;
+  var sec=id(t.getAttribute("data-goto"));
+  if(sec && sec.scrollIntoView)
+    sec.scrollIntoView({ behavior: reduceMotion()?"auto":"smooth", block:"start" });
 });
 id("rpBackToReport").addEventListener("click", rpSourcesBack);
 id("navSources").addEventListener("click", rpSources);
