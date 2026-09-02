@@ -88,8 +88,32 @@ await p.click('#rpBackToReport'); await p.waitForTimeout(500);
 await p.click('#rpDownloadSummary'); await p.waitForTimeout(800);
 await shot('12-summary', true);
 await p.click('#sumClose'); await p.waitForTimeout(500);
-await p.click('#rpOpenRecord'); await p.waitForTimeout(1200);
+await p.click('#rpOpenRecord'); await p.waitForTimeout(1600);
+/* the room introduces itself the first time it is opened */
+await shot('13a-walkthrough');
+for (let i=0;i<7;i++){
+  if (await p.evaluate(()=>document.getElementById('wk').hidden)) break;
+  await p.click('#wkNext'); await p.waitForTimeout(500);
+}
+await p.waitForTimeout(300);
 await shot('13-console', true);
+
+/* Back to the report, then the new check control, then the way back in. The
+   three screens that used to have no picture at all. */
+await p.click('#navBackReport'); await p.waitForTimeout(700);
+/* the data room returns to the screen it was opened from, whichever that was,
+   so walk back with whatever back control is actually on screen until the
+   result is up. The new check pill lives only there. */
+for (let i=0;i<4;i++){
+  if (await p.evaluate(()=>!document.getElementById('rpReport').hidden)) break;
+  const back = await p.$('#rpt .rp-sheet:not([hidden]) .rp-back');
+  if (!back) break;
+  await back.click(); await p.waitForTimeout(600);
+}
+await p.click('#rpNewCheck'); await p.waitForTimeout(900);
+await shot('14-after-new-check');
+await p.click('#lastOpen'); await p.waitForTimeout(900);
+await shot('15-resumed', true);
 
 console.log('\npage errors:', errs.length, errs[0] || '');
 await b.close();

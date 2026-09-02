@@ -1,44 +1,79 @@
 # Upload this to GitHub
 
-Everything in this folder replaces what is in the repo now.
+25 files. Every one of them runs. Nothing here is documentation, a test or a
+leftover, so if a file is in this folder it is because the site stops working
+without it.
 
-1. Unzip this file.
+1. Unzip.
 2. Open your GitHub repo, the one Vercel pulls from.
 3. Add file, then Upload files.
-4. Drag in ALL of these, from inside the unzipped folder:
+4. Drag in everything from inside the unzipped folder:
 
    index.html
    admin.html
    vercel.json
    package.json
-   README.md
-   api/            (the whole folder: 21 files)
-   db/             (6 files, including register.neon.sql)
-   docs/           (7 files)
-   assets/
-   tools/          (optional. The checks. Nothing serves from here.)
+   api/     (19 files)
+   db/      (register.neon.sql, migrate-003.neon.sql)
 
-5. Commit to `main`.
+5. Commit to `main`. Vercel sees the push and deploys on its own.
 
-GitHub replaces files that have the same name, so nothing duplicates.
-Vercel sees the push and deploys on its own.
+## One database migration, before or after the deploy
 
-## Environment variables
+`db/migrate-003.neon.sql` adds one column to `ops_runs`. Run it in the Neon SQL
+editor. It is safe to run twice and safe to run before the deploy.
 
-`KBYS_MAX_SEARCHES` should be `10`. The review sweep is three pinned searches
-rather than one, so the plan has ten in it. At 8 the two open sweeps at the end
-get dropped.
+It exists because the console now lets somebody say "this is a company, not a
+person" when it has refused their identifier, and that assertion goes into the
+operations chain rather than living only in the browser. Rows written before it
+keep hash schema v2 and verify under v2 forever; new rows are written under v3.
+Nothing already in the chain is re-hashed.
 
-`POSTGRES_URL` switches on the write side, the operations chain and the public
-register. See `docs/STORAGE.md`. Until it is set, storage is skipped, the audit
-report says so, and the register returns an empty list. Checks are unaffected.
+Until the migration runs, checks still work. The chain write for a run will
+fail with an unknown column and the report card will say the run was not
+logged, which is the honest thing for it to say.
+
+GitHub replaces files with the same name. It does not remove files you do not
+upload, so the `docs/` and `tools/` folders already in the repo stay exactly
+where they are and are untouched by this.
+
+## Two files to DELETE from the repo by hand
+
+Uploading cannot remove anything, so these two have to go manually. Neither is
+harmful today. Both are dead and both look alive, which is how somebody ends up
+debugging the wrong file at eleven at night.
+
+    api/stats.js         the counter endpoint before it was renamed. The page
+                         has called /api/counter for three builds.
+
+    api/_reference.js    imported by nothing.
+
+On GitHub: open the file, the three dots at the top right, Delete file, commit.
 
 ## The one thing to run by hand, once
 
-`db/register.neon.sql` creates the register table. Run it in the Neon SQL
-editor. Nothing else needs a migration.
+`db/register.neon.sql` in the Neon SQL editor. It creates `ops_register`, the
+table behind the public register. Nothing else needs a migration.
 
----
+## Environment variables
+
+    KBYS_MAX_SEARCHES = 10      ten searches in the plan. At 8 the two open
+                                sweeps at the end get dropped.
+
+    POSTGRES_URL                switches on the write side, the operations chain
+                                and the register. Until it is set, storage is
+                                skipped and the register is empty. Checks are
+                                unaffected.
+
+## The five endpoints this creates
+
+    /api/check           the check itself
+    /api/counter         how many checks have been run
+    /api/register        the public register, read only, no auth by design
+    /api/evidence        one stored run, for the back office
+    /api/admin-metrics   the back office figures
+
+All five are used. There are no others.
 
 # What changed in this build
 

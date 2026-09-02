@@ -821,9 +821,12 @@ if (!/rpIdRow\(rpAgency\(off\[i\]\.src\)/.test(script))
   const m = /#rpt \.rp-who\{[^}]*font-size:clamp\(([\d.]+)px/.exec(styleBlock);
   if (!m || Number(m[1]) < 24)
     fails.push('the verdict headline is no longer set large enough to be the first thing read');
-  /* And the pill must stay a label, not grow back into a second headline. */
+  /* And the pill must stay a label, not grow back into a second headline. The
+     ceiling moved from 13 to 14 when the pill was asked to carry the
+     regulator's full name: a body spelled out in words needs the extra half
+     point to stay readable, and 14 is still barely a quarter of the headline. */
   const p = /#rpt \.rp-eyebrow\{[^}]*font-size:clamp\(([\d.]+)px[^)]*,\s*([\d.]+)px\)/.exec(styleBlock);
-  if (p && Number(p[2]) > 13)
+  if (p && Number(p[2]) > 14)
     fails.push('the verdict pill has grown back to headline size');
 }
 if (!/body\[data-stage="console"\] \.searchbox\{display:none\}/.test(
@@ -1200,11 +1203,47 @@ if (!/We do not publish individuals/.test(script))
    deck and they are all its siblings. */
 {
   const h1 = (styleBlock.match(/body\[data-stage="landing"\] \.cbh1\{[^}]*\}/) || [''])[0];
+  /* THE SIZE IS THE SITE'S, NOT AN OPINION.
+     4ormfinance.com sets its hero at clamp(38px,5.8vw,70px), weight 750,
+     letter-spacing -.033em, line-height 1.04. The cap, the weight, the
+     tracking and the leading here are those values exactly. Only the viewport
+     step differs, and only because this line carries the lockup and holds one
+     line above 1080, which caps how fast it can grow. */
+  /* A ceiling, not an equality. The site caps its hero at 70 and this line
+     must never exceed that; it sits under it on purpose, because the site's
+     wraps and this one does not, so the same point size reads larger here. */
   const cap = (h1.match(/clamp\([^,]+,[^,]+,(\d+)px\)/) || [])[1];
   if (!cap) fails.push('the landing headline has no size cap');
-  else if (Number(cap) < 70) fails.push('the landing headline is capped at ' + cap + 'px and was asked to be bigger');
+  else if (Number(cap) > 70)
+    fails.push('the landing headline is capped at ' + cap + 'px, above the 70px the site caps its hero at');
+  /* And the two sides of the breakpoint have to use the same step, or the
+     headline grows as the window narrows. */
+  {
+    const step = (h1.match(/clamp\([^,]+,([\d.]+)vw,/) || [])[1];
+    const wrapRule = (styleBlock.match(/@media\(max-width:1080px\)\{[\s\S]{0,600}?\}\s*\n\}/) || [''])[0];
+    const wrapStep = (wrapRule.match(/font-size:clamp\([^,]+,([\d.]+)vw,/) || [])[1];
+    if (step && wrapStep && step !== wrapStep)
+      fails.push('the landing headline uses ' + step + 'vw above 1080 and ' + wrapStep
+        + 'vw below it, so its size jumps at the breakpoint');
+  }
+  if (!/letter-spacing:-\.033em/.test(h1))
+    fails.push('the landing headline no longer carries the tracking the site sets on its hero');
+  if (!/font-weight:750/.test(h1))
+    fails.push('the landing headline no longer carries the weight the site sets on its hero');
+  if (!/line-height:1\.04/.test(h1))
+    fails.push('the landing headline no longer carries the leading the site sets on its hero');
   if (!/white-space:nowrap/.test(h1))
-    fails.push('the landing headline may wrap, which breaks the lockup off its own line');
+    fails.push('the landing headline may wrap above the fold, which lets the sentence '
+      + 'break away from the lockup on a wide screen');
+  /* And below the desk it has to wrap, or it shrinks under the body copy. */
+  if (!/@media\(max-width:1080px\)\{\s*\n\s*body\[data-stage="landing"\] \.cbh1\{[\s\S]{0,240}white-space:normal/.test(styleBlock))
+    fails.push('the landing headline is held to one line on a phone, where it has to '
+      + 'shrink below the body copy to fit');
+  {
+    const sub = (styleBlock.match(/body\[data-stage="landing"\] \.cbsub\{[^}]*\}/) || [''])[0];
+    if (!/clamp\(16px,1\.5vw,19px\)/.test(sub))
+      fails.push('the landing lead is no longer set to the size the site sets its hero lead');
+  }
   if (!/\.iqmark\{[^}]*height:1\.356em/.test(styleBlock))
     fails.push('the 4ormIQ mark is no longer sized in em off the headline, so the two can drift apart');
   const deck = (styleBlock.match(/body\[data-stage="landing"\] \.cbdeck\{\n?\s*margin:(\d+)px/) || [])[1];
@@ -1362,6 +1401,272 @@ if (!/<button class="navbtn green" type="button" id="waitSources">/.test(html))
 }
 if (/rp-pill-blue/.test(html))
   fails.push('a report screen still carries the old blue sources pill');
+/* The result screen is where somebody finishes reading, so it is where the
+   next check has to start from. Without this the only way back to the search
+   bar was the data room, which most readers never open. */
+if (!/id="rpNewCheck"/.test(html))
+  fails.push('the result screen has no way to start the next check');
+if (!/id="lastRow"/.test(html) || !/function rpResume\(/.test(html))
+  fails.push('the landing page offers no way back into the last report');
+
+/* ------------------------------------------------- NO NAME LEAVES UNGATED
+   Every field carrying a person's name runs through SR-001. Two paths did
+   not: the plain words summary, because it is prose rather than a field, and
+   the printed one page sheet, which is the most published thing this product
+   makes. Both are guarded here by name. */
+if (!/function rpScrubPeople\(/.test(html))
+  fails.push('the plain words summary is no longer scrubbed of individuals');
+if (!/rpSay"\)\.textContent=rpScrubPeople\(/.test(html))
+  fails.push('the report prints the summary without scrubbing it');
+if (!/sh-say[\s\S]{0,80}rpScrubPeople\(/.test(html))
+  fails.push('the printed sheet prints the summary without scrubbing it');
+if (!/return Object\.keys\(out\)\.filter\(function\(k\)\{\s*return rpPersonOutputAllowed/.test(html))
+  fails.push('the printed sheet names individuals without passing the SR-001 gate');
+
+/* --------------------------------------------------- THE POLICE DIRECTORY
+   Everybody is told to call their local police and nobody is told who that
+   is. Thirteen provinces and territories, and the national directory. */
+{
+  const provs = (html.match(/var RP_PROV_ORDER = \[([^\]]*)\]/) || [null,''])[1]
+    .split(',').filter(Boolean).length;
+  if (provs !== 13)
+    fails.push('the police picker covers ' + provs + ' provinces and territories, not 13');
+  if (!/rcmp\.ca\/en\/corporate-information\/rcmp-locations/.test(html))
+    fails.push('the national police directory link is gone');
+  if (!/p\.id==="police"\) out\+=rpPoliceHtml\(\)/.test(html))
+    fails.push('the police pack no longer carries the province picker');
+}
+
+/* ------------------------------------------------ THE ONE PAGE, TWO COPIES */
+if (!/id="sumDownloadPlain"/.test(html))
+  fails.push('the one page summary offers only one copy');
+if (!/sh-h">Report card<\/div>/.test(html))
+  fails.push('the printed sheet has lost the report card');
+if (!/function buildSummary\(d, mode\)/.test(html))
+  fails.push('the printed sheet no longer knows which copy it is building');
+
+/* --------------------------------------------- ONE LAMP, OVER ONE DOORWAY */
+if (!/body\[data-stage="console"\] #room\{display:none\}/.test(html))
+  fails.push('the lamp is back over the data room');
+
+/* ------------------------------------ FIND SUPPORT ASKS BEFORE IT INSTRUCTS
+   The five answers come first: a wall of instructions in front of somebody who
+   has not yet said what happened to them is a wall. And the emergency band
+   carries the police, because the Anti-Fraud Centre says investigating is the
+   local force's job and every other body on the page asks for the file number
+   only the police can give. */
+{
+  const b = html.indexOf('function buildDirectory()');
+  const dir = b < 0 ? '' : html.slice(b, b + 9000);
+  const tri = dir.indexOf('class="triage"');
+  const act = dir.indexOf('class="actnow"');
+  if (tri < 0 || act < 0) fails.push('find support has lost the triage block or the emergency band');
+  else if (tri > act)
+    fails.push('find support puts the emergency band before the five answers again, '
+      + 'so the page instructs before it asks');
+  if (!/Tell your local police/.test(dir))
+    fails.push('the find support emergency band no longer names the police');
+  if (!/rcmp\.ca\/en\/corporate-information\/rcmp-locations/.test(dir))
+    fails.push('the find support band names the police with no way to reach them');
+}
+
+/* ------------------------------------------------ THE DATA ROOM OPENS AT ITS TOP */
+{
+  const i = html.indexOf('function rpConsole()');
+  const fn = i < 0 ? '' : html.slice(i, html.indexOf('\n}', i));
+  if (!/scrollBehavior="auto"/.test(fn))
+    fails.push('the data room resets the scroll while the root is set to scroll smoothly, '
+      + 'so it shows the middle of the page and then glides to the top');
+  if (!/top\(\);\s*\n\s*document\.body\.setAttribute\("data-stage","console"\);/.test(fn))
+    fails.push('the data room sets the scroll after the stage swap, so there is a '
+      + 'position to travel from and the reader sees the trip');
+}
+
+/* ------------------------------------------ THE WAIT SAYS WHO IS WORKING ON IT */
+if (!/id="waitForming"/.test(html))
+  fails.push('the waiting screen no longer says what is happening under the bar');
+{
+  const i = html.indexOf('id="waitForming"');
+  const wf = html.slice(i, i + 20000);
+  /* The 4 must be the file. A typeface standing in for it is the one thing
+     that must never happen, so the guard checks for the image, not the word. */
+  if (!/<img class="fourm4" src="data:image\/png;base64,/.test(wf.slice(0, 400)))
+    fails.push('the waiting line no longer uses the mark file, and something is standing in for it');
+  if (!/We are <span class="fourming">/.test(wf.slice(0, 400)))
+    fails.push('the waiting line no longer says who is doing the work');
+  /* The mark is inlined, so the estimate is thousands of characters past the
+     opening tag. The window has to clear the data URI. */
+  if (!/id="waitEta"/.test(wf.slice(0, 12000)))
+    fails.push('the waiting line has lost the estimate');
+  if (!/function waitEtaText\(/.test(html))
+    fails.push('the estimate is typed rather than read off the same clock the bar is paced to');
+}
+/* ------------------------------------------ THE READER CAN OVERRIDE THE GATE
+   Two or three capitalised words is how a great many real companies are named,
+   so refusing them outright was the console being wrong about the most
+   ordinary identifier there is. The door exists, it is only on the person
+   block, the assertion lapses when the identifier changes, and it reaches the
+   operations chain under its own hashed field. */
+{
+  if (!/id="kbOverride"/.test(html) || !/id="kbUndo"/.test(html))
+    fails.push('the person block has no door in it, so a company named like a person cannot be checked');
+  if (!/function assertActive\(/.test(html) || !/function assertClear\(/.test(html))
+    fails.push('nothing scopes the reader assertion to the identifier it was made about');
+  if (!/if\(USER_ASSERT\) o\.assert=USER_ASSERT;/.test(html))
+    fails.push('the reader assertion never leaves the browser, so it cannot be in the chain');
+  /* Only the person block gets a door. A phone number has no company reading. */
+  if (!/t==="Person"\s*\n?\s*\?/.test(html))
+    fails.push('the override is offered on blocks other than a person name');
+}
+{
+  const ops = fs.readFileSync(path.join(root, 'api/_ops.js'), 'utf8');
+  if (!/export const HASH_SCHEMA = 'v3';/.test(ops))
+    fails.push('the operations chain is not writing the version that carries the reader assertion');
+  ['v1', 'v2', 'v3'].forEach(v => {
+    if (!new RegExp('\\n  ' + v + ': r => \\[').test(ops))
+      fails.push('canonical hash version ' + v + ' is gone, so rows written under it can never be verified again');
+  });
+  if (!/r\.sector \|\| '', r\.user_assert \|\| '',/.test(ops))
+    fails.push('v3 does not append the reader assertion, so the field is recorded but not committed to');
+  /* Bounded to each version's own body, or a lazy match runs straight past
+     the end of v2 and finds the field in v3. */
+  ['v1', 'v2'].forEach(v => {
+    const i = ops.indexOf('\n  ' + v + ': r => [');
+    if (i < 0) return;
+    const body = ops.slice(i, ops.indexOf("].join('|')", i));
+    if (/user_assert/.test(body))
+      fails.push('frozen hash version ' + v + ' was edited, which re-hashes every row already written under it');
+  });
+  const chk = fs.readFileSync(path.join(root, 'api/check.js'), 'utf8');
+  if (!/assert:\s*ONE_OF\(body\?\.assert,\s*\['NOT_A_PERSON'\]\)/.test(chk))
+    fails.push('the reader assertion reaches a hashed column without passing an allow list');
+  if (!/user_assert: ask\.assert,/.test(chk))
+    fails.push('the reader assertion is validated and then never written to the chain');
+}
+
+/* ------------------------------------------------- THE ROOM SHOWS ITSELF
+   Seven instruments, seven sentences, and every one has to point at something
+   that is actually on the screen. A tour aimed at a selector nobody kept is a
+   tour that skips a step in silence. */
+{
+  const steps = (html.match(/var WK_STEPS = \[([\s\S]*?)\n\];/) || [null,''])[1];
+  const sels = [...steps.matchAll(/sel:"([^"]+)"/g)].map(m => m[1]);
+  if (sels.length !== 8)
+    fails.push('the walkthrough has ' + sels.length + ' steps and the room has eight things to point at');
+  /* Three of the steps point at a row rather than a thing, and each of those
+     has to name every item in the row. A balloon that says "the ten checks"
+     and then lists six is worse than one that lists none. */
+  const need = { '#statstrip': 5, '#sbRight': 7, '#tiles': 10 };
+  Object.keys(need).forEach(sel => {
+    const i = steps.indexOf('sel:"' + sel + '"');
+    if (i < 0) { fails.push('the walkthrough no longer covers ' + sel); return; }
+    const end = steps.indexOf('{ sel:', i + 6);
+    const body = steps.slice(i, end < 0 ? steps.length : end);
+    const n = (body.match(/\n      \["/g) || []).length;
+    if (n !== need[sel])
+      fails.push('the walkthrough step for ' + sel + ' names ' + n + ' items and there are ' + need[sel]);
+  });
+  if (!/id="wkList"/.test(html))
+    fails.push('the walkthrough cannot render the item lists it carries');
+  sels.forEach(sel => {
+    const ok = sel.startsWith('#')
+      ? new RegExp('id="' + sel.slice(1) + '"').test(html)
+      : new RegExp('class="[^"]*\\b' + sel.replace(/^\./, '').replace('.', '[^"]*\\b') + '\\b')
+          .test(html);
+    if (!ok) fails.push('the walkthrough points at ' + sel + ', which is not on the page any more');
+  });
+  [...steps.matchAll(/x:"([^"]*)"/g)].forEach(m => {
+    if (m[1].length < 40) fails.push('a walkthrough step says almost nothing: ' + m[1]);
+  });
+  if (!/id="wkCancel"/.test(html) || !/id="wkNext"/.test(html))
+    fails.push('the walkthrough cannot be advanced or cancelled');
+  if (!/id="navWalk"/.test(html))
+    fails.push('there is no way to start the walkthrough again');
+  if (!/if\(!WK_SEEN\) setTimeout/.test(html))
+    fails.push('the walkthrough no longer runs itself once, or runs itself every time');
+  /* The layer is fixed, so its children are placed against the viewport. Add
+     the scroll offset and the balloon walks off the bottom of the page. */
+  {
+    const i = html.indexOf('function wkPlace()');
+    const fn = html.slice(i, html.indexOf('\nfunction wkShow', i));
+    if (/window\.scroll[XY]/.test(fn))
+      fails.push('the walkthrough positions against the page inside a fixed layer, '
+        + 'so the balloon leaves the screen as soon as anything is scrolled');
+  }
+}
+
+/* ------------------------------------- THE REGULATORS, IN THEIR OWN WORDS
+   Three quotes, verbatim, each attributed and each linked to the page it was
+   read off. This is the one block on the site that carries somebody else's
+   words about a real body, so the guard is on the parts that make it
+   checkable: a quote with no name against it, or no link, is an assertion. */
+{
+  const i = html.indexOf('class="rp-quotes"');
+  if (i < 0) fails.push('sources and method has lost the regulator quotes');
+  else {
+    const blk = html.slice(i, html.indexOf('<div class="rp-sec" id="srcLogic">', i));
+    const q = (blk.match(/<blockquote>/g) || []).length;
+    if (q < 2 || q > 3)
+      fails.push('sources and method carries ' + q + ' regulator quotes, and it was asked for two or three');
+    const who = (blk.match(/class="rp-qwho"/g) || []).length;
+    const lk  = (blk.match(/class="rp-qlk" href="https:\/\//g) || []).length;
+    if (who !== q) fails.push('a regulator quote has no body named against it');
+    if (lk !== q)  fails.push('a regulator quote cannot be opened at the source it was read from');
+    /* Every one of these must be a body, not a blog, a broker or us. */
+    ['bcsc.bc.ca', 'fca.org.uk', 'canada.ca'].forEach(d => {
+      if (!blk.includes(d))
+        fails.push('the quote sourced to ' + d + ' is gone, so the block is short a regulator');
+    });
+    if (/4orm|we think|we believe/i.test(blk.replace(/rp-q\w+/g, '')))
+      fails.push('the regulator quote block has our own voice inside it');
+  }
+}
+
+/* ------------------------------- SOURCES AND METHOD KNOWS WHERE IT CAME FROM
+   It is reachable from six places and every one of them is a different place
+   to be returned to. Opening it from the data room used to drop the reader on
+   the report with no way back to the board they had been reading. */
+{
+  if (!/RP_BACKNAME = \{[^}]*console:"Back to the data room"/.test(html))
+    fails.push('sources and method cannot name the data room as a destination, '
+      + 'so somebody who opens it from there is told the wrong way out');
+  if (!/if\(RP_FROM==="console"\)\{/.test(html))
+    fails.push('sources and method has no route back to the data room');
+  if (!/RP_CONSOLE_Y/.test(html))
+    fails.push('going back to the data room does not restore where the reader was in it');
+}
+
+/* ------------------------------------------------- THE MARK IN THE RING
+   The hub of the loading circle carries the 4 and nothing else: the file it
+   comes from is the mark on a transparent square, so there is no plate behind
+   it and no clip needed to hide one. A clip reappearing here means the image
+   has gone back to a version with a ground baked into it. */
+{
+  if (/netMarkClip/.test(html))
+    fails.push('the hub mark is being clipped again, which means the file behind it '
+      + 'has a plate baked in and the ring has a tile in the middle of it');
+  if (!/var NET_MARK = "data:image\/png;base64,/.test(html))
+    fails.push('the hub mark is no longer inlined, so the loading circle has a hole in it offline');
+}
+
+/* THE TAB MARK. Three sizes, all inlined, all built from the mark file. */
+{
+  const head = html.slice(0, 40000);
+  ['16x16', '32x32'].forEach(sz => {
+    if (!new RegExp('rel="icon" type="image/png" sizes="' + sz + '" href="data:image/png;base64,').test(head))
+      fails.push('the ' + sz + ' tab icon is gone, so the tab falls back to a blank page mark');
+  });
+  if (!/rel="apple-touch-icon" sizes="180x180" href="data:image\/png;base64,/.test(head))
+    fails.push('the home screen icon is gone');
+}
+if (!/class="cbtwo"/.test(html))
+  fails.push('the landing no longer says how few questions it takes to start');
+
+/* ------------------------------------------------- THE THREAD OWNS THE PAGE */
+if (!/data-stage="landing"\]\[data-chat="on"\] \.cbtitle/.test(html))
+  fails.push('the landing page keeps its headline once the thread opens');
+if (!/setAttribute\("data-chat","on"\)/.test(html) || !/removeAttribute\("data-chat"\)/.test(html))
+  fails.push('nothing sets or clears the attribute the thread screen depends on');
 /* An invisible overlay must not be clickable. .navbtn carries
    pointer-events:auto so it can be clicked through a nav that has none, and
    inherited into the closed waiting overlay it swallowed every click on the
@@ -1488,13 +1793,38 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
   }
 }
 
-/* SOURCES AND METHOD IS ONE COLUMN.
-   It is prose and rows and nothing else, and running the rows to the full sheet
-   while the sentences inside them stopped two-thirds of the way across gave the
-   page two right-hand edges. One column, and the tables end where the text does. */
+/* SOURCES AND METHOD USES THE SHEET, AND STILL HAS A MEASURE.
+   The original guard demanded a 900px column, which was the right answer to the
+   wrong shape: full-width rows whose sentences stopped two-thirds of the way
+   across gave the page two right-hand edges. The fix was never the column, it
+   was the rows. They are cards in a multi-column grid now, so each sentence
+   fills the thing that holds it, and the page uses the paper it is printed on.
+   What is guarded is that invariant, not the number 900: the rows must be laid
+   out in more than one column, and the lead must keep a reading measure. */
 {
-  if (!/#rpSources \.rp-sec\{max-width:900px;/.test(styleBlock))
-    fails.push('the sources page is back on the full sheet width, so its tables outrun its sentences again');
+  const rowsSel = (styleBlock.match(/#rpSources \.rp-rows\{[^}]*\}/) || [''])[0];
+  if (!/grid-template-columns:repeat\(2,/.test(rowsSel))
+    fails.push('the sources rows are one full-width column again, so every sentence stops '
+      + 'two-thirds of the way across a block that does not');
+  if (!/#rpt #rpSources \.rp-slead\{max-width:\d+ch\}/.test(styleBlock))
+    fails.push('the sources lead has lost its measure and can now run the whole sheet');
+  const heroSel = (styleBlock.match(/#rpSources \.rp-hero2\{[^}]*\}/) || [''])[0];
+  if (!/grid-template-columns:/.test(heroSel))
+    fails.push('the sources hero is stacked again, which puts the reason the product exists '
+      + 'below the fold on the page that has to earn belief');
+  /* Five levels of authority, in five blocks, each stating its own limit. Four
+     grey boxes for five levels is the page disagreeing with the board. */
+  const catSel = (styleBlock.match(/#rpt \.rp-cat\{[^}]*\}/) || [''])[0];
+  if (!/grid-template-columns:repeat\(5,/.test(catSel))
+    fails.push('the levels of authority are no longer five blocks');
+  if (!/var RP_CATLIST = \[[\s\S]{0,40}\["A",/.test(html))
+    fails.push('the levels of authority no longer carry the letter the board uses');
+  if (!/function rpTierCount\(/.test(html))
+    fails.push('the register count per level is typed rather than counted, so it will go stale');
+  ['a','b','own','c','d'].forEach(t => {
+    if (!new RegExp('#rpt \\.rp-catc\\[data-t="' + t + '"\\]').test(styleBlock))
+      fails.push('level ' + t + ' has no colour, so the five blocks read as one grey list');
+  });
   /* The header is NOT in that column, and that is deliberate. The two pills
      have to sit in the same corner on every screen or they stop being a fixed
      thing a reader can reach for. Body has a measure; chrome has an edge. */
