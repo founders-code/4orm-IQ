@@ -87,6 +87,24 @@ export const CATALOGUE = [
       jurisdictions:['US-FL'], domain:'sunbiz.org', supports_person_search:true }),
   S({ source_id:'OPENCORPORATES', display_name:'OpenCorporates', category:'01',
       source_tier:'B', domain:'opencorporates.com', supports_person_search:true }),
+  /* Cleared on SR-001 and never entered here, which is why the board read 104
+     while the register carried more. A source approved and not catalogued is a
+     source nobody can be asked for: it never enters a plan, so it never fails,
+     so nothing ever reports it missing. */
+  S({ source_id:'CA_QC_REGISTRAIRE', display_name:'Registraire des entreprises du Quebec',
+      category:'01', jurisdictions:['CA-QC'], domain:'registreentreprises.gouv.qc.ca',
+      supports_person_search:true }),
+  S({ source_id:'SG_ACRA', display_name:'ACRA', category:'01',
+      jurisdictions:['SG'], domain:'acra.gov.sg' }),
+  S({ source_id:'HK_COMPANIES_REGISTRY', display_name:'Hong Kong Companies Registry',
+      category:'01', jurisdictions:['HK'], domain:'cr.gov.hk' }),
+  S({ source_id:'NZ_COMPANIES_OFFICE', display_name:'New Zealand Companies Office',
+      category:'01', jurisdictions:['NZ'], domain:'companiesoffice.govt.nz',
+      supports_person_search:true }),
+  S({ source_id:'OFFSHORE_REGISTRIES',
+      display_name:'Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones',
+      category:'01', source_tier:'B', jurisdictions:['INTL'], transport:'parallel',
+      domain:'' }),
 
   /* ---------------- 02 registration and licensing ---------------- */
   S({ source_id:'CSA_REGISTRATION', display_name:'CSA Registration', category:'02',
@@ -136,10 +154,38 @@ export const CATALOGUE = [
   S({ source_id:'ESMA_MICA_CASP', display_name:'ESMA MiCA CASP', category:'02', also:['01'],
       jurisdictions:['EU'], domain:'esma.europa.eu',
       verticals:['CRYPTO'] }),
+  /* THE SECTOR LICENCE REGISTERS.
+     Not everybody being asked for money is being sold a security. A deposit on
+     a house, a car, a mortgage or an insurance policy is licensed by a
+     different body in every province, and until these were catalogued a person
+     asking about a brokerage got a plan built entirely out of securities
+     registers. Entity level only: the register is asked about the brokerage or
+     the dealership, never about the individual agent. */
+  S({ source_id:'CA_ON_RECO', display_name:'RECO real estate register', category:'02',
+      jurisdictions:['CA-ON'], domain:'reco.on.ca' }),
+  S({ source_id:'CA_ON_FSRA', display_name:'FSRA Ontario, mortgage and insurance licences',
+      category:'02', jurisdictions:['CA-ON'], domain:'fsrao.ca' }),
+  S({ source_id:'CA_PROV_SECTOR_REGULATORS',
+      display_name:'BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators',
+      category:'02', jurisdictions:['CA'], transport:'parallel', domain:'' }),
+  S({ source_id:'US_NMLS', display_name:'NMLS Consumer Access', category:'02', also:['04'],
+      jurisdictions:['US'], domain:'nmlsconsumeraccess.org',
+      supports_person_search:true }),
+  S({ source_id:'SG_MAS_FI_DIRECTORY', display_name:'MAS Financial Institutions Directory',
+      category:'02', jurisdictions:['SG'], domain:'mas.gov.sg',
+      verticals:['BROKER_DEALER','INVESTMENT_ADVISER','FOREX_CFD','CRYPTO','PRIVATE_FUND','PUBLIC_STOCK'] }),
 
   /* ---------------- 03 enforcement and sanctions ---------------- */
   S({ source_id:'IOSCO_ISCAN', display_name:'IOSCO I-SCAN', category:'03',
       jurisdictions:['INTL'], domain:'iosco.org' }),
+  S({ source_id:'CA_AUTONOMOUS_SANCTIONS',
+      display_name:'Canadian Consolidated Autonomous Sanctions List', category:'03',
+      jurisdictions:['CA'], domain:'international.gc.ca', supports_person_search:true }),
+  S({ source_id:'CONSUMER_AGENCY_ALERTS',
+      display_name:'Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts', category:'03',
+      jurisdictions:['INTL'], transport:'parallel', domain:'' }),
+  S({ source_id:'SG_MAS_ALERT', display_name:'MAS Investor Alert List', category:'03',
+      jurisdictions:['SG'], domain:'mas.gov.sg' }),
   S({ source_id:'BCSC_CAUTION', display_name:'BCSC Caution List', category:'03',
       jurisdictions:['CA-BC'], domain:'bcsc.bc.ca' }),
   S({ source_id:'ASC_CAUTION', display_name:'ASC Caution List', category:'03',
@@ -191,6 +237,9 @@ export const CATALOGUE = [
       jurisdictions:['HK'], domain:'sfc.hk', supports_domain_search:true }),
 
   /* ---------------- 04 people and control ---------------- */
+  S({ source_id:'CA_ISC_FEDERAL',
+      display_name:'Corporations Canada, Individuals with Significant Control', category:'04',
+      jurisdictions:['CA'], domain:'ised-isde.canada.ca', supports_person_search:true }),
   S({ source_id:'ISC_OWNERSHIP', display_name:'ISC Ownership', category:'04',
       jurisdictions:['CA'], domain:'ic.gc.ca', supports_person_search:true }),
   S({ source_id:'UK_PSC', display_name:'UK PSC Register', category:'04',
@@ -214,6 +263,16 @@ export const CATALOGUE = [
   /* ---------------- 05 legal and courts ---------------- */
   S({ source_id:'CANLII', display_name:'CanLII', category:'05',
       jurisdictions:['CA'], domain:'canlii.org', supports_person_search:true,
+      supports_historical:true }),
+  S({ source_id:'CA_SCC_FC', display_name:'Supreme Court of Canada and Federal Court',
+      category:'05', jurisdictions:['CA'], domain:'decisions.fct-cf.gc.ca',
+      supports_historical:true }),
+  S({ source_id:'CA_PROV_COURTS', display_name:'Provincial courts and tribunals',
+      category:'05', jurisdictions:['CA'], transport:'parallel', domain:'',
+      supports_historical:true }),
+  S({ source_id:'CA_SEC_TRIBUNALS',
+      display_name:'Securities tribunals and the Competition Tribunal', category:'05',
+      also:['03'], jurisdictions:['CA'], transport:'parallel', domain:'',
       supports_historical:true }),
   S({ source_id:'OSB_BANKRUPTCY', display_name:'OSB Bankruptcy', category:'05',
       jurisdictions:['CA'], domain:'ised-isde.canada.ca' }),
