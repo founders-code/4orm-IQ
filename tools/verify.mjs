@@ -1265,10 +1265,15 @@ if (!/We do not publish individuals/.test(script))
   }
   if (!/\.iqmark\{[^}]*height:1\.356em/.test(styleBlock))
     fails.push('the 4ormIQ mark is no longer sized in em off the headline, so the two can drift apart');
-  const deck = (styleBlock.match(/body\[data-stage="landing"\] \.cbdeck\{\n?\s*margin:(\d+)px/) || [])[1];
+  /* Tolerates a comment between the brace and the declaration, which is how
+     every other rule in this file is written. */
+  const deckRule = (styleBlock.match(/body\[data-stage="landing"\] \.cbdeck\{[\s\S]*?\}/) || [''])[0];
+  const deck = (deckRule.match(/margin:(\d+)px/) || [])[1];
   if (!deck) fails.push('the landing deck has no top margin, so nothing separates it from the headline');
-  else if (Number(deck) < 90)
-    fails.push('the landing deck sits ' + deck + 'px under the headline and was asked for about an inch');
+  /* A floor, not a target. It was asked to come closer to the headline; what
+     must never happen is the two touching. */
+  else if (Number(deck) < 34)
+    fails.push('the landing deck sits ' + deck + 'px under the headline, close enough to read as one block');
 }
 
 /* The phase map only names the steps now. It used to carry a ceiling each, and
