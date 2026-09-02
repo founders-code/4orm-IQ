@@ -271,7 +271,7 @@ body[data-stage="landing"] .searchbox{margin-top:22px;box-shadow:var(--sh-lg)}
    rather than a headline. Smaller, with air above it and a rule to separate it
    from the sentence it is evidence for. */
 body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justify-content:center;
-  gap:11px;margin:34px auto 0;padding-top:24px;max-width:34ch;
+  gap:11px;margin:48px auto 0;padding-top:28px;max-width:34ch;
   border-top:1px solid rgba(255,255,255,.055)}
 .servedn{font-family:var(--mono);font-size:clamp(21px,2.4vw,29px);font-weight:700;color:var(--ok);
   letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;
@@ -655,9 +655,42 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 .upnote{margin-top:16px;font-size:12px;color:var(--tx-3);line-height:1.55;max-width:74ch}
 .upnote b{color:var(--tx-2);font-weight:600}
 /* Tucked under the line above it rather than given equal air: it is the
-   qualification on that sentence, not a second sentence. */
+   qualification on that sentence, not a second sentence. Inside the pair below
+   it is a panel of its own and this is overridden. */
 .upadv{margin-top:12px}
 body[data-stage="landing"] .upadv{margin-top:14px}
+
+/* ============================ THE TWO NOTES, AS A PAIR ===================
+   Two panels rather than two paragraphs. They say different things, one about
+   what the product does and one about what it refuses to be, and centred at
+   one width under one control they read as a single block of grey.
+
+   The measure comes off the panel, not the paragraph: max-width on .upnote is
+   what centres them one under the other, so it is cleared inside the grid and
+   the column does the measuring instead. */
+body[data-stage="landing"] .noteg{
+  /* The whole block sits well clear of the bar. The bar is the only control on
+     the screen and everything under it is a footnote to it, so the gap has to
+     read as a break rather than as the next line of the same paragraph. */
+  /* The pair squares off with the search bar rather than floating inset under
+     it: at this measure the group reaches the edge of the same column the bar
+     sits in, so the two read as one stack instead of two objects of different
+     widths. It clamps to the column on anything narrower. */
+  margin:64px auto 0;max-width:92ch;
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+body[data-stage="landing"] .noteg .upnote{
+  margin:0;text-align:left;max-width:none;
+  background:rgba(255,255,255,.022);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;padding:18px 20px}
+/* One column on a phone, where two would give each panel a twenty character
+   measure and every sentence would break four times. */
+@media(max-width:760px){
+  body[data-stage="landing"] .noteg{grid-template-columns:1fr;gap:12px;margin-top:44px}
+}
+/* Hidden with the pair, not on their own. The thread hides .upnote by element,
+   which leaves two empty framed panels sitting under the conversation. */
+body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 
 /* stat strip */
 .statstrip{
@@ -2316,7 +2349,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .foot .note{margin-top:26px;font-size:11.5px;color:var(--tx-4);line-height:1.7;max-width:82ch}
 /* The document row. Deliberately the quietest thing on the landing page: it
    has to be findable and must never compete with the search bar. */
-.docrow{margin:18px auto 0;display:flex;justify-content:center;align-items:center;gap:11px}
+.docrow{margin:34px auto 0;display:flex;justify-content:center;align-items:center;gap:11px}
 .docrow button{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;
   text-transform:uppercase;color:var(--tx-4);background:none;border:0;cursor:pointer;padding:4px 2px}
 .docrow button:hover{color:var(--tx-2)}
@@ -3938,6 +3971,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <span class="lbl" style="color:var(--tx-4)">One page to print, or every record, every source and every gap in full</span>
         </div>
 
+        <!-- TWO STATEMENTS, SIDE BY SIDE.
+             Stacked in one centred column, these two and the link row and the
+             counter all read as a single paragraph of small grey text under
+             the bar: same width, same weight, nothing telling the eye where
+             one statement ends and the next begins. Set as a pair of quiet
+             panels they separate, and the block gains air above and below
+             rather than being made smaller. -->
+        <div class="noteg landing-only">
         <p class="upnote landing-only" style="color:var(--tx-3)">We check the registers, read the records, and publish every source we used and every one we could not reach. Nothing is invented, and green never means we guarantee anyone.</p>
 
         <!-- ADVICE, AND THE ABSENCE OF IT.
@@ -3947,6 +3988,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
              thing it disclaims is not a disclaimer. This one is never rewritten
              by anything. -->
         <p class="upnote upadv landing-only" style="color:var(--tx-3)"><b>This is not financial advice.</b> We do not advise, recommend or endorse anyone. We present third party evidence, name the source and the date beside every line, and leave the decision with you.</p>
+        </div>
 
         <!-- The way to the two standing documents from the first screen. The
              site footer carries them too, but it is hidden on the landing
