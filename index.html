@@ -212,14 +212,17 @@ body[data-stage="landing"] .cbmain{padding:110px 0 60px;text-align:center}
    fifteen characters. Two headlines that are meant to be the same thing were
    not close.
 
-   The cap, the weight, the tracking and the leading are now the site's
-   exactly. The only value that differs is the viewport step, and it differs
-   for one reason: this line carries the 4ormIQ lockup and stays on one line,
-   so the step has to be low enough that the sentence still fits the sheet at
-   every width. 4.6vw is the largest that does. The floor stays low for the
-   same reason, and below 1080 the base rule lets it wrap. */
+   The weight, the tracking and the leading are the site's exactly. The size
+   sits a step under it, deliberately: the site's headline wraps inside fifteen
+   characters and this one runs as a single line, so at the same point size it
+   reads considerably larger than the site's does. 4.15vw with a 62 cap is the
+   step where the two look like the same headline rather than measure like it.
+   It is never larger than the site's 70.
+
+   The floor stays low because this line does not wrap above 1080, and below
+   1080 it takes the same step so nothing jumps at the breakpoint. */
 body[data-stage="landing"] .cbh1{
-  white-space:nowrap;font-size:clamp(13.5px,4.6vw,70px);letter-spacing:-.033em;
+  white-space:nowrap;font-size:clamp(13.5px,4.15vw,62px);letter-spacing:-.033em;
   font-weight:750;line-height:1.04;margin-top:34px;
 }
 /* The middle line. Big enough to be the second thing read, small enough that
@@ -244,7 +247,10 @@ body[data-stage="landing"] .cbh1{width:max-content;max-width:96vw;position:relat
   body[data-stage="landing"] .cbh1{
     white-space:normal;width:auto;max-width:15ch;left:auto;transform:none;
     margin-left:auto;margin-right:auto;
-    font-size:clamp(38px,5.8vw,70px);text-wrap:balance;
+    /* The same step as the rule above it, so the size is continuous across
+       the breakpoint: at 1080 both sides give 44.8px. Only the floor differs,
+       and the floor is the site's own 38. */
+    font-size:clamp(38px,4.15vw,62px);text-wrap:balance;
   }
 }
 /* Down a little from the deck, because the four identifier chips that used to

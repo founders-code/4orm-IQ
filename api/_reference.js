@@ -17,6 +17,131 @@
 
 export const REFERENCE = {
 
+/* ------------------------------------------------------------------ *
+ * THE REGISTERS SR-001 CLEARED AND THE CATALOGUE HAD NEVER CARRIED.
+ * Sector licensing, the courts, and the registries outside the four
+ * jurisdictions the first build covered.
+ * ------------------------------------------------------------------ */
+
+"Registraire des entreprises du Quebec": {
+  info: ["CA-QC","A","Quebec's enterprise register. Confirms a Quebec company exists, its status, its address and the people declared to it.","https://www.registreentreprises.gouv.qc.ca/"],
+  hit: "A company registered in Quebec, with its status and its declared officers.",
+  miss: "Nothing in Quebec. It may be federal or registered in another province.",
+  look: "Read the status and the date of the last annual declaration. A company that has stopped filing is a company that has stopped being maintained."
+},
+
+"ACRA": {
+  info: ["SG","A","Singapore's corporate register. Confirms a Singapore entity exists and its standing.","https://www.acra.gov.sg/"],
+  hit: "A Singapore entity by that name exists, with a UEN and a status.",
+  miss: "Nothing in Singapore. A firm claiming a Singapore base with no ACRA record should be asked about it.",
+  look: "The entity status. Live is what you want. Struck off or in liquidation means what it says."
+},
+
+"Hong Kong Companies Registry": {
+  info: ["HK","A","Hong Kong's companies register. Confirms incorporation and standing.","https://www.cr.gov.hk/"],
+  hit: "A Hong Kong company by that name exists, with a registration number.",
+  miss: "Nothing in Hong Kong. A firm claiming a Hong Kong base with no record should be asked about it.",
+  look: "Whether the company is live, and when it was incorporated. A recent incorporation behind a long claimed history is the contradiction to chase."
+},
+
+"New Zealand Companies Office": {
+  info: ["NZ","A","New Zealand's companies register. Confirms incorporation, standing and directors.","https://companies-register.companiesoffice.govt.nz/"],
+  hit: "A New Zealand company by that name exists, with its directors on the record.",
+  miss: "Nothing in New Zealand. The company may be registered elsewhere.",
+  look: "The registered office address and the directors. A New Zealand shell with an overseas director and a virtual address is a known pattern."
+},
+
+"Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones": {
+  info: ["INTL","B","The company registers of the jurisdictions most often used to hold a fund or an operating entity offshore. Coverage differs by island: some publish a searchable register, some publish almost nothing.","https://www.opencorporates.com/"],
+  hit: "An entity by that name is recorded in one of those jurisdictions.",
+  miss: "Nothing found. Several of these registers are closed to the public, so an absence here proves very little.",
+  look: "Which jurisdiction it is in, and whether that jurisdiction actually publishes the register. An offshore entity is legal and common. What matters is whether the one you were told about is the one that exists."
+},
+
+"RECO real estate register": {
+  info: ["CA-ON","A","The Real Estate Council of Ontario's register. Says whether a brokerage is registered to trade in real estate in Ontario.","https://www.reco.on.ca/"],
+  hit: "The brokerage is registered with RECO, or it appears in RECO's discipline record.",
+  miss: "No RECO registration. In Ontario, trading in real estate without registration is an offence, so an absence is worth asking about directly.",
+  look: "Look for the brokerage, not the person. Check the registration status and whether there is a discipline decision attached."
+},
+
+"FSRA Ontario, mortgage and insurance licences": {
+  info: ["CA-ON","A","The Financial Services Regulatory Authority of Ontario. Licenses mortgage brokerages, insurance agencies, credit unions and loan companies in Ontario.","https://www.fsrao.ca/"],
+  hit: "The firm holds an Ontario licence for what it is doing, or it appears in FSRA's enforcement record.",
+  miss: "No Ontario licence found for that activity. A firm arranging mortgages or selling insurance in Ontario needs one.",
+  look: "Match the licence to the activity. A licence to sell insurance is not a licence to arrange a mortgage, and a firm holding one while doing the other is the thing to notice."
+},
+
+"BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators": {
+  info: ["CA","A","The provincial bodies that license real estate, mortgage and insurance outside Ontario: the BC Financial Services Authority, the Real Estate Council of Alberta, the Autorite des marches financiers, the Financial and Consumer Affairs Authority of Saskatchewan, and their Manitoba and Atlantic counterparts.","https://www.bcfsa.ca/"],
+  hit: "The firm holds a licence in that province for what it is doing, or it appears in that regulator's enforcement record.",
+  miss: "No licence found in that province. A licence in one province is not a licence in another.",
+  look: "Check the province the money is going to, not only the province you are in. These regulators do not share one register, and each one only answers for its own."
+},
+
+"NMLS Consumer Access": {
+  info: ["US","A","The United States national register of mortgage and consumer lending licences, for companies and individuals.","https://www.nmlsconsumeraccess.org/"],
+  hit: "The firm holds a state lending licence, with the states it covers listed.",
+  miss: "No NMLS record. A firm arranging a mortgage or a consumer loan in the United States needs one in every state it operates in.",
+  look: "The states listed on the licence. A licence in one state is not a licence to lend in yours."
+},
+
+"MAS Financial Institutions Directory": {
+  info: ["SG","A","The Monetary Authority of Singapore's directory of the institutions it regulates.","https://eservices.mas.gov.sg/fid"],
+  hit: "The firm is regulated in Singapore, with the activities it is licensed for.",
+  miss: "Not regulated by MAS. A firm claiming a Singapore licence with no directory entry is claiming something the regulator does not confirm.",
+  look: "The licence type against what they are actually offering you."
+},
+
+"Canadian Consolidated Autonomous Sanctions List": {
+  info: ["CA","A","Canada's own sanctions list, held by Global Affairs Canada. Names the people and entities Canadians are prohibited from dealing with.","https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/consolidated-consolide.aspx"],
+  hit: "A name on this list is a legal prohibition, not a warning. Do not send anything and speak to your bank.",
+  miss: "Not on Canada's sanctions list. That is the floor, not a clearance.",
+  look: "Match the full legal name and any listed alias. Sanctions lists carry aliases precisely because names get changed."
+},
+
+"Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts": {
+  info: ["INTL","A","The public warnings issued by the consumer and competition authorities of Canada and the United States, and by the FBI's internet crime centre.","https://competition-bureau.canada.ca/"],
+  hit: "A consumer authority has published something naming this party or this scheme.",
+  miss: "No consumer alert found. These bodies publish selectively, so silence here is very weak evidence.",
+  look: "Whether the alert names this party or names a pattern the approach you received matches. Both are worth knowing, and they are not the same thing."
+},
+
+"MAS Investor Alert List": {
+  info: ["SG","A","The Monetary Authority of Singapore's list of unregulated persons who may have been wrongly perceived as licensed.","https://www.mas.gov.sg/investor-alert-list"],
+  hit: "MAS has published this name as one that may be mistaken for a regulated firm.",
+  miss: "Not on the MAS list. The list only covers what has been reported to MAS.",
+  look: "The exact entity name and the website beside it. These entries usually name the site as well as the brand."
+},
+
+"Corporations Canada, Individuals with Significant Control": {
+  info: ["CA","A","The federal register of the people who actually control a federally incorporated company, as opposed to the directors named on the front of it.","https://ised-isde.canada.ca/"],
+  hit: "The people with real control over the company are on the record.",
+  miss: "No control record. Federal companies are required to keep this, so an absence for a federal corporation is a filing failure worth noting.",
+  look: "Compare the people with control against the people who have been talking to you. They are not always the same, and the difference is the point of this register."
+},
+
+"Supreme Court of Canada and Federal Court": {
+  info: ["CA","A","The decisions of Canada's highest court and of the Federal Court.","https://decisions.fct-cf.gc.ca/"],
+  hit: "The party has been before one of these courts. Read what the case was about before drawing anything from it.",
+  miss: "Nothing at this level. Most disputes never reach these courts, so this proves very little on its own.",
+  look: "What the party was doing in the case. Being sued, suing somebody, and being prosecuted are three different facts."
+},
+
+"Provincial courts and tribunals": {
+  info: ["CA","A","The published decisions of the provincial superior and small claims courts and of the provincial tribunals.","https://www.canlii.org/"],
+  hit: "A decision names the party. Most commercial disputes end up here rather than in a federal court.",
+  miss: "No published decision found. Many proceedings are settled or never published, so an absence is not a clean record.",
+  look: "The date and the outcome. An old settled dispute and a current unsatisfied judgment are not the same thing at all."
+},
+
+"Securities tribunals and the Competition Tribunal": {
+  info: ["CA","A","The tribunals that decide securities enforcement in each province, and the federal Competition Tribunal.","https://www.canlii.org/"],
+  hit: "A tribunal has made a finding about this party. This is the record behind most regulator caution list entries.",
+  miss: "No tribunal decision found. A regulator can warn about a party long before any tribunal has heard it.",
+  look: "Whether the decision is a finding, an order, or a settlement, and what the party agreed to. A settlement without an admission is still a fact, and it is not a finding of wrongdoing."
+},
+
 "Corporations Canada": {
   info: ["CA","A","The federal corporate register. Confirms a federally incorporated company exists, its status, and its directors.","https://ised-isde.canada.ca/cc/lgcy/fdrlCrpSrch.html"],
   hit: "A federal company by that name exists, with a number, a status and directors on the record.",
