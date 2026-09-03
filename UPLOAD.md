@@ -14,11 +14,29 @@ without it.
    vercel.json
    package.json
    api/     (19 files)
-   db/      (register.neon.sql, migrate-003.neon.sql)
+   db/      (register.neon.sql, migrate-003.neon.sql, migrate-004.neon.sql, retention.neon.sql)
 
 5. Commit to `main`. Vercel sees the push and deploys on its own.
 
 ## One database migration, before or after the deploy
+
+`db/migrate-004.neon.sql` brings the corpus into line with the published privacy
+notice: it drops the reader's search string, the stored render payload and the
+stored headline from `runs`, replaces the string with a salted hash, deletes
+every person-level node and edge, and adds a database constraint that rejects
+them from then on. It is destructive on purpose. Run it once, and take a backup
+first if the environment holds anything you need.
+
+`db/retention.neon.sql` installs `purge_expired()` and the `ops_retention`
+record of every time it ran. Until it existed nothing expired. Call
+`POST /api/retain` on a schedule; `GET /api/retain` reports when it last ran
+without running anything. Both are behind the admin gate.
+
+Two salts are required and they must be different from each other: `OPS_SALT`
+for the visitor-day on the operations chain, `CORPUS_SALT` for the identifier
+hash on the corpus. One salt across both stores would let the two be joined,
+which is the thing keeping them apart prevents. With either unset the column it
+protects is written null, never in the clear.
 
 `db/migrate-003.neon.sql` adds one column to `ops_runs`. Run it in the Neon SQL
 editor. It is safe to run twice and safe to run before the deploy.

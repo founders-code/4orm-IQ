@@ -34,16 +34,23 @@ function manifest() {
 const M = manifest();
 
 export const POLICY = {
-  version: '2026-09-01',
-  effective_from: '2026-09-01',
+  version: '2026-09-02',
+  effective_from: '2026-09-02',
   change_kind: 'RULE_CHANGED',
-  summary: 'Row hashes carry a schema marker and the recorded fields gained a sector. '
-         + 'The console runs live by default rather than reading the seeded corpus.',
-  reason: 'Recorded fields have to be able to grow, and growing them used to invalidate '
-        + 'every hash already written, which is indistinguishable from tampering. Rows now '
-        + 'name the canonical function that produced them and are verified under it. '
-        + 'Separately, the console defaulted to the demo corpus, so a visitor sent the bare '
-        + 'link got a canned answer that looked like a check and wrote nothing to the log.',
+  summary: 'The corpus stopped keeping the reader\'s search string, the rendered result and '
+         + 'every person-level record, and retention became a mechanism rather than a period '
+         + 'in a document.',
+  reason: 'The published privacy notice said the search string, the result and any person\'s '
+        + 'name were not kept. That was true of the operations chain and false of the corpus, '
+        + 'which wrote the string on an index, the whole rendered payload beside it, and a '
+        + 'persistent person graph the page suppressed only at render. The string is now a '
+        + 'salted hash, the payload and the headline are gone, person records are refused on '
+        + 'the write path and rejected by a database constraint, the schema lock reads every '
+        + 'schema rather than one, and purge_expired enforces twelve and twenty four month '
+        + 'periods that nothing enforced before. Two measurement defects were corrected with '
+        + 'it: the chain verifier did not read user_assert, so a run that overrode the '
+        + 'person-name gate would have been reported as tampered with, and four counters were '
+        + 'written as zero having never been measured.',
   evidence_url: null,          /* internal change: no external record to cite */
   author: '4orm Finance',
 
@@ -53,6 +60,11 @@ export const POLICY = {
   sources_total:      M ? (M.total | 0) : 0,
   sources_enabled:    M ? (M.enabled || []).length : 0,
   sources:            M ? (M.enabled || []) : [],
+  /* The registers the register itself marks CRITICAL. Read here so that a run
+     row's critical_failed count is measured against the manifest rather than
+     against a list somebody typed into check.js. */
+  critical:           M ? (M.critical || []) : [],
+  sources_critical:   M ? (M.critical || []).length : 0,
   enforcement_on:     true,
 };
 

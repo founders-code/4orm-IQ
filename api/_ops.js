@@ -161,8 +161,15 @@ export async function recordRun(req, run) {
       sources_out_of_scope: run.sources_out_of_scope | 0,
       critical_failed: run.critical_failed | 0,
       incomplete: !!run.incomplete,
-      suppressed_items: run.suppressed_items | 0,
-      barred_items: run.barred_items | 0,
+      /* NULL MEANS NOT MEASURED, AND ZERO MEANS NONE OCCURRED.
+         These two coerced null to 0, so four years of rows would have said
+         "no suppressions" about a step this process never counted. Suppression
+         and barring happen in the browser, after this row is written. Until the
+         page reports them back, the honest value is null. Rows already written
+         hold 0 and verify against 0; only new rows can be null, and the
+         canonical string reads null as empty, so nothing already hashed moves. */
+      suppressed_items: run.suppressed_items == null ? null : run.suppressed_items | 0,
+      barred_items: run.barred_items == null ? null : run.barred_items | 0,
       duration_ms: run.duration_ms == null ? null : run.duration_ms | 0,
       policy_version: run.policy_version || null,
       manifest_generated: run.manifest_generated || null,
@@ -238,12 +245,21 @@ export async function verifyChain(limit) {
     const page = 2000;
     let after = 0;
     for (;;) {
+      /* EVERY FIELD IN EVERY CANON VERSION MUST BE SELECTED HERE.
+         A column left out of this list is read as its empty default when the
+         canonical string is rebuilt, so the recomputed hash differs from the
+         stored one and the verifier reports the chain broken at that row. That
+         is a false alarm indistinguishable from a real one, which is the worst
+         failure this file can have. user_assert was missing and is added: it is
+         null on every ordinary run, so only a run that overrode the person-name
+         gate would ever have shown it. When a v4 is appended, this list grows
+         with it. */
       const rows = (await p.query(
         `select seq, at, prev_hash, row_hash, hash_schema, visitor_day, input_type, province,
                 purpose, outcome,
                 sources_planned, sources_ok, sources_failed, sources_out_of_scope, critical_failed,
                 incomplete, suppressed_items, barred_items, duration_ms,
-                policy_version, manifest_generated, enforcement_on, sector
+                policy_version, manifest_generated, enforcement_on, sector, user_assert
            from ops_runs where seq > $1 order by seq asc limit $2`, [after, page])).rows;
       if (!rows.length) break;
       for (const row of rows) {

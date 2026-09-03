@@ -646,6 +646,19 @@ export default async function handler(req, res) {
        ordering is the guarantee, not an optimisation. */
     const pol = await ensurePolicyRecorded();
 
+    /* OUT OF SCOPE, AND CRITICAL FAILURES, MEASURED RATHER THAN ASSUMED.
+       Out of scope is what the register does not clear us to ask: applicable to
+       this party, and not on the enabled list. Critical failed is a source
+       SR-001 marks CRITICAL that we planned and did not reach. Both are read
+       off the manifest, so they move when the register moves and never when
+       somebody edits a number here. */
+    const enabledSet = new Set(POLICY.sources || []);
+    const criticalSet = new Set(POLICY.critical || []);
+    const outOfScope = enabledSet.size
+      ? app.applicable.filter(x => !enabledSet.has(x.display_name)).length : 0;
+    const criticalFailed = criticalSet.size
+      ? (sources || []).filter(s => s.status !== 'found' && criticalSet.has(s.board || s.label)).length : 0;
+
     const ops = await recordOps(req, {
       input_type: opsInputType(q, domain),
       province: null,                       /* set when the purpose gate lands */
@@ -654,11 +667,22 @@ export default async function handler(req, res) {
       sources_planned: sources?.length ?? 0,
       sources_ok: call.input?.scores?.sources_checked ?? 0,
       sources_failed: call.input?.scores?.sources_not_reached ?? 0,
-      sources_out_of_scope: payload.pipeline?.outOfScope ?? 0,
-      critical_failed: payload.pipeline?.criticalFailed ?? 0,
+      /* THESE WERE ALWAYS ZERO, AND THE BACK OFFICE REPORTED THE ZEROS.
+         They read payload.pipeline.outOfScope and .criticalFailed, and nothing
+         in api/ ever set either key, so four columns on every row since the
+         chain began carry a number that was never measured. Two of them are
+         answerable here and are now computed; two are not, and say so. */
+      sources_out_of_scope: outOfScope,
+      critical_failed: criticalFailed,
       incomplete: (call.input?.scores?.sources_not_reached ?? 0) > 0,
-      suppressed_items: payload.pipeline?.suppressed ?? 0,
-      barred_items: payload.pipeline?.barred ?? 0,
+      /* Suppression and barring happen in the browser, after this row is
+         written, so the server cannot count them without the page telling it
+         and the page telling it would mean a second write keyed to a run. Null
+         is the honest value: not measured, rather than none occurred. The
+         column is nullable and the canonical string treats null as empty, so
+         existing rows are unaffected. */
+      suppressed_items: null,
+      barred_items: null,
       duration_ms: Date.now() - t0,
       policy_version: OPS_POLICY_VERSION,
       manifest_generated: POLICY.manifest_generated,
@@ -700,10 +724,20 @@ export default async function handler(req, res) {
     } catch (e) { }
 
     /* Per register, rolled into the day. Fire and forget: a health counter must
-       never be able to hold up a response. */
+       never be able to hold up a response.
+
+       This read s.id, s.name, s.ok, s.timedOut and s.ms off rows that
+       reviewLedger returns as { platform, host, board, searched, pages, urls }.
+       Every one of those was undefined, so every row was written as source
+       "undefined" with status failed and no latency, and the per-register
+       health table in the back office was measuring nothing. It now writes the
+       platform under its board name, and searched-with-no-pages is recorded as
+       reached rather than as a failure, because that is what it is. */
     try {
       for (const s of (ledger || [])) {
-        recordSource(s.id || s.name, s.ok ? 'ok' : (s.timedOut ? 'timed_out' : 'failed'), s.ms);
+        const id = s.board || s.platform || s.host;
+        if (!id) continue;
+        recordSource(id, s.searched ? 'ok' : 'failed', null);
       }
     } catch {}
 

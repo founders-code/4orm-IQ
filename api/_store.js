@@ -8,9 +8,58 @@
  * slow, the check still returns and the payload says storage was skipped.
  *
  * Set POSTGRES_URL on the project. With it unset this file is inert.
+ *
+ * WHAT THIS FILE MAY NOT WRITE, AND WHY
+ *
+ * This is the corpus. It exists so that the next check can recognise a wallet,
+ * a beneficiary or a tracking id that has appeared before. That is a record
+ * about a BUSINESS, built from public records, and it is the only reason any
+ * of it is kept.
+ *
+ * Three things were being written that the published privacy notice says are
+ * not written, and the notice is the promise, so the code moved:
+ *
+ *   1. The reader's search string, verbatim, on an indexed column. It is now
+ *      a salted hash, so a repeat can be recognised and the string cannot be
+ *      recovered. Where the reader typed an email address, that string was
+ *      personal information sitting in an index.
+ *   2. The entire render payload as a blob. Findings, sources and graph rows
+ *      are already broken out below, so the blob was a second copy of the
+ *      result, which is the one thing the product promises not to keep.
+ *   3. Person-level nodes and edges. The page suppresses these at render;
+ *      suppressing at render while writing them to a table that outlives the
+ *      run is not a control, it is a curtain. The write path now refuses them
+ *      at the same point the reader would have been refused.
+ *
+ * PERSON_NODE_TYPES below is the enforcement. Do not add to the write path
+ * anything that carries a natural person's name.
  */
 
 import { node as gnode } from './_graph.js';
+import crypto from 'crypto';
+
+/* The node types that carry a natural person. Refused on the write path, both
+   as nodes and as either end of an edge. This list is checked by the build. */
+const PERSON_NODE_TYPES = new Set([
+  'PERSON', 'DIRECTOR', 'OFFICER', 'PROMOTER', 'ADVISER'
+]);
+const isPersonNode = t => PERSON_NODE_TYPES.has(String(t || '').toUpperCase());
+
+/**
+ * The reader's search string, one way.
+ *
+ * Salted for the same reason the visitor-day is: an unsalted hash of a short
+ * identifier is recoverable by trying the identifiers, which is not a large
+ * number. With CORPUS_SALT unset nothing is written at all, and a run simply
+ * has no identifier column. Never a fallback to the plain string.
+ */
+function identifierHash(v) {
+  const salt = process.env.CORPUS_SALT;
+  if (!salt) return null;
+  const norm = String(v || '').trim().toLowerCase();
+  if (!norm) return null;
+  return crypto.createHash('sha256').update(salt + '|' + norm).digest('hex').slice(0, 24);
+}
 
 let poolPromise = null;
 
@@ -105,16 +154,21 @@ async function writeAll(c, ctx) {
 
   await c.query('BEGIN');
 
+  /* No identifier and no payload. The hash recognises a repeat; the headline
+     and the verdict are what the corpus needs to know a run happened and how it
+     ended. Everything a later run can use is written to its own table below,
+     with its source and its excerpt beside it, so nothing here is a stored
+     conclusion standing in for a record. */
   const run = await c.query(
-    `insert into runs (identifier, domain, verdict, headline,
+    `insert into runs (identifier_hash, domain, verdict,
        identity_confidence, evidence_coverage, sources_checked, sources_not_reached,
        model, exa_calls, exa_cost_usd, parallel_calls,
-       input_tokens, output_tokens, ms_total, payload, brief_chars)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+       input_tokens, output_tokens, ms_total, brief_chars)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
      returning id`,
     [
-      trim(identifier, 200), trim(domain, 253),
-      trim(payload.verdict, 16), trim(payload.headline, 300),
+      identifierHash(identifier), trim(domain, 253),
+      trim(payload.verdict, 16),
       payload.idc ?? null, payload.cov ?? null,
       ctx.sourcesChecked ?? null, ctx.sourcesNotReached ?? null,
       trim(pipeline?.claude?.model, 80),
@@ -122,7 +176,7 @@ async function writeAll(c, ctx) {
       pipeline?.parallel?.calls ?? null,
       pipeline?.claude?.input_tokens ?? null, pipeline?.claude?.output_tokens ?? null,
       pipeline?.ms?.total ?? null,
-      JSON.stringify(payload), briefChars
+      briefChars
     ]
   );
   const runId = run.rows[0].id;
@@ -227,6 +281,9 @@ async function writeAll(c, ctx) {
     for (const n of g.nodes.slice(0, 200)) {
       const built = safeNode(n.type, n.v, n.v);
       if (!built) continue;
+      /* A person never enters the corpus. The page suppresses these at render;
+         this is the same refusal one layer earlier, where it actually holds. */
+      if (isPersonNode(built.node_type)) continue;
       await c.query(
         `insert into operator_nodes
            (node_id, node_type, normalized_value, display_value, specificity, specificity_band, first_seen, last_seen)
@@ -243,6 +300,10 @@ async function writeAll(c, ctx) {
       const a = safeNode(guessType(e.from), e.from, e.from);
       const b = safeNode(guessType(e.to), e.to, e.to);
       if (!a || !b) continue;
+      /* Either end. An edge from a company to a director carries the director,
+         so refusing only the node would leave the name in display_value on the
+         upsert two lines down. */
+      if (isPersonNode(a.node_type) || isPersonNode(b.node_type)) continue;
       /* Both ends must exist before an edge can reference them. */
       for (const nd of [a, b]) {
         await c.query(
@@ -267,6 +328,7 @@ async function writeAll(c, ctx) {
     for (const w of (g.priors || []).slice(0, 60)) {
       const nd = safeNode(w.kind, w.id, w.id);
       if (!nd) continue;
+      if (isPersonNode(nd.node_type)) continue;
       await c.query(
         `insert into prior_warning_links (node_id, run_id, prior_entity, regulator, warned_on, source_url)
          values ($1,$2,$3,$4,$5,$6)`,
@@ -281,7 +343,7 @@ async function writeAll(c, ctx) {
     await c.query(
       `insert into entity_classifications (entity_id, run_id, classification, confidence, reason, source_ids)
        values ($1,$2,$3,$4,$5,$6)`,
-      [trim(domain || identifier, 253), runId, trim(cl.classification, 40),
+      [trim(domain || identifierHash(identifier) || 'unknown', 253), runId, trim(cl.classification, 40),
        cl.confidence ?? null, trim(cl.reason, 1000), arr(cl.matched).map(x => trim(x, 120))]);
   }
 
