@@ -4,10 +4,9 @@ BEGIN
   create table if not exists runs (
     id                  uuid primary key default gen_random_uuid(),
     created_at          timestamptz not null default now(),
-    identifier          text        not null,
+    identifier_hash     text,
     domain              text,
     verdict             text,
-    headline            text,
     identity_confidence int,
     evidence_coverage   int,
     sources_checked     int,
@@ -19,10 +18,9 @@ BEGIN
     input_tokens        int,
     output_tokens       int,
     ms_total            int,
-    payload             jsonb,        -- the whole render payload, as served
     brief_chars         int           -- size of the evidence brief, not the text
   );
-  create index if not exists runs_identifier_idx on runs (lower(identifier), created_at desc);
+  create index if not exists runs_idhash_idx on runs (identifier_hash, created_at desc);
   create index if not exists runs_domain_idx     on runs (domain, created_at desc);
   create index if not exists runs_verdict_idx    on runs (verdict, created_at desc);
   create table if not exists run_sources (
@@ -92,7 +90,8 @@ BEGIN
   create index if not exists findings_kind_idx on findings (kind, severity);
   create table if not exists operator_nodes (
     node_id           text primary key,          -- TYPE:normalized_value
-    node_type         text not null,
+    node_type         text not null
+      check (node_type not in ('PERSON','DIRECTOR','OFFICER','PROMOTER','ADVISER')),
     normalized_value  text not null,
     display_value     text not null,
     specificity       numeric(3,2),              -- 0.00 to 1.00

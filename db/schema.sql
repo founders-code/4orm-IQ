@@ -13,13 +13,31 @@
 create extension if not exists pgcrypto;
 
 -- ---------------------------------------------------------------- runs
+-- WHAT IS NOT HERE, AND WHY.
+--
+-- Three columns were removed by migration 004 because the published privacy
+-- notice says they do not exist, and the notice is the promise:
+--
+--   identifier  the reader's search string, verbatim, on a lower() index that
+--               made this table searchable by who was checked. Where somebody
+--               typed an email address that was personal information sitting
+--               in an index. It is now a salted hash: a repeat is still
+--               recognisable, the string is not recoverable.
+--   payload     the entire rendered result as a blob. The findings, the
+--               retrieved sources and the graph are all broken out into their
+--               own tables below, each row carrying its source and its
+--               excerpt, so the blob was a second copy of the one thing the
+--               product promises not to file away.
+--   headline    a sentence of conclusion about a named party, outliving the
+--               run that produced it.
+--
+-- tools/smoke20.mjs fails the build if any of the three reappears here.
 create table if not exists runs (
   id                  uuid primary key default gen_random_uuid(),
   created_at          timestamptz not null default now(),
-  identifier          text        not null,
+  identifier_hash     text,         -- sha256(CORPUS_SALT | lowercased input), 24 hex
   domain              text,
   verdict             text,
-  headline            text,
   identity_confidence int,
   evidence_coverage   int,
   sources_checked     int,
@@ -31,10 +49,9 @@ create table if not exists runs (
   input_tokens        int,
   output_tokens       int,
   ms_total            int,
-  payload             jsonb,        -- the whole render payload, as served
   brief_chars         int           -- size of the evidence brief, not the text
 );
-create index if not exists runs_identifier_idx on runs (lower(identifier), created_at desc);
+create index if not exists runs_idhash_idx on runs (identifier_hash, created_at desc);
 create index if not exists runs_domain_idx     on runs (domain, created_at desc);
 create index if not exists runs_verdict_idx    on runs (verdict, created_at desc);
 
@@ -141,9 +158,13 @@ create index if not exists findings_kind_idx on findings (kind, severity);
 -- One row per identifier, ever. normalized_value is what matching runs on:
 -- lower cased, punctuation stripped, company suffixes removed for names,
 -- EVM addresses lower cased. display_value keeps what the source said.
+-- No natural person ever enters this table. The page suppresses person nodes
+-- at render; the check constraint below is the same refusal in the one place
+-- that survives somebody editing the application code.
 create table if not exists operator_nodes (
   node_id           text primary key,          -- TYPE:normalized_value
-  node_type         text not null,
+  node_type         text not null
+    check (node_type not in ('PERSON','DIRECTOR','OFFICER','PROMOTER','ADVISER')),
   normalized_value  text not null,
   display_value     text not null,
   specificity       numeric(3,2),              -- 0.00 to 1.00
