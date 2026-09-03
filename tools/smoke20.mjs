@@ -123,11 +123,48 @@ if(/select[\s\S]{0,400}identifier/i.test(api))
    that way: it is the one table on this page with free text in it. */
 if(/\bpolicy\b[\s\S]{0,300}\b(identifier|subject|party|searched)\b/i.test(api))
   fails.push('the rule history has grown a field that could name a party');
-const sql = fs.readFileSync('/home/claude/kbys/build/4orm-iq/db/telemetry.sql','utf8');
-const body = sql.split('\n').filter(l=>!l.trim().startsWith('--')).join('\n');
-for(const bad of ['identifier','subject','party','query'])
-  if(new RegExp('^\\s+'+bad+'\\s','im').test(body))
-    fails.push('db/telemetry.sql has grown a "'+bad+'" column, which rebuilds the person-level file');
+/* 2. THE SCHEMA LOCK, ACROSS BOTH FILES.
+      This read only db/telemetry.sql, and the privacy notice pointed at it as
+      the guarantee that no column names a subject. It was true of that file
+      and false of the product: db/schema.sql declared "identifier text not
+      null" on an index, and the run store wrote the whole rendered payload
+      beside it. A guard that reads one of two schemas is a guard that can be
+      satisfied while the promise it stands for is broken, so it now reads
+      both, and the corpus schema carries two extra bans of its own. */
+const SCHEMAS = [
+  ['db/telemetry.sql', ['identifier','subject','party','query']],
+  /* identifier_hash is allowed and identifier is not, which is the whole
+     point of migration 004: a repeat can be recognised, the string cannot be
+     recovered. payload and headline are banned because a stored render is a
+     stored result, and the notice says results are not kept. */
+  ['db/schema.sql',    ['identifier','subject','party','payload','headline']],
+  ['db/schema.neon.sql',['identifier','subject','party','payload','headline']],
+];
+for (const [file, banned] of SCHEMAS) {
+  const sql = fs.readFileSync('/home/claude/kbys/build/4orm-iq/'+file,'utf8');
+  const body = sql.split('\n').filter(l=>!l.trim().startsWith('--')).join('\n');
+  for (const bad of banned)
+    if (new RegExp('^\\s+'+bad+'\\s','im').test(body))
+      fails.push(file+' has grown a "'+bad+'" column, which rebuilds the person-level file');
+}
+/* And the write path itself. The schema can be clean while the code writes a
+   name into a column that does not announce itself. */
+const store = fs.readFileSync('/home/claude/kbys/build/4orm-iq/api/_store.js','utf8');
+if(!/PERSON_NODE_TYPES\s*=\s*new Set\(/.test(store))
+  fails.push('the corpus write path no longer declares which node types carry a person');
+const setAt = store.indexOf('PERSON_NODE_TYPES = new Set(');
+const setBody = setAt < 0 ? '' : store.slice(setAt, setAt + 400);
+for(const t of ['PERSON','DIRECTOR','OFFICER','PROMOTER','ADVISER'])
+  if(!new RegExp("'"+t+"'").test(setBody))
+    fails.push('the corpus write path stopped refusing '+t+' nodes');
+if((store.match(/isPersonNode\(/g)||[]).length < 4)
+  fails.push('the person refusal is no longer applied at every write into the graph');
+if(/JSON\.stringify\(payload\)/.test(store))
+  fails.push('the run store writes the whole render payload again');
+if(!/function identifierHash/.test(store) || !/process\.env\.CORPUS_SALT/.test(store))
+  fails.push('the search string is no longer hashed with a required salt before it is written');
+if(/trim\(identifier,\s*\d+\)/.test(store))
+  fails.push('the run store writes the search string verbatim');
 if(errs.length) fails.push('page errors: '+errs.length);
 
 console.log('\n' + (fails.length ? 'FAILED' : 'PASSED'));

@@ -2147,19 +2147,98 @@ if (/[\u2014\u2013]/.test(admin))
   if (!/document\.addEventListener\("click", function\(e\)\{[\s\S]{0,600}?data-doc/.test(script))
     fails.push('nothing listens for the document links, so they are decoration');
 
-  /* 5. THE PRIVACY NOTICE MUST MATCH THE CODE, not the other way round. */
+  /* 5. THE PRIVACY NOTICE MUST MATCH THE CODE, not the other way round.
+     This guard used to check for four sentences and pass. The sentences were
+     true of the operations chain and false of the corpus, which wrote the
+     reader's search string on an index and the whole rendered payload beside
+     it. The notice now describes both stores, and the checks below reach into
+     the code that each claim is about rather than only into the prose. */
   const priv = (html.match(/<div class="rp-sheet" id="rpPrivacy"[\s\S]*?\n<\/div>\n\n/) || [''])[0];
-  for (const phrase of ['no accounts', 'do not store what you typed',
-                        'rolled at midnight', 'Results themselves are not retained'])
+  for (const phrase of ['no accounts', 'do not keep what you typed',
+                        'rolled at midnight', 'run fresh against the registers',
+                        'No natural person is kept', 'one way hash',
+                        'Twelve\\s+months', 'Twenty\\s+four months'])
     if (!new RegExp(phrase, 'i').test(priv))
-      fails.push('the privacy notice no longer says "' + phrase + '"');
+      fails.push('the privacy notice no longer says "' + phrase.replace(/\\s\+/g, ' ') + '"');
+  /* The corpus is disclosed. A store nobody is told about is the defect this
+     section was written to close, so its own section has to stay on the page. */
+  if (!/What we keep about the party you checked/.test(priv))
+    fails.push('the privacy notice no longer discloses the corpus');
   const ops = fs.readFileSync(path.join(root, 'api', '_ops.js'), 'utf8');
   if (!/never will be: the identifier itself/.test(ops))
     fails.push('the operations log no longer promises what the privacy notice tells readers it promises');
+  /* THE VERIFIER MUST SELECT EVERY FIELD THE HASH COMMITS TO.
+     A column missing from that SELECT is rebuilt as its empty default, the
+     recomputed hash differs, and the chain is reported broken at a row nobody
+     touched. A false alarm here is indistinguishable from a real one. */
+  {
+    const sel = (ops.match(/select seq, at, prev_hash[\s\S]*?from ops_runs/) || [''])[0];
+    const canon = (ops.match(/v3: r => \[[\s\S]*?\]\.join\('\|'\)/) || [''])[0];
+    const fields = [...canon.matchAll(/r\.([a-z_]+)/g)].map(m => m[1]);
+    const missing = [...new Set(fields)].filter(f => f !== 'at' && !new RegExp('\\b' + f + '\\b').test(sel));
+    if (missing.length)
+      fails.push('the chain verifier does not read ' + missing.join(', ') +
+                 ', so a row carrying one would be reported as tampered with');
+  }
+  /* THE CORPUS, CHECKED AGAINST WHAT THE NOTICE SAYS ABOUT IT.
+     Each of these is a sentence on the page that would be false without the
+     line of code beside it. */
+  const store = fs.readFileSync(path.join(root, 'api', '_store.js'), 'utf8');
+  if (!/PERSON_NODE_TYPES = new Set\(/.test(store) || (store.match(/isPersonNode\(/g) || []).length < 4)
+    fails.push('the corpus write path no longer refuses person records at every point it writes the graph');
+  if (!/function identifierHash/.test(store) || !/process\.env\.CORPUS_SALT/.test(store))
+    fails.push('the search string reaches the corpus without being hashed under a required salt');
+  if (/JSON\.stringify\(payload\)/.test(store))
+    fails.push('the corpus writes the whole rendered result again, which the notice says it does not');
+  const cSql = fs.readFileSync(path.join(root, 'db', 'schema.sql'), 'utf8');
+  if (!/check \(node_type not in \('PERSON'/.test(cSql))
+    fails.push('the database no longer carries the constraint that rejects a person record');
+  /* Retention is a mechanism or it is a sentence. The notice states periods, so
+     something has to enforce them. */
+  if (!fs.existsSync(path.join(root, 'db', 'retention.neon.sql')))
+    fails.push('the retention periods the notice publishes have nothing that enforces them');
+  else {
+    const ret = fs.readFileSync(path.join(root, 'db', 'retention.neon.sql'), 'utf8');
+    if (!/create or replace function purge_expired/.test(ret))
+      fails.push('the purge function is gone, so retention is documentation again');
+    if (!/interval '12 months'/.test(ret) || !/interval '24 months'/.test(ret))
+      fails.push('the retention periods in the code no longer match the ones the notice publishes');
+    if (!/ops_retention/.test(ret))
+      fails.push('nothing records that retention ran, so the notice cannot claim it did');
+  }
+  if (!fs.existsSync(path.join(root, 'api', 'retain.js')))
+    fails.push('there is no route that runs retention');
+  else if (!/requireAdmin/.test(fs.readFileSync(path.join(root, 'api', 'retain.js'), 'utf8')))
+    fails.push('the retention route is not behind the admin gate');
   if (!/\.slice\(0, 12\)/.test(ops) || !/toISOString\(\)\.slice\(0, 10\)/.test(ops))
     fails.push('the visitor-day is no longer truncated and rolled daily, which the privacy notice states as fact');
   if (!/priv\.gc\.ca/.test(priv))
     fails.push('the privacy notice gives the reader no route to the Privacy Commissioner');
+}
+
+/* ================= THE PAGE OPENS ON THE SCREEN IT MEANS TO ==============
+   Every rule that hides the data room, the network, the categories, the board
+   and the site footer is scoped to body[data-stage="landing"]. That attribute
+   was set by the last statement of an eight and a half thousand line inline
+   script, so between first paint and that statement the browser had nothing
+   telling it which screen it was on and painted the console instead: a
+   different headline, a top bar reading SOURCES 0, and an empty source board
+   reading 0 of 0 reached. It was reported by somebody who caught it on a cold
+   load. The attribute belongs in the markup, where it applies to the first
+   layout. */
+{
+  if (!/<body data-stage="landing">/.test(html))
+    fails.push('the body no longer opens on the landing stage, so the console paints before the script runs');
+  /* And the script must still assert it, because a stage change on the way back
+     from a report has to be able to return the page to a known state. */
+  if (!/document\.body\.setAttribute\("data-stage","landing"\)/.test(script))
+    fails.push('nothing sets the landing stage from script, so returning from a report cannot restore it');
+  /* The attribute has to come before the first element that depends on it, and
+     the only way to guarantee that is for it to be on the body tag itself. */
+  const bodyAt = html.indexOf('<body');
+  const firstDep = html.indexOf('id="network"');
+  if (bodyAt < 0 || (firstDep > 0 && html.slice(bodyAt, bodyAt + 40).indexOf('data-stage') < 0))
+    fails.push('the stage is not on the body tag, so the elements below it lay out unstaged');
 }
 
 /* -------------------------------------- declaration diff against a prior build */

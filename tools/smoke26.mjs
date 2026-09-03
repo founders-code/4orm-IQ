@@ -39,8 +39,16 @@ const one = async (want, where) => {
 /* Sources and method, from the landing, where there is no result behind it. */
 await p.click('#navSources'); await p.waitForTimeout(400);
 await one('rpSources', 'sources from the landing');
-if ((await p.textContent('#rpBackToReportT')).trim() !== 'Back')
-  fail('the way out of sources offers to go back to a report that does not exist yet');
+/* The point is that it must not offer a report that was never run. The label
+   itself moved from a bare "Back" to naming its destination, which is the
+   improvement, so this asserts the property rather than the old string. */
+{
+  const t = (await p.textContent('#rpBackToReportT')).trim();
+  if (/report|what we found|what to do|data room/i.test(t))
+    fail('the way out of sources offers to go back to a report that does not exist yet, it says: ' + t);
+  if (!/^Back/i.test(t))
+    fail('the way out of sources no longer reads as a way back, it says: ' + t);
+}
 await p.click('#rpBackToReport'); await p.waitForTimeout(400);
 if (await stage() !== 'landing') fail('back from sources did not return to the landing');
 
