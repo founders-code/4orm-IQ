@@ -1818,7 +1818,11 @@ if (!/waitScrim\.classList\.add\("snap"\)/.test(script))
 
 /* THE REPORT CARD. Reference first, then what makes the run findable again. */
 {
-  const plate = html.slice(html.indexOf('<div class="rp-idtray">'), html.indexOf('</div></div>', html.indexOf('<div class="rp-idtray">')));
+  /* Matched on the class, not on the whole opening tag, so adding an attribute
+     to the element does not silently empty this slice and pass every check
+     inside it by finding nothing to check. */
+  const trayAt = html.search(/<div class="rp-idtray"[^>]*>/);
+  const plate = html.slice(trayAt, html.indexOf('</div></div>', trayAt));
   if (plate.indexOf('id="rpCardRef"') > plate.indexOf('id="rpIdent"'))
     fails.push('the report reference is below the record rows, it belongs at the top of the card');
   for (const x of ['rpCardRef', 'rpCardMeta', 'rpCardFoot'])

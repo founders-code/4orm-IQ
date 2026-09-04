@@ -2747,6 +2747,9 @@ body[data-stage="report"] .foot{display:none}
   letter-spacing:.17em;text-transform:uppercase;color:var(--tx-3)}
 /* the base rate. It is the line with the largest measured effect on how a
    warning is read, so it sits with the answer and not in a footnote. */
+/* display:flex outranks the hidden attribute, so the statistic went on painting
+   on the one screen it must never appear on. */
+#rpt .rp-rate[hidden]{display:none}
 #rpt .rp-rate{display:flex;gap:12px;margin-top:22px;padding:13px 16px;border-radius:var(--r-sm);
   background:var(--gold-50);border:1px solid var(--gold);max-width:46ch}
 #rpt .rp-rate i{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold-dp)}
@@ -2758,6 +2761,21 @@ body[data-stage="report"] .foot{display:none}
   padding:6px;box-shadow:var(--sh-sm)}
 #rpt .rp-idplate{background:var(--surface);border-radius:calc(var(--r-lg) - 6px);padding:18px 22px 16px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(16,32,64,.04)}
+/* THE RETRY, AND ONLY ON A RUN THAT DID NOT HAPPEN.
+   A failed check has exactly one useful control on it and it is not a document
+   pack. */
+#rpt .rp-retry{margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#rpt .rp-retry[hidden]{display:none}
+#rpt .rp-retryb{appearance:none;cursor:pointer;
+  padding:13px 22px;border-radius:999px;border:1px solid var(--blue);
+  background:var(--blue);color:#fff;
+  font-family:var(--rmono);font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;white-space:nowrap;
+  transition:background .2s var(--ease),transform .2s var(--ease)}
+#rpt .rp-retryb:hover{background:var(--blue-dp);transform:translateY(-1px)}
+#rpt .rp-retryb:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+#rpt .rp-retryx{font-size:13px;color:var(--tx-3)}
+@media(max-width:520px){#rpt .rp-retry{gap:10px}#rpt .rp-retryx{font-size:12px}}
 #rpt .rp-cardhd{padding-bottom:16px;border-bottom:1px solid var(--border-strong);margin-bottom:14px}
 #rpt .rp-cardk{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
   text-transform:uppercase;color:var(--gold-dp)}
@@ -3579,6 +3597,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-good .rp-x{display:block;margin-top:6px;font-size:13px;line-height:1.5;color:var(--tx-3)}
 #rpt .rp-good .rp-lk{display:block;margin-top:12px}
 
+/* A CHECK THAT DID NOT RUN IS NOT A CALM ONE.
+   "calm" is the tone for a real result with nothing against it, and it is green
+   because green is earned. A run that reached no register wore the same green,
+   so the screen that says "treat this as unchecked" said it inside the colour
+   this product uses for cleared. It reads in the neutral ink instead. */
+#rpt .rp-tonight[data-c="none"]{background:var(--surface-2);border:1px solid var(--border-strong)}
+#rpt .rp-tonight[data-c="none"] .rp-t{color:var(--tx)}
+#rpt .rp-tonight[data-c="none"] .rp-x{color:var(--tx-2)}
 #rpt .rp-tonight[data-c="calm"]{background:var(--ok-bg);border:1px solid var(--ok-br)}
 #rpt .rp-tonight[data-c="calm"] .rp-t{color:#0B5C40}
 #rpt .rp-tonight[data-c="calm"] .rp-x{color:#146B4E}
@@ -4097,7 +4123,13 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
           <div class="rp-saylab">In our own words</div>
           <p class="rp-say" id="rpSay"></p>
-          <div class="rp-rate"><i></i><span>Of the people who reported an investment or crypto
+          <!-- The only control a check that did not run can honestly offer.
+               Hidden on every run that did. -->
+          <div class="rp-retry" id="rpRetry" hidden>
+            <button type="button" class="rp-retryb" id="rpRetryB">Run the check again</button>
+            <span class="rp-retryx">Nothing was recorded, so nothing is repeated.</span>
+          </div>
+          <div class="rp-rate" id="rpRate"><i></i><span>Of the people who reported an investment or crypto
             approach to BBB Scam Tracker in 2025, <b>more than 77% said they lost money.</b> Almost
             none of them expected to.</span></div>
         </div>
@@ -4108,7 +4140,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
              at the top, and the date and the log entry go with it, because the
              three of them together are what makes this run findable again. The
              rows below are the same fields every document pack is built from. -->
-        <div class="rp-idtray"><div class="rp-idplate">
+        <div class="rp-idtray" id="rpIdTray"><div class="rp-idplate">
           <div class="rp-cardhd">
             <div class="rp-cardk">Report card</div>
             <div class="rp-cardref" id="rpCardRef"></div>
@@ -10756,6 +10788,9 @@ if(/[?&]debug=1\b/.test(window.location.search)){
                     runCtx:function(v){ if(arguments.length) RUN_CTX=v; return RUN_CTX; },
                     escalation:function(d){return rpEscalation(d);},
   onLiveEvent:onLiveEvent, waitOpen:waitOpen,
+  /* The report painter, so a failure screen can be driven and looked at the
+     way a reader meets it rather than only through the console. */
+  enter:function(d,label){ return rpEnter(d,label); },
   bar:function(){ return { wait:waitShown, ceil:waitCeil, top:barShown }; },
   screen:function(){ return RP_AT; },
                     delivery:function(d){return rpDelivery(d);} };
@@ -12808,7 +12843,7 @@ function rpDelivery(d){
   /* A check that did not complete carries no imperative at all. The failure is
      ours and it is not evidence about anybody. */
   if(d && d.failed){
-    return { c:"calm", act:null,
+    return { c:"none", act:null,
       t:"This check did not finish.",
       x:"Nothing here is a finding about this party, in either direction. Run it again. "
        +"If you were about to send money, treat this as unchecked rather than as cleared, "
@@ -12926,6 +12961,33 @@ function renderReport(d){
       actBox.hidden = true;
     }
   }
+
+  /* ------------------------------------------------ A RUN THAT DID NOT HAPPEN
+     The failure sentence was honest and everything around it was not. The page
+     still issued a reference number for a run whose own card said "log entry:
+     not written", still laid out ten rows of "we could not check" as though
+     absence had been established rather than never attempted, and still set the
+     line about four in five people losing money beside the name of a company
+     nobody had looked at. Read together that is a verdict of nothing, on a
+     screen that had checked nothing, and it is exactly why a service outage
+     kept being read as a finding.
+
+     So a run that did not happen keeps the two things that are true, which are
+     the name and our own account of why there is no answer, gains the one
+     control that is useful, and drops everything that only means something
+     about a check that ran. */
+  (function(){
+    var failed = !!d.failed;
+    var card = id("rpIdTray");
+    /* No reference for a run with no log entry behind it. A reference somebody
+       can read down a phone to a fraud desk has to lead somewhere. */
+    if(card) card.hidden = failed;
+    /* Not beside a name we did not check. */
+    var rate = id("rpRate");
+    if(rate) rate.hidden = failed;
+    var retry = id("rpRetry");
+    if(retry) retry.hidden = !failed;
+  })();
   id("rpWho").textContent=rpTitle(d.name||"");
   /* The line under the name is the domain, or failing that what the reader
      actually typed. Where the party has no domain and was searched by name,
@@ -13648,6 +13710,19 @@ id("rpTonightA").addEventListener("click", function(e){
   if(t && t!==this && t.getAttribute) rpPvShow(t.getAttribute("data-pak"), t);
 });
 id("navBackReport").addEventListener("click", rpBackFromConsole);
+/* The retry runs the same identifier again from the top. It is wired to the
+   label the report was drawn for rather than to the input box, because by the
+   time somebody is reading a failure the box behind the overlay may hold
+   anything. */
+(function(){
+  var b = id("rpRetryB");
+  if(!b) return;
+  b.addEventListener("click", function(){
+    var q = String(RP_LABEL || (CURRENT && CURRENT.name) || "").trim();
+    if(!q) { rpNewCheck(); return; }
+    check(q);
+  });
+})();
 /* NEW CHECK.
    One route, whether it is pressed in the data room or on the report. It has
    to land on an empty page: leaving the last conversation on screen made the
