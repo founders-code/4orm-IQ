@@ -1630,6 +1630,36 @@ if (!/id="waitForming"/.test(html))
   if (!/id\("dial"\+n\)\.style\.opacity = pct > 0/.test(html))
     fails.push('a dial reading nothing still paints its round cap, which reads as a mark on the ring');
 
+  /* The operator diagnostic carries the provider's raw words, which is the one
+     thing the gate above exists to keep off a reader's screen. It is allowed to
+     exist only because it is gated on the address, and only an address a reader
+     never types. If that gate ever goes, the leak comes back through the door
+     it was closed at. */
+  if (/id="rpOper"/.test(html)) {
+    if (!/var RP_DEBUG = \/\[\?&\]debug=1/.test(html))
+      fails.push('the operator diagnostic exists with nothing deciding when it may be shown');
+    if (!/failed && RP_DEBUG && d\.operator/.test(html))
+      fails.push('the operator diagnostic is not gated on the debug address, so a reader could '
+        + "be shown the provider's own error text");
+  }
+
+  /* RETRIEVAL SURVIVES A FAILED JUDGEMENT.
+     The server sends the board and every page it read BEFORE the reasoning call
+     starts, because retrieval is final and does not change when that call
+     returns. The console held it and then discarded it on any failure, so a run
+     that reached seventy registers reported nothing checked at all, on a product
+     whose first rule is that coverage is counted from the retrieval log rather
+     than asserted. */
+  if (!/var pr = PARTIAL, pc = \(pr && pr\.counts\) \|\| null;/.test(html))
+    fails.push('a failed run no longer reads the retrieval the server already sent, so a good '
+      + 'sweep is thrown away whenever the reasoning step fails');
+  if (!/g\.cov = Math\.max\(0, Math\.min\(100, Math\.round\(reached \/ TOTAL_SOURCES \* 100\)\)\);/.test(html))
+    fails.push('coverage on a half-run is not counted from the registers that answered');
+  /* And the half that did not happen must not be reported as though it had. */
+  if (!/g\.idc = 0;/.test(html))
+    fails.push('a half-run reports an identity confidence, which is a conclusion drawn in the '
+      + 'step that did not run');
+
   if (!/function rpSafeFail\(/.test(html))
     fails.push('the console has no gate between an upstream message and the words it prints as ours');
   if (!/g\.statement = rpSafeFail\(msg\)/.test(html))
