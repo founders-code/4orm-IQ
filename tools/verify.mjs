@@ -1568,6 +1568,52 @@ if (!/id="waitForming"/.test(html))
     fails.push('the reader assertion is validated and then never written to the chain');
 }
 
+/* ---------------------------------------------- NOTHING MACHINE SHAPED SPEAKS
+   A provider's error text once reached a reader under the heading "in our own
+   words", carrying a status code, a JSON body, a request id and an instruction
+   about somebody's billing account, on a page about a stranger's company. Two
+   gates now stand between an upstream failure and a sentence on the screen: the
+   server maps the failure to a sentence of ours, and the console refuses to
+   print anything that does not read like one. This checks both, because either
+   one alone is a single deployment away from being an old build. */
+{
+  const chk = fs.readFileSync(path.join(root, 'api/check.js'), 'utf8');
+  const cat = chk.slice(chk.lastIndexOf('} catch (err)'));
+  if (!cat) fails.push('the check route has no outer catch, so an upstream failure escapes untranslated');
+  if (/message:\s*(raw|err\?\.message|err\.message|String\(err)/.test(cat))
+    fails.push("the check route returns a provider's own error text as the message a reader is shown");
+  if (!/console\.error\(/.test(cat))
+    fails.push('the check route translates an upstream failure and keeps no record of what actually failed');
+  if (!/operator:\s*\{/.test(cat))
+    fails.push('the check route hides the real failure from the operator as well as the reader');
+  /* Every branch has to hand back a sentence, so a status nobody planned for
+     still lands on words rather than on whatever the provider felt like saying. */
+  if (!/else\s*\n?\s*message =/.test(cat))
+    fails.push('the check route has no final branch, so an unmapped failure carries no sentence of ours');
+
+  /* And the two dials never read green on a number that did not earn it. Both
+     were painted --ok whatever they said, so a check that reached nothing at
+     all showed a reader two green zeroes on the one screen built to withhold
+     comfort. */
+  if (!/\.dialnum \.v\.lo,\.dialcap \.t\.lo\{/.test(html) || !/\.dialnum \.v\.mid,\.dialcap \.t\.mid\{/.test(html))
+    fails.push('the dials have no colour band, so a nought reads in the same green as a ninety');
+  if (!/var band = pct >= 70 \? "" : \(pct >= 35 \? "mid" : "lo"\)/.test(html))
+    fails.push('nothing assigns a dial its colour band from the number it is showing');
+  if (!/id\("dial"\+n\)\.style\.opacity = pct > 0/.test(html))
+    fails.push('a dial reading nothing still paints its round cap, which reads as a mark on the ring');
+
+  if (!/function rpSafeFail\(/.test(html))
+    fails.push('the console has no gate between an upstream message and the words it prints as ours');
+  if (!/g\.statement = rpSafeFail\(msg\)/.test(html))
+    fails.push('the failure statement is printed as our own words without passing the gate');
+  const sf = html.slice(html.indexOf('function rpSafeFail('),
+                        html.indexOf('function errorResult('));
+  ['request_id', 'anthropic', 'billing', 'credit balance', 'https?', 'length > '].forEach(t => {
+    if (sf.indexOf(t) < 0)
+      fails.push('the message gate no longer refuses ' + t + ', which is how the leak got out the first time');
+  });
+}
+
 /* ------------------------------------------------- THE ROOM SHOWS ITSELF
    Seven instruments, seven sentences, and every one has to point at something
    that is actually on the screen. A tour aimed at a selector nobody kept is a

@@ -170,10 +170,19 @@ body[data-stage="console"] .navreport.ready{display:inline-flex}
      redeclare .nav, .navactions and .navleft, so editing the nav where the nav
      lives did nothing. That is the fourth time a class owned by one component
      has been silently redeclared by another on this page. */
-  .nav{padding:0 16px;top:14px;gap:10px}
+  /* A FIXED BAR NEEDS A GROUND ON A PHONE.
+     Fixed, with no background, over a page that scrolls: the headline passed
+     straight through the two pills and the three were unreadable together.
+     A fade rather than a solid bar, because a hard edge across the top of a
+     dark room reads as a broken layout, and the fade only has to hide the two
+     or three lines that actually pass under it. */
+  .nav{padding:14px 14px 22px;top:0;gap:10px;
+    background:linear-gradient(180deg,
+      rgba(7,10,15,.97) 0%, rgba(7,10,15,.93) 52%, rgba(7,10,15,0) 100%)}
   .navactions{gap:7px}
   .navleft{gap:10px}
-  .navhelp{padding:13px 18px;font-size:10.5px;gap:8px}
+  .navhelp{padding:11px 14px;font-size:9.5px;gap:6px;letter-spacing:.1em}
+  .helpbtn{padding:10px 14px;font-size:9.5px;letter-spacing:.1em}
 }
 
 /* ================= the two stages ================= */
@@ -202,6 +211,13 @@ body[data-stage="landing"] .cbar{
    moves it. Changing anything else changes the rhythm inside it, which is not
    what was asked for. */
 body[data-stage="landing"] .cbmain{padding:228px 0 64px;text-align:center}
+/* AND ON A PHONE IT STARTS MUCH HIGHER.
+   Two hundred and twenty eight points of air is right on a desktop and absurd
+   on a screen six hundred points tall: it put the search bar ninety five
+   points BELOW the fold on an iPhone 13, and two hundred and fifty five below
+   it on an SE. Somebody opening the site on a phone saw a headline and no way
+   to do anything, which is what "not working on mobile" meant. The one control
+   on the page has to be on the first screen. */
 /* the landing variant is declared beside the base rule, further down */
 /* One line, whatever the width. The size is tied to the viewport so it
    shrinks to fit rather than breaking the sentence in half. */
@@ -277,11 +293,65 @@ body[data-stage="landing"] .cbuse{
 body[data-stage="landing"] .cbsub{
   margin:14px auto 0;font-size:clamp(16px,1.5vw,19px);color:var(--tx-2);max-width:56ch;line-height:1.62;
 }
+/* The sentence, as its own element inside that paragraph, so the promise under
+   it can survive when the sentence is resized or dropped. The short form sits
+   beside it and only one of the two is ever shown. */
+.cbsubt{display:inline}
+.cbsubs{display:none}
 /* Its own line, and lighter than the sentence above it: it is a reassurance,
    not a second headline. */
 .cbtwo{display:block;margin-top:12px;font-family:var(--mono);font-size:11px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;color:var(--tx-3)}
 body[data-stage="landing"] .searchbox{margin-top:26px;box-shadow:var(--sh-lg)}
+
+/* ===================== THE HERO ON A PHONE, IN ONE PLACE ==================
+   These rules were written first and placed above the ones they override, so
+   every one of them lost on source order and the phone kept the desktop
+   values: a search bar two hundred and fifty points below the fold on a small
+   screen, which is what "not working on mobile" meant. Overrides go after the
+   rule they override. This block is last for that reason and nothing about the
+   hero may be set below it.
+
+   The target is a measurement, not a taste: the BOTTOM edge of the search bar
+   lands inside the first screen on the smallest phone supported. The build
+   checks it at 320 by 568 and at 390 by 664. */
+@media(max-width:760px){
+  body[data-stage="landing"] .cbmain{padding:78px 0 40px}
+  body[data-stage="landing"] .cbdeck{margin:26px auto 0}
+  body[data-stage="landing"] .cbuse{margin:14px auto 0;font-size:13.5px;line-height:1.5;max-width:36ch}
+  /* The line under it lists what the box accepts. The placeholder inside the
+     box lists the same four things, and on a phone the sentence costs four
+     lines to repeat what the reader is about to see anyway. */
+  /* The short form of the same sentence. The scope has to survive on a phone,
+     because the hint inside the box was cut down to two of the four accepted
+     types, but three lines of it repeating what the box says is the kind of
+     weight that makes a phone screen feel like a document. */
+  body[data-stage="landing"] .cbsub{margin-top:12px;font-size:12.5px;line-height:1.5;max-width:36ch}
+  body[data-stage="landing"] .cbsub .cbsubt{display:none}
+  body[data-stage="landing"] .cbsub .cbsubs{display:inline}
+  .cbtwo{margin-top:10px;font-size:10px;letter-spacing:.1em}
+  body[data-stage="landing"] .searchbox{margin-top:20px}
+  /* Two framed boxes of small print at the foot of a phone is a lot of weight
+     for a footnote. The frames stay, because they are what separates two
+     different statements, but the padding and the measure come down so they
+     read as notes rather than as a second section. */
+  body[data-stage="landing"] .noteg{margin-top:30px;gap:10px}
+  body[data-stage="landing"] .noteg .upnote{padding:14px 16px;font-size:11px;line-height:1.55}
+  .docrow{margin-top:26px}
+  body[data-stage="landing"] .servedrow.on{margin-top:30px;padding-top:22px}
+}
+@media(max-width:400px){
+  /* Clear of the fixed nav, which ends at 73 points. The headline was starting
+     at 60 and passing behind the two pills. */
+  body[data-stage="landing"] .cbmain{padding:74px 0 30px}
+  /* The site floors its hero at 38, and that floor assumes a line wrapping
+     inside fifteen characters with room around it. At 320 points it is three
+     lines and it alone pushes the control off the screen. */
+  body[data-stage="landing"] .cbh1{font-size:clamp(31px,4.15vw,62px);margin-top:16px}
+  body[data-stage="landing"] .cbdeck{margin-top:20px;font-size:18.5px}
+  body[data-stage="landing"] .cbuse{font-size:12.8px;margin-top:12px}
+  body[data-stage="landing"] .searchbox{margin-top:18px}
+}
 .servedrow{display:none}
 /* It sits at the foot now, under the disclaimer, so it reads as an instrument
    rather than a headline. Smaller, with air above it and a rule to separate it
@@ -601,6 +671,18 @@ body[data-stage="landing"] .kbblocked{margin-left:auto;margin-right:auto;text-al
   .searchbox{padding-left:18px}
   .searchbox input{padding:17px 0;font-size:16px}
   .gobtn{padding:15px 20px}
+}
+/* THE BUTTON TAKES WHAT THE FIELD NEEDS.
+   At 390 points the field was 174 wide and the placeholder read "Company,
+   website or w", cut mid word, so the one thing telling a reader what the box
+   accepts was unreadable on the device most of them will use. The button loses
+   fifteen points of padding and two of tracking, which it can afford: it is
+   the only button on the screen and nobody is going to miss it. */
+@media(max-width:430px){
+  .searchbox{padding:8px 8px 8px 16px;gap:10px}
+  .searchbox .pfx{font-size:13px}
+  .searchbox input{padding:16px 0;font-size:15.5px}
+  .gobtn{padding:14px 15px;font-size:10px;letter-spacing:.11em}
 }
 
 .cbtitle{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap;justify-content:space-between;margin-bottom:20px}
@@ -1989,6 +2071,15 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   pointer-events:none;padding-top:6px;
 }
 .dialnum .v{font-size:clamp(28px,4vw,38px);font-weight:800;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums;color:var(--ok)}
+/* A DIAL EARNS ITS COLOUR. IT IS NOT BORN GREEN.
+   Both dials were painted --ok whatever they read, so a check that reached
+   nothing at all showed a reader two green zeroes. Green is the one colour on
+   this screen that means the record supports the party, and zero per cent
+   coverage is the opposite of that. Low reads in the muted ink and mid reads in
+   the body ink. Neither ever reads red: a coverage number we could not fill is
+   us not knowing, and never a finding against anybody. */
+.dialnum .v.lo,.dialcap .t.lo{color:var(--tx-4)}
+.dialnum .v.mid,.dialcap .t.mid{color:var(--tx-2)}
 .dialnum .u{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.16em;color:var(--tx-4);margin-top:6px}
 .dialcap{margin-top:6px}
 .dialcap .t{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ok)}
@@ -2747,10 +2838,31 @@ body[data-stage="report"] .foot{display:none}
   #rpt .rp-head > .rp-nav{grid-area:nav;grid-column:auto}
   #rpt .rp-nav{grid-area:nav;justify-self:end;gap:18px}
   #rpt .rp-navb{letter-spacing:.14em}}
-@media(max-width:520px){#rpt .rp-nav{flex-direction:column;align-items:stretch;gap:13px;
-    justify-self:stretch}
+/* THE HEADER IS CHROME, NOT CONTENT, AND ON A PHONE IT WAS BOTH.
+   Below 520 the pills stacked into a column, one per row at full width, under
+   a mark at fifty eight points. Between them they took the best part of a
+   phone screen before the verdict, so a reader opening a result on the device
+   they were checking from saw a logo and three buttons and had to scroll to
+   find out what we told them. Pills wrap in a row instead, at the size they
+   are everywhere else, and the mark comes down to the size of the type it sits
+   beside. */
+@media(max-width:520px){
+  #rpt .rp-head{padding-top:18px;gap:12px 12px}
+  #rpt .rp-hlogo img{height:34px}
+  #rpt .rp-nav{flex-wrap:wrap;gap:8px;justify-self:end;justify-content:flex-end}
   #rpt .rp-nav .rp-back{align-self:start}
-  #rpt .rp-navsep{display:none}}
+  #rpt .rp-navsep{display:none}
+  #rpt .rp-pill{padding:8px 12px;font-size:9.5px;letter-spacing:.08em;gap:6px}
+  #rpt .rp-pill svg{width:11px;height:11px}
+  #rpt .rp-navb{font-size:9.5px;letter-spacing:.08em}
+  /* The answer starts sooner, because the header above it is no longer a
+     screenful. */
+  #rpt .rp-hero{padding-top:26px}
+  /* The two documents zero their title's top margin so it sits level with the
+     panel beside it on a desktop. There is no panel beside it on a phone, and
+     zeroed it starts a few points under a pill that wrapped to a second row. */
+  #rpt .rp-doc .rp-stitle{margin-top:20px}
+}
 
 
 /* the answer */
@@ -3272,11 +3384,15 @@ body[data-stage="report"] .foot{display:none}
   gap:14px;background:none;border:0;border-radius:0;overflow:visible}
 #rpSources .rp-row{grid-template-columns:1fr;gap:10px;align-content:start;
   padding:24px 26px 26px;border:1px solid var(--border);border-radius:var(--r)}
-/* An odd number of cards leaves the last one alone in a two column row with a
-   hole beside it. It takes the whole row instead, which closes the section
-   rather than trailing off. */
-#rpSources .rp-row:last-child:nth-child(odd){grid-column:1 / -1}
-@media(max-width:900px){#rpSources .rp-row:last-child:nth-child(odd){grid-column:auto}}
+/* AN ODD LAST CARD KEEPS ITS COLUMN.
+   It used to take the whole row, on the reasoning that a hole beside it looked
+   unfinished. That was true while the grid painted its own ground, and it has
+   not been true since the frame moved onto the cards. What spanning did buy was
+   a sentence set across the full twelve hundred pixel column, which runs to a
+   hundred and twenty nine characters a line and is past the point where an eye
+   finds the start of the next one. Half the row is the readable measure, and
+   the empty cell beside the last card is now white space rather than grey. */
+#rpSources .rp-row:last-child:nth-child(odd){grid-column:auto}
 #rpSources .rp-row .rp-rk{font-size:9.5px;letter-spacing:.15em;color:var(--blue-dp)}
 #rpSources .rp-row .rp-rv{font-size:14.5px;line-height:1.62}
 @media(max-width:900px){#rpSources .rp-rows{grid-template-columns:1fr}}
@@ -3302,7 +3418,9 @@ body[data-stage="report"] .foot{display:none}
    through an empty cell. The frame ends where the sentence ends. */
 #rpt .rp-dis{margin-top:30px;border:1.5px solid var(--border-strong);
   border-radius:var(--r);background:var(--surface-2);
-  padding:clamp(26px,2.6vw,38px);max-width:min(100%,88ch)}
+  padding:clamp(26px,2.6vw,38px);max-width:min(100%,80ch)}
+/* The panel is capped, so the sentences inside it are too: 88ch of panel less
+   its own padding still left a 83 character line, which is over the measure. */
 #rpt .rp-dis .rp-disk{font-family:var(--rmono);font-size:9.5px;font-weight:700;
   letter-spacing:.19em;text-transform:uppercase;color:var(--bad-dp)}
 #rpt .rp-dis p{margin-top:14px;font-size:14.5px;line-height:1.66;color:var(--tx-2)}
@@ -3321,8 +3439,9 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-laws{margin-top:16px;display:grid;gap:14px;
   grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(max-width:900px){#rpt .rp-laws{grid-template-columns:1fr}}
-#rpt .rp-laws .rp-law:last-child:nth-child(odd){grid-column:1 / -1}
-@media(max-width:900px){#rpt .rp-laws .rp-law:last-child:nth-child(odd){grid-column:auto}}
+/* Same rule, same reason: a spanned card sets its explanation across the whole
+   column and the line runs too long to read. It keeps its column. */
+#rpt .rp-laws .rp-law:last-child:nth-child(odd){grid-column:auto}
 #rpt .rp-law{border:1px solid var(--border-strong);border-radius:var(--r-sm);
   background:var(--surface);padding:22px 24px 20px;
   display:flex;flex-direction:column}
@@ -6846,8 +6965,23 @@ function setDial(n,pct,unit,title,note){
   id("dial"+n+"u").textContent=unit;
   id("d"+n+"t").textContent=title;
   id("dial"+n+"x").textContent=note;
+  /* Seventy is where a coverage number stops being a caveat, and thirty five is
+     where it stops carrying anything at all. The thresholds live here so that
+     both dials and both labels move together. */
+  (function(){
+    var band = pct >= 70 ? "" : (pct >= 35 ? "mid" : "lo");
+    [id("dial"+n+"v"), id("d"+n+"t")].forEach(function(e){
+      if(!e) return;
+      e.classList.remove("lo","mid");
+      if(band) e.classList.add(band);
+    });
+  })();
   countUp(id("dial"+n+"v"),pct,"%");
   setTimeout(function(){ id("dial"+n).style.strokeDashoffset = ARC*(1-pct/100); },60);
+  /* A zero length arc drawn with a round cap still paints its cap, so a dial
+     reading nothing showed a green dot sitting on the ring. Nothing measured
+     draws nothing. */
+  id("dial"+n).style.opacity = pct > 0 ? "" : "0";
 }
 function setReads(list){
   var w=id("reads"); w.innerHTML="";
@@ -8492,8 +8626,43 @@ function detect(v){
   if(/^[+()\d][\d\s().-]{6,}$/.test(v)) return "Phone";   /* refused at the gate */
   if(/^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(v)) return "Website";
   var w=v.split(/\s+/);
-  if(w.length>=2&&w.length<=3&&/^[A-Z][a-z]+$/.test(w[0])&&/^[A-Z][a-z'-]+$/.test(w[w.length-1])) return "Person";
+  if(w.length>=2&&w.length<=3&&/^[A-Z][a-z]+$/.test(w[0])&&/^[A-Z][a-z'-]+$/.test(w[w.length-1])
+     && !hasTradeWord(w)) return "Person";
   return "Company";
+}
+/* THE WORD THAT SETTLES IT.
+   Two capitalised words is the shape of a person's name and it is equally the
+   shape of most small companies in this country. Goliath Ventures, Apex
+   Capital, Bright Solar: every one of them was read as a person and refused,
+   and the reader was told we do not check people while looking at the name of
+   the business they were about to wire money to. That is the worst refusal
+   this product can make, because the person it turns away is the one it exists
+   for.
+
+   One word is enough to settle it. Nobody is called Ventures. If any token in
+   the name is a word businesses use and people do not, it is a company and the
+   gate does not fire. This can only ever move a name from refused to allowed,
+   never the other way, so the person-name gate keeps every case it had. */
+var TRADE_WORDS = ("ventures venture capital holdings holding partners partner group groupe "
+  + "solutions systems technologies technology trading traders financial finance investments "
+  + "investment advisors advisers advisory management managers realty properties property "
+  + "motors auto autos bank banking trust funds fund labs lab media global digital energy "
+  + "mining resources consulting consultants enterprises enterprise industries services "
+  + "equity wealth securities markets exchange network networks logistics construction homes "
+  + "builders insurance mortgage mortgages lending credit brokers brokerage brokers "
+  + "associates corporation corp incorporated inc limited ltd llc llp plc company co "
+  + "international worldwide national federal united general standard premier prime "
+  + "developments development contracting supply supplies wholesale retail leasing rentals "
+  + "clinic clinics health medical pharma dental law legal accounting tax realtors "
+  + "acquisitions asset assets fintech crypto blockchain exchange payments pay bancorp "
+  + "mutual savings loan loans lenders equities forex futures commodities metals bullion"
+  ).split(" ");
+var TRADE_SET = (function(){ var m={}, i;
+  for(i=0;i<TRADE_WORDS.length;i++) m[TRADE_WORDS[i]]=true; return m; })();
+function hasTradeWord(w){
+  for(var i=0;i<w.length;i++)
+    if(TRADE_SET[String(w[i]).toLowerCase().replace(/[^a-z]/g,"")]) return true;
+  return false;
 }
 /* The gate. detect() still names the shape, because telling somebody we do not
    do this is better than pretending we did not understand them. */
@@ -8528,15 +8697,37 @@ function assertClear(){ USER_ASSERT=null; USER_ASSERT_FOR=""; }
   /* The cost of starting, stated before anybody has to guess at it. Two
      questions is the whole commitment, and somebody weighing up whether to
      begin should not have to find that out by beginning. */
-  el2.innerHTML="Give us "+rpEsc(words.join(", "))+" or "+rpEsc(last)
-    +". We will show you what the public record can, and cannot, verify."
+  /* The sentence and the promise are two elements, not one. On a phone the
+     sentence goes and the promise stays: the box below already lists what it
+     accepts, and how many questions it will ask is not something the box can
+     say. Hiding the paragraph hid both, which took the promise with it. */
+  /* Two lengths of the same sentence, both built from the same list, so the
+     short one can never come to accept something the long one does not. The
+     long one runs to three lines on a phone and repeats what the box under it
+     is about to say; the short one is the scope and nothing else. */
+  el2.innerHTML='<span class="cbsubt">Give us '+rpEsc(words.join(", "))+" or "+rpEsc(last)
+    +'. We will show you what the public record can, and cannot, verify.</span>'
+    +'<span class="cbsubs">'+rpEsc((words.join(", ")+" or "+last)
+        .replace(/^a /,"A ").replace(/\ban? /g,""))+'.</span>'
     +'<b class="cbtwo">Two questions to get started, then we read the registers.</b>';
 })();
 
 var input=id("kbInput"), go=id("kbGo");
 (function(){
-  var wide="Company, website, email or wallet", narrow="Company, website or wallet";
-  function ph(){ input.placeholder = window.innerWidth<640 ? narrow : wide; }
+  /* THREE WIDTHS, BECAUSE THE FIELD IS TWO HUNDRED POINTS ON A PHONE AND A
+     HUNDRED AND THIRTY ON A SMALL ONE.
+     Two tiers were not enough: at 320 the middle string still rendered as
+     "Company, websit", cut mid word, and a hint cut mid word tells a reader
+     less than no hint at all. The sentence above the box carries all four
+     accepted types at every width, so the hint is free to get shorter without
+     anything being lost. */
+  var wide="Company, website, email or wallet",
+      narrow="Company or website",
+      tiny="Company";
+  function ph(){
+    var w=window.innerWidth;
+    input.placeholder = w<360 ? tiny : (w<640 ? narrow : wide);
+  }
   ph(); window.addEventListener("resize",ph,{passive:true});
 })();
 function kbBlockPaint(){
@@ -9095,6 +9286,22 @@ var LIVE = !/[?&]demo=1\b/.test(window.location.search);
   history.replaceState(null, "", u.pathname + (q ? "?"+q : "") + u.hash);
 })();
 
+/* A message is ours only if it reads like a sentence somebody wrote. Anything
+   carrying a status code, a JSON fragment, a request id, a stack, or the name
+   of a system we do not name on screen is machine output, and machine output
+   is replaced rather than tidied. */
+function rpSafeFail(msg){
+  var m = String(msg == null ? "" : msg).trim();
+  var HOUSE = "The check could not be completed. Nothing was assessed, and nothing here is "
+            + "a finding about this party.";
+  if(!m) return HOUSE;
+  if(m.length > 320) return HOUSE;
+  if(/[{}\[\]]|"[a-z_]+"\s*:|request_id|req_[0-9A-Za-z]{6,}|^\s*\d{3}\s|https?:\/\/|\bat\s+\w+\.\w+\s*\(/i.test(m))
+    return HOUSE;
+  if(/anthropic|openai|claude|gpt|api key|token|sdk|billing|credit balance|plans\s*&\s*billing/i.test(m))
+    return HOUSE;
+  return m;
+}
 function errorResult(q, msg){
   var g={}; for(var k in GREY) g[k]=GREY[k];
   /* The check did not run. Everything downstream reads this, because telling
@@ -9104,7 +9311,14 @@ function errorResult(q, msg){
   g.name=q.trim().toUpperCase();
   g.domain=detect(q)||"Unidentified";
   g.headline="Check did not complete";
-  g.statement=msg;
+  /* NOTHING MACHINE SHAPED IS EVER PRINTED AS OUR OWN WORDS.
+     The server was passing a provider's error text straight through and this
+     line put it under the heading "in our own words": a reader checking a
+     company before sending money was shown a raw four hundred, a JSON body, a
+     request id and an instruction about somebody's billing account. The server
+     no longer sends it, and this is the second gate, because the first one is
+     one deployment away from being an old build. */
+  g.statement = rpSafeFail(msg);
   g.note="Nothing has been guessed at. When a check cannot complete, the console reports that it could not complete. It does not produce an assessment anyway.";
   return g;
 }
@@ -10893,7 +11107,8 @@ window.addEventListener("keydown",function(e){
 if(LIVE){
   var ll=id("liveLbl");
   ll.style.display=""; ll.classList.add("live"); ll.textContent="Live checking";
-  id("kbInput").placeholder="Any company, website, email or wallet";
+  if(!(window.matchMedia && window.matchMedia("(max-width:560px)").matches))
+    id("kbInput").placeholder="Any company, website, email or wallet";
   document.querySelector(".upnote").innerHTML=
     "<b>Live checking is on.</b> Every identifier you type runs a real sweep against public records. "+
     "Nothing is read from a stored corpus, and nothing is invented: if the sweep cannot complete, the console says so.";
@@ -13097,7 +13312,17 @@ function renderReport(d){
     }
   }
   id("rpWho").textContent=rpTitle(d.name||"");
-  id("rpDom").textContent=rpDomain(d)||RP_LABEL||"";
+  /* The line under the name is the domain, or failing that what the reader
+     actually typed. Where the party has no domain and was searched by name,
+     both were the same string and the page printed the name twice, once as the
+     title and once as a mono line under it, which reads as a fault. */
+  (function(){
+    var who=rpTitle(d.name||""), dom=rpDomain(d)||RP_LABEL||"";
+    var same=dom.trim().toLowerCase()===who.trim().toLowerCase();
+    var el=id("rpDom");
+    el.textContent = same ? "" : dom;
+    el.hidden = same || !dom;
+  })();
   id("rpSay").textContent=rpScrubPeople(d.statement||d.note||"", d);
   id("rpIdent").innerHTML=rpIdent(d);
   rpCard(d);
