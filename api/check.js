@@ -746,9 +746,48 @@ export default async function handler(req, res) {
     return res.status(200).json(payload);
 
   } catch (err) {
+    /* NOTHING A PROVIDER SAYS REACHES A READER.
+       This returned err.message straight through, and the console printed it
+       under "in our own words". A reader checking a company before sending
+       money was shown a raw four hundred, a request id, and an instruction to
+       go and buy credits: a message about OUR account, in our voice, on a page
+       about somebody else's company. It also named the vendor, which no screen
+       here may do.
+
+       So the reader gets a sentence about what happened to their check, chosen
+       by what kind of failure it was, and the technical text goes to the server
+       log and to the operator field, which only the audit panel reads. */
     const status = err?.status || 500;
+    const raw = String(err?.message || '');
+    const low = raw.toLowerCase();
+
+    let message;
+    if (/credit balance|quota|billing|payment required/.test(low) || status === 402)
+      message = 'The check could not run: this service is temporarily unable to reach one of '
+              + 'the systems it depends on. Nothing was assessed, and nothing here is a '
+              + 'finding about this party. Please try again shortly.';
+    else if (status === 401 || status === 403 || /api key|unauthor|forbidden/.test(low))
+      message = 'The check could not run: this service is not currently able to reach one of '
+              + 'the systems it depends on. Nothing was assessed. Please try again shortly.';
+    else if (status === 429 || /rate limit|overloaded|too many/.test(low))
+      message = 'The check could not run: the service is busy. Nothing was assessed. Please '
+              + 'try again in a few minutes.';
+    else if (status === 504 || /timed? ?out|timeout|aborted/.test(low))
+      message = 'The check ran past the time limit and did not finish. Nothing was assessed, '
+              + 'and a partial sweep is never reported as a result.';
+    else
+      message = 'The check could not be completed. Nothing was assessed, and nothing here is '
+              + 'a finding about this party.';
+
+    /* The real text, for us. Never sent to the page as prose. */
+    try { console.error('[check] upstream failure', status, raw.slice(0, 400)); } catch {}
+
     return fail(status >= 400 && status < 600 ? status : 500, {
-      error: 'upstream_error', message: err?.message || 'The check could not be completed.'
+      error: 'upstream_error',
+      message,
+      /* Read by the audit panel and the back office, never rendered as the
+         assessment. Truncated, because a provider payload is not evidence. */
+      operator: { status, detail: raw.slice(0, 300) }
     });
   }
 }
