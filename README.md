@@ -167,6 +167,29 @@ firm or recovery service is ever named, and every telephone number in it was
 read off that organisation's own published contact page. Where the responsible
 answer is a referral service rather than a name, that is what it gives.
 
+## Checking it, and keeping it clean
+
+    npm run verify        the build check on its own, about a second
+    npm test              everything: the build check and all 41 tests
+    npm run sweep         report what is in here and not doing anything
+    npm run sweep:apply   take it out
+
+`npm run sweep` reads the file the way the browser does and reports what nothing
+reaches: CSS rules for classes no element wears, functions nothing calls, ids
+nothing addresses, and tools that cannot fail. It changes nothing until you add
+`--apply`, and when it does apply it writes a backup, runs the build check, and
+puts the file back if the check does not pass. A sweep that breaks the build
+undoes itself.
+
+It never touches `assets/`. The page carries the marks base64 embedded, so
+nothing fetches those files at runtime and a naive tool calls them dead. They
+are not dead. They are the only copy of the logo, and the logo is never redrawn
+from anything else.
+
+The build check refuses a class the stylesheet declares that no element wears,
+and a function declared but never reached, so what the sweep cleared cannot come
+back in quietly.
+
 ---
 
 *4orm Finance*

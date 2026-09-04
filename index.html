@@ -94,7 +94,6 @@ svg{display:block}
    search bar puts at 383px, so on a 390px phone the whole hero rendered 60px
    wider than the screen and the right edge of the search bar was cut off. */
 .wrap{max-width:1560px;margin:0 auto;padding:0 34px;min-width:0}
-.mono{font-family:var(--mono)}
 .tnum{font-variant-numeric:tabular-nums}
 .lbl{
   font-family:var(--mono);font-size:9px;font-weight:700;
@@ -130,40 +129,14 @@ svg{display:block}
 }
 .helpbtn:hover{background:#2C240F;border-color:var(--gold);transform:translateY(-1px)}
 .helpbtn .hi{font-size:12px;line-height:1}
-.navhelp{
-  pointer-events:auto;display:inline-flex;align-items:center;gap:11px;
-  padding:15px 26px;border-radius:999px;
-  border:1px solid var(--gold);background:#2C240F;color:var(--gold);
-  font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  box-shadow:var(--sh),var(--hair);backdrop-filter:blur(20px) saturate(150%);
-  transition:all .28s var(--ease);white-space:nowrap;
-}
 .navactions{display:flex;align-items:center;gap:12px;pointer-events:auto}
-/* Green, because it is the thing you leave with. It only appears once there is
-   a result to report on. */
-.navreport{
-  display:none;align-items:center;gap:11px;
-  padding:15px 26px;border-radius:999px;
-  border:1px solid var(--ok);background:#0A2A1E;color:var(--ok);
-  font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  box-shadow:var(--sh),var(--hair);backdrop-filter:blur(20px) saturate(150%);
-  transition:all .28s var(--ease);white-space:nowrap;
-}
-body[data-stage="console"] .navreport.ready{display:inline-flex}
-.navreport:hover{background:#0E3A2A;border-color:#5FE9B8;color:#5FE9B8;transform:translateY(-1px);box-shadow:var(--sh-lg)}
-.navreport .hi{font-size:13px;line-height:1}
-@media(max-width:620px){.navreport{padding:13px 18px;font-size:10.5px;gap:8px}
+@media(max-width:620px){
   .navactions{gap:8px}}
 
 @keyframes helppulse{
   0%,100%{box-shadow:var(--sh),var(--hair),0 0 0 0 rgba(231,199,108,.30)}
   50%    {box-shadow:var(--sh),var(--hair),0 0 0 9px rgba(231,199,108,0)}
 }
-.navhelp{animation:helppulse 3.4s var(--ease) infinite}
-.navhelp .hi{color:var(--gold)}
-.navhelp:hover{background:#3A2F13;border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--sh-lg);animation:none}
-@media(prefers-reduced-motion:reduce){.navhelp{animation:none}}
-.navhelp .hi{font-size:14px;line-height:1}
 @media(max-width:620px){
   /* Everything the top nav does at this width, in one place, next to the nav.
      A second block a thousand lines down in the report's stylesheet used to
@@ -181,7 +154,6 @@ body[data-stage="console"] .navreport.ready{display:inline-flex}
       rgba(7,10,15,.97) 0%, rgba(7,10,15,.93) 52%, rgba(7,10,15,0) 100%)}
   .navactions{gap:7px}
   .navleft{gap:10px}
-  .navhelp{padding:11px 14px;font-size:9.5px;gap:6px;letter-spacing:.1em}
   .helpbtn{padding:10px 14px;font-size:9.5px;letter-spacing:.1em}
 }
 
@@ -196,8 +168,7 @@ body[data-stage="landing"] .foot,
 body[data-stage="landing"] .cbtop,
 body[data-stage="landing"] .statstrip,
 body[data-stage="landing"] .boardwrap,
-body[data-stage="landing"] .auditrow,
-body[data-stage="landing"] .hls{display:none}
+body[data-stage="landing"] .auditrow{display:none}
 
 body[data-stage="landing"] .console{padding:0;min-height:100vh;display:flex;align-items:center}
 body[data-stage="landing"] .console::before{height:100%;inset:-10% -20% auto -20%}
@@ -365,12 +336,8 @@ body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justi
 .servedl{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
   color:var(--tx-3)}
 /* Hidden with the attribute, not with display:none in the class. Clearing an
-   inline style falls back to the stylesheet, so a class that says display:none
-   can never be un-hidden by setting style.display="" and the element stays
-   invisible while every line of code around it looks correct. */
-.servedh{font-size:9.5px;letter-spacing:.1em;color:var(--tx-4);margin-left:2px;
+   inline style falls back to the stylesheet{font-size:9.5px;letter-spacing:.1em;color:var(--tx-4);margin-left:2px;
   align-self:center}
-.servedh[hidden]{display:none}
 .servedn.tick{animation:servedtick .5s var(--spring)}
 @keyframes servedtick{0%{transform:translateY(5px) scale(.96);opacity:.5}100%{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.servedn.tick{animation:none}}
@@ -609,10 +576,7 @@ body[data-stage="console"] #room{display:none}
 /* .cbtitle lives with the identifier chips further down. One declaration only. */
 .cbh1{font-size:clamp(20px,2.4vw,29px);font-weight:800;letter-spacing:-.035em;line-height:1.15;white-space:nowrap}
 .cbh1 .dim{color:var(--tx-3)}
-.cbh1 .blu{color:var(--blue-lt)}
 @media(max-width:1080px){.cbh1{white-space:normal}}
-
-.hls{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
 .hl{
   display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;
   border:1px solid var(--border-strong);background:var(--bg-2);
@@ -620,7 +584,6 @@ body[data-stage="console"] #room{display:none}
   text-transform:uppercase;color:var(--tx-2);white-space:nowrap;
 }
 .hl i{width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none}
-@media(max-width:980px){.hls{justify-content:flex-start}}
 
 /* the search bar, taller */
 .searchbox{
@@ -1295,11 +1258,6 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 .tcarry .x{font-size:13px;color:var(--gold);line-height:1.6;max-width:80ch}
 .dsec .tcarry{margin-top:20px}
 
-.ctxnote{padding:15px 24px;background:var(--gold-50);border-bottom:1px solid var(--warn-br);display:none;gap:13px;align-items:flex-start}
-.ctxnote.on{display:flex}
-.ctxnote .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:22px}
-.ctxnote .x{font-size:13px;color:var(--gold);line-height:1.6;max-width:80ch}
-
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
 .dirintro .di{font-size:13.5px;color:var(--tx-2);line-height:1.65;max-width:82ch}
 /* A question mark asks a question. It does not say there is a page of working
@@ -1434,7 +1392,12 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 .waitforming{display:flex;align-items:baseline;justify-content:flex-end;
   gap:14px;margin-top:26px;min-height:21px;font-size:15px;color:var(--tx-2);
   letter-spacing:-.008em}
-.waitforming[hidden]{display:none}
+/* IT STOPS SPEAKING WITHOUT LEAVING THE ROOM.
+   display:none took fifty pixels out of the column the moment the answer
+   landed, and the register animation below it lurched fifty pixels taller in
+   the last half second a reader was looking at it. It keeps its box and goes
+   quiet instead. */
+.waitforming[hidden]{display:flex;visibility:hidden}
 .waitforming .wf-l{font-weight:600;color:var(--tx-2)}
 /* THE FOUR IS THE FILE AND IT IS MEASURED OFF ITSELF.
    mark-4.png is 66 by 91. In the logo the x-height of "orm" is 42.9 per cent
@@ -1499,12 +1462,6 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
   .edu .ex{font-size:12.5px;line-height:1.48}
   .edu .eduv{font-size:28px;margin-top:9px}
 }
-.edunav{display:flex;align-items:center;gap:12px;margin-top:20px}
-.edubtn{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--border-strong);
-  background:var(--surface);color:var(--tx-3);font-size:13px;line-height:1;
-  display:flex;align-items:center;justify-content:center;transition:all .25s var(--ease)}
-.edubtn:hover{border-color:var(--gold);color:var(--gold);background:var(--surface-2)}
-.edubtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* Reserved at one row. Sixteen dots wrap to two rows on a narrow window, and a
    second row appearing takes its height straight out of the network. */
 .edudots{flex:none;display:flex;gap:6px;justify-content:flex-start;flex-wrap:wrap;margin:10px 0 0;
@@ -1514,7 +1471,6 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 .edudots button:hover{background:var(--tx-4);transform:scale(1.3)}
 .edudots button.on{background:var(--gold);width:20px;border-radius:4px}
 .edudots button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.educount{flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--tx-4);min-width:44px;text-align:right}
 /* ------------------------------------------------------------------ *
  * THE NETWORK
  * ------------------------------------------------------------------ */
@@ -1616,34 +1572,6 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 .pkt{fill:#BFD4FF}
 .pkt.core{fill:#FFF0C4}
 @media(prefers-reduced-motion:reduce){.pkt{display:none}}
-
-/* The card is the message. The fine print sits well below it, so nothing
-   competes with the thing they are meant to be reading. */
-.waitdisc{margin-top:56px;padding-top:24px;border-top:1px solid var(--border)}
-.waitdisc .wdh{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--tx-4);margin-bottom:11px}
-.waitdisc p{font-size:12px;color:var(--tx-4);line-height:1.6;margin-bottom:9px;max-width:76ch}
-.waitdisc p b{color:var(--tx-2)}
-.wdhelp{margin-top:14px;padding:16px 18px;border-radius:var(--r-sm);border:1px solid var(--warn-br);
-  background:var(--warn-bg);font-size:12.5px;color:var(--tx-2);line-height:1.6}
-.wdhelp b{color:var(--warn)}
-.wdhh{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--warn)}
-.wdhp{font-size:12.5px;color:var(--tx-2);line-height:1.6;margin:9px 0 0;max-width:74ch}
-.wdhgrid{display:grid;gap:1px;background:var(--warn-br);border:1px solid var(--warn-br);
-  border-radius:var(--r-sm);overflow:hidden;margin-top:13px}
-.wdhrow{display:flex;gap:14px;align-items:flex-start;background:var(--bg-2);padding:11px 13px}
-.wdhk{flex:none;width:104px;font-family:var(--mono);font-size:8.5px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--tx-4);padding-top:4px}
-.wdhv{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.wdhv .ghtel{align-self:flex-start;font-size:14px;font-weight:700;letter-spacing:.02em}
-.wdhany{align-self:flex-start;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--warn);letter-spacing:.01em}
-.wdhv em{font-style:normal;font-size:11.5px;color:var(--tx-3);line-height:1.5}
-.wdhurl{align-self:flex-start;font-family:var(--mono);font-size:11px;color:var(--blue-lt);
-  border-bottom:1px solid var(--blue-100);word-break:break-all}
-.wdhurl:hover{border-color:var(--blue-lt)}
-.wdhelp .ghmore{margin-top:14px}
-@media(max-width:560px){.wdhrow{flex-direction:column;gap:5px}.wdhk{width:auto;padding-top:0}}
 /* Reserved. The counter on the right is replaced by a button part way through
    a run, the two are different heights, and the difference comes straight out
    of the network above, which then re-lays itself out under the reader. */
@@ -1759,40 +1687,14 @@ body[data-stage="console"] .summaryband.on{display:grid}
 .rulerow[data-v="NEVER"]{background:var(--bg-2)}
 .rulerow[data-v="NEVER"] .rk{color:var(--gold);border-color:var(--gold-br);background:var(--gold-50);font-size:8px}
 .rulerow[data-v="NEVER"] .rt{color:var(--tx-3);font-size:11.5px}
-/* ---- the consent gate. Everything behind it is inert until it is answered. ---- */
-.gatescrim{position:fixed;inset:0;z-index:400;background:rgba(4,7,12,.82);backdrop-filter:blur(9px) saturate(60%);
-  transition:opacity .45s var(--ease)}
-.gatebox{position:fixed;z-index:401;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:min(720px,92vw);max-height:88vh;display:flex;flex-direction:column;
-  background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);
-  box-shadow:var(--sh-xl);overflow:hidden;transition:opacity .45s var(--ease),transform .5s var(--spring)}
-.gatescrim.gone,.gatebox.gone{opacity:0;pointer-events:none}
-.gatebox.gone{transform:translate(-50%,-46%) scale(.99)}
-.gatehd{padding:18px 26px;border-bottom:1px solid var(--border);background:var(--bg-2)}
-.gatebody{overflow-y:auto;overscroll-behavior:contain;padding:26px}
-.gatebody h2{font-size:23px;font-weight:800;letter-spacing:-.03em;color:var(--tx);line-height:1.16;margin-bottom:16px}
-.gatebody p{font-size:13.5px;color:var(--tx-2);line-height:1.68;margin-bottom:14px;max-width:70ch}
-.gatebody p b{color:var(--tx)}
-.gatefine{font-size:12.5px;color:var(--tx-3);border-top:1px solid var(--border);padding-top:16px;margin-top:6px}
-.gatehelp{margin:20px 0 18px;padding:18px;border:1px solid var(--warn-br);border-radius:var(--r);background:var(--warn-bg)}
-.gatehelp .gh{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--warn);margin-bottom:14px}
-.ghrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.ghcard .ght{font-size:13.5px;font-weight:700;color:var(--tx);letter-spacing:-.015em;line-height:1.35}
-.ghcard .ghx{font-size:12.5px;color:var(--tx-2);line-height:1.6;margin-top:6px}
-.ghtel{font-family:var(--mono);font-size:12.5px;color:var(--warn);border-bottom:1px solid var(--warn-br);text-decoration:none}
-.ghtel:hover{color:var(--gold)}
 .ghmore{margin-top:16px;display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:999px;
   border:1px solid var(--gold-dp);background:transparent;color:var(--gold);
   font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .ghmore:hover{background:#2C240F}
-.gatefoot{padding:18px 26px;border-top:1px solid var(--border);background:var(--bg-2);display:flex;justify-content:flex-end}
 .gateok{padding:13px 30px;border-radius:999px;background:var(--blue);color:#fff;border:none;
   font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   transition:transform .3s var(--pop),background .25s var(--ease)}
 .gateok:hover{background:var(--blue-lt);transform:translateY(-1px)}
-@media(max-width:640px){.gatebox{inset:0;top:0;left:0;transform:none;width:100%;max-height:100%;border-radius:0;border:none}
-  .gatebox.gone{transform:none}}
 /* ---- the quick strip. Everything the check produced, one row, one click.
        Nothing here scrolls the page; each opens a snapshot over it. ---- */
 /* ---- snapshot internals ---- */
@@ -1829,20 +1731,6 @@ button.snaprow:hover{background:var(--surface-2)}
 @keyframes topshim{0%{background-position:0 0}100%{background-position:280px 0}}
 .topbar.on i{background-size:280px 100%;animation:topshim 1.5s linear infinite}
 @media(prefers-reduced-motion:reduce){.topbar.on i{animation:none}}
-
-/* ---- not financial advice ---- */
-.notfin{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:140;
-  display:flex;align-items:flex-start;gap:13px;max-width:min(760px,92vw);
-  padding:15px 18px;border-radius:var(--r);border:1px solid var(--warn-br);
-  background:var(--warn-bg);box-shadow:var(--sh-lg);
-  transition:opacity .45s var(--ease),transform .45s var(--spring)}
-.notfin.gone{opacity:0;transform:translateX(-50%) translateY(14px);pointer-events:none}
-.notfin .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--warn);min-height:22px}
-.notfin .x{font-size:12.5px;color:var(--warn);line-height:1.62}
-.notfin .x b{color:var(--warn)}
-.notfinx{flex:none;margin-left:6px;font-size:18px;line-height:1;color:var(--warn);opacity:.7;
-  background:none;border:none;padding:0 2px}
-.notfinx:hover{opacity:1}
 
 /* ---- the top bar figures earn their attention ---- */
 .cbtop .r span{padding:4px 0;border:none;background:none}
@@ -1907,7 +1795,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 @media(max-width:560px){#categories .tiles{grid-template-columns:1fr}}
 @media(max-width:1080px){
   .split{grid-template-columns:1fr;gap:0}
-  .col-r{position:static}
 }
 /* FIND SUPPORT IS A LIGHT DOCUMENT, NOT A DARK PANEL.
    It was a dark sheet on a dark page, which is the wrong register entirely for
@@ -2166,14 +2053,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .tilest[data-s="YELLOW"]{color:var(--warn)}
 .tilest[data-s="GREEN"]{color:var(--ok)}
 .tilest[data-s="GREY"]{color:var(--nul)}
-.tilenm{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
-.tilex{font-size:12.5px;color:var(--tx-3);line-height:1.5;flex:1}
-.tilebar{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden}
-.tilebar i{display:block;height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt));transition:width 1s var(--spring)}
-.tilefoot{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.tilecount{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--tx-4)}
-.tileopen{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-lt);opacity:.42;transition:opacity .3s var(--ease),transform .3s var(--spring)}
-.tile:hover .tileopen,.tile.sel .tileopen{opacity:1;transform:translateX(3px)}
 
 /* ================= drill panel ================= */
 .drill{
@@ -2181,25 +2060,11 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   background:var(--surface);max-height:0;transition:max-height .6s var(--spring),margin-top .4s var(--ease);
 }
 .drill.on{max-height:4200px;margin-top:18px}
-.drillhd{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
-  padding:22px 24px;border-bottom:1px solid var(--border);background:var(--bg-2);
-}
-.drillhd .n{font-size:19px;font-weight:800;letter-spacing:-.03em;margin-top:9px;line-height:1.2}
-.drillhd .q{font-size:13.5px;color:var(--tx-2);margin-top:8px;max-width:64ch;line-height:1.6}
-.drillx{
-  flex:none;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--tx-3);border:1px solid var(--border-strong);border-radius:999px;padding:7px 13px;
-  transition:all .25s var(--ease);
-}
-.drillx:hover{color:var(--tx);border-color:var(--border-lit)}
 
 .rule{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg-3);display:flex;gap:14px;align-items:flex-start}
 .rule .rk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:34px}
 .rule .rx{font-size:13px;color:var(--tx-2);line-height:1.62}
-.rule .rx b{color:var(--tx);font-weight:600}
-
-.srcscroll,.srcwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rule .rx b{color:var(--tx);font-weight:600}.srcwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .srctbl{width:100%;border-collapse:collapse;min-width:720px}
 .srctbl th{
   text-align:left;padding:11px 14px;font-family:var(--mono);font-size:8.5px;font-weight:700;
@@ -2209,11 +2074,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .srctbl td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top;line-height:1.5}
 .srctbl tr:last-child td{border-bottom:none}
 .srctbl tbody tr:hover{background:var(--surface-2)}
-.srctbl .sname{color:var(--tx);font-weight:500}
-.srctbl .sname a{border-bottom:1px solid var(--border-lit);transition:border-color .2s var(--ease),color .2s var(--ease)}
-.srctbl .sname a:hover{color:var(--blue-lt);border-color:var(--blue-lt)}
-.srctbl .sj{font-family:var(--mono);font-size:10.5px;color:var(--tx-3);white-space:nowrap}
-.srctbl .sm{font-family:var(--mono);font-size:10px;color:var(--tx-3);white-space:nowrap}
 .tier{
   font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.13em;
   padding:3px 7px;border-radius:5px;text-transform:uppercase;white-space:nowrap;display:inline-block;
@@ -2228,7 +2088,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .use[data-u="licence"]{color:var(--gold)}
 .use[data-u="mixed"]{color:var(--warn)}
 .use[data-u="unknown"]{color:var(--tx-4)}
-.drillfoot{padding:16px 24px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-3);line-height:1.6}
 
 /* ================= negative review report card ================= */
 .rcard{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
@@ -2262,11 +2121,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .nid{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.13em;color:var(--tx-4);padding:3px 8px;border-radius:5px;border:1px solid var(--border-strong);white-space:nowrap}
 .ncount{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--tx);white-space:nowrap;font-variant-numeric:tabular-nums}
 .ncount small{color:var(--tx-4);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-left:5px}
-.nbar{height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden}
-.nbar i{display:block;height:100%;width:0%;border-radius:3px;transition:width 1s var(--spring)}
-.nbar i[data-s="hi"]{background:linear-gradient(90deg,var(--bad-br),var(--bad))}
-.nbar i[data-s="mid"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
-.nbar i[data-s="lo"]{background:linear-gradient(90deg,#CCD6E4,#A7B4C6)}
 .nquote{
   padding:10px 13px;border-left:2px solid var(--border-lit);background:var(--bg-2);
   font-size:12.5px;line-height:1.6;color:var(--tx-2);border-radius:0 8px 8px 0;font-style:italic;max-width:84ch;
@@ -2308,7 +2162,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .pipec{background:var(--surface);padding:12px 14px}
 .pipec .v{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--tx)}
 .pipec .l{font-size:11px;color:var(--tx-4);margin-top:3px;letter-spacing:.03em}
-.rcfoot{padding:15px 22px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.6}
 
 /* ================= result blocks ================= */
 .res{display:none}
@@ -2370,8 +2223,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .sbleft .vmore{flex:1 1 auto}
 @media(max-width:760px){.sbleft .vmore{max-height:260px}}
 @media(max-width:640px){.verdict{padding:24px 20px 22px}}
-
-.evgrid{display:grid;gap:11px;margin-top:2px}
 .ev{border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;background:var(--bg-2)}
 .evtop{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:8px}
 .evsrc{font-family:var(--mono);font-size:10px;color:var(--tx-2);font-weight:400;flex:1;min-width:0}
@@ -2387,7 +2238,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   letter-spacing:.13em;text-transform:uppercase;color:var(--blue-lt);border-bottom:1px solid var(--blue-50);padding-bottom:2px;
 }
 .evlink:hover{border-color:var(--blue-lt)}
-.evnone{font-size:13px;color:var(--tx-3);line-height:1.6}
 
 .claims{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
 .claimhead,.claimrow{display:grid;grid-template-columns:1.15fr 1fr 1.35fr 70px;gap:20px;padding:14px 22px;align-items:start}
@@ -2437,24 +2287,6 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 
 /* ================= explain ================= */
 .divide{height:1px;background:linear-gradient(90deg,transparent,var(--border-strong),transparent)}
-.ladder{display:grid;gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
-.rung{display:flex;gap:20px;align-items:flex-start;padding:20px 22px;background:var(--surface)}
-.rung .rt{flex:none;width:150px}
-.rung .rt .rn{font-size:13px;color:var(--tx);margin-top:8px;font-weight:600}
-.rung .rx{flex:1;min-width:0;font-size:13px;color:var(--tx-2);line-height:1.6}
-.rung .rp{flex:none;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;padding:4px 9px;border-radius:6px;border:1px solid var(--border-strong);color:var(--tx-3);white-space:nowrap}
-.rung .rp.yes{color:var(--blue-lt);border-color:var(--blue-50);background:var(--blue-100)}
-@media(max-width:760px){.rung{flex-wrap:wrap;gap:9px}.rung .rt{width:auto}.rung .rx{flex:1 1 100%;order:9}}
-
-.twobox{display:grid;grid-template-columns:1fr 1fr;gap:2px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--border)}
-.tb{padding:28px 26px;background:var(--surface)}
-.tb.bad{background:var(--bg-2)}
-.tb .th{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.17em;text-transform:uppercase}
-.tb.bad .th{color:var(--bad)}
-.tb.good .th{color:var(--ok)}
-.tb .tv{font-size:clamp(22px,3vw,31px);font-weight:800;letter-spacing:-.035em;margin-top:12px;line-height:1.1}
-.tb .tx{font-size:13px;color:var(--tx-2);margin-top:11px;line-height:1.62}
-@media(max-width:720px){.twobox{grid-template-columns:1fr}}
 
 .foot{border-top:1px solid var(--border);padding:46px 0 56px;margin-top:16px}
 .footin{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
@@ -2546,12 +2378,6 @@ body[data-stage="report"] .foot{display:none}
   outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.wk-hole,.wk-bal{transition:none}}
 
-.navback{display:none;align-items:center;gap:8px;border-radius:999px;padding:9px 16px;
-  border:1px solid rgba(255,255,255,.18);font-family:var(--mono);font-size:10px;font-weight:800;
-  letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
-.navback.ready{display:inline-flex}
-.navback:hover{border-color:rgba(255,255,255,.42)}
-
 /* ===== the report, scoped to #rpt ===== */
 #rpt{background:var(--bg);min-height:100vh}
 #rpt{
@@ -2586,9 +2412,6 @@ body[data-stage="report"] .foot{display:none}
 #rpt button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 #rpt img{max-width:100%;display:block}
 #rpt a{color:inherit}
-
-#rpt .rp-ground{position:fixed;inset:0;z-index:0;background:var(--bg);
-  transition:background .72s var(--ease)}
 
 
 /* ------------------------------------------------------------- the light views */
@@ -2658,7 +2481,6 @@ body[data-stage="report"] .foot{display:none}
   display:flex;align-items:center;justify-content:center}
 #rpt .rp-pvk[data-n=""]::before{display:none}
 #rpt .rp-pvsm{margin:-6px 0 13px 34px;font-size:13.5px;line-height:1.55;color:var(--tx-3)}
-#rpt .rp-pvp{margin:0;font-size:14.5px;line-height:1.6;color:var(--tx-2)}
 
 /* how to reach them: every row that is a link is a link */
 #rpt .rp-pvr{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);gap:4px 16px;
@@ -2820,7 +2642,6 @@ body[data-stage="report"] .foot{display:none}
   padding-bottom:2px}
 #rpt .rp-navb svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex:none;
   align-self:center}
-#rpt .rp-navsep{align-self:center;width:1px;height:12px;background:var(--border-strong);flex:none}
 
 /* Tight, it gives up dead centre and slides left rather than give up the line, because
    sitting level with the record data matters more than sitting mid page. */
@@ -2851,7 +2672,7 @@ body[data-stage="report"] .foot{display:none}
   #rpt .rp-hlogo img{height:34px}
   #rpt .rp-nav{flex-wrap:wrap;gap:8px;justify-self:end;justify-content:flex-end}
   #rpt .rp-nav .rp-back{align-self:start}
-  #rpt .rp-navsep{display:none}
+  
   #rpt .rp-pill{padding:8px 12px;font-size:9.5px;letter-spacing:.08em;gap:6px}
   #rpt .rp-pill svg{width:11px;height:11px}
   #rpt .rp-navb{font-size:9.5px;letter-spacing:.08em}
@@ -3016,7 +2837,6 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-fig .rp-v{font-family:var(--rmono);font-size:clamp(28px,3.4vw,40px);font-weight:700;
   letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums;color:var(--tx);
   white-space:nowrap}
-#rpt .rp-fig .rp-v.rp-bad{color:var(--bad)} #rpt .rp-fig .rp-v.rp-warn{color:var(--warn)}
 #rpt .rp-fig .rp-l{margin-top:14px;font-size:13.5px;line-height:1.52;color:var(--tx-2);max-width:28ch}
 
 
@@ -3028,9 +2848,6 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-h2{margin-top:12px;font-size:clamp(22px,2.5vw,30px);font-weight:800;letter-spacing:-.03em;
   line-height:1.1;text-wrap:balance}
 #rpt .rp-sub{margin-top:12px;font-size:15px;line-height:1.6;color:var(--tx-2);max-width:62ch}
-#rpt .rp-para{font-size:15px;line-height:1.66;color:var(--tx-2);max-width:70ch}
-#rpt .rp-para+.rp-para{margin-top:16px}
-#rpt .rp-para b{color:var(--tx);font-weight:600}
 
 /* ------------------------------------------------------------- the clock */
 #rpt .rp-clock{position:relative;z-index:2;margin-top:96px;background:var(--surface-2);
@@ -3166,9 +2983,6 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-pak .rp-pm{justify-self:end;white-space:nowrap;border-radius:999px;padding:5px 12px;
   font-family:var(--rmono);font-size:9px;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase}
-#rpt .rp-pak .rp-pm.rp-act{background:var(--ok-bg);border:1px solid var(--ok-br);color:var(--ok)}
-#rpt .rp-pak .rp-pm.rp-intel{background:var(--surface-2);border:1px solid var(--border-strong);
-  color:var(--tx-3)}
 #rpt .rp-pak .rp-pg{display:flex;align-items:center;justify-content:center;width:34px;height:34px;
   border-radius:50%;background:var(--blue-50);color:var(--blue-dp);flex:none;
   transition:background .3s var(--ease),color .3s var(--ease),transform .5s var(--spring)}
@@ -3249,14 +3063,6 @@ body[data-stage="report"] .foot{display:none}
   font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3);
   line-height:2}
 #rpt .rp-foot a{color:var(--blue);text-decoration:none}
-
-/* ------------------------------------------------------------- sources page */
-#rpt .rp-backl{display:inline-flex;align-items:center;gap:10px;font-family:var(--rmono);font-size:9.5px;
-  font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2);
-  text-decoration:none;border:1px solid var(--border-strong);border-radius:999px;
-  padding:9px 16px 9px 12px;transition:border-color .3s var(--ease),transform .4s var(--spring)}
-#rpt .rp-backl:hover{border-color:var(--tx-3);transform:translateX(-2px)}
-#rpt .rp-backl svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
 /* THE HEADER IS CHROME, AND CHROME IS THE SAME ON EVERY SCREEN.
    The body of this page is one 900 column because it is prose and rows and
    nothing else. The header is not body: it carries the mark and the two pills,
@@ -3550,11 +3356,6 @@ body[data-stage="console"] .searchbox{display:none}
 body[data-stage="console"] .cbmain{padding:0}
 body[data-stage="console"] .cbtop{margin-bottom:0}
 body[data-stage="console"] .statstrip{margin-top:22px}
-.navnew{display:none;align-items:center;gap:8px;border-radius:999px;padding:9px 16px;
-  border:1px solid rgba(255,255,255,.18);font-family:var(--mono);font-size:10px;font-weight:800;
-  letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
-body[data-stage="console"] .navnew{display:inline-flex}
-.navnew:hover{border-color:rgba(255,255,255,.42)}
 
 /* ---------------------------------------------------- the nav, as one set
    Four controls that were four different pills: a green one, two plain ones
@@ -3632,7 +3433,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-back{align-self:center}
 @media(max-width:820px){
   #rpt .rp-nav{flex-wrap:wrap;justify-content:flex-start;gap:8px}
-  #rpt .rp-navsep{display:none}
 }
 
 /* THE FOUR THINGS TO DO, CLOSED.
@@ -3764,8 +3564,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-from .c{display:block;margin-top:5px;font-size:13px;line-height:1.5;color:var(--tx-2)}
 #rpt .rp-from.rp-str i{background:var(--ok)}
 #rpt .rp-from.rp-str .w{color:var(--ok)}
-#rpt .rp-from.rp-soft i{background:var(--warn)}
-#rpt .rp-from.rp-soft .w{color:var(--warn)}
 
 /* What holds up, said as plainly as what does not. */
 #rpt .rp-goods{margin-top:30px;display:grid;gap:10px}
@@ -5255,10 +5053,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     <div class="waitbar" role="progressbar" aria-label="Check progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="waitBarWrap"><i id="waitBar"></i></div>
     <div class="waitmeta"><span id="waitPhase" aria-live="polite">Starting the sweep</span><span class="wclock" id="waitClock">0s</span><span id="waitPct">0%</span></div>
     <!-- Under the bar, on the right. Two minutes of a moving bar and a rising
-         percentage says a machine is busy. This says who is busy and what they
-         are doing, in the product's own name, using the logo file itself and
-         nothing redrawn. It goes when the answer is ready. -->
-    <!-- Under the bar, on the right. Two minutes of a moving bar and a rising
          percentage says a machine is busy. This says who is busy, what they are
          doing and how long it takes, in the product's own name.
 
@@ -6633,134 +6427,12 @@ var REGREAD = {
 };
 /* END GENERATED:REGREAD */
 
-/* GENERATED:CATALOGUE_META - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
-var CATALOGUE_META = {
-  total: 121,
-  sources: {
-    "Corporations Canada":{id:"CA_CORPORATIONS",cat:"01",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Ontario Registry":{id:"CA_ON_REGISTRY",cat:"01",tier:"A",jur:["CA-ON"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "BC Registry":{id:"CA_BC_REGISTRY",cat:"01",tier:"A",jur:["CA-BC"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Alberta Registry":{id:"CA_AB_REGISTRY",cat:"01",tier:"A",jur:["CA-AB"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "SEC EDGAR":{id:"SEC_EDGAR",cat:"01",tier:"A",jur:["US"],verts:["ALL"],also:["02","10"],transport:"exa_pinned"},
-    "Companies House":{id:"UK_COMPANIES_HOUSE",cat:"01",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Florida Sunbiz":{id:"US_FL_SUNBIZ",cat:"01",tier:"A",jur:["US-FL"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "OpenCorporates":{id:"OPENCORPORATES",cat:"01",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Registraire des entreprises du Quebec":{id:"CA_QC_REGISTRAIRE",cat:"01",tier:"A",jur:["CA-QC"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "ACRA":{id:"SG_ACRA",cat:"01",tier:"A",jur:["SG"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Hong Kong Companies Registry":{id:"HK_COMPANIES_REGISTRY",cat:"01",tier:"A",jur:["HK"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "New Zealand Companies Office":{id:"NZ_COMPANIES_OFFICE",cat:"01",tier:"A",jur:["NZ"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones":{id:"OFFSHORE_REGISTRIES",cat:"01",tier:"B",jur:["INTL"],verts:["ALL"],also:[],transport:"parallel"},
-    "CSA Registration":{id:"CSA_REGISTRATION",cat:"02",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","BROKER_DEALER","INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PRIVATE_FUND","FOREX_CFD","CRYPTO","COMMODITIES"],also:[],transport:"exa_pinned"},
-    "CIRO AdvisorReport":{id:"CIRO_ADVISORREPORT",cat:"02",tier:"A",jur:["CA"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","PUBLIC_STOCK","PRIVATE_INVESTMENT"],also:["04"],transport:"exa_pinned"},
-    "FINTRAC MSB":{id:"FINTRAC_MSB",cat:"02",tier:"A",jur:["CA"],verts:["CRYPTO","FOREX_CFD","PRIVATE_INVESTMENT","OTHER"],also:[],transport:"exa_pinned"},
-    "Bank of Canada PSP":{id:"BOC_PSP",cat:"02",tier:"A",jur:["CA"],verts:["CRYPTO","OTHER"],also:[],transport:"exa_pinned"},
-    "FCA Register":{id:"FCA_REGISTER",cat:"02",tier:"A",jur:["UK"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PRIVATE_FUND","PUBLIC_STOCK"],also:["04"],transport:"exa_pinned"},
-    "BrokerCheck":{id:"FINRA_BROKERCHECK",cat:"02",tier:"A",jur:["US"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PUBLIC_STOCK"],also:["04"],transport:"exa_pinned"},
-    "NFA BASIC":{id:"NFA_BASIC",cat:"02",tier:"A",jur:["US"],verts:["FOREX_CFD","COMMODITIES","CRYPTO"],also:["03","04"],transport:"exa_pinned"},
-    "FinCEN MSB":{id:"FINCEN_MSB",cat:"02",tier:"A",jur:["US"],verts:["CRYPTO","FOREX_CFD","OTHER"],also:[],transport:"exa_pinned"},
-    "SEC IAPD, Form ADV":{id:"SEC_IAPD_ADV",cat:"02",tier:"A",jur:["US"],verts:["INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PRIVATE_FUND","BROKER_DEALER"],also:["04","01","10"],transport:"parallel"},
-    "SEC Form D":{id:"SEC_FORM_D",cat:"02",tier:"A",jur:["US"],verts:["PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","CRYPTO","INVESTMENT_ADVISER"],also:["01","10"],transport:"parallel"},
-    "ASIC Professional Register":{id:"ASIC_PRO_REGISTER",cat:"02",tier:"A",jur:["AU"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PRIVATE_FUND"],also:["04"],transport:"exa_pinned"},
-    "SFC Public Register":{id:"HK_SFC_PUBLIC_REGISTER",cat:"02",tier:"A",jur:["HK"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PUBLIC_STOCK"],also:["04"],transport:"exa_pinned"},
-    "ESMA MiCA CASP":{id:"ESMA_MICA_CASP",cat:"02",tier:"A",jur:["EU"],verts:["CRYPTO"],also:["01"],transport:"exa_pinned"},
-    "RECO real estate register":{id:"CA_ON_RECO",cat:"02",tier:"A",jur:["CA-ON"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "FSRA Ontario, mortgage and insurance licences":{id:"CA_ON_FSRA",cat:"02",tier:"A",jur:["CA-ON"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators":{id:"CA_PROV_SECTOR_REGULATORS",cat:"02",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"parallel"},
-    "NMLS Consumer Access":{id:"US_NMLS",cat:"02",tier:"A",jur:["US"],verts:["ALL"],also:["04"],transport:"exa_pinned"},
-    "MAS Financial Institutions Directory":{id:"SG_MAS_FI_DIRECTORY",cat:"02",tier:"A",jur:["SG"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","FOREX_CFD","CRYPTO","PRIVATE_FUND","PUBLIC_STOCK"],also:[],transport:"exa_pinned"},
-    "IOSCO I-SCAN":{id:"IOSCO_ISCAN",cat:"03",tier:"A",jur:["INTL"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Canadian Consolidated Autonomous Sanctions List":{id:"CA_AUTONOMOUS_SANCTIONS",cat:"03",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts":{id:"CONSUMER_AGENCY_ALERTS",cat:"03",tier:"A",jur:["INTL"],verts:["ALL"],also:[],transport:"parallel"},
-    "MAS Investor Alert List":{id:"SG_MAS_ALERT",cat:"03",tier:"A",jur:["SG"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "BCSC Caution List":{id:"BCSC_CAUTION",cat:"03",tier:"A",jur:["CA-BC"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "ASC Caution List":{id:"ASC_CAUTION",cat:"03",tier:"A",jur:["CA-AB"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "OSC Alerts":{id:"OSC_ALERTS",cat:"03",tier:"A",jur:["CA-ON"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "CSA Alerts":{id:"CSA_ALERTS",cat:"03",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "FCA Warning List":{id:"FCA_WARNING",cat:"03",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "OFAC":{id:"OFAC",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "UN Consolidated":{id:"UN_CONSOLIDATED",cat:"03",tier:"A",jur:["INTL"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "DOJ Press":{id:"DOJ_PRESS",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:["04","05"],transport:"exa_pinned"},
-    "IRS-CI":{id:"IRS_CI",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:["04"],transport:"exa_pinned"},
-    "State AG":{id:"US_STATE_AG",cat:"03",tier:"A",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "SEC Trading Suspensions":{id:"SEC_TRADING_SUSPENSIONS",cat:"03",tier:"A",jur:["US"],verts:["PUBLIC_STOCK"],also:[],transport:"exa_pinned"},
-    "CFTC RED List":{id:"CFTC_RED_LIST",cat:"03",tier:"A",jur:["US"],verts:["FOREX_CFD","COMMODITIES","CRYPTO","BROKER_DEALER"],also:["02"],transport:"exa_pinned"},
-    "CFTC Enforcement":{id:"CFTC_ENFORCEMENT",cat:"03",tier:"A",jur:["US"],verts:["FOREX_CFD","COMMODITIES","CRYPTO","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:["04","05"],transport:"parallel"},
-    "DFPI Crypto Scam Tracker":{id:"DFPI_CRYPTO_SCAM_TRACKER",cat:"03",tier:"B",jur:["US-CA"],verts:["CRYPTO","FOREX_CFD","PRIVATE_INVESTMENT"],also:["07"],transport:"exa_pinned"},
-    "CIRO Discipline":{id:"CIRO_DISCIPLINARY",cat:"03",tier:"A",jur:["CA"],verts:["BROKER_DEALER","INVESTMENT_ADVISER","PUBLIC_STOCK","PRIVATE_INVESTMENT"],also:["04"],transport:"exa_pinned"},
-    "ASIC Investor Alerts":{id:"ASIC_INVESTOR_ALERTS",cat:"03",tier:"A",jur:["AU"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "SFC Alert List":{id:"HK_SFC_ALERT_LIST",cat:"03",tier:"A",jur:["HK"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Corporations Canada, Individuals with Significant Control":{id:"CA_ISC_FEDERAL",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "ISC Ownership":{id:"ISC_OWNERSHIP",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "UK PSC Register":{id:"UK_PSC",cat:"04",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "ASIC Banned":{id:"ASIC_BANNED",cat:"04",tier:"A",jur:["AU"],verts:["ALL"],also:["03"],transport:"exa_pinned"},
-    "CSA Disciplined":{id:"CSA_DISCIPLINED",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:["03"],transport:"exa_pinned"},
-    "CSA Disciplined Persons":{id:"CSA_DISCIPLINED_PERSONS",cat:"04",tier:"A",jur:["CA"],verts:["ALL"],also:["03"],transport:"parallel"},
-    "SEDI Insider Reports":{id:"CSA_SEDI",cat:"04",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT"],also:["01","10"],transport:"parallel"},
-    "CanLII":{id:"CANLII",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Supreme Court of Canada and Federal Court":{id:"CA_SCC_FC",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Provincial courts and tribunals":{id:"CA_PROV_COURTS",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"parallel"},
-    "Securities tribunals and the Competition Tribunal":{id:"CA_SEC_TRIBUNALS",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:["03"],transport:"parallel"},
-    "OSB Bankruptcy":{id:"OSB_BANKRUPTCY",cat:"05",tier:"A",jur:["CA"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "CourtListener":{id:"COURTLISTENER",cat:"05",tier:"B",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "UK Insolvency":{id:"UK_INSOLVENCY",cat:"05",tier:"A",jur:["UK"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "PACER":{id:"PACER",cat:"05",tier:"A",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Justia Dockets":{id:"JUSTIA_DOCKETS",cat:"05",tier:"B",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Bankruptcy Claims":{id:"BANKRUPTCY_CLAIMS",cat:"05",tier:"B",jur:["US"],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "SEDAR+":{id:"CSA_SEDAR_PLUS",cat:"05",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:["01","10"],transport:"parallel"},
-    "ICANN RDAP":{id:"ICANN_RDAP",cat:"06",tier:"A",jur:[],verts:["ALL"],also:["10"],transport:"connector"},
-    "Certificate Log":{id:"CERT_LOG",cat:"06",tier:"B",jur:[],verts:["ALL"],also:["10"],transport:"exa_pinned"},
-    "Google Web Risk":{id:"GOOGLE_WEB_RISK",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "VirusTotal":{id:"VIRUSTOTAL",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "urlscan.io":{id:"URLSCAN",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Mail Config":{id:"MAIL_CONFIG",cat:"06",tier:"B",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Trustpilot":{id:"TRUSTPILOT",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Sitejabber":{id:"SITEJABBER",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "BBB Scam Tracker":{id:"BBB_SCAM_TRACKER",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Forex Peace Army":{id:"FOREX_PEACE_ARMY",cat:"07",tier:"C",jur:[],verts:["FOREX_CFD","CRYPTO","COMMODITIES","BROKER_DEALER"],also:[],transport:"exa_pinned"},
-    "Reddit":{id:"REDDIT",cat:"07",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Glassdoor":{id:"GLASSDOOR",cat:"07",tier:"C",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Beneficiary Match":{id:"BENEFICIARY_MATCH",cat:"08",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "IBAN and SWIFT":{id:"IBAN_SWIFT",cat:"08",tier:"B",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Chainabuse":{id:"CHAINABUSE",cat:"08",tier:"C",jur:[],verts:["CRYPTO"],also:["07"],transport:"exa_pinned"},
-    "Chain Analytics":{id:"CHAIN_ANALYTICS",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:[],transport:"connector"},
-    "Etherscan":{id:"ETHERSCAN",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
-    "Solscan":{id:"SOLSCAN",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
-    "Tronscan":{id:"TRONSCAN",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
-    "Bitcoin Explorer":{id:"BTC_EXPLORER",cat:"08",tier:"B",jur:[],verts:["CRYPTO"],also:["09","10"],transport:"exa_pinned"},
-    "Infrastructure Cluster":{id:"INFRA_CLUSTER",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Identifier Reuse":{id:"IDENTIFIER_REUSE",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Document Fingerprint":{id:"DOC_FINGERPRINT",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Analytics and Pixel Reuse":{id:"PUBLICWWW",cat:"09",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Site Technology":{id:"BUILTWITH",cat:"09",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "DNS and IP History":{id:"SECURITYTRAILS",cat:"09",tier:"B",jur:[],verts:["ALL"],also:["06","10"],transport:"exa_pinned"},
-    "Host and Certificate Graph":{id:"CENSYS",cat:"09",tier:"B",jur:[],verts:["ALL"],also:["06"],transport:"exa_pinned"},
-    "Wallet Reuse":{id:"WALLET_REUSE",cat:"09",tier:"4orm",jur:[],verts:["CRYPTO"],also:[],transport:"connector"},
-    "Beneficiary Reuse":{id:"BENEFICIARY_REUSE",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "People Cluster":{id:"PEOPLE_CLUSTER",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Operator Graph":{id:"OPERATOR_GRAPH",cat:"09",tier:"4orm",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "ICANN RDAP Date":{id:"RDAP_DATE",cat:"10",tier:"A",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Wayback Machine":{id:"WAYBACK",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "First Certificate":{id:"FIRST_CERT",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Trademark Filing":{id:"TRADEMARK",cat:"10",tier:"A",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Domain History":{id:"DOMAIN_HISTORY",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Incorporation Date":{id:"INCORP_DATE",cat:"10",tier:"A",jur:[],verts:["ALL"],also:[],transport:"connector"},
-    "Public Profile":{id:"PUBLIC_PROFILE",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Form D First Filing":{id:"FORM_D_FIRST",cat:"10",tier:"A",jur:["US"],verts:["PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","CRYPTO"],also:[],transport:"parallel"},
-    "Form D First Sale":{id:"FORM_D_FIRST_SALE",cat:"10",tier:"A",jur:["US"],verts:["PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","CRYPTO"],also:[],transport:"parallel"},
-    "EDGAR First Filing":{id:"EDGAR_FIRST",cat:"10",tier:"A",jur:["US"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT","VC_STARTUP","PRIVATE_FUND","INVESTMENT_ADVISER"],also:[],transport:"exa_pinned"},
-    "SEDAR+ First Filing":{id:"SEDAR_FIRST",cat:"10",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:[],transport:"exa_pinned"},
-    "SEDI First Insider Record":{id:"SEDI_FIRST",cat:"10",tier:"A",jur:["CA"],verts:["PUBLIC_STOCK"],also:[],transport:"exa_pinned"},
-    "IAPD First Registration":{id:"IAPD_FIRST",cat:"10",tier:"A",jur:["US"],verts:["INVESTMENT_ADVISER","PRIVATE_INVESTMENT","PRIVATE_FUND"],also:[],transport:"exa_pinned"},
-    "App Store First Release":{id:"APP_STORE_FIRST",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "Google Play First Release":{id:"PLAY_STORE_FIRST",cat:"10",tier:"B",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "GitHub Repository Created":{id:"GITHUB_REPO_CREATED",cat:"10",tier:"B",jur:[],verts:["VC_STARTUP","CRYPTO"],also:["09"],transport:"exa_pinned"},
-    "GitHub First Commit":{id:"GITHUB_FIRST_COMMIT",cat:"10",tier:"B",jur:[],verts:["VC_STARTUP","CRYPTO"],also:["09"],transport:"exa_pinned"},
-    "First Press Release":{id:"FIRST_PRESS_RELEASE",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "First YouTube Video":{id:"FIRST_YOUTUBE",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"},
-    "First Social Post":{id:"FIRST_SOCIAL_POST",cat:"10",tier:"D",jur:[],verts:["ALL"],also:[],transport:"exa_pinned"}
-  }
-};
-/* END GENERATED:CATALOGUE_META */
+/* THE GENERATED CATALOGUE METADATA IS GONE, AND THIS NOTE IS WHY.
+   tools/sync-catalogue.mjs wrote sixteen kilobytes of per-source metadata into
+   this file for all 121 registers, and nothing in the page ever read one field
+   of it. The board draws from SOURCES and REGINFO; the register drawer draws
+   from SR001. If a screen ever needs the transport, tier or vertical of a named
+   source, regenerate it with that tool rather than hand-writing a copy. */
 
 
 /* ======================= support directory ======================= */
@@ -7137,13 +6809,6 @@ function setStats(list){
 
 function slug(x){ return x.toLowerCase().replace(/[^a-z0-9]+/g,"-"); }
 
-/* The one place that answers "which registers is this check allowed to use".
-   Everything that plans, sweeps, counts or draws goes through here. */
-function srScope(c){
-  var all=(c&&c.src)||[], inn=[], out=[];
-  for(var i=0;i<all.length;i++) (srEnabled(all[i][0])?inn:out).push(all[i]);
-  return {inn:inn, out:out, all:all};
-}
 function renderBoard(status){
   var w=id("brows"); w.innerHTML="";
   SOURCES.forEach(function(g){
@@ -7179,10 +6844,6 @@ function applicableSet(d){
   if(!d || !d.applicable || !d.applicable.length) return null;
   var set={}; d.applicable.forEach(function(n){ set[n]=1; });
   return set;
-}
-function appliesHere(d,name){
-  var set=applicableSet(d);
-  return !set || !!set[name];
 }
 function countApplicable(d){
   var set=applicableSet(d);
@@ -8162,39 +7823,6 @@ function snapChrono(){
   infoOpen("Claim dates against the record", (d.name||"This party"), null, h);
 }
 
-/* What the party was classified as, and therefore which registers were even
-   in the plan. This is the audit trail behind the coverage figure. */
-function snapRouting(){
-  var d=CURRENT; if(!d) return;
-  var cls=d.classifications||[], na=d.notApplicable||[];
-  var app=countApplicable(d);
-  var h='<div class="infosec">'+
-    snapCells([[String(TOTAL_SOURCES),"Sources in the catalogue",""],
-               [String(app),"Could hold a record here",""],
-               [String(na.length),"Could never have applied",""]])+
-    '<div class="infop"><b>Coverage is measured against what applied.</b> An Australian licence register has nothing to say '+
-    'about a Canadian issuer with no Australian activity, and counting it as a gap would make the coverage figure meaningless. '+
-    'Both halves are published, so you can see what was left out and why.</div></div>';
-
-  if(cls.length){
-    h+='<div class="infosec"><div class="infoh">What this party appears to be</div>'+
-       '<div class="infop" style="margin-top:0">More than one is normal. A crypto fund is several things at once, and each one opens a different set of registers.</div>'+
-       '<div class="snaplist">'+cls.map(function(c){
-         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
-           '<span class="st2">'+esc(String(c.classification).replace(/_/g," ").toLowerCase())+'</span>'+
-           '<span class="sd">'+esc(c.reason)+'</span></span>'+
-           '<span class="sg">'+Math.round((c.confidence||0)*100)+'%</span></div>';
-       }).join('')+'</div></div>';
-  }
-  if(na.length){
-    h+='<div class="infosec"><div class="infoh">'+na.length+' sources that could never have applied</div>'+
-       '<div class="snaplist">'+na.slice(0,80).map(function(x){
-         return '<div class="snaprow"><span class="sx"></span><span class="sb">'+
-           '<span class="st2">'+esc(x.source)+'</span><span class="sd">'+esc(x.reason)+'</span></span></div>';
-       }).join('')+'</div></div>';
-  }
-  infoOpen("How this check was routed", (d.name||"This party"), null, h);
-}
 
 /* ---- a category tile ---- */
 /* The rule badges said RED, GREEN, GREY and NEVER. A colour is not an outcome,
@@ -8606,7 +8234,6 @@ function srEnabled(name){
   if(!SR001_SET){ SR001_SET={}; (SR001.enabled||[]).forEach(function(x){ SR001_SET[x]=1; }); }
   return !!SR001_SET[String(name||"").trim()];
 }
-function srCritical(name){ return (SR001.critical||[]).indexOf(String(name||"").trim())>=0; }
 /* The board state for a source the register has not cleared. It is its own
    state, not a variant of unreached: unreached means we tried and could not
    get there, this means we did not try and are saying so. */
@@ -8664,9 +8291,6 @@ function hasTradeWord(w){
     if(TRADE_SET[String(w[i]).toLowerCase().replace(/[^a-z]/g,"")]) return true;
   return false;
 }
-/* The gate. detect() still names the shape, because telling somebody we do not
-   do this is better than pretending we did not understand them. */
-function inputAllowed(t){ return !!t && !BLOCKED_INPUT[t]; }
 
 /* THE READER CAN SAY WE READ IT WRONG.
    detect() calls two or three capitalised words a person's name, and plenty of
@@ -9128,7 +8752,10 @@ function ledgerHTML(ledger){
 function toIdle(){
   MODE="idle"; CURRENT=null;
   id("modeLbl").textContent="Standing by";
-  id("navReport").classList.remove("ready");
+  /* The "ready" class went with the rules that read it. Whether these nav
+     buttons show is decided by data-when against the stage, and has been for a
+     long time; .navreport.ready and .navback.ready named a class the buttons
+     never wore, so they matched nothing and this line changed nothing. */
   id("dialPanelT").textContent="Source network";
   id("dialMode").textContent="Idle"; id("dialMode").classList.remove("live");
   id("barPanelT").textContent="Connector distribution";
@@ -9187,7 +8814,6 @@ function toResult(d,label){
   setReads(d.reads); setBars(d.bars,d.barFoot);
   if(d.stats) setStats(d.stats);
   id("auditRow").classList.toggle("on", !!d.cats);
-  id("navReport").classList.add("ready");
   if(LIVE) bumpServed();
   id("summaryBand").classList.add("on");
   id("verdictWrap").classList.add("on");
@@ -11868,12 +11494,6 @@ function rpDate(v){
   if(y) return y[1];
   return String(v);
 }
-function rpStamp(v){
-  var t=Date.parse(v);
-  if(isNaN(t)) return String(v||"");
-  var dt=new Date(t);
-  return dt.getUTCDate()+" "+RP_MONTHS[dt.getUTCMonth()].slice(0,3)+" "+dt.getUTCFullYear();
-}
 function rpDays(from,to){
   var a=Date.parse(from), b=to?Date.parse(to):NaN;
   if(isNaN(a)) return null;
@@ -11900,11 +11520,6 @@ function rpChrono(d,re){
    accident six months from now. */
 var RP_PERSON_NODE = /^(PERSON|DIRECTOR|OFFICER|PROMOTER|ADVISER)$/;
 function rpPeople(d){ return []; }
-function rpPersonNodesSuppressed(d){
-  var c=0, n=(d.graph&&d.graph.nodes)||[];
-  for(var i=0;i<n.length;i++) if(RP_PERSON_NODE.test(String(n[i].type||""))) c++;
-  return c;
-}
 
 /* A title is not a person. Chief Executive, Managing Director and Persons With
    Significant Control all match a name shaped pattern, and printing one as a

@@ -151,8 +151,15 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     if (/>\s*A name is enough/i.test(src))
       fails.push('the deck line reads "A name is enough", which invites a person name');
   }
-  if (!/function inputAllowed\(/.test(src))
-    fails.push('OPS-001 s.8: the input gate function is gone');
+  /* THE GUARD POINTS AT THE GATE THAT RUNS, NOT AT A HELPER BESIDE IT.
+     It used to require a function named inputAllowed. Nothing called that
+     function: the gate on the submit path reads BLOCKED_INPUT itself. So the
+     guard was keeping a corpse alive and proving nothing about the gate. This
+     tests the line that actually stops a person's name. */
+  if (!/var bad\s*=\s*t\s*&&\s*BLOCKED_INPUT\[t\]/.test(src)
+      && !/BLOCKED_INPUT\[t\]/.test(src))
+    fails.push('OPS-001 s.8: nothing on the submit path consults the blocked-input map, '
+      + 'so a refused identifier would run');
   if (!/BLOCKED_INPUT/.test(src))
     fails.push('OPS-001 s.8: the blocked-input map is gone');
 
@@ -489,9 +496,20 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
    every handler fired. This guard reads the classes out of the markup and
    checks each one is styled somewhere. */
 {
-  const need = ['rp-pv','rp-pvsheet','rp-pvhd','rp-pvbody','rp-pvft','rp-pvname',
-                'rp-pvx','rp-pvdl','rp-pvlead','rp-pvsec','rp-pvk','rp-pvp',
-                'rp-pvr','rp-pvclock','rp-pvfn'];
+  /* THE LIST COMES OUT OF THE MARKUP, WHICH IS WHAT THE COMMENT ALWAYS SAID.
+     It was a frozen array of fifteen names, and it went stale the moment the
+     dialog stopped emitting one of them: the guard then demanded a rule for a
+     class nothing wears, and the rule survived every sweep because a guard was
+     protecting it. Reading the emitted set means the guard cannot outlive the
+     markup it is guarding. A class named ONLY inside the stylesheet is not
+     emitted and is not required. */
+  const emitted = new Set();
+  for (const m of html.replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
+                      .matchAll(/\brp-pv[a-z]*\b/g)) emitted.add(m[0]);
+  const need = [...emitted].sort();
+  if (need.length < 12)
+    fails.push('the pack preview dialog emits only ' + need.length + ' classes, so either it '
+      + 'has been gutted or this guard is no longer reading it');
   /* `.rp-pvclock .rp-k{...}` styles a child, not the element. Require a rule
      whose selector ENDS at the class, which is what actually gives the element
      its own box. */
@@ -537,8 +555,18 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   }
   if (!/function srEnabled\(name\)/.test(src))
     fails.push('SR-001: the enforcement function is gone');
-  if (!/function srScope\(c\)/.test(src))
-    fails.push('SR-001: srScope, the one place that answers which registers a check may use, is gone');
+  /* Same correction: srScope was a wrapper nobody called. What actually decides
+     whether a register may be used is srEnabled, and the board and the sweep
+     both call it directly. Guard the thing that runs. */
+  if (!/function srEnabled\(/.test(src))
+    fails.push('SR-001: srEnabled, which decides whether a register may be used, is gone');
+  /* One call site, and it is the one that matters: the board decides each chip's
+     state through the gate, so a register the register-of-record has not cleared
+     draws as out of scope rather than as ready. Scope is enforced again on the
+     server, which is where it binds; this is the screen agreeing with it. */
+  if (!/srEnabled\(n\) \? \(status && status\[n\] \? status\[n\] : "ready"\) : SR_OUT_OF_SCOPE/.test(src))
+    fails.push('SR-001: the board no longer draws a chip through the register gate, so a source '
+      + 'the register never cleared could render as ready');
   if (!/srEnabled\(n\) \? \(status/.test(src))
     fails.push('SR-001: the board no longer marks an uncleared register out of scope');
   if (!/SR_OUT_OF_SCOPE = "policy"/.test(src))
@@ -2285,6 +2313,50 @@ if (/[\u2014\u2013]/.test(admin))
   const firstDep = html.indexOf('id="network"');
   if (bodyAt < 0 || (firstDep > 0 && html.slice(bodyAt, bodyAt + 40).indexOf('data-stage') < 0))
     fails.push('the stage is not on the body tag, so the elements below it lay out unstaged');
+}
+
+/* ================================================ NOTHING DEAD STAYS IN
+   The file carried a hundred and two CSS rules for classes no element has worn
+   in months, sixteen kilobytes of generated source metadata nothing read, and
+   seven functions nobody called, two of which were being held alive by guards
+   in this very file. Dead code is not free: it is read as if it ran, it is
+   copied when somebody adapts a block beside it, and it hides the live rule it
+   sits next to. So the build counts it and refuses to grow it.
+
+   Both tests are deliberately structural. A class is dead when the stylesheet
+   names it and nothing outside the stylesheet ever does. A function is dead
+   when it is declared once and called nowhere, allowing for the ways a function
+   is reached without a call beside its name: passed to map or forEach, handed
+   to requestAnimationFrame or addEventListener, or named in a debug hook. */
+{
+  const styleBlocks = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n');
+  const css = styleBlocks.replace(/\/\*[\s\S]*?\*\//g, '');
+  const outside = html.replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
+                      .replace(/<!--[\s\S]*?-->/g, '')
+                      .replace(/\/\*[\s\S]*?\*\//g, '');
+  /* Built by concatenation, so the name never appears whole in the source. */
+  const BUILT = /^done-(ok|none|miss|na|bad|warn)$/;
+  const declared = new Set([...css.matchAll(/\.(-?[A-Za-z_][\w-]*)/g)].map(m => m[1]));
+  const orphanCls = [...declared].filter(c =>
+    !BUILT.test(c) &&
+    !new RegExp('["\'`][^"\'`]*\\b' + c.replace(/-/g, '\\-') + '\\b').test(outside));
+  if (orphanCls.length)
+    fails.push('the stylesheet carries ' + orphanCls.length + ' class(es) no element ever wears: '
+      + orphanCls.sort().slice(0, 12).join(', ') + (orphanCls.length > 12 ? ', ...' : '')
+      + '. Either emit them or delete the rules.');
+
+  const declFns = [...script.matchAll(/\nfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map(m => m[1]);
+  const orphanFn = [...new Set(declFns)].filter(n => {
+    const esc = n.replace(/\$/g, '\\$');
+    const calls = (script.match(new RegExp('\\b' + esc + '\\s*\\(', 'g')) || []).length;
+    const decls = (script.match(new RegExp('function\\s+' + esc + '\\s*\\(', 'g')) || []).length;
+    if (calls > decls) return false;
+    /* reached without being called by name beside a paren */
+    return !new RegExp('[(:=,\\[]\\s*' + esc + '\\b|["\']' + n + '["\']').test(script);
+  });
+  if (orphanFn.length)
+    fails.push('the script declares ' + orphanFn.length + ' function(s) nothing reaches: '
+      + orphanFn.sort().join(', ') + '. Either call them or delete them.');
 }
 
 /* -------------------------------------- declaration diff against a prior build */

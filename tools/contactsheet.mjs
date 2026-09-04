@@ -1,3 +1,6 @@
+/* SWEEP: keep. This renders every screen in every state onto one sheet so a
+   person can look at the whole product at once. It asserts nothing on purpose:
+   its output is for eyes, and the eyes are the check. */
 /* EVERY SCREEN, EVERY STATE, LOOKED AT.
  *
  * This is the thing that was missing. Thirty-seven checks passed on a page
