@@ -1159,6 +1159,12 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
   opacity:0;pointer-events:none;transition:opacity .4s var(--ease);
 }
 .dirscrim.on{opacity:1;pointer-events:auto}
+/* ABOVE THE WAITING SCREEN, WHICH IS THE ONE PLACE IT WAS NEEDED MOST.
+   The directory sits at 200 and 201. The waiting screen sits at 400 and 401,
+   so Find support opened correctly and completely invisibly for the whole two
+   minutes somebody is most likely to want it. The click always worked. */
+body.wait-up .dirscrim{z-index:500}
+body.wait-up .dirbox{z-index:501}
 .dirbox{
   position:fixed;inset:2.5vh 2.5vw;z-index:201;display:flex;flex-direction:column;
   max-width:1340px;margin-left:auto;margin-right:auto;
@@ -1599,11 +1605,6 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
    assessment lands, the button grows by twenty four pixels, the sentence beside
    it rewraps, and the row loses a line. That line comes out of the network. */
 .waitfoot .gateok{margin-left:0;min-width:212px;justify-content:center}
-.waitbrowse{padding:12px 22px;border-radius:999px;background:transparent;
-  border:1px solid var(--border-lit);color:var(--tx-2);font-size:13.5px;font-weight:600;
-  transition:all .25s var(--ease)}
-.waitbrowse:hover{border-color:var(--gold);color:var(--gold)}
-.waitfoot .waitbrowse + .gateok{margin-left:0}
 @media(max-width:640px){.waitbox{inset:0;top:0;left:0;transform:none;width:100%;max-height:100%;border-radius:0;border:none}
   .waitbox.on{transform:none}.waitq{display:none}}
 /* ---- the summary band. Two numbers hard left, the answer, then the six
@@ -1695,6 +1696,34 @@ body[data-stage="console"] .summaryband.on{display:grid}
   font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   transition:transform .3s var(--pop),background .25s var(--ease)}
 .gateok:hover{background:var(--blue-lt);transform:translateY(-1px)}
+/* IT HAS TO BE CLICKED, SO IT HAS TO LOOK LIKE IT.
+   It sat quietly at the foot of the screen looking like one option among
+   several while it was in fact the only way forward, and people waited at it
+   without knowing they were waiting. It breathes until it is pressed, and it
+   says what pressing it does. On a phone it runs the full width, because a
+   button a thumb has to hunt for is a button that does not get pressed. */
+.gateok{position:relative}
+.gateok:not(:disabled){animation:gatepulse 2.6s var(--ease) infinite}
+@keyframes gatepulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(46,107,242,.42)}
+  60%{box-shadow:0 0 0 13px rgba(46,107,242,0)}
+}
+.gateok:disabled{animation:none;opacity:.55}
+@media(prefers-reduced-motion:reduce){.gateok:not(:disabled){animation:none;
+  box-shadow:0 0 0 3px rgba(46,107,242,.34)}}
+/* The line that tells them it is a gate rather than a dismissal. It is for the
+   phone, where the button is a thumb target at the foot of a small screen and
+   nothing else explains it. On anything wider the pulse and the wording carry
+   it, and the extra line would come straight out of the card and the register
+   web above, which is exactly what it did the first time this shipped. */
+.gatehint{display:none;margin-top:10px;font-size:12px;color:var(--dk-tx3);text-align:center}
+.gatehint[hidden]{display:none}
+@media(max-width:620px){
+  .gateok{width:100%;min-height:48px;padding:15px 20px;font-size:11.5px}
+  .gatehint{display:block;font-size:11.5px}
+}
+/* Even on a phone, a window this short has no spare row to give it. */
+@media(max-width:620px) and (max-height:620px){ .gatehint{display:none} }
 /* ---- the quick strip. Everything the check produced, one row, one click.
        Nothing here scrolls the page; each opens a snapshot over it. ---- */
 /* ---- snapshot internals ---- */
@@ -2668,10 +2697,24 @@ body[data-stage="report"] .foot{display:none}
    are everywhere else, and the mark comes down to the size of the type it sits
    beside. */
 @media(max-width:520px){
-  #rpt .rp-head{padding-top:18px;gap:12px 12px}
-  #rpt .rp-hlogo img{height:34px}
-  #rpt .rp-nav{flex-wrap:wrap;gap:8px;justify-self:end;justify-content:flex-end}
+  /* ONE COLUMN, THREE ROWS, EACH ONE FULL WIDTH.
+     The grid still had two columns here, so the way back sat on the left of a
+     row while a pill sat on the right of it and the second pill dropped to a
+     line of its own, indented under nothing. Three misaligned rows of chrome
+     above the answer. A phone gets a stack: mark, way back, then the pills
+     side by side across the full width, each a real touch target. */
+  #rpt .rp-head{padding-top:18px;gap:12px;
+    grid-template-columns:1fr;grid-template-areas:"logo" "back" "nav"}
+  #rpt .rp-hlogo{grid-area:logo;justify-self:start}
+  #rpt .rp-navmid{grid-area:back;justify-self:start}
+  #rpt .rp-head > .rp-nav{grid-area:nav;grid-column:auto}
+  #rpt .rp-hlogo img{height:30px}
+  #rpt .rp-nav{display:flex;flex-wrap:wrap;gap:8px;
+    justify-self:stretch;justify-content:flex-start}
   #rpt .rp-nav .rp-back{align-self:start}
+  /* Forty four points is the smallest thing a thumb hits reliably. */
+  #rpt .rp-pill{min-height:44px;flex:1 1 auto;justify-content:center}
+  #rpt .rp-nav br{display:none}
   
   #rpt .rp-pill{padding:8px 12px;font-size:9.5px;letter-spacing:.08em;gap:6px}
   #rpt .rp-pill svg{width:11px;height:11px}
@@ -5151,9 +5194,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
          out of the network above. -->
     <span class="waitslot">
       <span class="waitleft" id="waitLeft"></span>
-      <button class="waitbrowse" type="button" id="waitBrowse" style="display:none">Close and keep looking</button>
+      <!-- THE SECOND WAY OFF THIS SCREEN IS GONE.
+           "Close and keep looking" sat beside the one control that matters and
+           offered a reader a way past the disclaimer without reading it. On a
+           phone the two buttons competed for the same thumb. There is one way
+           forward now, and it is the acknowledgement. -->
     </span>
     <button class="gateok" type="button" id="waitOk">I understand</button>
+    <span class="gatehint" id="waitHint">Tap to continue. The check keeps running either way.</span>
   </div>
 </div>
 
@@ -11109,7 +11157,6 @@ var EDU_HOLD = 7000;
    timer, on the arrows, or on a dot. Once all of them have been, the reader
    has been through the whole disclaimer and can leave. */
 var eduSeen = {};
-function eduSeenAll(){ return Object.keys(eduSeen).length >= EDU.length; }
 function eduMarkSeen(){
   eduSeen[eduI % EDU.length] = 1;
   showBrowse();
@@ -11119,21 +11166,11 @@ function eduMarkSeen(){
    fast as they like, but they cannot skip the material. Once the result is
    ready the button disappears, because "Show the result" is the better one. */
 function showBrowse(){
-  var b=id("waitBrowse"), h=id("waitLeft");
-  if(!b) return;
-  var seen=Object.keys(eduSeen).length;
-  if(!waitDone && eduSeenAll()){
-    b.style.display="";
-    b.textContent="Close and keep looking";
-    if(h) h.style.display="none";
-  } else {
-    b.style.display="none";
-    if(h){
-      h.style.display = waitDone ? "none" : "";
-      h.textContent = seen+" / "+EDU.length+" read";
-      h.title = "Go through all "+EDU.length+" and you can close this early. The check keeps running either way.";
-    }
-  }
+  /* The browse button is gone; this keeps the counter honest and nothing else. */
+  var h=id("waitLeft");
+  if(!h) return;
+  h.style.display = waitDone ? "none" : "";
+  h.textContent = Object.keys(eduSeen).length+" / "+EDU.length+" read";
 }
 function eduRestart(ms){
   clearInterval(eduT);
@@ -11151,7 +11188,6 @@ function eduStep(n){ eduGo(eduI + n); }
 function waitOpen(q){
   waitDone=false; waitAck=false; waitPayload=null; eduI=0; eduSeen={};
   clearInterval(waitAutoT); waitAutoT=null;
-  var br=id("waitBrowse"); if(br) br.style.display="none";
   var hl=id("waitLeft"); if(hl){ hl.style.display=""; hl.textContent="0 / "+EDU.length+" read"; }
   id("waitQ").textContent=q;
   id("waitPhase").textContent="Starting the sweep";
@@ -11180,6 +11216,9 @@ function waitOpen(q){
     waitScrim.classList.remove("snap"); waitBox.classList.remove("snap");
   });
   document.body.style.overflow="hidden";
+  /* Marks the one state where anything opened on top has to clear the waiting
+     screen's z-index rather than sit politely under it. */
+  document.body.classList.add("wait-up");
   waitReturn = document.activeElement;
   /* The deck is reserved at its tallest card BEFORE the network is built, and
      the network is built only once the box has real layout. Doing either the
@@ -11388,6 +11427,7 @@ function waitClose(){
      early must not stamp a partial duration on a check that is still going. */
   if(waitDone) runClockStop();
   document.body.style.overflow="";
+  document.body.classList.remove("wait-up");
   if(waitReturn && waitReturn.focus){ try{ waitReturn.focus(); }catch(e){} }
   waitReturn=null;
   if(waitRender){
@@ -11436,20 +11476,20 @@ id("waitSources").addEventListener("click",function(){
   rpSourcesFill();
   id("rpBackToReportT").textContent="Back to the check";
   document.body.classList.add("over-wait");
+  /* THE WAITING SCREEN LOCKED THE PAGE AND THE SHEET INHERITED THE LOCK.
+     waitOpen sets body overflow hidden so nothing scrolls behind the scrim.
+     This sheet opens OVER that screen and is fifteen thousand pixels tall, and
+     the lock was never lifted, so on a phone Sources and Method could not be
+     scrolled by one pixel. A desktop hid it because a mouse wheel over the
+     sheet's own scroller still worked. Released here, restored on the way
+     back, because the wait screen underneath still wants it. */
+  document.body.style.overflow="";
   for(var k in RP_SCREENS){ var el=id(RP_SCREENS[k]); if(el) el.hidden=(k!=="sources"); }
   RP_AT="sources";
   document.body.setAttribute("data-stage","report");
   rpTop();
   setTimeout(function(){ id("rpBackToReport").focus(); },60);
 });
-id("waitBrowse").addEventListener("click",function(){
-  waitAck=true;
-  /* Status goes to the phase line. The disclaimer is the one sentence somebody
-     has to read, and a status message must never be able to replace it. */
-  id("waitPhase").textContent="Still checking. The result will open by itself.";
-  waitClose();
-});
-
 /* The arrows and the counter went with the rest of the chrome. The cards
    advance on their own; the dots below them are the only control. */
 /* Arrow keys move the cards while the wait screen has focus, which is the
@@ -11465,6 +11505,7 @@ id("waitOk").addEventListener("click",function(){
   /* Acknowledged while the sweep is still running. It closes itself the moment
      the assessment lands, so nobody has to come back to this screen. */
   this.disabled=true; this.textContent="Understood";
+  var hint=id("waitHint"); if(hint) hint.hidden=true;
   id("waitPhase").textContent="Understood. The result will open by itself when the sweep finishes.";
   showBrowse();
 });
@@ -11478,7 +11519,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260905.0748";
+var KBYS_BUILD = "20260905.0838";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one

@@ -45,17 +45,29 @@ say('the sentence under the bar still lists what it takes',
     (doc.getElementById('kbAccepts')||{textContent:''}).textContent));
 say('metarow gone', !doc.querySelector('.metarow'));
 
-// wait screen: every card, then leave
+/* THE WAITING SCREEN HAS ONE WAY OFF IT.
+   It used to have two: the acknowledgement, and a "Close and keep looking"
+   button that appeared once every card had been seen. Two controls side by
+   side, one of which walked a reader past the disclaimer without reading it,
+   and on a phone they competed for the same thumb. This asserts the property
+   that replaced it rather than the button that is gone: exactly one control
+   leaves this screen, and it is the acknowledgement. */
 window.__KBYS__.check('investhelm.com');
 await new Promise(r=>setTimeout(r,320));
 console.log('\nWAIT SCREEN');
-const browse=doc.getElementById('waitBrowse');
-console.log('  leave button hidden before all cards seen:', browse.style.display==='none');
+say('the second way off the screen is gone', !doc.getElementById('waitBrowse'));
+const ok=doc.getElementById('waitOk');
+say('the acknowledgement is there and live', !!ok && !ok.disabled);
+say('and it says what pressing it does',
+  (doc.getElementById('waitHint')||{textContent:''}).textContent.trim().length > 10);
 const total=doc.querySelectorAll('#eduDots button').length;
 for(let i=0;i<total;i++){ doc.querySelectorAll('#eduDots button')[i].click(); await new Promise(r=>setTimeout(r,15)); }
-console.log('  after every card, leave button offered:', browse.style.display!=='none', '|', browse.textContent);
-browse.click(); await new Promise(r=>setTimeout(r,120));
-console.log('  clicking it closes the panel:', !doc.getElementById('waitBox').classList.contains('on'));
+say('reading every card still does not open a second exit', !doc.getElementById('waitBrowse'));
+ok.click(); await new Promise(r=>setTimeout(r,120));
+say('acknowledging leaves the panel up while the sweep runs',
+  doc.getElementById('waitBox').classList.contains('on'));
+say('and the hint stops once it has been pressed',
+  (doc.getElementById('waitHint')||{hidden:true}).hidden === true);
 console.log('  and says the check is still running:', doc.getElementById('waitFine').textContent);
 await new Promise(r=>setTimeout(r,6500));
 console.log('  the result still arrived:', !!window.__KBYS__.current(), '|', doc.getElementById('modeLbl').textContent);
