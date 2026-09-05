@@ -82,8 +82,11 @@ create table if not exists ops_runs (
   sources_out_of_scope int  not null default 0,
   critical_failed      int  not null default 0,
   incomplete           boolean not null default false,
-  suppressed_items     int  not null default 0,   -- tier C/D or Quebec-subject suppressions
-  barred_items         int  not null default 0,   -- content-age and dead-item refusals
+  suppressed_items     int,                       -- tier C/D or Quebec-subject suppressions.
+                                            -- NULL means not measured. Never 0 by default:
+                                            -- a zero here reads as a count that was taken.
+  barred_items         int,                       -- content-age and dead-item refusals.
+                                            -- NULL means not measured, same reason.
   duration_ms          int,
   policy_version       text,                 -- WHICH rules governed, never what they said
   manifest_generated   date,
