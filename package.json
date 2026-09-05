@@ -17,6 +17,7 @@
   "scripts": {
     "verify": "node tools/verify.mjs",
     "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
+    "stamp": "node tools/stamp.mjs",
     "sweep": "node tools/sweep.mjs",
     "sweep:apply": "node tools/sweep.mjs --apply",
     "sr001": "node tools/sr001-build.mjs",

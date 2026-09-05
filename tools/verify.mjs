@@ -1660,6 +1660,35 @@ if (!/id="waitForming"/.test(html))
     fails.push('a half-run reports an identity confidence, which is a conclusion drawn in the '
       + 'step that did not run');
 
+  /* THE PAGE AND THE FUNCTION CARRY THE SAME BUILD.
+     Written by tools/stamp.mjs. If they differ, the static page and the API
+     function came from different deploys, which looks exactly like a bug in
+     whichever one you happen to be reading. */
+  {
+    const pageB = (html.match(/var KBYS_BUILD = "([^"]*)"/) || [])[1];
+    const apiB  = (fs.readFileSync(path.join(root, 'api/check.js'), 'utf8')
+                     .match(/const BUILD = '([^']*)'/) || [])[1];
+    if (!pageB || !apiB) fails.push('the build stamp is missing from the page or the check route');
+    else if (pageB !== apiB)
+      fails.push('the page is build ' + pageB + ' and the check route is build ' + apiB
+        + ', so they were stamped at different times. Run tools/stamp.mjs.');
+  }
+
+  /* AND NOTHING RETRIEVES WHAT IT CANNOT REPORT.
+     SR-001 clears no source for person level output and the page renders no
+     people, so a search aimed at a named individual pays to collect material
+     that is then discarded, on a product that tells its readers it keeps no
+     person level record. */
+  {
+    const ret = fs.readFileSync(path.join(root, 'api/_retrieval.js'), 'utf8');
+    if (/\(seeds\.people \|\| \[\]\)\.slice\([^)]*\)\.forEach/.test(ret))
+      fails.push('round two runs searches against named individuals again, and nothing on the '
+        + 'page can report a person, so it is retrieving what it must discard');
+    const chk2 = fs.readFileSync(path.join(root, 'api/check.js'), 'utf8');
+    if (!/people: \(seeds\.people \|\| \[\]\)\.length/.test(chk2))
+      fails.push("person names are travelling to the browser in the audit payload");
+  }
+
   if (!/function rpSafeFail\(/.test(html))
     fails.push('the console has no gate between an upstream message and the words it prints as ours');
   if (!/g\.statement = rpSafeFail\(msg\)/.test(html))
