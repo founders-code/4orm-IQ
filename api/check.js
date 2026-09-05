@@ -70,6 +70,9 @@ function opsInputType(q, domain) {
 export const config = { maxDuration: 300 };
 
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
+/* Written by tools/stamp.mjs. Returned on every response so the function's
+   build can be compared with the page's. */
+const BUILD = '20260905.0623';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -498,6 +501,50 @@ export default async function handler(req, res) {
     const board0  = searchedBoard(reachedBoard(sources, conn, siblings), searchedHosts);
     const ledger  = reviewLedger(sources, REVIEW_HOSTS);
 
+    /* ============ A DEAD SEARCH PROVIDER IS NOT A CLEAN RECORD ============
+       exa() and parallel() never throw. Every failure - no key, a 401, an
+       exhausted quota, a timeout - comes back as {status:'error'|'unreachable'|
+       'not_configured', results:[]}, which is the same shape as a search that
+       ran properly and found nothing. So a provider outage walked straight
+       through retrieval, produced a board where every register reads unreached,
+       and handed the reasoning call an empty brief. The assessment that came
+       back said nothing was found.
+
+       On a product whose first promise is that coverage is COUNTED from the
+       retrieval log rather than asserted, that is the worst failure available:
+       it is indistinguishable, on screen, from having checked and found a clean
+       record. A reader about to send money cannot tell "we asked 121 registers
+       and none held anything" from "we never managed to ask".
+
+       It also has a tell, which is the clock. A real sweep takes minutes. A
+       sweep where every call is refused at the door takes seconds.
+
+       So the calls are counted, and a sweep where nothing answered stops here
+       rather than going on to have an empty brief assessed. A search that ran
+       and legitimately returned no pages is NOT this: that call's status is
+       'found', and it passes. */
+    {
+      const calls  = [...exaAll, ...parOut];
+      const answered = calls.filter(b => b.status === 'found').length;
+      const configured = !calls.some(b => b.status === 'not_configured');
+      if (calls.length && answered === 0) {
+        const why = !configured
+          ? 'the search provider is not configured on this deployment'
+          : 'the search provider refused or could not be reached on every one of the '
+            + calls.length + ' searches this check made';
+        const detail = calls.slice(0, 6)
+          .map(b => b.source + ':' + b.status + (b.http ? ' ' + b.http : '')).join(', ');
+        try { console.error('[check] retrieval dark', why, detail); } catch {}
+        return fail(503, {
+          error: 'retrieval_unavailable', build: BUILD,
+          message: 'The check could not read any register. This is a fault on our side and '
+                 + 'not a finding about this party: no register was reached, so nothing here '
+                 + 'says anything about them, in either direction. Please try again shortly.',
+          operator: { status: 503, detail: why + ' [' + detail + ']' }
+        });
+      }
+    }
+
     /* Everything above is retrieval, and it is final. The board, the ledger and
        the page list do not change when the reasoning call returns, so they go to
        the client now rather than in two minutes. */
@@ -615,14 +662,21 @@ export default async function handler(req, res) {
         exa:      { calls: exaAll.length, round1: exaOut.length, round2: exa2.length,
                     ok: exaAll.filter(b => b.status === 'found').length,
                     results: exaAll.reduce((n, b) => n + b.results.length, 0), cost_usd: exaCost || null },
-        seeds:    { people: seeds.people, case_numbers: seeds.caseNumbers,
+        /* THE COUNT, NOT THE NAMES.
+           This wrote the extracted person names into the payload that goes to
+           the browser, so individuals' names travelled to the client inside the
+           audit panel on a product that tells its readers it keeps no person
+           level record. The other three are identifiers of things rather than
+           of people and stay as they were. */
+        seeds:    { people: (seeds.people || []).length, case_numbers: seeds.caseNumbers,
                     related_entities: seeds.relatedEntities, domains: seeds.domains },
         parallel: { calls: parOut.length, ok: parOut.filter(b => b.status === 'found').length,
                     results: parOut.reduce((n, b) => n + b.results.length, 0) },
         claude:   { model: MODEL,
                     input_tokens: msg.usage?.input_tokens,
                     output_tokens: msg.usage?.output_tokens },
-        ms: { retrieval: tRetrieval, exa: tExa, total: Date.now() - t0 }
+        ms: { retrieval: tRetrieval, exa: tExa, total: Date.now() - t0 },
+        build: BUILD
       }
     });
 

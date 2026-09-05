@@ -12,6 +12,50 @@
  * one Claude call afterwards, which is the only place judgment is paid for.
  */
 
+/* ==================== THE SEARCHES LEAVE AT A RATE ======================
+   Every search on a round used to be dispatched in one Promise.all, so a check
+   opened with thirty four simultaneous requests. Exa's documented limit is ten
+   queries a second. Most of that burst came back 429, exa() turned each one
+   into {status:'error', results:[]}, and a refused search is indistinguishable
+   downstream from a register that genuinely held nothing.
+
+   The tell was the clock: a real sweep takes minutes, and a sweep that is
+   refused at the door takes seconds.
+
+   Cutting the number of searches would have fixed the errors by checking less,
+   which is the one economy this product cannot make. Coverage is the thing
+   being sold. So the same searches go out, at a rate the provider accepts.
+
+   A 429 is also temporary, and losing a register to one is losing evidence we
+   were entitled to, so it is retried rather than recorded as a dark source. */
+const QPS = Math.max(1, Math.min(10, Number(process.env.KBYS_QPS) || 8));
+
+let windowStart = 0, windowCount = 0;
+async function slot() {
+  for (;;) {
+    const now = Date.now();
+    if (now - windowStart >= 1000) { windowStart = now; windowCount = 0; }
+    if (windowCount < QPS) { windowCount++; return; }
+    await new Promise(r => setTimeout(r, 1000 - (now - windowStart) + 5));
+  }
+}
+
+/* Two retries, backing off, and only for the statuses that mean "later".
+   A 401 or a 402 is not a "later" and is never retried. */
+const RETRY_ON = new Set([429, 502, 503, 504]);
+async function paced(fn, label) {
+  let last = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await slot();
+    const r = await fn();
+    if (!(r && r.status === 'error' && RETRY_ON.has(r.http))) return r;
+    last = r;
+    await new Promise(z => setTimeout(z, 400 * Math.pow(2, attempt) + Math.random() * 200));
+  }
+  try { console.warn('[retrieval] gave up after retries', label, last && last.http); } catch {}
+  return last;
+}
+
 const EXA_URL      = 'https://api.exa.ai/search';
 const PARALLEL_URL = 'https://api.parallel.ai/v1/search';
 
@@ -109,6 +153,9 @@ export const REVIEW_HOSTS = DOMAINS.reviews;
 export async function exa(query, opts = {}) {
   const key = process.env.EXA_API_KEY;
   if (!key) return { source: 'Exa', status: 'not_configured', results: [] };
+  return paced(() => exaOnce(query, opts, key), 'exa:' + (opts.label || query).slice(0, 40));
+}
+async function exaOnce(query, opts, key) {
 
   /* Exa bills per request and again per page per content type, so text is
      pulled only where the reasoning call needs prose. On a register lookup the
@@ -155,6 +202,9 @@ export async function exa(query, opts = {}) {
 export async function parallel(objective, queries, opts = {}) {
   const key = process.env.PARALLEL_API_KEY;
   if (!key) return { source: 'Parallel', status: 'not_configured', results: [] };
+  return paced(() => parallelOnce(objective, queries, opts, key), 'parallel:' + String(objective).slice(0, 40));
+}
+async function parallelOnce(objective, queries, opts, key) {
 
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), opts.timeout || 40000);
@@ -541,19 +591,31 @@ export function planRound2(q, domain, seeds = {}, enabled) {
   const D = DOMAINS;
   const out = [];
 
-  (seeds.people || []).slice(0, 3).forEach((person, i) => {
-    out.push({ label:`R2 person, ${person}`, cats:['C4','C3'], numResults:5, fullText:true, maxChars:2400,
-      query:`"${person}" charged barred disciplined enforcement registration director officer`,
-      includeDomains:[...D.us_criminal, ...D.us, ...D.ca_securities, ...D.us_states, ...D.uk] });
-    if (i === 0) {
-      out.push({ label:`R2 person, courts, ${person}`, cats:['C5','C4'], numResults:4,
-        query:`"${person}" lawsuit judgment docket case`,
-        includeDomains:[...D.us_courts, ...D.ca_courts] });
-    }
-    out.push({ label:`R2 person, public profile, ${person}`, cats:['C4','C10'], numResults:5,
-      query:`"${person}" ${q} profile role history previous companies`,
-      includeDomains:D.people });
-  });
+  /* ============ NOTHING IS RETRIEVED THAT CANNOT BE REPORTED ============
+     Round two used to run up to seven searches against named individuals: a
+     criminal and disciplinary sweep, a court docket sweep, and a public profile
+     sweep, all pulling full page text.
+
+     None of it could ever reach a reader. SR-001 clears no source for
+     person-level output (personOutput is empty), person nodes are filtered
+     before the corpus is written, and rpPeople returns an empty list by
+     construction. So the run was retrieving named people's criminal records,
+     disciplinary history and litigation, putting them through the reasoning
+     call, and discarding every one - while the privacy notice tells a reader we
+     do not keep that material.
+
+     Paying for it was the smaller problem. Retrieving it at all was the real
+     one, and on a budget of six round two searches these could crowd out the
+     case number, related entity and sibling domain searches whose results a
+     reader can actually be shown.
+
+     A person's disciplinary record can bear on a company's fitness, and this
+     comes back the day counsel signs off and SR-001 clears a source for it.
+     Until then the register decides, and the register says no.
+
+     seeds.people is still extracted, because the count of people named in the
+     records is itself a reportable fact about a company. It is a count here and
+     never a query. */
 
   (seeds.caseNumbers || []).slice(0, 3).forEach(c => {
     out.push({ label:`R2 docket, ${c}`, cats:['C5'], numResults:4, fullText:true, maxChars:3000,
