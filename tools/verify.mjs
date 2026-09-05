@@ -1689,6 +1689,23 @@ if (!/id="waitForming"/.test(html))
       fails.push("person names are travelling to the browser in the audit payload");
   }
 
+  /* A COUNTER THAT WAS NEVER MEASURED MUST BE ABLE TO SAY SO.
+     suppressed_items and barred_items are written as null when nothing counted
+     them. A column declared not null rejects an explicit null even when it has
+     a default, so declaring these not null does not give you a zero: it stops
+     the whole chain write, and no run gets logged at all. That shipped, and the
+     report card said "log entry: not written" on every check until it was
+     found. */
+  for (const f of ['db/telemetry.sql', 'db/telemetry.neon.sql']) {
+    const t = fs.readFileSync(path.join(root, f), 'utf8');
+    for (const col of ['suppressed_items', 'barred_items']) {
+      const line = (t.match(new RegExp('^\\s*' + col + '\\s+int[^\\n]*', 'm')) || [''])[0];
+      if (/not null/.test(line))
+        fails.push(f + ': ' + col + ' is declared not null, and the write path sends null when '
+          + 'nothing measured it, so every chain write will fail and no run will be logged');
+    }
+  }
+
   if (!/function rpSafeFail\(/.test(html))
     fails.push('the console has no gate between an upstream message and the words it prints as ours');
   if (!/g\.statement = rpSafeFail\(msg\)/.test(html))
