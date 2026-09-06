@@ -2216,6 +2216,64 @@ if (!/head_hash/.test(admin))
 if (!/d\.policy&&d\.policy\.history|policy\.history/.test(admin))
   fails.push('the rule history is not shown anywhere in the back office');
 
+/* ------------------------------------------------------- faults only, and
+   who is signed in
+
+   One button empties the room of everything that is not a fault. It has to
+   keep the red parts lit, put every non-red part back the moment it is
+   released, and never dim the reader screen, which is the thing that says how
+   many faults there are and what they are. The signed-in address sits beside
+   the live pill so a person can see at a glance whose board this is. */
+if (!/id="faultbtn"/.test(admin))
+  fails.push('the faults only button is gone from the back office');
+if (!/id="faultbtn"[^>]*aria-pressed/.test(admin))
+  fails.push('the faults only button does not report its pressed state');
+if (!/<a class="trig" href="evidence\.html" id="mapbtn">[\s\S]{0,140}id="faultbtn"/.test(admin))
+  fails.push('the faults only button is not beside the map button');
+if (!/<span class="live">[\s\S]{0,80}?<span class="who" id="who">/.test(admin))
+  fails.push('the signed in address is no longer beside the live pill');
+if (/<div class="mctl">[\s\S]{0,400}?class="who"/.test(admin))
+  fails.push('the signed in address is still down in the controls');
+if (!/function markFaults\(/.test(admin))
+  fails.push('nothing decides what stays lit in faults only, so the button does nothing');
+if (!/body\.faults \.fdim\{opacity:/.test(admin))
+  fails.push('the faults only dim rule is gone, so pressing it changes nothing on screen');
+if (!/prev\[i\]\.classList\.remove\("fdim"\)/.test(admin))
+  fails.push('faults only never clears its own marks, so the board cannot come back');
+if (!/markFaults\(\);/.test(admin.split('function paint(d){')[1] || ''))
+  fails.push('faults only is not re-applied after a paint, so a reload lights parts that are not faults');
+if (!/closest\("\.reader"\)/.test(admin))
+  fails.push('faults only can dim the reader screen, which is the one thing that names the faults');
+
+/* Three states, not two. A log nobody has walked is not a broken log, and the
+   live board showed "BROKEN at row none yet" because it only had two. */
+if (!/v\.intact===false \? "BROKEN at row/.test(admin))
+  fails.push('the chain lamp calls an unverified log broken');
+if (!/"Never walked, "/.test(admin))
+  fails.push('the back office has no wording for a chain that has never been walked');
+if (!/v\.intact===undefined \? null : proof/.test(admin))
+  fails.push('the provable gauge reads zero per cent on a chain nobody has walked yet');
+
+/* A worst-register row whose name did not come back is a row we cannot read,
+   not a register failing at zero per cent. The live board printed one. */
+if (!/String\(w\[0\]\)!=="undefined"/.test(admin))
+  fails.push('the hazard list will print a register it cannot name');
+
+/* The chain lamp told a reader to press Verify the chain, and the wall board
+   had no such control. That is worse than the wrong wording it replaced: it
+   asks somebody to do a thing there is no way to do, and it leaves the log
+   permanently unwalked, which is why the lamp was red in the first place. */
+if (!/id="walkbtn"/.test(admin))
+  fails.push('there is no way to walk the chain from the back office, so the chain lamp can never leave amber');
+if (!/api\("\/api\/evidence\?run=1"\)/.test(admin))
+  fails.push('the verify control does not call the walk route');
+if (!/if\(!res\.ok\)\{[\s\S]{0,200}The walk did not run/.test(admin))
+  fails.push('a refused walk is not reported as a walk that did not run, so a 401 could read as a verified chain');
+if (!/This says nothing about whether the chain is intact/.test(admin))
+  fails.push('a failed walk does not say that it proves nothing about the chain');
+if (!/key==="m:chain"/.test(admin))
+  fails.push('the verify control is not scoped to the chain lamp');
+
 /* ------------------------------------------------------------ the map page
    The page a partner is shown in a room. It carries the three points where the
    intelligence sits, and the one distinction that page exists to make: the
