@@ -83,6 +83,9 @@ body{font:15px/1.5 var(--ui);color:var(--ink);-webkit-font-smoothing:antialiased
   font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
   cursor:pointer;transition:all .18s var(--ease)}
 .trig:hover{border-color:var(--edge-lit);color:var(--ink)}
+a.trig{text-decoration:none}
+#mapbtn{border-color:rgba(76,135,255,.55);color:var(--blue)}
+#mapbtn:hover{background:rgba(76,135,255,.12);border-color:var(--blue);color:#9CBBFF}
 .trig[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 
 /* --------------------------------------------------------- the two thirds */
@@ -408,6 +411,7 @@ select.trig option{background:var(--panel);color:var(--ink);
     <span class="live"><i></i>Live</span>
     <div class="mstats" id="mstats"></div>
     <div class="mctl">
+      <a class="trig" href="evidence.html" id="mapbtn">The map</a>
       <span class="who" id="who"></span>
       <select class="trig" id="win" aria-label="Window">
         <option value="7">7 days</option><option value="30" selected>30 days</option>
@@ -1448,7 +1452,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260906.0525";
+var BUILD = "20260906.0638";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
