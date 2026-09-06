@@ -4935,6 +4935,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <p>There are no accounts and there is no login. <b>We do not keep what you typed, and we do
           not keep the result.</b> A check is run fresh against the registers every time and is not
           filed away for anybody to read later.</p>
+        <p>There is one exception and it is set out in full in section 04. When the same name is
+          checked by a great many different people in a short space of time, that name is written
+          down, on its own, so that we can tell a regulator something is spreading. It is never
+          attached to you or to anybody else who searched it.</p>
         <p>Two things are kept, and they are different from each other. The first is the shape of
           the run, with nothing in it that names anybody, so that the count of checks we publish
           can be proved rather than asserted. The second is a record of the business identifiers
@@ -4978,10 +4982,11 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <p>That is what lets a later check say that a wallet asking you for money has appeared
           before under a different company name. It is the one thing we could not do by asking the
           registers again on the day, and it is why the record exists at all.</p>
-        <p><b>The identifier you typed is stored only as a one way hash</b>, salted the same way
-          the visitor-day is, so a repeat check can be recognised and the string itself cannot be
-          recovered from it. The domain of a business you checked is kept as written, because it
-          is a business address in a public register.</p>
+        <p><b>The identifier you typed is stored as a one way hash</b>, salted the same way the
+          visitor-day is, so a repeat check can be recognised and the string itself cannot be
+          recovered from it. The one case where the name itself is also written down is the
+          surge described in section 04. The domain of a business you checked is kept as written,
+          because it is a business address in a public register.</p>
         <p><b>No natural person is kept.</b> Directors, officers, promoters, advisers and any other
           person named in a company record are refused at the point of writing, not hidden at the
           point of showing, and the database itself carries a constraint that rejects them. There
@@ -4989,7 +4994,38 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
 
       <div class="rp-dsec">
-        <h3><i>04</i>What we never keep, and how long we keep the rest</h3>
+        <h3><i>04</i>When one name is checked by a crowd</h3>
+        <p>A scam does not arrive quietly. It arrives as a great many ordinary people, none of whom
+          know each other, all typing the same name into this box inside a day or two. That pattern
+          is visible to us and to almost nobody else, and there is a real argument that we owe it to
+          the regulator who can act on it.</p>
+        <p><b>So we count.</b> Every check adds one to a tally kept against the hash of the
+          identifier, never against you. The tally is a number beside a string of characters that
+          nobody can read backwards into a name, and for the overwhelming majority of checks that
+          is all that is ever written.</p>
+        <p><b>Once a tally crosses a bar we have set in advance</b>, and only then, the name itself
+          is written down beside it, so that we can tell a regulator which name is spreading. The
+          bar is a level no ordinary business reaches by being looked up in the normal course of
+          things. Nothing is written before the bar is crossed, which means the early checks stay
+          unreadable even to us: we can name what is surging now, never who was searched last
+          month.</p>
+        <p><b>What is written is the name and the count, and nothing else.</b> Not who searched it,
+          not when any one person searched it, not how many people, not where they were. The tally
+          is kept in the store that holds business identifiers, which carries no visitor field of
+          any kind, and it is salted separately from the operations log, so the two cannot be put
+          back together by us or by anybody who obtained both.</p>
+        <p><b>A surge is not a finding, and we will never report it as one.</b> A name can surge
+          because it is in the news, because it advertised heavily, because it was acquired, or
+          because somebody set out to make it surge. What we can honestly say to a regulator is
+          the count and what the checks themselves returned, and that is all we will say. We do
+          not publish this list, and we do not sell it.</p>
+        <p>A name written this way is kept for <b>ninety days</b> from the last check that named
+          it, and then deleted, on the same job that clears everything else. It is deleted sooner
+          on request, under section 07.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>05</i>What we never keep, and how long we keep the rest</h3>
         <p><b>The identifier you searched, in the clear. The result the check returned. Any
           person's name.</b> None of the three is written anywhere, and the build refuses to ship
           if a column carrying one of them appears in either schema or if the write path stops
@@ -5013,7 +5049,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
 
       <div class="rp-dsec">
-        <h3><i>05</i>Where it is held, and who else sees it</h3>
+        <h3><i>06</i>Where it is held, and who else sees it</h3>
         <p>The service runs on infrastructure in Canada and the United States. The registers we
           query are third party bodies, mostly regulators and official registries, and querying
           one sends it the identifier you asked about, in the same way that opening its website
@@ -5023,7 +5059,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
 
       <div class="rp-dsec">
-        <h3><i>06</i>What you can ask us to do</h3>
+        <h3><i>07</i>What you can ask us to do</h3>
         <p>Under <a href="https://laws-lois.justice.gc.ca/eng/acts/P-8.6/" target="_blank"
           rel="noopener noreferrer">PIPEDA</a>, and under the Quebec, Alberta and British Columbia
           statutes where they apply, you can ask what we hold about you, ask for it to be
@@ -11519,7 +11555,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260905.0838";
+var KBYS_BUILD = "20260906.0525";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one

@@ -19,6 +19,11 @@ const stamp = d.toISOString().slice(0, 10).replace(/-/g, '') + '.' +
 for (const [file, re, make] of [
   ['index.html', /var KBYS_BUILD = "[^"]*";/, s => `var KBYS_BUILD = "${s}";`],
   ['api/check.js', /const BUILD = '[^']*';/, s => `const BUILD = '${s}';`],
+  /* The back office lamp that reads Page and API match compares these two. If
+     the stamper wrote only the consumer pair, that lamp would go red on every
+     deploy and mean nothing. */
+  ['admin.html', /var BUILD = "[^"]*";/, s => `var BUILD = "${s}";`],
+  ['api/admin-metrics.js', /const BUILD = '[^']*';/, s => `const BUILD = '${s}';`],
 ]) {
   const p = path.join(root, file);
   let t = fs.readFileSync(p, 'utf8');

@@ -33,16 +33,14 @@ if (!/<body[^>]*data-boot="1"/.test(fs.readFileSync(FILE, 'utf8')))
 const held = await p.evaluate(() => {
   document.body.setAttribute('data-boot', '1');
   const r = {
-    wrapVis: getComputedStyle(document.querySelector('.wrap')).visibility,
-    footVis: getComputedStyle(document.querySelector('footer')).visibility,
+    boardVis: getComputedStyle(document.getElementById('fit')).visibility,
     bootShown: getComputedStyle(document.getElementById('boot')).display
   };
   document.body.removeAttribute('data-boot');
   return r;
 });
 console.log('while it works out who you are:', JSON.stringify(held));
-if (held.wrapVis !== 'hidden') fail('the shell is visible before sign in resolves, which is the flash');
-if (held.footVis !== 'hidden') fail('the footer is visible before sign in resolves');
+if (held.boardVis !== 'hidden') fail('the board is visible before sign in resolves, which is the flash');
 if (held.bootShown === 'none') fail('there is nothing on screen while sign in resolves');
 
 await p.waitForTimeout(2200);
@@ -50,14 +48,16 @@ const after = await p.evaluate(() => ({
   boot: document.body.hasAttribute('data-boot'),
   gate: !document.getElementById('gate').hidden,
   note: (document.getElementById('gateNote').textContent || '').trim(),
-  panel: !document.getElementById('panel').hidden,
+  board: getComputedStyle(document.getElementById('fit')).visibility !== 'hidden'
+         && !document.getElementById('gate').hidden === false,
+  lamps: document.querySelectorAll('#board .pl').length,
   stayed: location.pathname.endsWith('admin.html')
 }));
 console.log('after Clerk fails to load:', JSON.stringify(after));
 if (after.boot) fail('the back office is stuck on its boot screen when Clerk cannot load');
 if (!after.gate) fail('nothing is shown when Clerk cannot load');
 if (!after.note) fail('the gate does not say why it cannot let anybody in');
-if (after.panel) fail('the operations panel opened without a sign in');
+if (after.lamps) fail('the board painted without a sign in');
 if (!after.stayed) fail('the back office navigated away from itself');
 
 /* And the redirect configuration, read off the page. */

@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:1500,height:1000},deviceScaleFactor:2});
+const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+await p.goto('file:///home/claude/out/backoffice-preview.html'); await p.waitForTimeout(1200);
+await p.click('[data-demo="trouble"]'); await p.waitForTimeout(900);
+await p.evaluate(()=>document.getElementById('mimic').closest('.card').scrollIntoView({block:'start'}));
+await p.waitForTimeout(500);
+await p.screenshot({path:'/tmp/m-flow.png',clip:{x:0,y:0,width:1500,height:700}});
+console.log('errors:',errs.length,errs[0]||'');
+await b.close();

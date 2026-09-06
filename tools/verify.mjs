@@ -14,6 +14,7 @@ import path from 'path';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const admin = fs.readFileSync(path.join(root, 'admin.html'), 'utf8');
+const metrics = fs.readFileSync(path.join(root, 'api/admin-metrics.js'), 'utf8');
 const script = (html.match(/<script[^>]*>([\s\S]*?)<\/script>/) || [])[1] || '';
 const fails = [];
 const warn = [];
@@ -1706,6 +1707,30 @@ if (!/id="waitForming"/.test(html))
     }
   }
 
+  /* THE PULSE AND THE NOTICE SAY THE SAME THING.
+     Section 04 promises a name is written only after a tally crosses a bar, is
+     never attached to a visitor, and is cleared at ninety days. Three promises,
+     three guards, because a notice that has drifted from the code is worse than
+     no notice at all. */
+  {
+    const st = fs.readFileSync(path.join(root, 'api/_store.js'), 'utf8');
+    if (/insert into search_pulse/.test(st)) {
+      if (!/const PULSE_LABEL_AT = /.test(st))
+        fails.push('the pulse writes names with no threshold declared, and the notice promises a bar');
+      if (!/row\.label == null && \(row\.n \| 0\) >= PULSE_LABEL_AT/.test(st))
+        fails.push('a name can be written to the pulse before the tally crosses the bar');
+      if (/search_pulse[\s\S]{0,400}visitor/.test(st))
+        fails.push('the pulse write touches a visitor field, and section 04 promises it never can');
+      if (!/When one name is checked by a crowd/.test(html))
+        fails.push('the pulse is being written and the privacy notice does not disclose it');
+      const ret = fs.readFileSync(path.join(root, 'db/retention.neon.sql'), 'utf8');
+      if (!/purge_pulse_labels/.test(ret))
+        fails.push('a pulse name is written with nothing to clear it at ninety days');
+      if (!/interval '90 days'/.test(ret))
+        fails.push('the pulse label clock is not the ninety days the notice promises');
+    }
+  }
+
   if (!/function rpSafeFail\(/.test(html))
     fails.push('the console has no gate between an upstream message and the words it prints as ours');
   if (!/g\.statement = rpSafeFail\(msg\)/.test(html))
@@ -2134,6 +2159,46 @@ if (!/data-boot/.test(admin))
   fails.push('the back office renders its shell before it knows whether anybody is signed in');
 if (/[\u2014\u2013]/.test(admin))
   fails.push('an em dash or en dash is present in the back office');
+
+/* ---------------------------------------- the back office reads live data
+   The board was a demo painting two sample objects for a day. Every one of the
+   guards below is a way it silently stopped being live, or stopped being
+   honest about what it could not see. */
+if (!/\/api\/admin-metrics\?days=/.test(admin))
+  fails.push('the back office does not call the metrics route, so it is drawing sample data');
+if (!/build=/.test(admin))
+  fails.push('the back office does not send its build stamp, so the page and API lamp cannot compare');
+if (!/function normalise\(/.test(admin))
+  fails.push('the row shapes the route returns are not normalised, so the charts will draw empty');
+for (const f of ['systems', 'registers', 'documents'])
+  if (!new RegExp("\\b" + f + "\\b").test(metrics))
+    fails.push('the metrics route does not return ' + f + ', so those lamps can never light');
+
+/* A class that sets display beats the hidden attribute. That put the sign in
+   gate on top of a board that had loaded perfectly well. */
+if (!/\[hidden\]\{display:none!important\}/.test(admin))
+  fails.push('the back office does not force hidden to none, so an overlay can sit on a working board');
+
+/* Two elements with one id is how the window selector and the chart container
+   collided, and the selector rendered as an empty pill. */
+{
+  const ids = [...admin.matchAll(/\sid="([A-Za-z0-9_-]+)"/g)].map(m => m[1]);
+  const dupe = ids.filter((v, i, a) => a.indexOf(v) !== i);
+  if (dupe.length) fails.push('the back office reuses an element id: ' + [...new Set(dupe)].join(', '));
+}
+
+/* Absent register health once fell through to green and drew ten answered
+   checks. A failure shown as a clean result is the only dishonest output this
+   product can make. */
+if (!/if\(!d\.registers\) return \{[^}]*s:"warn"/.test(admin))
+  fails.push('absent register health does not read amber in the back office, so it can draw a clean board from nothing');
+
+/* The evidence layer and the rule history were panels on the old page. They
+   are cards behind their own lamps now, and the heads have to survive. */
+if (!/head_hash/.test(admin))
+  fails.push('the chain head is not shown anywhere in the back office');
+if (!/d\.policy&&d\.policy\.history|policy\.history/.test(admin))
+  fails.push('the rule history is not shown anywhere in the back office');
 
 /* -------------------------------------- the register names real businesses
    In Canadian defamation the plaintiff does not have to prove falsity. Say
