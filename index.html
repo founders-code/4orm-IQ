@@ -309,7 +309,6 @@ body[data-stage="landing"] .searchbox{margin-top:26px;box-shadow:var(--sh-lg)}
   body[data-stage="landing"] .noteg{margin-top:30px;gap:10px}
   body[data-stage="landing"] .noteg .upnote{padding:14px 16px;font-size:11px;line-height:1.55}
   .docrow{margin-top:26px}
-  body[data-stage="landing"] .servedrow.on{margin-top:30px;padding-top:22px}
 }
 @media(max-width:400px){
   /* Clear of the fixed nav, which ends at 73 points. The headline was starting
@@ -323,24 +322,12 @@ body[data-stage="landing"] .searchbox{margin-top:26px;box-shadow:var(--sh-lg)}
   body[data-stage="landing"] .cbuse{font-size:12.8px;margin-top:12px}
   body[data-stage="landing"] .searchbox{margin-top:18px}
 }
-.servedrow{display:none}
 /* It sits at the foot now, under the disclaimer, so it reads as an instrument
    rather than a headline. Smaller, with air above it and a rule to separate it
    from the sentence it is evidence for. */
-body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justify-content:center;
-  gap:11px;margin:16px auto 0;padding-top:26px;max-width:34ch;
-  border-top:1px solid rgba(255,255,255,.055)}
-.servedn{font-family:var(--mono);font-size:clamp(21px,2.4vw,29px);font-weight:700;color:var(--ok);
-  letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 22px rgba(51,216,155,.26)}
-.servedl{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--tx-3)}
 /* Hidden with the attribute, not with display:none in the class. Clearing an
    inline style falls back to the stylesheet{font-size:9.5px;letter-spacing:.1em;color:var(--tx-4);margin-left:2px;
-  align-self:center}
-.servedn.tick{animation:servedtick .5s var(--spring)}
-@keyframes servedtick{0%{transform:translateY(5px) scale(.96);opacity:.5}100%{transform:none;opacity:1}}
-@media(prefers-reduced-motion:reduce){.servedn.tick{animation:none}}
+  align-self:center}100%{transform:none;opacity:1}}
 
 /* Two logos, and they are not interchangeable.
 
@@ -403,7 +390,6 @@ body[data-stage="landing"] .servedrow.on{display:flex;align-items:baseline;justi
    phone. Driven by an attribute on body, set when the thread opens and cleared
    when it resets, so nothing here can be reached by a stale inline style. */
 body[data-stage="landing"][data-chat="on"] .cbtitle,
-body[data-stage="landing"][data-chat="on"] .servedrow,
 body[data-stage="landing"][data-chat="on"] .regrow,
 body[data-stage="landing"][data-chat="on"] #lastRow,
 body[data-stage="landing"][data-chat="on"] .srwarn{display:none}
@@ -451,6 +437,16 @@ body[data-stage="report"] #room{display:none}   /* the report is a white documen
    light drifting over a table of figures is the one place the argument stops
    helping and starts being decoration. */
 body[data-stage="console"] #room{display:none}
+
+/* Invisible by opacity rather than display, because an element that is not
+   displayed cannot be pressed. It exists only where the lamp does. */
+.lampgo{
+  position:fixed;left:50%;top:28px;transform:translateX(-50%);
+  width:36px;height:36px;border-radius:50%;z-index:3;opacity:0;
+  -webkit-tap-highlight-color:transparent;
+}
+body[data-stage="report"] .lampgo,
+body[data-stage="console"] .lampgo{display:none}
 
 #room .lit{
   position:absolute;inset:0;
@@ -3754,6 +3750,16 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
   </div>
   <div class="walls"></div>
 </div>
+<!-- THE WAY IN, ON THE LAMP.
+     The light itself is untouched. This is a transparent hit area sitting on
+     the bulb, so an operator can reach the back office from the front page
+     without a staff door printed on a consumer screen. It is a sibling of the
+     room rather than a child of it, because the room is pointer-events:none
+     and hidden from assistive technology, and a link inside it could never be
+     pressed. It carries no label, is out of the tab order, and is silent to a
+     screen reader, because it is a convenience for one person rather than
+     navigation for a visitor. -->
+<a class="lampgo" href="admin.html" tabindex="-1" aria-hidden="true"></a>
 
 
 <!-- ====================================================================
@@ -4045,21 +4051,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <button type="button" data-doc="privacy">Privacy notice</button>
         </p>
 
-        <!-- Under the disclaimer, deliberately. The counter is evidence of the
-             claim above it, not a headline of its own: first what we do and
-             what we refuse to promise, then the odometer showing how often we
-             have done it.
-
-             Real or absent. It renders only when the engine returns a count off
-             the chained log, and shows nothing at all otherwise. Two earlier
-             words were both wrong. Nobody is a customer, the product is free and
-             has no accounts, and one person can run several checks, so a count
-             of checks is not a count of people served. The number is checks run,
-             because that is the number we can prove. -->
-        <div class="servedrow landing-only" id="servedRow" style="display:none">
-          <span class="servedn" id="servedN">0</span>
-          <span class="servedl" id="servedL">Checks run</span>
-        </div>
 
         <p class="upnote console-only"><b>Uploading a document or screenshot</b> lets us read the payment instructions and check whether the beneficiary matches the company you are being asked to trust. That is the check that saves the money. It is not enabled in this build.</p>
       </div>
@@ -8946,7 +8937,6 @@ function toResult(d,label){
   setReads(d.reads); setBars(d.bars,d.barFoot);
   if(d.stats) setStats(d.stats);
   id("auditRow").classList.toggle("on", !!d.cats);
-  if(LIVE) bumpServed();
   id("summaryBand").classList.add("on");
   id("verdictWrap").classList.add("on");
   renderSummaryRail(d);
@@ -9645,50 +9635,8 @@ id("sumDownload").addEventListener("click", function(){ sumDownloadDoc("full"); 
 id("sumDownloadPlain").addEventListener("click", function(){ sumDownloadDoc("plain"); });
 
 
-/* ------------------------------------------------------------------ *
- * CUSTOMERS SERVED
- *
- * One number, counted from the runs table, back to the first check this engine
- * ever ran. It goes up by one every time somebody runs a check.
- *
- * If the engine cannot give a real number, the counter does not appear. There
- * is no seed value, no estimate and nothing that climbs on a timer. A counter
- * that invents its own number is Rule Zero with a nicer font, and this product
- * only works if every figure on it is one somebody could audit.
- * ------------------------------------------------------------------ */
-var SERVED = null;
 
-function paintServed(n, animate){
-  if(typeof n !== "number" || !isFinite(n) || n < 0) return;
-  SERVED = n;
-  var row=id("servedRow"), el2=id("servedN");
-  if(!row || !el2) return;
-  el2.textContent = n.toLocaleString("en-CA");
-  row.style.display="";
-  row.classList.add("on");
-  if(animate){
-    el2.classList.remove("tick");
-    void el2.offsetWidth;
-    el2.classList.add("tick");
-  }
-}
 
-function loadServed(){
-  if(!window.fetch) return;
-  /* This runs while the page is still evaluating. A counter must never be able
-     to take the page down, so a synchronous throw out of fetch is caught here
-     as well as the async rejection. Worst case there is no counter. */
-  try{
-    fetch("/api/counter", { headers:{ "Accept":"application/json" } })
-      .then(function(r){ return r && r.ok ? r.json() : null; })
-      .then(function(j){
-        /* available:false means we have no real number. Say nothing at all. */
-        if(!j || !j.available || typeof j.checks !== "number") return;
-        paintServed(j.checks, false);
-      })
-      .catch(function(){ /* no number, no counter */ });
-  }catch(e){ /* no number, no counter */ }
-}
 
 /* ------------------------------------------------------------------ *
  * THE NETWORK ON THE WAITING SCREEN
@@ -9977,11 +9925,7 @@ function netStop(keepRing){
 
 /* Every completed check is one more. The server is the source of truth, and
    this is the optimistic step so the reader sees their own run land. */
-function bumpServed(){
-  if(typeof SERVED === "number") paintServed(SERVED + 1, true);
-}
 
-loadServed();
 
 /* ---- audit report ---- */
 var arScrim=id("arScrim"), arBox=id("arBox"), arBody=id("arBody");
@@ -11555,7 +11499,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260906.0525";
+var KBYS_BUILD = "20260906.0638";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one

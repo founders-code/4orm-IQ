@@ -14,6 +14,7 @@ import path from 'path';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const admin = fs.readFileSync(path.join(root, 'admin.html'), 'utf8');
+const eviPage = fs.readFileSync(path.join(root, 'evidence.html'), 'utf8');
 const metrics = fs.readFileSync(path.join(root, 'api/admin-metrics.js'), 'utf8');
 const script = (html.match(/<script[^>]*>([\s\S]*?)<\/script>/) || [])[1] || '';
 const fails = [];
@@ -332,11 +333,28 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
      style: the style falls back to the class and it stays invisible while every
      line around it looks right. This shipped once. Toggle visibility with the
      hidden attribute, and let the class style only the look. */
-  if (/\.servedh\{[^}]*display:none/.test(html))
-    fails.push('the chain head is hidden by a class rule, so it can never be shown');
-  if (/id\("servedH"\)[\s\S]{0,220}style\.display\s*=\s*""/.test(html))
-    fails.push('the chain head is un-hidden by clearing an inline style, which does not work '
-      + 'when a class rule sets display:none');
+  /* The counter came off the landing page. It is guarded as absent rather than
+     deleted quietly, so it cannot drift back without somebody deciding to. */
+  if (/id="served(Row|N|L|H)"/.test(html))
+    fails.push('the checks-run counter is back on the landing page');
+  if (/\bbumpServed\b|\bpaintServed\b|\bloadServed\b/.test(html))
+    fails.push('the counter script is back on the landing page');
+
+  /* The way into the back office from the landing is a transparent hit area over
+     the light. It has to stay invisible, stay pressable, and stay out of the way
+     of anybody reading the page with assistive technology. */
+  if (!/class="lampgo" href="admin\.html"/.test(html))
+    fails.push('the quiet way into the back office is gone from the lamp');
+  if (!/^\.lampgo\{[^}]*opacity:0/m.test(html))
+    fails.push('the back office hit area is no longer invisible');
+  /* the stage-scoped rule that hides it on the report and the console is
+     correct and has to be allowed. Only the base rule is checked. */
+  if (/^\.lampgo\{[^}]*display:none/m.test(html))
+    fails.push('the back office hit area is display:none, so it cannot be pressed');
+  if (!/class="lampgo"[^>]*aria-hidden="true"/.test(html))
+    fails.push('the back office hit area is announced to screen readers');
+  if (!/class="lampgo"[^>]*tabindex="-1"/.test(html))
+    fails.push('the back office hit area is in the tab order of a consumer page');
 
   /* ---------------------------------------------------------------- *
      THE HASH SCHEMA, AND THE RULE RECORD
@@ -444,8 +462,6 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   if (!/var LIVE = !\/\[\?&\]demo=1/.test(html))
     fails.push('the console no longer runs live by default, so a visitor sent the bare '
       + 'link gets the seeded corpus instead of a check');
-  if (!/if\(LIVE\) bumpServed\(\);/.test(html))
-    fails.push('the demo can move the public counter');
 
   /* Auth fails closed, and identity is not authorisation. */
   if (!/if \(!secret\) return \{ ok: false, status: 503/.test(auth))
@@ -2199,6 +2215,29 @@ if (!/head_hash/.test(admin))
   fails.push('the chain head is not shown anywhere in the back office');
 if (!/d\.policy&&d\.policy\.history|policy\.history/.test(admin))
   fails.push('the rule history is not shown anywhere in the back office');
+
+/* ------------------------------------------------------------ the map page
+   The page a partner is shown in a room. It carries the three points where the
+   intelligence sits, and the one distinction that page exists to make: the
+   intake is a conversation built on motivational interviewing, not a chatbot. */
+if (!/href="evidence\.html"/.test(admin))
+  fails.push('there is no way to reach the map from the back office');
+if (!/href="admin\.html"/.test(eviPage))
+  fails.push('the map has no way back to the back office');
+for (const id of ['intake', 'read', 'corpus'])
+  if (!new RegExp('id:"' + id + '"[^}]*ai:').test(eviPage))
+    fails.push('the map no longer marks ' + id + ' as one of the intelligence points');
+if (!/motivational interviewing/i.test(eviPage))
+  fails.push('the map no longer says what the intake is built on');
+if (!/not a chatbot/i.test(eviPage))
+  fails.push('the map no longer draws the distinction from a chatbot');
+if (!/single trust score/i.test(eviPage))
+  fails.push('the map no longer states that there is no single trust score');
+if (!/silence is never clearance|silence read as a clean/i.test(eviPage))
+  fails.push('the map no longer states that a silent register is not a clean result');
+if (/[\u2014\u2013]/.test(eviPage))
+  fails.push('an em dash or en dash is present in the map page');
+
 
 /* -------------------------------------- the register names real businesses
    In Canadian defamation the plaintiff does not have to prove falsity. Say

@@ -1,0 +1,748 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ · The evidence scaffolding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* ==================================================== THE EVIDENCE SCAFFOLDING
+   One page that answers the question a partner asks in the room: how does any
+   of this connect to 4orm. It is a map you can press rather than a deck you
+   read, because the point being made is that three different audiences read
+   the same single record, and that is easier to show than to say.
+
+   House tokens, from the 4orm web design standard. Blue is the product. Gold
+   is the human annotation. Green, amber and red are status and nothing else. */
+:root{
+  --bg:#FFFFFF; --bg-2:#F7F9FC; --bg-3:#EFF3F9;
+  --surface:#FFFFFF; --surface-2:#F4F7FB; --surface-3:#EAEFF6;
+  --border:#E6EBF3; --border-strong:#CCD6E4;
+  --tx:#142036; --tx-2:#46556E; --tx-3:#5E6E88;
+  --blue:#2E6BF2; --blue-lt:#5B8CFF; --blue-dp:#1B4ABE;
+  --blue-50:#EAF1FE; --blue-100:#CFE0FD;
+  --gold:#E7C76C; --gold-dp:#C49A3A; --gold-50:#FBF3DC;
+  --ok:#0E8A5F; --ok-bg:#E3F6EE; --ok-br:#9CCFBB;
+  --warn:#8F5C12; --warn-bg:#FBF1DC; --warn-br:#E2C88B;
+  --bad:#D6334E; --bad-bg:#FCE6EA; --bad-br:#EBB6C0;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --r-sm:12px; --r:18px; --r-lg:26px;
+  --sh-sm:0 1px 2px rgba(16,32,64,.05);
+  --sh:0 10px 34px rgba(16,32,64,.08);
+  --sh-lg:0 28px 70px rgba(16,32,64,.14);
+  --spring:cubic-bezier(.32,.72,0,1);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font:15px/1.6 var(--sans);
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1220px;margin:0 auto;padding:0 28px}
+
+/* ------------------------------------------------------------------- top */
+.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topin{max-width:1220px;margin:0 auto;padding:14px 28px;display:flex;
+  align-items:center;gap:18px}
+.brand{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--tx)}
+.brand b{color:var(--blue)}
+.topsp{flex:1}
+.btn{appearance:none;border:1px solid var(--border-strong);background:var(--surface);
+  color:var(--tx-2);border-radius:99px;padding:9px 17px;font:inherit;font-size:13px;
+  font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;
+  align-items:center;gap:8px;transition:all .2s var(--ease)}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.pri:hover{background:var(--blue-dp);border-color:var(--blue-dp);color:#fff}
+
+/* ------------------------------------------------------------------ hero */
+.hero{padding:64px 0 34px}
+.kick{font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold-dp);margin-bottom:16px}
+h1{font-size:clamp(34px,4.6vw,58px);font-weight:800;letter-spacing:-.035em;
+  line-height:1.05;text-wrap:balance;max-width:20ch}
+h1 em{font-style:normal;color:var(--blue)}
+.lede{margin-top:20px;font-size:clamp(16px,1.6vw,19px);line-height:1.6;color:var(--tx-2);
+  max-width:62ch;text-wrap:balance}
+
+/* ------------------------------------------------------------- the parties */
+.parties{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:38px}
+.party{border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;
+  background:var(--surface-2)}
+.party .n{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--blue)}
+.party h3{margin-top:9px;font-size:17px;font-weight:700;letter-spacing:-.015em}
+.party p{margin-top:7px;font-size:13.5px;line-height:1.55;color:var(--tx-2)}
+
+/* --------------------------------------------------------------- the map */
+.mapsec{padding:52px 0 0;scroll-margin-top:78px}
+.maphd{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.maphd h2{font-size:clamp(24px,2.6vw,32px);font-weight:800;letter-spacing:-.03em}
+.maphd p{font-size:14px;color:var(--tx-3);max-width:52ch}
+.mapbox{scroll-margin-top:78px;border:1px solid var(--border);border-radius:var(--r-lg);background:
+  linear-gradient(180deg,var(--surface),var(--bg-2));padding:20px;box-shadow:var(--sh)}
+.mapbox svg{width:100%;height:auto;display:block}
+
+.lane{fill:var(--bg-3);stroke:none}
+.lanelab{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.2em;
+  fill:var(--tx-3);text-transform:uppercase}
+.nb{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.4;
+  transition:fill .2s var(--ease),stroke .2s var(--ease)}
+.nd{cursor:pointer}
+.nd:hover .nb{stroke:var(--blue);fill:var(--blue-50)}
+.nd.on .nb{stroke:var(--blue);stroke-width:2.4;fill:var(--blue-50)}
+.nd.lit .nb{stroke:var(--blue);stroke-width:2.4;fill:#fff;
+  filter:drop-shadow(0 6px 20px rgba(46,107,242,.32))}
+.nt{font-family:var(--sans);font-size:14px;font-weight:700;fill:var(--tx);
+  letter-spacing:-.01em;pointer-events:none}
+.ns{font-family:var(--sans);font-size:11.5px;fill:var(--tx-3);pointer-events:none}
+.nk{font-family:var(--mono);font-size:8.5px;font-weight:800;letter-spacing:.16em;
+  fill:var(--tx-3);text-transform:uppercase;pointer-events:none}
+
+/* the intelligence nodes wear the one visual difference on the map */
+.nd.ai .nb{stroke:var(--blue);stroke-width:1.8;fill:var(--blue-50)}
+.nd.ai:hover .nb,.nd.ai.on .nb{fill:#DCE8FE}
+.nd.ai .nt{fill:var(--blue-dp)}
+.nd.ai .nk{fill:var(--blue)}
+.aibadge{fill:var(--blue)}
+.aibadget{font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:.14em;
+  fill:#fff;pointer-events:none}
+
+.pp{fill:none;stroke:var(--border-strong);stroke-width:2;stroke-linecap:round}
+.pp.hot{stroke:var(--blue);stroke-width:2.6}
+.frame{fill:none;stroke:var(--border-strong);stroke-width:1;stroke-dasharray:5 6}
+.chip{fill:var(--surface-3);stroke:var(--border);stroke-width:1}
+.chipt{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.06em;
+  fill:var(--tx-2);pointer-events:none}
+.slab{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.18em;
+  fill:var(--tx-3);text-transform:uppercase;pointer-events:none}
+
+/* ------------------------------------------------------------- the reader */
+.read{margin-top:18px;border:1px solid var(--border);border-radius:var(--r);
+  background:var(--surface);box-shadow:var(--sh-sm);overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1fr) 300px}
+@media(max-width:900px){.read{grid-template-columns:1fr}}
+.readmain{padding:24px 26px 26px}
+.readmain .k{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--blue)}
+.readmain h3{margin-top:8px;font-size:22px;font-weight:800;letter-spacing:-.025em}
+.readmain .body{margin-top:12px;font-size:15px;line-height:1.62;color:var(--tx-2);
+  max-width:62ch}
+.readmain .body p + p{margin-top:11px}
+.rail{border-left:1px solid var(--border);background:var(--bg-2);padding:24px 22px}
+.rail .k{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold-dp)}
+.rail ul{margin-top:11px;list-style:none;display:grid;gap:10px}
+.rail li{font-size:13px;line-height:1.5;color:var(--tx-2);padding-left:15px;position:relative}
+.rail li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;
+  border-radius:2px;background:var(--gold)}
+.never{margin-top:16px;padding:13px 15px;border-radius:var(--r-sm);
+  background:var(--bad-bg);border:1px solid var(--bad-br)}
+.never .k{color:var(--bad)}
+.never p{margin-top:7px;font-size:12.5px;line-height:1.5;color:#7C1F30}
+
+/* -------------------------------------------------------------- the walk */
+.walk{display:flex;align-items:center;gap:14px;margin-top:16px;padding:14px 18px;
+  border:1px solid var(--border);border-radius:var(--r);background:var(--surface-2)}
+.walk .step{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx-3);white-space:nowrap}
+.walk .cap{flex:1;font-size:14.5px;color:var(--tx);line-height:1.5}
+.walk .cap b{color:var(--blue-dp)}
+
+/* -------------------------------------------------------------- sections */
+.sec{padding:76px 0 0}
+.sec h2{font-size:clamp(24px,2.6vw,32px);font-weight:800;letter-spacing:-.03em;
+  text-wrap:balance;max-width:26ch}
+.sec .sub{margin-top:12px;font-size:16px;line-height:1.6;color:var(--tx-2);max-width:64ch}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+@media(max-width:900px){.grid3,.parties{grid-template-columns:1fr}}
+.card{border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;
+  background:var(--surface);box-shadow:var(--sh-sm)}
+.card .k{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--blue)}
+.card h3{margin-top:9px;font-size:17.5px;font-weight:700;letter-spacing:-.018em}
+.card p{margin-top:9px;font-size:13.5px;line-height:1.58;color:var(--tx-2)}
+
+/* the conversation sample, which is the whole argument for the intake */
+.conv{margin-top:26px;border:1px solid var(--border);border-radius:var(--r-lg);
+  background:var(--surface);box-shadow:var(--sh);overflow:hidden}
+.convhd{padding:15px 22px;border-bottom:1px solid var(--border);background:var(--bg-2);
+  display:flex;align-items:center;gap:12px}
+.convhd .k{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--tx-3)}
+.convbody{padding:22px;display:grid;gap:12px;max-width:760px}
+.msg{display:flex;gap:12px;align-items:flex-start}
+.msg .who{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--tx-3);width:56px;flex:0 0 auto;padding-top:9px}
+.msg .b{padding:11px 15px;border-radius:14px;font-size:14.5px;line-height:1.55;
+  background:var(--surface-3);color:var(--tx)}
+.msg.iq .b{background:var(--blue-50);color:var(--tx);border:1px solid var(--blue-100)}
+.msg .note{margin-top:6px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--gold-dp)}
+
+table.map{width:100%;border-collapse:collapse;margin-top:22px}
+table.map th{text-align:left;font-family:var(--mono);font-size:9.5px;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3);
+  padding:0 14px 10px 0;border-bottom:1px solid var(--border-strong)}
+table.map td{padding:13px 14px 13px 0;border-bottom:1px solid var(--border);
+  font-size:13.5px;line-height:1.55;color:var(--tx-2);vertical-align:top}
+table.map td:first-child{font-weight:700;color:var(--tx);width:22%}
+
+footer{margin-top:88px;padding:30px 0 60px;border-top:1px solid var(--border)}
+footer p{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--tx-3);
+  text-transform:uppercase}
+</style></head><body>
+
+<header class="top"><div class="topin">
+  <span class="brand">4orm <b>IQ</b></span>
+  <span class="topsp"></span>
+  <a class="btn" href="admin.html">Back to operations</a>
+  <button class="btn pri" type="button" id="play">Follow one check</button>
+</div></header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="kick">The evidence scaffolding</div>
+    <h1>One check. One record. <em>Three audiences read it.</em></h1>
+    <p class="lede">A person about to send money, the business they are sending it to, and
+      the regulator who may ask about it later all need different things from the same
+      moment. 4orm builds that moment once, records it in a way that cannot be edited
+      afterwards, and lets all three read it. This page is that structure, drawn.</p>
+
+    <div class="parties">
+      <div class="party"><div class="n">Consumer</div>
+        <h3>Am I about to make a mistake</h3>
+        <p>Wants to know what the public record actually holds about the party in front of
+           them, in words they can act on, before the money moves.</p></div>
+      <div class="party"><div class="n">Company</div>
+        <h3>What does the record say about us</h3>
+        <p>Wants to see what was found, where it came from, and to correct it if it is
+           wrong or out of date.</p></div>
+      <div class="party"><div class="n">Regulator</div>
+        <h3>Show me it happened that way</h3>
+        <p>Wants proof a check ran, which rules were in force at the time, which registers
+           were asked, and what was deleted when.</p></div>
+    </div>
+  </section>
+
+  <section class="mapsec">
+    <div class="maphd">
+      <div>
+        <h2>The map</h2>
+        <p>Press any part of it. The intelligence sits at three points, and they are the
+           blue ones.</p>
+      </div>
+    </div>
+
+    <div class="mapbox" id="mapbox"></div>
+
+    <div class="walk" id="walk" hidden>
+      <span class="step" id="walkStep"></span>
+      <span class="cap" id="walkCap"></span>
+      <button class="btn" type="button" id="walkStop">Stop</button>
+    </div>
+
+    <div class="read">
+      <div class="readmain">
+        <div class="k" id="rk"></div>
+        <h3 id="rt"></h3>
+        <div class="body" id="rb"></div>
+      </div>
+      <div class="rail">
+        <div class="k" id="rlk">What it produces</div>
+        <ul id="rl"></ul>
+        <div class="never" id="rn" hidden>
+          <div class="k">What it never does</div>
+          <p id="rnp"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script>
+/* ============================================================== THE MAP
+   Drawn once from a node table, so the picture and the explanations behind it
+   cannot drift apart. Pressing a node fills the reader underneath rather than
+   opening a modal, because this page is narrated out loud in a room and a
+   modal makes the speaker close something before they can carry on. */
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+
+var MW=1300, MH=706;
+
+var NODES=[
+  /* the ask */
+  {id:"person", x:20,  y:44,  w:236,h:84, k:"The consumer",  t:"A person",
+   s:"about to send money"},
+  {id:"intake", x:288, y:44,  w:306,h:84, k:"4orm IQ",       t:"The intake",
+   s:"conversational discovery", ai:"AI 1"},
+  {id:"gate",   x:626, y:44,  w:182,h:84, k:"Gate",          t:"The gate",
+   s:"a person is refused"},
+  {id:"route",  x:840, y:44,  w:182,h:84, k:"Scope",         t:"Routing",
+   s:"which registers apply"},
+  /* the evidence */
+  {id:"regs",   x:288, y:196, w:734,h:158,k:"Retrieval",     t:"121 registers, in ten checks",
+   s:"asked together, every answer kept with the page it came from", wide:1},
+  {id:"pages",  x:1054,y:196, w:226,h:112,k:"Supply",        t:"Where the pages come from",
+   s:"search, direct feeds, objectives"},
+  /* the intelligence */
+  {id:"read",   x:288, y:414, w:330,h:104,k:"4orm IQ",       t:"The reading",
+   s:"one pass, no searching", ai:"AI 2"},
+  {id:"corpus", x:650, y:414, w:330,h:104,k:"4orm IQ",       t:"The pattern layer",
+   s:"signals no register holds", ai:"AI 3"},
+  {id:"record", x:1012,y:414, w:268,h:104,k:"Proof",         t:"The record",
+   s:"hashed, and provable later"},
+  /* who reads it */
+  {id:"outc",   x:20,  y:560, w:400,h:118,k:"Read by",       t:"The consumer",
+   s:"what the registers hold, in words they can act on"},
+  {id:"outco",  x:450, y:560, w:400,h:118,k:"Read by",       t:"The company",
+   s:"the same finding, and a route to correct it"},
+  {id:"outreg", x:880, y:560, w:400,h:118,k:"Read by",       t:"The regulator",
+   s:"proof it ran, under which rules, against which registers"}
+];
+
+var INFO={
+  person:{k:"Where it starts", t:"A person about to send money",
+    body:["Somebody is one press away from a payment they cannot get back, and they are not "
+         +"sure they understand it. That is the whole moment this product exists inside.",
+          "They are usually short of time, often slightly ashamed of not knowing, and rarely "
+         +"able to say precisely what is worrying them. So the product does not open with a "
+         +"search box and wait."],
+    rail:["A company name, a website, an email address or a wallet address",
+          "In their own words, not in a form"],
+    never:"It never accepts a person's name. That is refused at the gate, in code, and it is "
+         +"the boundary the whole assessment is built on."},
+
+  intake:{k:"Intelligence · one", t:"The intake, and why it is not a chatbot",
+    body:["4orm IQ finds out what is actually happening before anything is checked. It is "
+         +"built on motivational interviewing, the discipline made for helping somebody think "
+         +"clearly about a consequential decision without pushing them.",
+          "Open questions that begin with what or how, never why, because why makes a person "
+         +"defend themselves instead of telling you what happened. Roughly twice as many "
+         +"reflections as questions, so it is a conversation rather than an interrogation. "
+         +"And an affirmation when somebody admits they do not know, because that is the "
+         +"bravest thing anybody says in the exchange.",
+          "A chatbot waits to be asked. This asks, because the person often does not yet know "
+         +"which of the four things in front of them is the one that matters."],
+    rail:["What is going on?", "So the part that worries you is…",
+          "Let me make sure I have this right. What did I miss?",
+          "One check, correctly scoped"],
+    never:"It never creates urgency, never flatters, and never tells anybody what to do. It "
+         +"is trying to restore a sense of control, not to sell a decision."},
+
+  gate:{k:"The boundary", t:"The gate",
+    body:["Every ask is tested before it is allowed to run. Anything that reads as a person "
+         +"rather than a party to a transaction is refused, and so is anything outside the "
+         +"jurisdictions this product operates in.",
+          "A high count here is the gate working rather than an error. It is the single "
+         +"control that keeps this a transaction evidence service and stops it becoming a "
+         +"people-screening service, and it is enforced in code rather than in a policy."],
+    rail:["Refusals, counted and recorded", "The reason, shown to the person"],
+    never:"It never searches a person, assigns a reputation, or answers a question about "
+         +"somebody's character."},
+
+  route:{k:"Scope", t:"Routing",
+    body:["The sector and the jurisdiction decide which of the 121 registers could hold a "
+         +"record for this particular party. An Australian licence register does not lower "
+         +"coverage on a Canadian issuer with no Australian activity, because it could never "
+         +"have held a record in the first place.",
+          "Coverage is always measured against what applied, never against the whole "
+         +"catalogue. Which is also why a run cites the rulebook version it ran under."],
+    rail:["The applicable set for this party","The rulebook version in force at that moment"],
+    never:""},
+
+  regs:{k:"Retrieval", t:"121 registers, asked together",
+    body:["Company registries, licence registers, enforcement and caution lists, court and "
+         +"insolvency records, domain and certificate records, payment and chain records, and "
+         +"the dates a party claims about itself.",
+          "They run in parallel off one plan, and nothing is read or assessed until every one "
+         +"of them has come back or failed. Every answer is kept with the page it was read "
+         +"from, which is what lets a finding carry its provenance all the way through to a "
+         +"regulator months later."],
+    rail:["Ten checks: identity, licensing, enforcement, people, legal, web, reviews, "
+         +"payment, 4orm's own corpus, claim dates",
+          "Each answer, with its source page","What could not be reached, named"],
+    never:"No register in the catalogue is allowed to have its silence read as a clean "
+         +"result. A register that could not be reached is reported as exactly that."},
+
+  pages:{k:"Supply", t:"Where the pages come from",
+    body:["Some registers are called directly through their own interface. Some are reached "
+         +"by a search pinned to that register's own domain. Some questions span several "
+         +"pages and are handled as a research objective rather than a lookup.",
+          "Two independent providers, so one of them failing is a slower check rather than "
+         +"no check."],
+    rail:["Direct feeds where one exists","Pinned search where one does not",
+          "Objectives where the answer spans pages"],
+    never:""},
+
+  read:{k:"Intelligence · two", t:"The reading",
+    body:["One pass over everything that came back. It reads the evidence, forms the "
+         +"assessment, and attaches the provenance to every line of it.",
+          "It has no authority to search. If it wanted more evidence it would have to say so "
+         +"rather than go and get it, and that is not a limitation to work around. It is what "
+         +"keeps the coverage figure honest, because coverage is counted from the retrieval "
+         +"log rather than asserted by the step that would benefit from asserting it.",
+          "When this step fails, the pages were still read. The person is shown what was "
+         +"reached and told plainly that there is no assessment, rather than being handed a "
+         +"clean result drawn out of silence."],
+    rail:["A finding, in plain words","Identity confidence","Evidence coverage",
+          "What could not be reached"],
+    never:"It never produces a single trust score. Identity confidence and evidence coverage "
+         +"answer different questions, so they are shown apart and never combined."},
+
+  corpus:{k:"Intelligence · three", t:"The pattern layer",
+    body:["The same wallet under four company names. The same nameserver as a party that was "
+         +"acted against last month. A proposal document uploaded under two different brands. "
+         +"A name being checked five hundred times today that no register has ever heard of.",
+          "None of this exists inside any single register. It exists between them, and only "
+         +"because 4orm keeps its own corpus of what it has seen. This is where the compliance "
+         +"intelligence actually lives, and it is the part that gets stronger with every "
+         +"check that runs.",
+          "It is also the earliest warning anybody gets. A surge against a name with no "
+         +"registration, no filings and a domain three weeks old is what a new scam looks like "
+         +"from the inside, weeks before a regulator has anything to publish."],
+    rail:["Identifier and wallet reuse","Infrastructure and certificate clusters",
+          "Document fingerprints","Search surge against an unknown name"],
+    never:"It never builds a persistent record about a person. The corpus holds entities, "
+         +"infrastructure and documents, and it is kept in a separate store from the "
+         +"operations log, salted differently, so the two cannot be joined."},
+
+  record:{k:"Proof", t:"The record",
+    body:["Every run is a row, and every row carries the hash of the one before it. Alter a "
+         +"row after the fact and every hash after it stops matching.",
+          "That is what turns a number on a page into a number somebody outside the company "
+         +"can check. It is also what lets the same record be handed to a consumer, a company "
+         +"and a regulator without any of them having to take our word for the version they "
+         +"were given."],
+    rail:["A reference number the person keeps","The row, and every row that depends on it",
+          "The rulebook version in force at the time"],
+    never:"It never stores what was typed or who a check was about. There is no column for "
+         +"it in the operations schema and there will not be one."},
+
+  outc:{k:"Read by", t:"The consumer",
+    body:["What the registers hold, where each thing came from, and what could not be "
+         +"reached. Then the decision is handed back to them.",
+          "The two numbers are shown apart. There is no verdict about a person, no score, and "
+         +"no instruction. What it buys is that somebody who is about to be defrauded gets "
+         +"the one fact that changes their mind, in time to act on it."],
+    rail:["The finding, in plain words","A link to every page it was read from",
+          "What was not reachable, named","A reference number"],
+    never:""},
+
+  outco:{k:"Read by", t:"The company",
+    body:["A business that has been checked can see what was found, where it came from, and "
+         +"the wording as it was published.",
+          "That matters for two reasons. A public record that is wrong or out of date has "
+         +"somewhere to be corrected rather than only somewhere to be complained about. And a "
+         +"business that comes back clean has something it can show a counterparty, which is "
+         +"the side of this that is worth money to them rather than to us."],
+    rail:["The same finding, and the same links","The published wording, so a correction has "
+         +"something to point at","The same reference number the consumer holds"],
+    never:""},
+
+  outreg:{k:"Read by", t:"The regulator",
+    body:["Proof that a check ran, when, which rules were in force at that moment, which "
+         +"registers were asked, which answered, and what was deleted on which day.",
+          "This is the reason the architecture looks the way it does. Everything upstream is "
+         +"arranged so that this conversation is a matter of handing over a record rather "
+         +"than reconstructing one, and so that the record says the same thing it said to the "
+         +"person who paid for it."],
+    rail:["The hashed row, and the chain around it","The rulebook version and its history",
+          "The applicable register set","Deletion evidence, day by day",
+          "A surge with no register behind it, early"],
+    never:""}
+};
+
+/* ------------------------------------------------------------ draw it once */
+function draw(){
+  var pipes=[
+    ["person","intake","h"],["intake","gate","h"],["gate","route","h"],
+    ["route","regs","down"],["pages","regs","left"],
+    ["regs","read","down"],["corpus","read","left"],
+    ["read","record","h2"],
+    ["record","outc","fan"],["record","outco","fan"],["record","outreg","fan"]
+  ];
+  var by={}; NODES.forEach(function(n){by[n.id]=n;});
+  var P="";
+  pipes.forEach(function(p){
+    var A=by[p[0]], B=by[p[1]], d;
+    if(p[2]==="h"){ d="M"+(A.x+A.w)+" "+(A.y+A.h/2)+" L"+B.x+" "+(B.y+B.h/2); }
+    else if(p[2]==="down"){ var x=A.x+A.w/2; d="M"+x+" "+(A.y+A.h)+" L"+x+" "+B.y; }
+    else if(p[2]==="left"){ d="M"+A.x+" "+(A.y+A.h/2)+" L"+(B.x+B.w)+" "+(B.y+B.h/2); }
+    else if(p[2]==="h2"){ d="M"+(A.x+A.w)+" "+(A.y+A.h/2)+" L"+B.x+" "+(B.y+B.h/2); }
+    else { var sx=A.x+A.w/2, sy=A.y+A.h, tx=B.x+B.w/2, ty=B.y, my=(sy+ty)/2;
+           d="M"+sx+" "+sy+" C"+sx+" "+my+" "+tx+" "+my+" "+tx+" "+ty; }
+    P+='<path class="pp" data-from="'+p[0]+'" data-to="'+p[1]+'" d="'+d+'"/>';
+  });
+
+  /* the ten checks, drawn inside the retrieval block so the block is a thing
+     with contents rather than a label */
+  var CHECKS=["Identity","Licensing","Enforcement","People","Legal",
+              "Web","Reviews","Payment","4orm corpus","Claim dates"];
+  var r=by.regs, cw=(r.w-40-4*9)/5, chips="";
+  CHECKS.forEach(function(c,i){
+    var col=i%5, row=(i-col)/5;
+    var x=r.x+20+col*(cw+9), y=r.y+80+row*30;
+    chips+='<rect class="chip" x="'+x.toFixed(1)+'" y="'+y+'" width="'+cw.toFixed(1)
+      +'" height="24" rx="7"/>'
+      +'<text class="chipt" x="'+(x+cw/2).toFixed(1)+'" y="'+(y+16)+'" text-anchor="middle">'
+      +esc(c)+'</text>';
+  });
+
+  var boxes=NODES.map(function(n){
+    var g='<g class="nd'+(n.ai?" ai":"")+'" data-id="'+n.id+'" tabindex="0" role="button">'
+      +'<rect class="nb" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="14"/>'
+      +'<text class="nk" x="'+(n.x+20)+'" y="'+(n.y+26)+'">'+esc(n.k)+'</text>'
+      +'<text class="nt" x="'+(n.x+20)+'" y="'+(n.y+50)+'">'+esc(n.t)+'</text>'
+      +'<text class="ns" x="'+(n.x+20)+'" y="'+(n.y+70)+'">'+esc(n.s)+'</text>';
+    if(n.ai){
+      var bw=48, bx=n.x+n.w-bw-14;
+      g+='<rect class="aibadge" x="'+bx+'" y="'+(n.y+13)+'" width="'+bw+'" height="17" rx="8"/>'
+       + '<text class="aibadget" x="'+(bx+bw/2)+'" y="'+(n.y+25)+'" text-anchor="middle">'
+       + esc(n.ai)+'</text>';
+    }
+    return g+'</g>';
+  }).join("");
+
+  document.getElementById("mapbox").innerHTML =
+    '<svg viewBox="0 0 '+MW+' '+MH+'" role="img" '
+    +'aria-label="How one check is built, recorded, and read by three audiences">'
+    +'<text class="slab" x="20" y="28">The ask</text>'
+    +'<text class="slab" x="288" y="184">The evidence</text>'
+    +'<text class="slab" x="288" y="402">The intelligence, and the proof</text>'
+    +'<text class="slab" x="20" y="546">Who reads it</text>'
+    +P+boxes+chips+'</svg>';
+
+  document.querySelectorAll(".nd").forEach(function(g){
+    var id=g.getAttribute("data-id");
+    g.addEventListener("click",function(){ pick(id); });
+    g.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(id); } });
+  });
+}
+
+/* --------------------------------------------------------------- the reader */
+function pick(id){
+  var d=INFO[id]; if(!d) return;
+  document.querySelectorAll(".nd").forEach(function(g){
+    g.classList.toggle("on", g.getAttribute("data-id")===id); });
+  document.getElementById("rk").textContent=d.k;
+  document.getElementById("rt").textContent=d.t;
+  document.getElementById("rb").innerHTML=d.body.map(function(p){
+    return "<p>"+esc(p)+"</p>"; }).join("");
+  document.getElementById("rl").innerHTML=(d.rail||[]).map(function(x){
+    return "<li>"+esc(x)+"</li>"; }).join("");
+  var n=document.getElementById("rn");
+  if(d.never){ document.getElementById("rnp").textContent=d.never; n.hidden=false; }
+  else n.hidden=true;
+}
+
+/* ------------------------------------------------------- follow one check
+   The whole argument, narrated in eleven steps. It is here because in a room
+   the question is never "what are the components", it is "what happens". */
+var WALK=[
+  ["person","Somebody is about to send money to a company they were messaged by."],
+  ["intake","4orm IQ asks what is going on, and reflects back what it hears until the "
+           +"thing that actually needs checking is clear."],
+  ["gate","The ask is tested. A person's name would be refused here. A company, a website, "
+         +"an email or a wallet is allowed through."],
+  ["route","Sector and jurisdiction decide which of the 121 registers could hold a record "
+          +"for this party. That set is what coverage will be measured against."],
+  ["pages","Direct feeds where one exists, a pinned search where one does not, an objective "
+          +"where the answer spans pages."],
+  ["regs","Ten checks run together. Every answer is kept with the page it came from, and "
+         +"every register that could not be reached is named."],
+  ["corpus","The corpus adds what no register holds: the wallet seen under four names, the "
+           +"nameserver shared with a party acted against last month."],
+  ["read","One pass reads all of it and forms the assessment, with provenance on every line. "
+         +"It cannot go and find more, which is what keeps the coverage figure honest."],
+  ["record","The run is written as a row carrying the hash of the row before it. From here it "
+           +"cannot be edited without breaking everything after it."],
+  ["outc","The person gets the finding, the sources, what was missing, and the decision back. "
+         +"No score, no verdict."],
+  ["outreg","Months later a regulator can be handed the same row, the rules in force at the "
+           +"time, and the registers that were asked. Nothing is regenerated for them."]
+];
+var walkT=null, walkI=0;
+function walkStop(){
+  if(walkT) clearInterval(walkT);
+  walkT=null;
+  document.getElementById("walk").hidden=true;
+  document.querySelectorAll(".nd").forEach(function(g){ g.classList.remove("lit"); });
+}
+function walkStep(){
+  var s=WALK[walkI];
+  document.querySelectorAll(".nd").forEach(function(g){
+    g.classList.toggle("lit", g.getAttribute("data-id")===s[0]); });
+  document.getElementById("walkStep").textContent="Step "+(walkI+1)+" of "+WALK.length;
+  document.getElementById("walkCap").textContent=s[1];
+  pick(s[0]);
+  walkI++;
+  if(walkI>=WALK.length){
+    clearInterval(walkT); walkT=null;
+    document.getElementById("walkStep").textContent="That is one check";
+  }
+}
+function walkGo(){
+  walkStop();
+  walkI=0;
+  document.getElementById("walk").hidden=false;
+  document.getElementById("mapbox").scrollIntoView({block:"start",behavior:"smooth"});
+  walkStep();
+  walkT=setInterval(walkStep, 4200);
+}
+document.getElementById("play").addEventListener("click",walkGo);
+document.getElementById("walkStop").addEventListener("click",walkStop);
+
+draw();
+pick("intake");
+</script>
+
+<div class="wrap">
+
+  <section class="sec">
+    <h2>Where the intelligence is, and where it is deliberately not</h2>
+    <p class="sub">Three points on the map do the thinking. Everything between them is
+      plumbing, and that separation is the design rather than an accident of it. The step
+      that reads evidence has no authority to go and find more, so coverage is always
+      counted from what was actually retrieved and can never be asserted by the step that
+      would benefit from asserting it.</p>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="k">One · The intake</div>
+        <h3>Conversational discovery</h3>
+        <p>A person describes what is happening in their own words and 4orm IQ works out
+           what actually needs checking. It is built on motivational interviewing: open
+           questions that start with what or how, never why, and roughly twice as many
+           reflections as questions.</p>
+        <p>That is the difference from a chatbot. A chatbot waits to be asked. This asks,
+           because the person often does not yet know which of the four things in front of
+           them is the one that matters.</p>
+      </div>
+      <div class="card">
+        <div class="k">Two · The reading</div>
+        <h3>One reasoning pass over retrieved evidence</h3>
+        <p>Everything the registers returned is read once, and an assessment is formed with
+           the provenance attached to every line of it. The step cannot search. If it wanted
+           more evidence it would have to say so rather than go and get it, which is what
+           keeps the coverage figure honest.</p>
+      </div>
+      <div class="card">
+        <div class="k">Three · The pattern layer</div>
+        <h3>Signals no single register holds</h3>
+        <p>The same wallet under four company names. The same nameserver as a party that was
+           acted against last month. A name being checked five hundred times today that no
+           register has ever heard of. None of this exists in any one register. It exists
+           between them, and only because 4orm keeps its own corpus.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>What conversational discovery looks like</h2>
+    <p class="sub">Four lines from the intake, with the move each one is making. This is the
+      part people mean when they say it is not a chatbot.</p>
+
+    <div class="conv">
+      <div class="convhd"><span class="k">4orm IQ · intake</span></div>
+      <div class="convbody">
+        <div class="msg iq"><span class="who">IQ</span><span class="b">What is going on?
+          <div class="note">Open question. What, not why.</div></span></div>
+        <div class="msg"><span class="who">Them</span><span class="b">Someone messaged me
+          about an investment. They want the first payment today and I am not sure.</span></div>
+        <div class="msg iq"><span class="who">IQ</span><span class="b">So the part that
+          worries you is the hurry, more than the offer itself.
+          <div class="note">Reflection. Hands back what they said so they know it landed.</div></span></div>
+        <div class="msg"><span class="who">Them</span><span class="b">Yes. And I do not
+          really know what to look for.</span></div>
+        <div class="msg iq"><span class="who">IQ</span><span class="b">Not many people say
+          that out loud. Let us start with who is actually receiving the money, because that
+          is the one thing a register can answer.
+          <div class="note">Affirms the hard admission, then moves. No praise, no urgency.</div></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>The same record, read three ways</h2>
+    <p class="sub">This is the interoperation. Nothing is generated a second time for a
+      second audience, because a second generation is a second version, and two versions of
+      the truth is the thing an audit is looking for.</p>
+
+    <table class="map">
+      <thead><tr><th>What is held</th><th>The consumer sees</th><th>The company sees</th>
+        <th>The regulator sees</th></tr></thead>
+      <tbody>
+        <tr><td>The ask</td>
+          <td>Their own words, and the check that came out of them.</td>
+          <td>That a check was run against them, and on what identifier.</td>
+          <td>The input class only. The identifier itself is never stored in the clear.</td></tr>
+        <tr><td>Which registers applied</td>
+          <td>How many of them answered, and which did not.</td>
+          <td>The same list, so they can see what was and was not asked.</td>
+          <td>The applicable set, and the rulebook version that decided it.</td></tr>
+        <tr><td>What came back</td>
+          <td>The finding, with a link to the page it was read from.</td>
+          <td>The same finding and the same link, with a route to correct it.</td>
+          <td>The same finding, plus what could not be reached and why.</td></tr>
+        <tr><td>The assessment</td>
+          <td>Plain words, two numbers kept apart, no single score.</td>
+          <td>The wording as published, so a correction has something to point at.</td>
+          <td>The wording, the version, and the evidence it rests on.</td></tr>
+        <tr><td>The proof it ran</td>
+          <td>A reference number.</td>
+          <td>The same reference number.</td>
+          <td>The hashed row, and every row after it that depends on it.</td></tr>
+        <tr><td>What was deleted</td>
+          <td>Nothing to ask for. Almost nothing is kept.</td>
+          <td>Nothing held about them beyond the corpus period.</td>
+          <td>The deletion schedule, and evidence it ran on each day.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="sec">
+    <h2>Why the record cannot be edited afterwards</h2>
+    <p class="sub">Every run is a row, and every row carries the hash of the one before it.
+      Change a row after the fact and every hash after it stops matching. That is what turns
+      a number on a page into a number somebody outside the company can check, and it is the
+      reason the same record can be handed to all three audiences without anybody having to
+      take our word for the version they were given.</p>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="k">The rule</div>
+        <h3>A run cites a version, never the rules themselves</h3>
+        <p>Which lets the rules change without disturbing a hash already written. The cost is
+           that the version has to be recorded separately, so the rule history is chained
+           too.</p>
+      </div>
+      <div class="card">
+        <div class="k">The rule</div>
+        <h3>Silence is never clearance</h3>
+        <p>No register in the catalogue is allowed to have its silence read as a clean
+           result. A register that could not be reached is reported as a register that could
+           not be reached, and the run is marked incomplete.</p>
+      </div>
+      <div class="card">
+        <div class="k">The rule</div>
+        <h3>Two numbers, never combined</h3>
+        <p>How confident we are that we found the right party, and how much of the applicable
+           evidence we actually reached. They answer different questions, so they are shown
+           apart. There is no single trust score and there will not be one.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>4orm IQ · The evidence scaffolding · This page describes the architecture. It holds
+      no customer data.</p>
+  </footer>
+</div>
+</body></html>
