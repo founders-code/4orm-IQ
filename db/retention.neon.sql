@@ -88,3 +88,22 @@ create table if not exists ops_retention (
   total_rows  bigint not null default 0
 );
 create index if not exists ops_retention_at on ops_retention (ran_at desc);
+
+/* ------------------------------------------------------------- THE PULSE
+   Section 04 of the privacy notice promises a named row is kept for ninety
+   days from the last check that named it. The tally rows carry no name and no
+   visitor, so they age out on the corpus clock with everything else; it is the
+   NAME that has its own, shorter life, and it is cleared without deleting the
+   count, because the count on its own identifies nobody. */
+create or replace function purge_pulse_labels() returns int as $$
+declare n int;
+begin
+  update search_pulse
+     set label = null, labelled_at = null,
+         label_reason = 'label expired at ninety days'
+   where label is not null
+     and labelled_at < now() - interval '90 days';
+  get diagnostics n = row_count;
+  return n;
+end;
+$$ language plpgsql;

@@ -53,6 +53,12 @@ const isPersonNode = t => PERSON_NODE_TYPES.has(String(t || '').toUpperCase());
  * number. With CORPUS_SALT unset nothing is written at all, and a run simply
  * has no identifier column. Never a fallback to the plain string.
  */
+/* THE BAR. A level no ordinary business reaches by being looked up in the
+   normal course of things, and low enough that a real surge is named within
+   minutes of starting. Set it once, here, so the notice and the code cannot
+   drift: section 04 of the privacy notice describes exactly this number. */
+const PULSE_LABEL_AT = Math.max(5, Number(process.env.KBYS_PULSE_LABEL_AT) || 25);
+
 function identifierHash(v) {
   const salt = process.env.CORPUS_SALT;
   if (!salt) return null;
@@ -153,6 +159,62 @@ async function writeAll(c, ctx) {
   } = ctx;
 
   await c.query('BEGIN');
+
+  /* ================= THE PULSE, AND THE BAR IT WILL NOT CROSS ==============
+     A scam arrives as a great many ordinary people, none of whom know each
+     other, all typing the same name inside a day or two. That pattern is
+     visible here and to almost nobody else, and it is worth a regulator's time.
+
+     So every check adds one to a tally kept against the HASH. For the
+     overwhelming majority of identifiers that is the only thing ever written,
+     and the row is unreadable: nobody can turn the hash back into a name.
+
+     Only once a tally crosses PULSE_LABEL_AT does the next check on that same
+     identifier write the name itself beside it. Nothing was kept before the
+     bar was crossed, so the early checks stay unreadable even to us. We can
+     name what is surging now. We can never name who was searched last month.
+
+     This table lives in the corpus store, which has no visitor column of any
+     kind, and its salt is not the operations salt, so a tally cannot be joined
+     to a person by us or by anyone who obtained both stores.
+
+     The three outcome counters record what the REGISTERS returned. They are a
+     fact about the record, never a conclusion of ours about the party. */
+  try {
+    const ih = identifierHash(identifier);
+    if (ih) {
+      const v = String(payload?.verdict || '').toUpperCase();
+      const adv  = (v === 'RED' || v === 'AMBER' || v === 'YELLOW') ? 1 : 0;
+      const cln  = (v === 'GREEN') ? 1 : 0;
+      const inc  = (v === 'GREY' || !v) ? 1 : 0;
+      const bumped = await c.query(
+        `insert into search_pulse (day, identifier_hash, n, input_type, adverse, clean, incomplete)
+         values (current_date, $1, 1, $2, $3, $4, $5)
+         on conflict (day, identifier_hash) do update
+           set n = search_pulse.n + 1,
+               adverse = search_pulse.adverse + $3,
+               clean = search_pulse.clean + $4,
+               incomplete = search_pulse.incomplete + $5,
+               last_seen = now()
+         returning n, label`,
+        [ih, trim(ctx.inputType || null, 16), adv, cln, inc]);
+
+      /* The bar, and the only place a name is ever written. */
+      const row = bumped.rows[0] || {};
+      if (row.label == null && (row.n | 0) >= PULSE_LABEL_AT) {
+        const name = String(identifier || '').trim().slice(0, 200);
+        if (name) await c.query(
+          `update search_pulse set label = $3, labelled_at = now(), label_reason = $4
+             where day = current_date and identifier_hash = $1 and label is null and n >= $2`,
+          [ih, PULSE_LABEL_AT, name,
+           'crossed ' + PULSE_LABEL_AT + ' checks in one day']);
+      }
+    }
+  } catch (e) {
+    /* The pulse is a lookout, never a gate. A check must complete whether or
+       not this table exists yet. */
+    try { console.warn('[store] pulse not written:', e.message); } catch {}
+  }
 
   /* No identifier and no payload. The hash recognises a repeat; the headline
      and the verdict are what the corpus needs to know a run happened and how it

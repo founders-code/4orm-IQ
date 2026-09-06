@@ -1,418 +1,1468 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>4orm IQ Operations</title>
-<!-- THE TAB MARK. The 4 from assets/mark-4.png, the logo file itself, on
-     nothing: the ground is fully transparent so the tab's own colour shows
-     through and the mark reads in a light theme and a dark one. Rendered at
-     eight times the target and downsampled, so the diagonals stay clean at
-     sixteen pixels. Nothing here is redrawn. Inlined rather than linked so
-     the single file deploy carries its own icon. -->
-<link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNklEQVR4nI2S3UtUQRjGn/fM7Oruah8iatmXUVQGWpQidaFeBEYZRFjQRdFNl4FQdBGhG9R/ksYuVoQFElRieaV4GRV4YZifJe3Z49mZM3PeLo6iyaI+d/PO+/zemWcG2K66WAAAmgY7cH7kQFRkcrZl7mGJLFm0j15HsvItyNRH0Kwjt2VOk4ndnLkR+l6/9ZcBK8OVY2FzwN2xGNIUVN33rhpNzwNPhP7fuDBu3o0asltMBlD90Ovc90TrQ8/8YM9j5tSt2e6VfQcAqKi5lSWGySTvzF9M7Cx7ldrNMl6RFKEfdE9mPgyg5pCPweOLAIqE2JURGCaDK1/brR9kdc6Vfj4pCr+De5ND375QzZHvUMtNUS9vCLH1o0R9W4iWd520nH9jRAkQSyCYm39QSJWOJ/fv/ay9QtzA6FXLOgA7GCaD2dflSAW32eUhG1ph/yy8PHy5eUS5ekK7vrAKbOCIDYAeB6AQDX2nUSofYUe1ilfWehV1VSWJClEN4R0s3VUiTd4YDlmCwGuAHnaQBuPUiUY4NI5EFVGyBqKsFlTmQC3lClQev8Sux96i55i8yyjodYB0L4A0Q76wgHwKNeezTw57FKqZ8pgN+JeayWnSBVJLCzb0lYT2Y6v/oPgzblTHWAsZNcrKIyh3GjZ2DuOdP4FeWh8iofWTWFu3AQ0/BGaPGky/Nwwm6Nw0rLmAiWtTUW7pcPPJXZkI2NjfhjMDUzibOfZffWtxdMXmTB2a+k4WM/8D/1oA+v8+1tMAAAAASUVORK5CYII=">
-<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFaUlEQVR4nLWXXYhdVxXHf/vjnPuZySS1aROshIZgTcCHTnwJganiF0qpiIn4EBtBFEqF2kJt0XI7FVvUooJYSvFBm4dKph9UU1M/wESLLzZU0REFsaXQ2CaTaebOvedz77V8uJMYm+tkUmfWy4Fz1l7///6vtddeB9bVenZ9469k+484APYcvZ59v/86+353/eiDmovd/PqAq2PWRPa+sAMtfkHS3UG98C/gEaaPO04Q1o/AefCPvLSdEI8RZAehHzAujnNf2xydB9//2rtMY8Mx0tZOnKlodjw2NeOWrJ0Cy+Ctz8+/U0o9ps7eEIdFFGk5tQngdP0I7D/imDWxfdvgWo99Ds+ukC1Eox0XDEE1VdEqXR8CPbXMmHjtvf2rY0yPou69UpyLrtN2weSKRlNX3lCHvwOw5cx/KfH/ERiBy7YHF68ydeOoN8mU5P1oJlIXyqCGVMS2XQxn75bnd/3yPNmLQ4wtjCsB39jTyVasnkua6V4Tl4JNrDdGNRRIkbddvvDmVwc/fMeDFwr0Lfb2CCyDb/7S/ITazk/TdnPa26WQbrDeJaqKkSgdVywMe68/1H1gpVBXnoJlcG57o1tk9pm05abjcCG4rvdSiqoYce2Ok1B94/WHug/wwZPb8M1bCMWz/Hrq1KgTmgt1cGV9oNcbge9/tZUs1E+p+A/EwZkQa/H1MFAMotR115WL1Tdf/Urja3x8bidJ+iuSiUcw9mYApo+7t6lAzzIzo0y/3DR59qS2Jj4sw9Mhpg2vWYVEH727ysWl7NvzD3fuST/58g3RmKNa5Ts0LEY1fuxmV0lADaBM3exxp3+CTn5Ms9NBGk0PIM4H0kmv2eA7/Ucn704PnnoPmvzcxbBdwlIlaTvVqhrbiFaTguWcGSU98yNifYsOXyukLpGyCLEsgtD0oex/r//o5F2b7ji7u7t507Fmp7Xd+xBto+Vs0sAmzbHBL6OAGqYe87B1I0YO4yY/ShhA2m2qaSIkGNtB88UfVE+8+8tb7xtOSXDPoPY6q1m02nAqMUplQMefuJUJ9DDMfLHmfc9eQ6z+RP8fJ3ANT8ihTESTbqp67p/8du/j9P6SWme/m3Ya18XhUnDdxKsIJjMYDDiu5C5QAwZmjLDnyYMYM0Hnmj/T3ehsZxPphknamxPT6jr17dTXH8puPXVf+3H/reLppCH7TDQmFLIcStAR9qoVOO+o7Hnq+9jW7TgPSRvjWlibYq3FaBOMwXpIhAXgx42WDnDWSBBCGYlVIFY1Gg1Sl2O3OoZAz8D9cOORh8HeTjhX4boGGUBQqBTKAFWJll7ENyyWNwGqSpw1UOeRelhTDUtiWSIiEFZzCqZ7HmaEG3d/Fte9EynAt1NcJ8G1E+M6Cb6V4JqJmjQJtW+UQ59k8/UGgOwsmp+NlOcKyn5OnWdImaNVDnW+CgW27B6x1NgnZnOgARUHAhqMSg1SAgmxMqBOJA+pBnkFoJjPLCYQlobURSDmOVJloIkSwyqKcPbA6LZ66TNPM/WFn5FvNbS2KfkZyEGnpgj0CewEBd6YM+zaDX+dAyBbHBhrEmQ4QEJAyhzKoWKbBo3J5Qn8xwwnH6sveXvyf3j31AKE4ZJaPJoP0FhBlSmxcsQaSP8IwE03CScuT0C55NiMVXBkx49bQMj6iEmhGEAoFAmMyix8jj984oXRfWLk4qUrNaK3IK4wOmzRkW+Rga2gHggSLSZRVA/x4qcOj+bGA5cMJGs0Fc+OHnUG1kGoLTYFjYd48cBhpn/jmX1/GLdybX9MJAYUxXhAbr0AfmI8OKz1j4nGLr5pQA+uBnztCOyaG9WAc38jZoc4+eknmO5dFnwdTVe9sX8DHR3HdnCaNrUAAAAASUVORK5CYII=">
-<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ · Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:wght@600&display=swap">
 <style>
+/* =============================================================== THE WALL
+   One screen. Nothing scrolls, nothing is a click away, nothing moves when
+   the numbers change. The whole board is built at a fixed 1920 by 1080 and
+   scaled to whatever screen it is left running on, which is how a real
+   control room board is built: the composition never changes, only its size.
+
+   Two thirds carry the state of the machine. One third carries a reader
+   screen that says in words what the lamps say in colour, and under it the
+   path a check takes, drawn top to bottom. */
 :root{
-  --paper:#FFFFFF;--sunk:#F6F7F9;--edge:#E4E7EC;--edge2:#D3D8E0;
-  --ink:#14171C;--ink2:#3F4650;--ink3:#6C7480;--ink4:#98A0AC;
-  --blue:#2E6BF2;--ok:#0E8A5F;--warn:#B48A2E;--bad:#D6334E;
-  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --bg:#04060A; --panel:#0A1018; --panel-2:#0E1620; --sunk:#070C13;
+  --edge:#1A2534; --edge-2:#26344A; --edge-lit:#3B4E6B;
+  --ink:#EAF0F8; --ink-2:#A7B6C9; --ink-3:#6F8199; --ink-4:#4B5A70;
+  --ok:#33D89B; --warn:#E7C76C; --bad:#FF5340; --blue:#4C87FF; --idle:#3A4658;
+  /* The glass runs cooler than the text. A lamp is read by colour from across
+     the room and does not need to be the brightest thing on the board; the
+     word under it is read up close and keeps its full value. Red is left at
+     full strength, because the one lamp that should be able to shout is the
+     one that means something is broken. */
+  --ok-l:#26A16F; --warn-l:#BC9B4C;
+  /* Every engraved title on the two diagrams takes the reader screen's red and
+     the reader screen's face, so the whole board reads as one instrument. The
+     titles therefore carry no state of their own: the glass and the arcs are
+     the colour channel, exactly as on a real panel where the plate is one
+     colour for the life of the machine and only the lamp behind it changes. */
+  --title:#FF5340;
+  /* Two faces, two jobs. Inter for anything a person reads as a word, because
+     it was drawn for interface type: tall x height, open apertures, and it
+     holds together at nine pixels where a monospace face falls apart. The
+     monospace stays for output a machine produced, where character alignment
+     is the point: hashes, build stamps, times, the reader screen. */
+  --ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --head:Spectral,Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.22,.8,.28,1);
+  --r:12px; --r-sm:9px;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--sunk);color:var(--ink);font-family:var(--sans);font-size:15px;
-  line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding:0 26px 90px}
-h1,h2,h3{margin:0;letter-spacing:-.02em}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-button{font-family:inherit}
+*{box-sizing:border-box;margin:0;padding:0}
+/* A class that sets display beats the hidden attribute, which is how the sign
+   in gate and the error card ended up sitting on top of a board that had
+   loaded perfectly well. Nothing marked hidden is ever drawn. */
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font:15px/1.5 var(--ui);color:var(--ink);-webkit-font-smoothing:antialiased}
+#fit{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+/* flex:none matters more than it looks. Without it the centring container
+   shrinks the stage on a short screen before the transform scales it, so the
+   layout is no longer identical everywhere and things that fit on one machine
+   are cut off on another. The whole point of a fixed stage is that it is the
+   same board at every size, only smaller. */
+#stage{width:1920px;height:1080px;flex:none;transform-origin:center center;
+  position:relative;padding:26px 28px;display:grid;grid-template-rows:58px 1fr;gap:14px}
 
-header.top{padding:34px 0 22px;display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
-header.top h1{font-size:26px;font-weight:800}
-header.top .eb{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:7px}
-.spacer{flex:1}
-.ctl{display:flex;gap:8px;align-items:center}
-.ctl select,.ctl input{font-family:var(--sans);font-size:13.5px;padding:8px 11px;border:1px solid var(--edge2);
-  border-radius:8px;background:#fff;color:var(--ink)}
-.ctl button{font-size:13.5px;font-weight:600;padding:8px 16px;border-radius:8px;border:1px solid var(--blue);
-  background:var(--blue);color:#fff;cursor:pointer}
-.ctl button:hover{background:#2455C8}
+/* ------------------------------------------------------------- masthead */
+.mast{display:flex;align-items:center;gap:26px;border-bottom:1px solid var(--edge);
+  padding-bottom:12px}
+.brand{font-family:var(--ui);font-size:14px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink)}
+.brand span{color:var(--ink-4)}
+.live{display:inline-flex;align-items:center;gap:8px;font-family:var(--ui);font-size:10px;
+  font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ok);
+  border:1px solid rgba(51,216,155,.35);border-radius:99px;padding:5px 12px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--ok-l);
+  box-shadow:0 0 6px rgba(38,161,111,.5);animation:beat 2.4s ease-in-out infinite}
+@keyframes beat{50%{opacity:.35}}
+.mstats{display:flex;gap:30px;margin-left:auto}
+.mstat{text-align:right}
+.mstat .n{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--ink);
+  line-height:1;font-variant-numeric:tabular-nums}
+.mstat .k{margin-top:5px;font-family:var(--ui);font-size:10.5px;font-weight:500;
+  letter-spacing:0;color:var(--ink-3)}
+.mctl{display:flex;gap:8px;margin-left:26px}
+.trig{appearance:none;background:var(--panel-2);border:1px solid var(--edge-2);
+  color:var(--ink-2);border-radius:99px;padding:8px 15px;font-family:var(--ui);
+  font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  cursor:pointer;transition:all .18s var(--ease)}
+.trig:hover{border-color:var(--edge-lit);color:var(--ink)}
+.trig[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 
-.notice{margin:0 0 26px;padding:15px 19px;border-radius:11px;border:1px solid var(--edge2);
-  background:#fff;font-size:13.5px;color:var(--ink2);line-height:1.6}
-.notice b{color:var(--ink)}
-.notice.err{border-color:var(--bad);background:#FDF0F2;color:var(--bad)}
+/* --------------------------------------------------------- the two thirds */
+.body{display:grid;grid-template-columns:2fr 1fr;gap:22px;min-height:0}
+.lft{display:grid;grid-template-rows:auto auto 1fr;gap:16px;min-height:0}
+.rgt{display:grid;grid-template-rows:auto 1fr;gap:14px;min-height:0}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-bottom:26px}
-.tile{background:#fff;border:1px solid var(--edge);border-radius:12px;padding:17px 18px 16px;
-  display:flex;flex-direction:column;min-height:112px}
-.tile .v{font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
-.tile .v small{font-size:14px;font-weight:600;color:var(--ink3);letter-spacing:0;margin-left:3px}
-.tile .l{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--ink3);margin-top:9px;line-height:1.5}
-.tile .c{margin-top:auto;padding-top:9px;font-size:11px;color:var(--ink4);line-height:1.45}
-.tile[data-s="ok"] .v{color:var(--ok)} .tile[data-s="warn"] .v{color:var(--warn)}
-.tile[data-s="bad"] .v{color:var(--bad)}
+/* ----------------------------------------------------- the annunciator */
+.field{display:grid;gap:8px}
+.frow{display:grid;grid-template-columns:112px 1fr;align-items:center;gap:14px}
+.flab{font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.01em;
+  color:var(--title);opacity:.72;line-height:1.34;text-align:right}
+.lamps{display:grid;gap:2px 0}
+.pl{appearance:none;background:none;border:0;border-radius:9px;display:flex;
+  flex-direction:column;align-items:center;gap:7px;padding:9px 5px 8px;cursor:pointer;
+  text-align:center;font:inherit;transition:background .18s var(--ease)}
+.pl b{min-height:2.64em;display:flex;align-items:flex-start;justify-content:center}
+.pl:hover{background:rgba(255,255,255,.04)}
+.pl:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.pl i{width:17px;height:17px;border-radius:50%;position:relative;background:var(--idle);
+  box-shadow:inset 0 -3px 5px rgba(0,0,0,.55),inset 0 2px 4px rgba(255,255,255,.16)}
+.pl i::after{content:"";position:absolute;left:3.5px;top:2.5px;width:6px;height:4.5px;
+  border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.7),transparent)}
+/* A nine pixel uppercase plate is the hardest thing on this board to read, so
+   it gets every legibility lever there is short of more size: the interface
+   face, one more weight step, half the tracking, and subpixel smoothing rather
+   than the greyscale kind, which thins light type on a dark ground. */
+/* Sentence case, not capitals. At nine pixels the case is doing more damage
+   than any typeface can undo: capitals strip out the ascenders and descenders
+   the eye reads a word by, so every plate has to be decoded letter by letter.
+   Lowercase gives the word its shape back, and the plate still reads as a
+   plate because it is short, centred and set in the panel face. */
+.pl b{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.005em;
+  color:var(--title);line-height:1.32;
+  -webkit-font-smoothing:auto;-moz-osx-font-smoothing:auto}
+.pl em{font-style:normal;font-size:10.5px;font-weight:650;line-height:1.3;margin-top:-1px}
+.pl em .g{font-family:var(--mono);font-size:8.5px;font-weight:700;margin-right:4px}
+.pl[data-s="ok"] i{background:var(--ok-l);box-shadow:inset 0 -3px 5px rgba(0,0,0,.45),
+  inset 0 2px 4px rgba(255,255,255,.2),0 0 7px rgba(38,161,111,.32)}
+.pl[data-s="warn"] i{background:var(--warn-l);box-shadow:inset 0 -3px 5px rgba(0,0,0,.45),
+  inset 0 2px 4px rgba(255,255,255,.2),0 0 7px rgba(188,155,76,.32)}
+.pl[data-s="warn"] em,.pl[data-s="warn"] .g{color:var(--warn)}
+.pl[data-s="bad"] i{background:var(--bad);box-shadow:inset 0 -3px 5px rgba(0,0,0,.4),
+  inset 0 2px 4px rgba(255,255,255,.4),0 0 15px rgba(255,83,64,.8);
+  animation:alarm 1.15s ease-in-out infinite}
+.pl[data-s="bad"] em,.pl[data-s="bad"] .g{color:var(--bad)}
+@keyframes alarm{50%{opacity:.42}}
+@media(prefers-reduced-motion:reduce){.pl[data-s="bad"] i,.live i{animation:none}}
 
-.card{background:#fff;border:1px solid var(--edge);border-radius:12px;padding:22px 24px;margin-bottom:20px}
-.card h2{font-size:16px;font-weight:700;margin-bottom:4px}
-.card .sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:860px){.two{grid-template-columns:1fr}}
+/* ------------------------------------------------------------- the dials */
+.gauges{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.gauge{text-align:center;appearance:none;background:none;border:0;padding:6px 4px;
+  font:inherit;color:inherit;cursor:pointer;border-radius:10px;
+  transition:background .18s var(--ease)}
+.gauge:hover{background:rgba(255,255,255,.035)}
+.gauge:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.gwrap{position:relative;width:100%;max-width:132px;margin:0 auto}
+.gauge svg{width:100%;height:auto;overflow:visible;display:block}
+.gtrack{fill:none;stroke:var(--sunk);stroke-width:11;stroke-linecap:round}
+.gval{fill:none;stroke-width:11;stroke-linecap:round;
+  transition:stroke-dashoffset 1.1s var(--ease),stroke .4s var(--ease)}
+.gtick{stroke:var(--edge-2);stroke-width:1.5}
+.gtick.maj{stroke:var(--edge-lit);stroke-width:2}
+.gnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;pointer-events:none;padding-top:3px}
+.gnum .n{font-size:26px;font-weight:800;letter-spacing:-.04em;line-height:1;
+  font-variant-numeric:tabular-nums;color:var(--ink)}
+/* In a failure every part of the thing goes to the one red, the number
+   included. A dial whose arc is red and whose reading is still white is two
+   messages where there should be one. */
+.gauge[data-s="bad"] .gnum .n{color:var(--bad)}
+.gnum .u{font-size:13px;font-weight:700;line-height:1;margin-top:2px;color:var(--ink-3)}
+.gauge[data-s="ok"] .gval{stroke:var(--ok-l)}
+.gauge[data-s="ok"] .gnum .u{color:var(--ok-l)}
+.gauge[data-s="warn"] .gval{stroke:var(--warn-l)}
+.gauge[data-s="warn"] .gnum .u{color:var(--warn-l)}
+.gauge[data-s="bad"] .gval,.gauge[data-s="bad"] .gnum .u{stroke:var(--bad);color:var(--bad)}
+.gauge[data-s="idle"] .gval{stroke:var(--idle)}
+.gcap{margin-top:1px;font-family:var(--mono);font-size:10.5px;font-weight:500;
+  letter-spacing:.005em;-webkit-font-smoothing:auto;color:var(--title)}
+.gnote{margin-top:4px;font-size:10.5px;color:var(--ink-4);line-height:1.4;
+  max-width:26ch;margin-inline:auto}
 
-/* one series, direct labelled, no legend */
-.tsvg{width:100%;height:190px;display:block;overflow:visible}
-.tsvg .grid line{stroke:var(--edge);stroke-width:1}
-.tsvg .ax{fill:var(--ink4);font-family:var(--mono);font-size:9.5px}
-.tsvg rect.bar{fill:var(--blue);rx:2}
-.tsvg rect.hit{fill:transparent;cursor:pointer}
-.tsvg .lastlbl{fill:var(--ink);font-family:var(--mono);font-size:10.5px;font-weight:600}
+/* ------------------------------------------------------- the lower panels */
+.pair{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;min-height:0}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:var(--r);
+  padding:15px 17px 16px;min-height:0;display:flex;flex-direction:column}
+.ck{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-4);margin-bottom:6px}
+.card h2{font-family:var(--head);font-size:17px;font-weight:600;letter-spacing:0;color:var(--ink)}
+.card .sub{margin-top:4px;font-size:11px;line-height:1.5;color:var(--ink-3)}
+.scroll{overflow:hidden;margin-top:10px;flex:1;min-height:0}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+#pulseRows{font-variant-numeric:tabular-nums}
+.pulsetab col.c1{width:34%}.pulsetab col.c2{width:11%}.pulsetab col.c3{width:11%}
+.pulsetab col.c4{width:31%}.pulsetab col.c5{width:13%}
+th{font-family:var(--ui);font-size:10.5px;font-weight:600;letter-spacing:0;
+  color:var(--ink-3);text-align:left;padding:0 0 7px;
+  border-bottom:1px solid var(--edge)}
+td{padding:8px 0;border-bottom:1px solid var(--edge);font-size:12.5px;color:var(--ink-2);
+  vertical-align:top}
+td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.rblk{display:block;width:100%;appearance:none;background:none;border:0;padding:1px 4px 3px;
+  margin-top:2px;font:inherit;color:inherit;text-align:left;cursor:pointer;border-radius:8px;
+  transition:background .18s var(--ease)}
+.rblk:hover{background:rgba(255,255,255,.035)}
+.rblk:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.rrow{display:flex;align-items:baseline;gap:10px;margin-top:2px}
+.rname{font-size:12px;color:var(--ink-2)}
+.rv{margin-left:auto;font-family:var(--mono);font-size:11.5px;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.rrow[data-s="ok"] .rv{color:var(--ok)}
+.rrow[data-s="warn"] .rv{color:var(--warn)}
+.rrow[data-s="bad"] .rv{color:var(--bad)}
+.rbarw{display:block;height:5px;border-radius:3px;background:var(--sunk);margin-top:3px;overflow:hidden}
+.rbarw i{display:block;height:100%;border-radius:3px;background:var(--warn-l)}
+.rblk .rrow[data-s="bad"] ~ .rbarw i{background:var(--bad)}
+.rblk .rrow[data-s="ok"] ~ .rbarw i{background:var(--ok-l)}
 
-.rank{display:grid;gap:9px}
-.rrow{display:grid;grid-template-columns:1fr 132px 62px;gap:12px;align-items:center;font-size:13px}
-.rrow .n{color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rtrack{height:7px;border-radius:4px;background:var(--sunk);overflow:hidden}
-.rtrack i{display:block;height:100%;border-radius:4px}
-.rrow .p{font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+/* ------------------------------------------------- what sits on the floor
+   Both lower panels finished well short of their own bottom edge. Neither
+   border moves; the space underneath carries the two things that were left
+   out of the wall board and are asked for often enough to earn a place: the
+   evidence a regulator asks for, and the shape of the demand. */
+.floor{margin-top:auto;padding-top:14px;border-top:1px solid var(--edge)}
+.floor .fk{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-4);margin-bottom:9px}
+.evi{display:grid;gap:9px}
+.evirow{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline}
+.evirow .n{font-family:var(--mono);font-size:17px;font-weight:700;line-height:1;
+  color:var(--ink);font-variant-numeric:tabular-nums;min-width:44px}
+.evirow[data-s="bad"] .n{color:var(--bad)}
+.evirow[data-s="warn"] .n{color:var(--warn)}
+.evirow .t{font-size:11.5px;line-height:1.45;color:var(--ink-3)}
+.evirow .t b{color:var(--ink-2);font-weight:600}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.axl{font-family:var(--ui);font-size:10px;font-weight:500;fill:var(--ink-4)}
+.grid-l{stroke:var(--edge);stroke-width:1}
+.area{fill:url(#gArea)}
+.line{fill:none;stroke:var(--blue);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.dot{fill:#8FB2FF;stroke:var(--panel);stroke-width:2}
 
-table{border-collapse:collapse;width:100%;font-size:13.5px}
-/* Wide content scrolls inside its own box. The page body never scrolls sideways. */
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tw table{min-width:720px}
-.tw td{vertical-align:top}
-.q{color:var(--ink3);font-size:12.5px;line-height:1.5}
-th{text-align:left;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.11em;
-  text-transform:uppercase;color:var(--ink3);padding:9px 12px;border-bottom:1px solid var(--edge)}
-td{padding:10px 12px;border-bottom:1px solid var(--edge);color:var(--ink2)}
-tr:last-child td{border-bottom:none}
-td.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
-.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
-  font-weight:600;padding:3px 9px;border-radius:5px;border:1px solid currentColor}
-.pill i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
-.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)} .pill.mut{color:var(--ink3)}
+/* ============================================== THE READER SCREEN
+   A reporting terminal, built the way one is built: a grey bezel, a black
+   screen sunk behind it, monospace phosphor, scan lines and a live cursor.
 
-.ctl .ghost{background:#fff;color:var(--ink2);border-color:var(--edge2)}
-.ctl .ghost:hover{background:var(--sunk)}
-.who{font-size:12px;color:var(--ink3);margin-right:4px}
-.gate{background:#fff;border:1px solid var(--edge);border-radius:12px;padding:34px 36px;
-  max-width:520px;margin:10px 0 26px}
-.gate h2{font-size:20px;font-weight:700;margin-bottom:10px}
-.gate p{font-size:14px;color:var(--ink2);line-height:1.6}
-.gate .sm{margin-top:16px;font-size:12.5px;color:var(--ink3)}
-#clerkMount{margin-top:20px;min-height:40px}
-.boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  background:#0B0F17;color:#8494AB;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
-  z-index:50}
+   Warm red on black, at every state. Red is what instrument panels have always
+   used in a dark room because the eye holds its dark adaptation through it,
+   and it stays legible from across the room without lighting the room up.
+
+   The screen therefore carries no severity colour of its own. That is
+   deliberate and it is a division of labour: the lamps and the dials are the
+   colour channel, this is the text channel, and it is read rather than
+   glanced at. The one colour cue left on it is the small state dot in the
+   header, which still goes green, amber or red, so a passer-by can tell the
+   state without reading a word. */
+.reader{border:1px solid #4A5158;border-radius:10px;padding:5px;
+  background:linear-gradient(180deg,#22262A,#14171A);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 2px 10px rgba(0,0,0,.55)}
+.screen{position:relative;border-radius:6px;padding:15px 17px 16px;overflow:hidden;
+  background:#000;
+  box-shadow:inset 0 0 0 1px #2B3035, inset 0 0 46px rgba(0,0,0,.9)}
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.045) 0 1px,transparent 1px 3px),
+    radial-gradient(120% 130% at 50% 40%,transparent 55%,rgba(0,0,0,.6) 100%)}
+.rdhd{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:8px;
+  font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#8A4A40;
+  margin-bottom:11px}
+.rdhd::after{content:"";flex:1;height:1px;background:#331915}
+.rdhd i{width:7px;height:7px;border-radius:50%;background:#26A16F;
+  box-shadow:0 0 6px rgba(38,161,111,.6)}
+.rdline{font-family:var(--mono);font-size:16px;font-weight:500;line-height:1.55;
+  letter-spacing:.02em;color:#FF5340;text-shadow:0 0 13px rgba(255,83,64,.6)}
+.rdbody{margin-top:10px;display:grid;gap:6px}
+.rdbody p{font-family:var(--mono);font-size:12.5px;line-height:1.6;color:#E8776A;
+  text-shadow:0 0 9px rgba(255,83,64,.28)}
+.rdbody p::before{content:"> ";color:#7A3229}
+.rdfoot{margin-top:12px;padding-top:10px;border-top:1px solid #331915;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:#8A4A40}
+.cur{display:inline-block;width:8px;height:14px;margin-left:5px;vertical-align:-2px;
+  background:#FF5340;animation:cur 1.1s steps(1) infinite}
+@keyframes cur{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.cur{animation:none}}
+
+/* the header dot is the only thing on this screen that changes colour */
+.reader[data-s="warn"] .rdhd i{background:#BC9B4C;box-shadow:0 0 6px rgba(188,155,76,.6)}
+.reader[data-s="bad"]{border-color:#5A4046}
+.reader[data-s="bad"] .rdhd i{background:#FF5340;box-shadow:0 0 10px rgba(255,83,64,1);
+  animation:alarm 1.15s ease-in-out infinite}
+
+/* ------------------------------------------------- the vertical flow chart */
+.mimic{border:1px solid var(--edge);border-radius:var(--r);background:
+  linear-gradient(180deg,var(--panel-2),var(--sunk));padding:8px;min-height:0;
+  display:flex;align-items:stretch}
+.mimic svg{width:100%;height:100%;display:block}
+.pipe{fill:none;stroke:var(--edge-2);stroke-width:2.5;stroke-linecap:round}
+.pipe.live{stroke:var(--blue);stroke-width:3;stroke-dasharray:7 9;
+  animation:flow 1.1s linear infinite}
+.pipe.dead{stroke:rgba(255,83,64,.55);stroke-width:3;stroke-dasharray:4 6}
+.pipe.loop{stroke:rgba(76,135,255,.42);stroke-width:1.6;stroke-dasharray:3 7}
+.mrkh{fill:rgba(76,135,255,.55)}
+@keyframes flow{to{stroke-dashoffset:-32}}
+@media(prefers-reduced-motion:reduce){.pipe.live{animation:none}}
+.mtrunk{fill:var(--edge-lit)}
+.mframe{fill:rgba(76,135,255,.035);stroke:var(--edge);stroke-width:1;stroke-dasharray:4 6}
+.nbox{fill:var(--panel);stroke:var(--edge-2);stroke-width:1.5;
+  transition:fill .2s var(--ease),stroke .2s var(--ease)}
+.nnode.clicky{cursor:pointer}
+.nnode.clicky:hover .nbox{stroke:var(--edge-lit);fill:#121C28}
+.nnode[data-s="ok"] .nbox{stroke:rgba(51,216,155,.45)}
+.nnode[data-s="warn"] .nbox{stroke:rgba(231,199,108,.6);fill:rgba(231,199,108,.07)}
+.nnode[data-s="bad"] .nbox{stroke:var(--bad);fill:rgba(255,83,64,.13)}
+.nlamp{stroke:rgba(0,0,0,.5);stroke-width:1}
+.nnode[data-s="ok"] .nlamp{fill:#26A16F}
+.nnode[data-s="warn"] .nlamp{fill:#BC9B4C}
+.nnode[data-s="bad"] .nlamp{fill:#FF5340;animation:alarm 1.15s ease-in-out infinite}
+.ntitle{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.005em;
+  fill:var(--title);pointer-events:none}
+.nsub{font-family:var(--mono);font-size:8px;letter-spacing:.06em;fill:var(--ink-3);
+  pointer-events:none}
+.nsub.end{text-anchor:end;font-weight:700}
+.nnode[data-s="bad"] .nsub{fill:#FF5340}
+.nnode[data-s="warn"] .nsub.end{fill:var(--warn)}
+.slab{font-family:var(--mono);font-size:9.5px;font-weight:400;letter-spacing:.01em;
+  fill:var(--title);opacity:.72;pointer-events:none}
+
+/* ------------------------------------------------- what a lamp opens onto */
+/* A sheet, not a second screen. It sits over the board on a scrim, sized to
+   what it has to say, so pressing a lamp never leaves the operator staring at
+   a full screen of empty ground. */
+.sheet{position:absolute;inset:0;background:rgba(3,5,8,.86);backdrop-filter:blur(4px);
+  display:none;z-index:60;align-items:center;justify-content:center;padding:60px 70px}
+.sheet.on{display:flex}
+.sheetcard{width:min(1320px,100%);max-height:100%;background:var(--panel);
+  border:1px solid var(--edge-lit);border-radius:var(--r);padding:26px 30px 28px;
+  display:flex;flex-direction:column;min-height:0;
+  box-shadow:0 30px 90px rgba(0,0,0,.6)}
+.shhd{display:flex;align-items:flex-start;gap:18px;padding-bottom:16px;
+  border-bottom:1px solid var(--edge-2)}
+.shhd h3{font-family:var(--head);font-size:25px;font-weight:600;color:var(--ink)}
+.shhd .x{margin-top:5px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-4)}
+.shhd .c{margin-left:auto}
+.shbody{margin-top:18px;overflow:auto;min-height:0}
+.dgrid{display:grid;grid-template-columns:150px 1fr;gap:14px 26px;align-items:baseline}
+.dgrid dt{font-family:var(--ui);font-size:12px;font-weight:600;letter-spacing:0;
+  color:var(--ink-3)}
+.dgrid dd{font-size:15px;color:var(--ink-2);line-height:1.6;max-width:92ch}
+.plates{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.plate{display:flex;flex-direction:column;align-items:center;gap:8px;padding:13px 8px 11px;
+  background:var(--sunk);border:1px solid var(--edge);border-radius:var(--r-sm)}
+.plate i{width:17px;height:17px;border-radius:50%;background:var(--idle);position:relative;
+  box-shadow:inset 0 -3px 5px rgba(0,0,0,.55),inset 0 2px 4px rgba(255,255,255,.16)}
+.plate i::after{content:"";position:absolute;left:3.5px;top:2.5px;width:6px;height:4.5px;
+  border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.7),transparent)}
+.plate em{font-style:normal;font-family:var(--mono);font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;-webkit-font-smoothing:auto;
+  color:var(--title);text-align:center;line-height:1.32}
+.plate[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 7px rgba(38,161,111,.34),
+  inset 0 -3px 5px rgba(0,0,0,.45)}
+.plate[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 7px rgba(188,155,76,.34),
+  inset 0 -3px 5px rgba(0,0,0,.45)}
+.plate[data-s="bad"] i{background:var(--bad);animation:alarm 1.15s ease-in-out infinite}
+.plate[data-s="bad"]{border-color:rgba(255,83,64,.4)}
+.shleg{margin-top:16px;display:flex;gap:20px;font-family:var(--ui);font-size:11.5px;
+  font-weight:500;letter-spacing:0;color:var(--ink-3)}
+.shleg span{display:inline-flex;align-items:center;gap:7px}
+.shleg i{width:9px;height:9px;border-radius:50%}
+/* ------------------------------------------------- sign in, boot and errors
+   Nothing shows until Clerk has answered the only question that matters, which
+   is whether this person is signed in. A page that renders its shell, then the
+   gate, then the panel reads as a flash of something on every hard reload. */
+.boot,.gate,.err{position:fixed;inset:0;z-index:90;display:flex;align-items:center;
+  justify-content:center;background:var(--bg);padding:40px}
+.boot{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-4)}
 body:not([data-boot]) .boot{display:none}
-body[data-boot] .wrap,body[data-boot] footer{visibility:hidden}
+body[data-boot] #fit{visibility:hidden}
+.gatecard,.errcard{width:min(560px,100%);background:var(--panel);
+  border:1px solid var(--edge-lit);border-radius:var(--r);padding:28px 30px}
+.gatecard h2,.errcard h2{font-family:var(--head);font-size:22px;font-weight:600;color:var(--ink)}
+.gatecard p,.errcard p{margin-top:10px;font-size:14px;line-height:1.6;color:var(--ink-2)}
+.gatecard .sm{margin-top:16px;font-size:12.5px;color:var(--ink-4)}
+#clerkMount{margin-top:18px}
+.errcard{border-color:rgba(255,83,64,.5)}
+.errcard h2{color:var(--bad)}
+.errcard .act{margin-top:20px;display:flex;gap:10px}
+.demoflag{position:fixed;left:0;right:0;bottom:0;z-index:80;padding:7px 14px;text-align:center;
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:#0A0D12;background:var(--warn)}
+.who{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-4)}
+select.trig{appearance:none;min-width:96px;padding:8px 14px;text-align:center;
+  background-image:none}
+select.trig option{background:var(--panel);color:var(--ink);
+  font-family:var(--ui);text-transform:none;letter-spacing:0}
+</style></head><body data-clerk="pk_test_YWN0dWFsLWRvbmtleS03ODYuY2xlcmsuYWNjb3VudHMuZGV2JA" data-boot="1">
 
-/* the evidence layer */
-.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
-.chip{border:1px solid var(--edge);border-radius:10px;padding:14px 16px;background:var(--sunk)}
-.chip .l{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--ink3)}
-.chip .v{margin-top:8px;font-size:19px;font-weight:750;font-variant-numeric:tabular-nums;
-  word-break:break-all;line-height:1.25}
-.chip .v.h{font-family:var(--mono);font-size:12.5px;font-weight:500}
-.chip[data-s="ok"]{border-color:var(--ok);background:#EDF7F2}
-.chip[data-s="ok"] .v{color:var(--ok)}
-.chip[data-s="bad"]{border-color:var(--bad);background:#FDF0F2}
-.chip[data-s="bad"] .v{color:var(--bad)}
-.tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;
-  padding:7px 10px;border-radius:7px;opacity:0;transition:opacity .12s;font-family:var(--mono)}
-.tip.on{opacity:1}
-footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--edge);font-size:12.5px;
-  color:var(--ink3);line-height:1.6}
-</style></head><!-- The Clerk publishable key. It is public by design; the secret key never
-     appears in a page. Replace at build or inject at deploy. -->
-<body data-clerk="pk_test_YWN0dWFsLWRvbmtleS03ODYuY2xlcmsuYWNjb3VudHMuZGV2JA" data-boot="1">
-<!-- BOOT.
-     The page used to render its whole shell, then the sign in gate, then either
-     the panel or a redirect, which read as a flash of something on every hard
-     reload. Nothing shows until Clerk has answered the only question that
-     matters, which is whether this person is signed in. -->
-<div class="boot" id="boot"><span class="mono">Checking your session</span></div>
-<div class="wrap">
+<div class="boot" id="boot">Checking your session</div>
 
-<header class="top">
-  <div><span class="eb">4orm IQ</span><h1>Operations</h1></div>
-  <div class="spacer"></div>
-  <div class="ctl">
-    <span class="who mono" id="who"></span>
-    <button id="out" type="button" class="ghost" hidden>Sign out</button>
-    <select id="days">
-      <option value="7">7 days</option><option value="30" selected>30 days</option>
-      <option value="90">90 days</option><option value="365">12 months</option>
-    </select>
-    <button id="go" type="button">Load</button>
-  </div>
-</header>
-
-<div class="notice">
-  <b>This page shows how the machine is running. It cannot show who anybody looked up.</b>
-  There is no column in the operations schema for the identifier a user searched, the party a check
-  was about, or the result it returned, and there will not be one. A table holding that would rebuild
-  the person-level file the product was rebuilt to refuse. What it costs is a search-history screen.
-  What it buys is that there is nothing here to disclose on an access request and nothing to breach.
-</div>
-
-<div id="gate" class="gate" hidden>
+<div class="gate" id="gate" hidden><div class="gatecard">
   <h2>Sign in</h2>
   <p>The back office is behind Clerk. Your account has to be on the allowlist as well as
-     signed in, because being able to prove who you are is not the same as being allowed in here.</p>
+     signed in, because being able to prove who you are is not the same as being allowed
+     in here.</p>
   <div id="clerkMount"></div>
   <p class="sm" id="gateNote"></p>
-</div>
-<div id="err" class="notice err" hidden></div>
-<main id="panel" hidden></main>
-<div class="tip" id="tip"></div>
+</div></div>
 
-<footer>
-  Metrics per OPS-001 s.51. Evidence pack per s.52. Served by <span class="mono">/api/admin-metrics</span>,
-  which is disabled outright when <span class="mono">ADMIN_TOKEN</span> is unset rather than left open.
-</footer>
-</div>
+<div class="err" id="err" hidden><div class="errcard">
+  <h2 id="errT">The board could not load</h2>
+  <p id="errX"></p>
+  <div class="act"><button class="trig" type="button" id="errRetry">Try again</button>
+    <button class="trig" type="button" id="errOut">Sign out</button></div>
+</div></div>
 
+<div id="fit"><div id="stage">
+
+  <header class="mast">
+    <span class="brand">4orm IQ <span>·</span> Operations</span>
+    <span class="live"><i></i>Live</span>
+    <div class="mstats" id="mstats"></div>
+    <div class="mctl">
+      <span class="who" id="who"></span>
+      <select class="trig" id="win" aria-label="Window">
+        <option value="7">7 days</option><option value="30" selected>30 days</option>
+        <option value="90">90 days</option><option value="365">12 months</option>
+      </select>
+      <button class="trig" type="button" id="go">Reload</button>
+      <button class="trig" type="button" id="out" hidden>Sign out</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <div class="lft">
+      <div class="field" id="board"></div>
+      <div class="gauges" id="gauges"></div>
+      <div class="pair">
+        <div class="card">
+          <div class="ck">Early warning</div>
+          <h2>What is being checked, and how often</h2>
+          <div class="sub">A name is kept only once it crosses the bar. Below it, the row is a
+            hash nobody can read.</div>
+          <div class="scroll"><table class="pulsetab">
+            <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4">
+              <col class="c5"></colgroup>
+            <thead><tr><th>Name or hash</th><th>Today</th>
+            <th>Lift</th><th>What came back</th><th>First</th></tr></thead>
+            <tbody id="pulseRows"></tbody></table></div>
+          <div class="floor">
+            <div class="fk">The evidence a regulator asks for</div>
+            <div class="evi" id="evi"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ck">Hazard</div>
+          <h2>Registers by success rate, worst first</h2>
+          <div class="sub">A register that starts failing quietly is the one hazard this product
+            cannot survive.</div>
+          <div class="scroll" id="rank"></div>
+          <div class="floor">
+            <div class="fk">Checks attempted per day, this window</div>
+            <div class="chart" id="days"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rgt">
+      <div class="reader" id="reader" data-s="ok">
+        <div class="screen">
+          <div class="rdhd"><i></i>Operations summary</div>
+          <div class="rdline" id="rdline"></div>
+          <div class="rdbody" id="rdbody"></div>
+          <div class="rdfoot" id="rdfoot"></div>
+        </div>
+      </div>
+      <div class="mimic" id="mimic"></div>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheetcard">
+      <div class="shhd">
+        <div><h3 id="shT"></h3><div class="x" id="shX"></div></div>
+        <div class="c"><button class="trig" type="button" id="shC">Close</button></div>
+      </div>
+      <div class="shbody" id="shB"></div>
+    </div>
+  </div>
+
+</div></div>
 <script>
-var $=function(s){return document.querySelector(s)};
-var tip=$("#tip");
-function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
-  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
-function num(n){return n==null?"not recorded":Number(n).toLocaleString();}
+/* ============================================================ SAMPLE DATA
+   Two states, so the panel can be judged in both. Every field here is one the
+   metrics route already returns. Nothing on this screen is invented. */
+var CLEAR = {
+  window_days:30, generated:"2026-09-05T08:40:00Z",
+  runs:{attempted:1284,completed:1231,incomplete:41,suppressed:96,barred:38,avg_ms:74200,ran_unenforced:0},
+  completion_pct:95.9, incomplete_pct:3.2, people:812,
+  sources:{attempts:41208,ok:39760,failed:1448,out_of_scope:2140,success_pct:96.5,
+    worst:[["FINTRAC MSB",88.1],["ASIC Connect",91.4],["SEC EDGAR",93.0],["FCA Register",94.2],
+           ["CSA Disciplined",95.1],["Companies House",96.8]]},
+  chain:{height:1284,last_verify:{intact:true,checked:1284,ms:412}},
+  policy:{head:{height:9,version:"2026-09-02"}},
+  deletion:{days_run:30,days_failed:0,deleted:1840},
+  incidents:{total:0,pi:0,rrosh:0,reported:0},
+  rights:[{kind:"ACCESS",opened:3,closed:3,avg_days:4.2}],
+  by_outcome:[["COMPLETED",1231],["BLOCKED",29],["ERROR",24]],
+  by_input:[["Company",702],["Website",408],["Email",121],["Wallet",53]],
+  by_day:[38,44,41,52,49,58,61,55,47,52,60,66,71,64,58,62,70,74,69,63,58,66,72,78,74,68,61,70,76,81],
+  build:{match:true,page:"20260905.0838"},
+  systems:{search:"ok",reason:"ok",connectors:"ok",rdap:"ok",db:"ok",chain:"ok",
+           policy:"ok",retention:"ok",auth:"ok",deploy:"ok"},
+  registers:{down:{},quiet:{0:1,3:2,6:1,7:2,9:3}},
+  /* Not wired to a store yet. These are the honest states as of today: none of
+     the ten control documents has been written, so every one of them is amber.
+     An empty shelf is not a clean shelf. */
+  documents:{hra:"warn",mg:"warn",lr:"warn",pub:"warn",sub:"warn",
+             vend:"warn",ret:"warn",ir:"warn",sec:"warn",cou:"warn"},
+  pulse:{label_at:25,named:0,adverse:0,unknown:0,rows:[
+    {label:null,hash:"a41f77c9e0b3",n:9,was:6,adverse:0,clean:7,incomplete:2,type:"Company",first:"09:12"},
+    {label:null,hash:"7d02be51ac84",n:6,was:5,adverse:1,clean:4,incomplete:1,type:"Website",first:"11:40"},
+    {label:null,hash:"11c8a9f4d270",n:4,was:4,adverse:0,clean:3,incomplete:1,type:"Company",first:"14:05"}
+  ]}
+};
+var TROUBLE = JSON.parse(JSON.stringify(CLEAR));
+TROUBLE.chain.last_verify={intact:false,checked:806,broken_at:807,ms:388};
+TROUBLE.runs.ran_unenforced=14;
+TROUBLE.deletion.days_failed=3;
+TROUBLE.incidents={total:2,pi:2,rrosh:1,reported:0};
+TROUBLE.sources.success_pct=71.4;
+TROUBLE.sources.worst=[["FINTRAC MSB",22.0],["ASIC Connect",38.4],["SEC EDGAR",54.1],
+  ["FCA Register",66.2],["CSA Disciplined",78.9],["Companies House",84.0]];
+TROUBLE.completion_pct=79.2; TROUBLE.runs.completed=1017; TROUBLE.incomplete_pct=14.8;
+TROUBLE.rights=[{kind:"ACCESS",opened:5,closed:1,avg_days:27.4}];
+TROUBLE.by_outcome=[["COMPLETED",1017],["ERROR",198],["BLOCKED",69]];
+TROUBLE.build={match:false,page:"20260905.0838"};
+TROUBLE.registers={down:{0:2,1:5,2:7,4:2,7:1},quiet:{0:1,3:3,5:2,6:2,8:1,9:5}};
+/* In trouble the three with live exposure go red: a published claim with no
+   completed test, a published adverse finding with no release record, and a
+   security control that is claimed but cannot be evidenced. */
+TROUBLE.documents={hra:"warn",mg:"warn",lr:"warn",pub:"bad",sub:"bad",
+                   vend:"warn",ret:"warn",ir:"warn",sec:"bad",cou:"warn"};
+TROUBLE.systems={search:"bad",reason:"bad",connectors:"warn",rdap:"ok",db:"ok",
+                 chain:"bad",policy:"ok",retention:"bad",auth:"ok",deploy:"bad"};
+TROUBLE.pulse={label_at:25,named:2,adverse:1,unknown:1,rows:[
+  {label:"Meridian Yield Partners",hash:"c9a1057fe2b8",n:512,was:3,adverse:471,clean:8,
+   incomplete:33,type:"Company",first:"06:41"},
+  {label:"apex-vault-pro.com",hash:"3f77b1d0ca69",n:288,was:0,adverse:0,clean:2,
+   incomplete:286,type:"Website",first:"08:02"},
+  {label:null,hash:"5b1e88a0f3d2",n:19,was:2,adverse:12,clean:3,incomplete:4,type:"Company",first:"10:15"},
+  {label:null,hash:"a41f77c9e0b3",n:9,was:6,adverse:0,clean:7,incomplete:2,type:"Company",first:"12:30"}
+]};
 
-function tile(v,unit,label,cap,state){
-  return '<div class="tile"'+(state?' data-s="'+state+'"':'')+'>'
-    +'<div class="v">'+esc(v)+(unit?'<small>'+esc(unit)+'</small>':'')+'</div>'
-    +'<div class="l">'+esc(label)+'</div>'
-    +(cap?'<div class="c">'+esc(cap)+'</div>':'')+'</div>';
+var LAST=null;
+var $=function(s){return document.querySelector(s);};
+var num=function(n){return n==null?"none yet":(+n).toLocaleString("en-CA");};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+
+var GLYPH={ok:"●",warn:"▲",bad:"■",idle:"○"};
+var WORD ={ok:"OK",warn:"QUIET",bad:"DOWN"};
+
+/* Every part that can fail, with the plate short enough to engrave and the
+   plain sentence one press behind it. Amber means we have not seen it work
+   today. That is not a fault and must never be drawn as one: a register nobody
+   had cause to call is not a register that is down, and calling it down would
+   be the same lie the whole product exists to avoid. */
+/* Sixteen lamps, and not one of them says the same thing twice. Four things
+   are watched from two angles at once, so those get ONE lamp: the chain lamp
+   is lit by both "is the log being written" and "does the log still verify",
+   because to an operator those are the same lamp going out. */
+var worse=function(a,b){ var r={ok:0,warn:1,bad:2}; return r[b]>r[a]?b:a; };
+
+function machine(d){
+  var st=d.systems||{}, c=d.chain||{}, v=c.last_verify||{}, del=d.deletion;
+  var hist=(d.policy&&d.policy.history)||[];
+  var S=function(k){ return st[k]||"warn"; };
+  return [
+    {k:"searching", plate:"Asking registers", s:S("search"), v:WORD[S("search")],
+     name:"Reading the registers",
+     what:"The searches that go out and ask the 121 registers.",
+     amber:"No search has run yet in this window. Normal first thing in the morning.",
+     red:"No register was reached. A check that reads nothing says so, and never draws a clean record out of silence.",
+     go:"Look at the search provider first: its key, its credit, and its rate limit."},
+    {k:"assessing", plate:"Forming answers", s:S("reason"), v:WORD[S("reason")],
+     name:"Forming the answer",
+     what:"The single step that reads what came back and forms an assessment. It does no searching of its own.",
+     amber:"Nothing has needed an assessment yet in this window.",
+     red:"The pages were still read, but no assessment was formed. The reader is shown what was reached and told plainly that there is no assessment.",
+     go:"Check the model key and the credit balance on the account behind it."},
+    {k:"feeds", plate:"Direct feeds", s:S("connectors"), v:WORD[S("connectors")],
+     name:"Direct feeds",
+     what:"Registers we call through their own interface instead of searching for them.",
+     amber:"No direct feed was called in this window.",
+     red:"Every direct feed refused. Those registers fall back to search, which is slower and reads fewer pages.",
+     go:"Check each feed's credentials and whether the publisher moved its endpoint."},
+    {k:"domain", plate:"Domain lookups", s:S("rdap"), v:WORD[S("rdap")],
+     name:"Domain records",
+     what:"Who owns a website, and the day the domain was made.",
+     amber:"No domain has been looked up in this window.",
+     red:"Domain age is unavailable, so a three week old website cannot be told apart from a ten year old one.",
+     go:"These records are public. A failure here is usually the registry, not us."},
+    {k:"database", plate:"The database", s:S("db"), v:WORD[S("db")],
+     name:"The record book",
+     what:"The database every run is written to.",
+     amber:"Nothing has been written in this window.",
+     red:"Nothing can be recorded. Checks may still answer a reader, but there is no proof afterwards that they ran.",
+     go:"Stop taking new checks until this is back. An unrecorded run is not a run."},
+    {k:"chain", plate:"Evidence chain", s:worse(S("chain"), v.intact?"ok":"bad"),
+     v: v.intact? "Intact, "+num(v.checked)+" rows" : "BROKEN at row "+num(v.broken_at),
+     name:"The chain",
+     /* The evidence layer, which used to be a panel of its own. It belongs
+        behind the lamp that watches it: the height, the head, when it was last
+        walked, and which hash schemas are in the log. Without the head there is
+        nothing for anybody to check the counter against. */
+     extra:[
+       ["Chain height", num(c.height||0)],
+       ["Head", String(c.head_hash||"").slice(0,32) || "not started"],
+       ["Last walked", v.at ? String(v.at).slice(0,19).replace("T"," ")+" UTC"
+                            : "never run"],
+       ["Hash schemas", (c.schemas && c.schemas.length)
+          ? c.schemas.map(function(x){ return x.hash_schema+" x"+num(x.n); }).join("   ")
+          : "v1"]
+     ],
+     what:"The hashed log that makes a run provable afterwards, and whether every row in it still hashes to the one before it.",
+     amber:"Nothing has been chained in this window.",
+     red:"Either the log is not being written, or a row no longer verifies. Everything after the break is unprovable.",
+     go:"Do not touch the rows. Note the first broken height and keep everything from it."},
+    {k:"rulebook", plate:"The rulebook", s:worse(S("policy"), d.policy.head?"ok":"warn"),
+     v: d.policy.head? "v"+d.policy.head.version : "Not recorded",
+     name:"The rulebook",
+     /* A run row commits to a version and never to what that version said,
+        which is what lets a rule change without disturbing a hash already
+        written. The cost is that the version points at nothing unless the rules
+        themselves are recorded. This is that record. */
+     extra:[
+       ["Rule changes", num((d.policy.head||{}).height||0)],
+       ["Rule chain head", String((d.policy.head||{}).head_hash||"").slice(0,32)
+                           || "not started"],
+       ["In force", hist.length ? hist[0].version+", from "
+            +String(hist[0].effective_from||"").slice(0,10) : "none recorded"]
+     ].concat(hist.slice(0,4).map(function(x){
+       return ["v"+x.version, (x.change_kind||"")+". "+(x.summary||"")
+               +(x.reason?" "+x.reason:"")
+               +"  Registers "+num(x.sources_enabled)+" of "+num(x.sources_total)+"."];
+     })),
+     what:"Which registers a given check is allowed to use, and the version of that rulebook the checks are actually running.",
+     amber:"No version could be read. A check with no rules is a check with no scope.",
+     red:"The rulebook could not be reached at all. Nothing should be running.",
+     go:"Every published version is frozen. If this is not the version you expect, something published without you."},
+    {k:"signin", plate:"Sign in", s:S("auth"), v:WORD[S("auth")],
+     name:"The front door",
+     what:"The sign in for this page.",
+     amber:"Nobody has signed in during this window.",
+     red:"Sign in is broken. Nobody can reach this panel, including the people who need it during an incident.",
+     go:"Check the sign in provider and the keys on this deployment."}
+  ];
 }
 
-/* Daily volume. One series, so no legend: the heading names it. The last bar is
-   direct-labelled rather than every bar carrying a number. */
-function timeSeries(rows){
-  if(!rows.length) return '<p style="color:var(--ink3);font-size:13px">No runs in this window.</p>';
-  var W=760,H=190,padL=34,padB=22,padT=14;
-  var max=Math.max.apply(null,rows.map(function(r){return r.attempted;}))||1;
-  var iw=W-padL-8, ih=H-padB-padT;
-  var bw=Math.max(2,(iw/rows.length)-2);
-  var svg='<svg class="tsvg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" '
-    +'aria-label="Checks attempted per day">';
-  svg+='<g class="grid">';
-  for(var g=0;g<=2;g++){var y=padT+ih-(ih*g/2);
-    svg+='<line x1="'+padL+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'"/>'
-      +'<text class="ax" x="4" y="'+(y+3)+'">'+Math.round(max*g/2)+'</text>';}
-  svg+='</g>';
-  rows.forEach(function(r,i){
-    var h=Math.max(1,(r.attempted/max)*ih), x=padL+i*(iw/rows.length), y=padT+ih-h;
-    svg+='<rect class="bar" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'"/>';
-    svg+='<rect class="hit" x="'+x+'" y="'+padT+'" width="'+bw+'" height="'+ih+'" '
-      +'data-t="'+esc(r.day+"  "+r.attempted+" attempted, "+r.completed+" completed")+'"/>';
-    if(i===rows.length-1)
-      svg+='<text class="lastlbl" x="'+(x+bw+5)+'" y="'+(y+9)+'">'+r.attempted+'</text>';
+function readings(d){
+  var st=d.systems||{}, s2=d.sources, inc=d.incidents, del=d.deletion;
+  var rights=(d.rights||[]).reduce(function(a,x){
+    return {open:a.open+(x.opened-x.closed), days:Math.max(a.days,x.avg_days||0)};},{open:0,days:0});
+  return [
+    {k:"answering", plate:"Registers answering",
+     s:s2.success_pct>=95?"ok":(s2.success_pct>=85?"warn":"bad"),
+     v:s2.success_pct==null? "No attempts" : s2.success_pct+"% of "+num(s2.attempts),
+     what:"Of every register we asked in this window, how many answered.",
+     rule:"Amber below 95 per cent. Red below 85.",
+     go:"Open the worst registers list further down and see whether it is one publisher or all of them."},
+    {k:"completing", plate:"Checks finishing",
+     s:d.completion_pct>=95?"ok":(d.completion_pct>=85?"warn":"bad"),
+     v:d.completion_pct==null? "None yet" : d.completion_pct+"% completed",
+     what:"Of the checks people started, how many reached an answer.",
+     rule:"Amber below 95 per cent. Red below 85.",
+     go:"Compare it against the answering lamp. If registers are fine and this is not, the fault is after retrieval."},
+    {k:"enforced", plate:"Rules applied", s:d.runs.ran_unenforced?"bad":"ok",
+     v:d.runs.ran_unenforced? num(d.runs.ran_unenforced)+" runs unenforced" : "On, every run",
+     what:"Runs that went out without the rulebook applied to them.",
+     rule:"Red on the first one. There is no acceptable number of runs with no scope.",
+     go:"Find what let them through, then list the affected reference numbers."},
+    {k:"deletion", plate:"Deleting on time", s:worse(st.retention||"warn", del.days_failed?"bad":"ok"),
+     v:del.days_failed? num(del.days_failed)+" days failed" : num(del.days_run)+" days, all ran",
+     what:"The job that deletes on the schedule we published, and whether it ran on every day in this window.",
+     rule:"Red on the first missed day.",
+     go:"This is a privacy commitment, not a chore. Run it by hand, then record which days were missed and for how long."},
+    {k:"incidents", plate:"Privacy incidents", s:inc.rrosh?"bad":(inc.total?"warn":"ok"),
+     v:inc.total? num(inc.total)+" open, "+num(inc.rrosh)+" at threshold" : "None this window",
+     what:"Open privacy incidents, and how many have reached the real risk of significant harm threshold.",
+     rule:"Amber on any open incident. Red once one reaches the threshold, because that one carries a reporting clock.",
+     go:"The clock starts when it is discovered, not when it is confirmed."},
+    {k:"requests", plate:"Rights requests", s:rights.days>30?"bad":(rights.open?"warn":"ok"),
+     v:rights.open? num(rights.open)+" open, "+rights.days+"d oldest" : "All closed",
+     what:"Access, correction and deletion requests, and the age of the oldest one still open.",
+     rule:"Amber while any is open. Red past thirty days, which is the statutory limit.",
+     go:"Answer the oldest first. A late answer is a complaint waiting to be filed."},
+    {k:"pattern", plate:"Surge watch", s:d.pulse.unknown?"bad":(d.pulse.named?"warn":"ok"),
+     v:d.pulse.unknown? d.pulse.unknown+" surging, no record"
+       : (d.pulse.named? d.pulse.named+" surging, on record" : "Nothing above the bar"),
+     what:"Names being checked far more today than last week. A name is only kept once it crosses the threshold.",
+     rule:"Amber when a surging name is already on a register. Red when a surging name is on no register at all, which is what a new scam looks like from the inside.",
+     go:"It is not a finding. It is worth a phone call to the regulator for that sector."},
+    {k:"build", plate:"Page and API match",
+     s:worse(st.deploy||"warn", !d.build ? "warn" : (d.build.match?"ok":"bad")),
+     v:!d.build ? "Not reported" : (d.build.match? d.build.page : "Page and API disagree"),
+     what:"The build stamp this page carries, against the one the API returns.",
+     rule:"Red when they differ.",
+     go:"Redeploy both from one commit. Guessing which build is live has cost this project hours before."}
+  ];
+}
+
+/* ============================================ THE FILE
+   One lamp for every control document that has to exist and be current before
+   this thing carries a customer. A document that has not been written is
+   amber, not green: an empty shelf is not a clean shelf, and the whole product
+   exists to refuse exactly that substitution.
+
+   Nothing here is wired to a real store yet. The states below are the honest
+   position as of today, which is that none of the ten has been written. */
+var DOCS = [
+  {k:"hra", id:"HRA-001", plate:"Human rights",
+   what:"Every feature checked against the fifteen grounds in the Alberta Human Rights Act, including the deleted dialect feature.",
+   amber:"Not written. A feature that reads language is one adverse-effect finding away from a protected ground, and nothing on file says it was tested.",
+   red:"Written, and it carries a release blocker that has not been cleared.",
+   go:"Ranked third. The dialect feature was already deleted, so the exposure is historic rather than live."},
+  {k:"mg", id:"MG-001", plate:"Feature control",
+   what:"The registry of every model and feature inside the approved boundary, with owner, proxy review, testing and a formal deletion record.",
+   amber:"Not written. There is no single list of what the system actually runs, so nobody can say what was tested and what was not.",
+   red:"Written, and a feature is running that the registry does not carry.",
+   go:"Needed before anything new ships, because it is the thing that makes the other nine checkable."},
+  {k:"lr", id:"LR-001", plate:"Legal register",
+   what:"One row per statute, case and regulator publication the assessment relies on, with the operative words, a source link and a verification date.",
+   amber:"Not written. Every other document cites law, so this is the spine they all hang from.",
+   red:"Written, and an authority in it failed reverification.",
+   go:"Build this first. A citation nobody checked is the cheapest way to lose a file."},
+  {k:"pub", id:"PUB-001", plate:"Publishing rules",
+   what:"What may be said about a named party, how a finding is worded, and how a correction or takedown is handled.",
+   amber:"Not written. Findings are being displayed with no release record behind them.",
+   red:"An adverse finding is published and no responsible-communication record exists for it.",
+   go:"Live exposure. Ranked second."},
+  {k:"sub", id:"SUB-001", plate:"Claims proof",
+   what:"Every objectively testable claim we make in public, with the test that was completed before it was published.",
+   amber:"Not written. Claims about source count, coverage and speed are already published.",
+   red:"A published claim has no completed test behind it. The burden of proving adequate and proper testing sits on us, not on a complainant.",
+   go:"Live exposure the day the site went up. Ranked first."},
+  {k:"vend", id:"VEND-001", plate:"Vendors",
+   what:"Every service provider, what it processes, where it is stored, who can reach it, and the cross-border notice that follows.",
+   amber:"Not written. Needs contract text and production configuration that is not in this workspace.",
+   red:"A provider is processing information under terms nobody has read.",
+   go:"Gather the contracts and the region settings first. This one cannot be written from the outside."},
+  {k:"ret", id:"RET-001", plate:"Retention",
+   what:"Every class of information, how long it is kept, how it is deleted and what evidence proves the deletion ran.",
+   amber:"Not written. The schedule is enforced in code, but the document that governs it is not on file.",
+   red:"A class is being kept past its period, or a deletion cannot be evidenced.",
+   go:"Keep retention separate from publication. Deleting our copy does not take a published result down."},
+  {k:"ir", id:"IR-001", plate:"Incident plan",
+   what:"What happens when a finding is wrong, a register goes dark, a breach occurs, or a claim turns out to be unsupported.",
+   amber:"Not written. There is no rehearsed path for correcting an adverse finding before it costs somebody a transaction.",
+   red:"An incident is open and being handled without a plan.",
+   go:"The workflow that matters most is the one that corrects a wrong finding fast."},
+  {k:"sec", id:"SEC-001", plate:"Security",
+   what:"Secrets, access, encryption, separation, logging, backups and deployment approval, each mapped to evidence that can be shown.",
+   amber:"Not written. Needs production configuration that is not in this workspace.",
+   red:"A control is claimed that cannot be evidenced.",
+   go:"Separate implemented from planned. A control nobody can demonstrate is a planned control."},
+  {k:"cou", id:"COU-001", plate:"Counsel questions",
+   what:"The unresolved questions carried out of the assessment, each with the facts needed and the exact written approval required.",
+   amber:"Not written. Four questions are carried forward in the assessment with no disposition.",
+   red:"A question is unresolved and the product is operating as though it were answered.",
+   go:"Built last. It is the residue of the other nine."}
+];
+function file(d){
+  var st=(d.documents)||{};
+  return DOCS.map(function(x){
+    var v=st[x.k]||"warn";
+    return {k:"f:"+x.k, plate:x.plate, s:v, sys:1, doc:1,
+            name:x.id+" \u00b7 "+x.plate,
+            v: v==="ok" ? "Current" : (v==="warn" ? "Not written" : "Blocker open"),
+            what:x.what, amber:x.amber, red:x.red, go:x.go};
   });
-  svg+='<text class="ax" x="'+padL+'" y="'+(H-5)+'">'+esc(rows[0].day)+'</text>';
-  svg+='<text class="ax" x="'+(W-8)+'" y="'+(H-5)+'" text-anchor="end">'+esc(rows[rows.length-1].day)+'</text>';
-  return svg+'</svg>';
 }
 
-function ranked(rows){
-  if(!rows.length) return '<p style="color:var(--ink3);font-size:13px">No source activity recorded.</p>';
-  return '<div class="rank">'+rows.map(function(r){
-    var p=r.ok_pct==null?0:Number(r.ok_pct);
-    var col=p>=95?"var(--ok)":(p>=80?"var(--warn)":"var(--bad)");
-    return '<div class="rrow"><span class="n" title="'+esc(r.source_id)+'">'+esc(r.source_id)+'</span>'
-      +'<span class="rtrack"><i style="width:'+p+'%;background:'+col+'"></i></span>'
-      +'<span class="p">'+(r.ok_pct==null?"none yet":p+"%")+'</span></div>';
-  }).join('')+'</div>';
+/* ------------------------------------------------------- the register board */
+/* Every register by name, in the check it serves. Generated from SOURCES in
+   the console, so the board and the engine cannot drift apart. */
+var REGCATS=[
+  ["01 Identity",["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones"]],
+  ["02 Licensing",["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]],
+  ["03 Enforcement",["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]],
+  ["04 People",["Corporations Canada, Individuals with Significant Control","ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]],
+  ["05 Legal",["CanLII","Supreme Court of Canada and Federal Court","Provincial courts and tribunals","Securities tribunals and the Competition Tribunal","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims","SEDAR+"]],
+  ["06 Web",["ICANN RDAP","Certificate Log","Google Web Risk","VirusTotal","urlscan.io","Mail Config"]],
+  ["07 Reviews",["Trustpilot","Sitejabber","BBB Scam Tracker","Forex Peace Army","Reddit","Glassdoor"]],
+  ["08 Payment",["Beneficiary Match","IBAN and SWIFT","Chainabuse","Chain Analytics","Etherscan","Solscan","Tronscan","Bitcoin Explorer"]],
+  ["09 4orm",["Infrastructure Cluster","Identifier Reuse","Document Fingerprint","Analytics and Pixel Reuse","Site Technology","DNS and IP History","Host and Certificate Graph","Wallet Reuse","Beneficiary Reuse","People Cluster","Operator Graph"]],
+  ["10 Claim dates",["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile","Form D First Filing","Form D First Sale","EDGAR First Filing","SEDAR+ First Filing","SEDI First Insider Record","IAPD First Registration","App Store First Release","Google Play First Release","GitHub Repository Created","GitHub First Commit","First Press Release","First YouTube Video","First Social Post"]]
+];
+/* The engraved label for every one of the 121 registers, written by hand. An
+   auto-shortener turned "Registraire des entreprises du Quebec" into
+   "REGISTRAIRE DES" and made SEC EDGAR and SEC IAPD read the same, which on a
+   panel is worse than no label at all. The full name is on the tile. */
+var PLATES=[
+  ["CORP CANADA","ONTARIO","BC REGISTRY","ALBERTA","SEC EDGAR","UK CO HOUSE","FL SUNBIZ","OPENCORP","QUEBEC REQ","ACRA SG","HK REGISTRY","NZ COMPANIES","OFFSHORE"],
+  ["CSA REG","CIRO ADVISOR","FINTRAC MSB","BOC PSP","FCA UK","BROKERCHECK","NFA BASIC","FINCEN MSB","SEC IAPD","SEC FORM D","ASIC PRO","SFC HK","ESMA MICA","RECO","FSRA ONT","PROV REGS","NMLS","MAS SG"],
+  ["IOSCO SCAN","CAN SANCTIONS","CONSUMER ALERTS","MAS ALERT","BCSC CAUTION","ASC CAUTION","OSC ALERTS","CSA ALERTS","FCA WARNING","OFAC","UN LIST","DOJ PRESS","IRS CI","STATE AG","SEC SUSPEND","CFTC RED","CFTC ACTIONS","DFPI SCAMS","CIRO DISCIPLINE","ASIC ALERTS","SFC ALERTS"],
+  ["CANADA ISC","ISC OWNERS","UK PSC","ASIC BANNED","CSA DISCIPLINED","CSA PERSONS","SEDI INSIDERS"],
+  ["CANLII","SCC FEDERAL","PROV COURTS","TRIBUNALS","OSB BANKRUPT","COURTLISTENER","UK INSOLVENCY","PACER","JUSTIA","BANKRUPTCY","SEDAR PLUS"],
+  ["RDAP","CERT LOG","WEB RISK","VIRUSTOTAL","URLSCAN","MAIL CONFIG"],
+  ["TRUSTPILOT","SITEJABBER","BBB SCAMS","FOREX PEACE","REDDIT","GLASSDOOR"],
+  ["BENEFICIARY","IBAN SWIFT","CHAINABUSE","CHAIN ANALYTICS","ETHERSCAN","SOLSCAN","TRONSCAN","BITCOIN"],
+  ["INFRA CLUSTER","ID REUSE","DOC PRINT","PIXEL REUSE","SITE TECH","DNS HISTORY","HOST GRAPH","WALLET REUSE","PAYEE REUSE","PEOPLE CLUSTER","OPERATOR GRAPH"],
+  ["RDAP DATE","WAYBACK","FIRST CERT","TRADEMARK","DOMAIN HISTORY","INCORPORATED","PROFILE AGE","FORM D FILE","FORM D SALE","EDGAR FIRST","SEDAR FIRST","SEDI FIRST","IAPD FIRST","APP STORE","GOOGLE PLAY","REPO CREATED","FIRST COMMIT","FIRST PRESS","FIRST VIDEO","FIRST POST"]
+];
+function plateText(ci,i,n){
+  var row=PLATES[ci]||[];
+  return row[i] || String(n||"").toUpperCase().split(/\s+/).slice(0,2).join(" ");
+}
+/* If a register is ever added to SOURCES without a plate, the panel says so out
+   loud rather than quietly drawing a lamp with the wrong name under it. */
+(function(){
+  var bad=REGCATS.filter(function(c,i){return (PLATES[i]||[]).length!==c[1].length;});
+  if(bad.length) try{ console.error("[panel] plate labels out of step with SOURCES"); }catch(e){}
+})();
+function regState(d,ci){
+  var n=REGCATS[ci][1].length;
+  /* No register health reported means not measured, and not measured is amber.
+     It must never fall through to green: a check drawn as answered because
+     nobody asked is the same lie the whole product exists to refuse. */
+  if(!d.registers) return {bad:0,warn:n,ok:0,n:n,s:"warn",measured:false};
+  var down=d.registers.down||{}, quiet=d.registers.quiet||{};
+  var bad=down[ci]||0, wrm=quiet[ci]||0;
+  return {bad:bad,warn:wrm,ok:n-bad-wrm,n:n,measured:true,
+          s: bad? "bad" : (wrm? "warn" : "ok")};
 }
 
-function chainPanel(c){
-  if(!c || !c.height) return '<div class="card"><h2>The evidence layer</h2>'
-    +'<div class="sub">Nothing recorded yet. The chain starts at the first completed check.</div></div>';
-  var lv=c.last_verify;
-  var okv = lv && lv.intact;
-  return '<div class="card"><h2>The evidence layer</h2>'
-    +'<div class="sub">Every run is a row, and every row carries the hash of the one before it. '
-    +'Alter a row after the fact and every hash after it stops matching. That is what makes the '
-    +'counter on the landing page a number somebody can check rather than a number we assert.</div>'
-    +'<div class="chain">'
-    +'<div class="chip"><div class="l">Chain height</div><div class="v">'+num(c.height)+'</div></div>'
-    +'<div class="chip"><div class="l">Head</div><div class="v h">'+esc(String(c.head_hash||'').slice(0,16))+'</div></div>'
-    +'<div class="chip" data-s="'+(lv?(okv?'ok':'bad'):'')+'"><div class="l">Last verification</div>'
-      +'<div class="v">'+(lv?(okv?'Intact':'BROKEN'):'Never run')+'</div></div>'
-    +'<div class="chip"><div class="l">Verified at</div><div class="v h">'
-      +(lv?esc(String(lv.at).slice(0,19).replace('T',' ')):'not yet')+'</div></div>'
-    +'<div class="chip"><div class="l">Hash schemas in use</div><div class="v h">'
-      +((c.schemas&&c.schemas.length)
-          ? c.schemas.map(function(x){ return esc(x.hash_schema)+' \u00d7'+num(x.n); }).join('  ')
-          : 'v1')+'</div></div>'
-    +'</div>'
-    +(lv&&!okv?'<p style="color:var(--bad);font-size:13.5px;margin-bottom:14px"><b>The chain does not '
-      +'verify.</b> A row at sequence '+num(lv.broken_at)+' does not match its predecessor. Do not '
-      +'publish any figure drawn from this log until that is explained.</p>':'')
-    +'<button id="verify" type="button">Verify the chain now</button>'
-    +'<span id="vout" style="margin-left:14px;font-size:13px;color:var(--ink3)"></span>'
-    +'</div>';
-}
-
-/* The rule history.
-   A run row commits to a rule VERSION and never to what that rule said, which
-   is what lets a rule change without disturbing a hash already written. The
-   cost of that separation is that the version points at nothing unless the
-   rules themselves are recorded. This is that record, and it is chained too,
-   because a runs chain that verifies while the rule history was rewritten
-   underneath it proves the wrong thing. */
-function policyPanel(p){
-  if(!p) return '';
-  var head=p.head||{}, hist=p.history||[];
-  var h='<div class="card"><h2>The rules, and every time they changed</h2>'
-    +'<div class="sub">Each row is one rule change: what changed, why, when it took effect, '
-    +'and the evidence behind it. Every run in the log names the version it ran under, so a '
-    +'report can say which rule was in force when we looked instead of quietly applying '
-    +'today\u2019s rule to an older record.</div>'
-    +'<div class="chain">'
-    +'<div class="chip"><div class="l">Rule changes recorded</div><div class="v">'+num(head.height||0)+'</div></div>'
-    +'<div class="chip"><div class="l">Rule chain head</div><div class="v h">'
-      +esc(String(head.head_hash||'').slice(0,16)||'not started')+'</div></div>'
-    +'<div class="chip"><div class="l">Rules in force</div><div class="v h">'
-      +esc(hist.length?String(hist[0].version):'none recorded')+'</div></div>'
-    +'</div>';
-  if(!hist.length){
-    return h+'<div class="sub">No rule change has been recorded yet. Until one is, every run '
-      +'row cites a version that cannot be looked up.</div></div>';
+/* ------------------------------------------------------------- the gauges */
+var ARC=2*Math.PI*62*0.75;
+function gauge(pct,cap,unit,note,state,key){
+  var off=ARC*(1-(pct==null?0:pct)/100);
+  var ticks="",i;
+  for(i=0;i<=30;i++){
+    var a=(-225+i*270/30)*Math.PI/180, maj=i%5===0, r1=maj?76:79, r2=84;
+    ticks+='<line class="gtick'+(maj?' maj':'')+'" x1="'+(90+r1*Math.cos(a)).toFixed(1)+'" y1="'
+      +(90+r1*Math.sin(a)).toFixed(1)+'" x2="'+(90+r2*Math.cos(a)).toFixed(1)+'" y2="'
+      +(90+r2*Math.sin(a)).toFixed(1)+'"/>';
   }
-  h+='<div class="tw"><table><thead><tr><th>Version</th><th>In force from</th><th>Change</th>'
-    +'<th>What changed</th><th>Registers</th><th>Evidence</th></tr></thead><tbody>';
-  hist.forEach(function(r){
-    h+='<tr><td class="mono">'+esc(r.version)+'</td>'
-      +'<td class="mono">'+esc(String(r.effective_from||'').slice(0,10))+'</td>'
-      +'<td>'+esc(r.change_kind||'')+'</td>'
-      +'<td>'+esc(r.summary||'')+(r.reason?'<br><span class="q">'+esc(r.reason)+'</span>':'')+'</td>'
-      +'<td class="mono">'+num(r.sources_enabled)+'/'+num(r.sources_total)+'</td>'
-      +'<td>'+(r.evidence_url
-                ? '<a href="'+esc(r.evidence_url)+'" rel="noopener noreferrer" target="_blank">source</a>'
-                : '<span class="q">internal change</span>')+'</td></tr>';
+  return '<button class="gauge" type="button" data-s="'+state+'"'
+    +(key?' data-info="'+key+'"':'')+'><div class="gwrap">'
+    +'<svg viewBox="0 0 180 180" role="img" aria-label="'+esc(cap)+' '+(pct==null?"no reading":pct+"%")+'">'
+    +ticks
+    +'<circle class="gtrack" cx="90" cy="90" r="62" stroke-dasharray="'+ARC+' 999"'
+    +' transform="rotate(135 90 90)"/>'
+    +'<circle class="gval" cx="90" cy="90" r="62" stroke-dasharray="'+ARC+' 999"'
+    +' stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(135 90 90)"/>'
+    +'</svg>'
+    +'<div class="gnum"><span class="n">'+(pct==null?"--":pct)+'</span>'
+    +'<span class="u">'+esc(unit)+'</span></div></div>'
+    +'<div class="gcap">'+esc(cap)+'</div><div class="gnote">'+esc(note)+'</div></button>';
+}
+function gauges(d){
+  var s=d.sources, band=function(v,a,b){return v==null?"idle":(v>=a?"ok":(v>=b?"warn":"bad"));};
+  var mins=Math.round((d.runs.avg_ms||0)/600)/100;
+  var timePct=Math.max(0,Math.min(100,Math.round(100-((d.runs.avg_ms||0)/1000-40)/1.4)));
+  var v=d.chain.last_verify||{}, ran=d.runs.attempted||0, del=d.deletion||{};
+  /* Provable: the share of runs that are in the hashed log and still verify
+     against it. The only instrument here that measures whether the record can
+     be defended rather than whether the machine is quick. */
+  var proof = ran ? Math.max(0,Math.min(100,Math.round(100*(v.checked||0)/ran))) : null;
+  /* Deleted on time: the share of days in the window on which the scheduled
+     deletion actually ran. A retention promise nobody measured is a sentence. */
+  var dfail = del.days_failed||0, dall = d.window_days || (del.days_run||0);
+  var delPct = dall ? Math.round(100*(dall-dfail)/dall) : null;
+  $("#gauges").innerHTML =
+      gauge(d.completion_pct,"Checks finished","%",
+        num(d.runs.completed)+" of "+num(d.runs.attempted)+" reached an answer",
+        band(d.completion_pct,95,85),"completing")
+    + gauge(s.success_pct,"Registers answering","%",
+        num(s.ok)+" of "+num(s.attempts)+" times we asked, a register answered",
+        band(s.success_pct,95,85),"registers")
+    + gauge(timePct,"Time to spare","%",
+        mins+" minutes on average, against a three minute ceiling",
+        band(timePct,60,30),"pace")
+    + gauge(proof,"Runs we can prove","%",
+        v.intact ? num(v.checked)+" of "+num(ran)+" verify against the hashed log"
+                 : num(v.checked)+" of "+num(ran)+" verify, then the log breaks",
+        v.intact===false ? "bad" : band(proof,99,90),"provable")
+    + gauge(delPct,"Deleted on time","%",
+        dfail ? "on "+num(dfail)+" of "+num(dall)+" days the deletion did not run"
+              : "the deletion ran on all "+num(dall)+" days",
+        dfail ? "bad" : band(delPct,100,90),"deleted");
+  document.querySelectorAll("#gauges .gauge[data-info]").forEach(function(g){
+    g.addEventListener("click",function(){ openInfo(GAUGE_INFO[g.getAttribute("data-info")]); });
   });
-  return h+'</tbody></table></div></div>';
 }
 
-/* Exposed so the render path can be exercised without standing up Clerk. What
-   the suite tests is the panel, not the auth library. */
-window.render = render;
-function render(d){
-  var r=d.runs||{}, s=d.sources||{}, del=d.deletion||{}, inc=d.incidents||{};
-  var h='';
-  h+=chainPanel(d.chain);
-  h+=policyPanel(d.policy);
-  h+='<div class="grid">'
-    +tile(num(r.attempted),"","Checks attempted","Every request that reached the gates")
-    +tile(num(d.people),"","People helped","Distinct visitor-days. A floor, never a headcount")
-    +tile(d.completion_pct==null?"none yet":d.completion_pct, d.completion_pct==null?"":"%","Completed",
-          num(r.completed)+" of "+num(r.attempted),
-          d.completion_pct==null?null:(d.completion_pct>=95?"ok":(d.completion_pct>=85?"warn":"bad")))
-    +tile(s.success_pct==null?"none yet":s.success_pct, s.success_pct==null?"":"%","Source success rate",
-          num(s.ok)+" of "+num(s.attempts)+" attempts",
-          s.success_pct==null?null:(s.success_pct>=95?"ok":(s.success_pct>=85?"warn":"bad")))
-    +tile(d.incomplete_pct==null?"none yet":d.incomplete_pct, d.incomplete_pct==null?"":"%","Reported incomplete",
-          "A critical register was unreachable",
-          d.incomplete_pct==null?null:(d.incomplete_pct<=5?"ok":"warn"))
-    +tile(num(r.suppressed),"","Person-level suppressions","Tier C/D or Quebec subject")
-    +tile(num(r.barred),"","Items refused","Dead charge or over seven years")
-    +'</div>';
+function counts(d){
+  var C=[[num(d.runs.attempted),"Checks attempted","Every request that reached the gates"],
+         [num(d.people),"People helped","Distinct visitor-days. A floor, never a headcount"],
+         [num(d.chain.height),"Rows in the chain",
+          "Each one hashed to the one before it",
+          '<div class="vout" id="vout">Press Verify the chain to walk every row.</div>'],
+         [num(d.policy.head?d.policy.head.height:0),"Rule changes","Every one dated and signed"]];
+  $("#counts").innerHTML = C.map(function(c){
+    return '<div class="count"><div class="n">'+c[0]+'</div><div class="k">'+esc(c[1])
+      +'</div><div class="x">'+esc(c[2])+'</div>'+(c[3]||"")+'</div>';}).join("");
+}
 
-  h+='<div class="two">';
-  h+='<div class="card"><h2>Checks attempted per day</h2>'
-    +'<div class="sub">Requests that passed the jurisdiction and purpose gates.</div>'
-    +timeSeries(d.by_day||[])+'</div>';
-  h+='<div class="card"><h2>Registers by success rate, worst first</h2>'
-    +'<div class="sub">A register that starts failing quietly is the one hazard the product cannot '
-    +'survive, because a failure reported as a clean result is the only dishonest output it can make.</div>'
-    +ranked(s.worst||[])+'</div>';
-  h+='</div>';
-
-  h+='<div class="two">';
-  h+='<div class="card"><h2>How runs ended</h2><div class="sub">Blocks are the gates working, not errors.</div>'
-    +'<table><thead><tr><th>Outcome</th><th style="text-align:right">Runs</th></tr></thead><tbody>'
-    +(d.by_outcome||[]).map(function(o){
-        var cls=o.outcome==="COMPLETED"?"ok":(o.outcome==="ERROR"?"bad":"mut");
-        return '<tr><td><span class="pill '+cls+'"><i></i>'+esc(o.outcome)+'</span></td>'
-          +'<td class="num">'+num(o.n)+'</td></tr>';}).join('')
-    +'</tbody></table></div>';
-  h+='<div class="card"><h2>What people searched</h2>'
-    +'<div class="sub">The shape of the request. Never its content.</div>'
-    +'<table><thead><tr><th>Input type</th><th style="text-align:right">Runs</th></tr></thead><tbody>'
-    +(d.by_input||[]).map(function(o){
-        return '<tr><td>'+esc(o.input_type)+'</td><td class="num">'+num(o.n)+'</td></tr>';}).join('')
-    +'</tbody></table></div>';
-  h+='</div>';
-
-  h+='<div class="card"><h2>The evidence a regulator asks for</h2>'
-    +'<div class="sub">Rights handling, deletion and incidents. OPS-001 s.52.</div>'
-    +'<table><thead><tr><th>Measure</th><th style="text-align:right">Count</th><th>Note</th></tr></thead><tbody>';
-  (d.rights||[]).forEach(function(x){
-    h+='<tr><td>'+esc(x.kind)+' requests</td><td class="num">'+num(x.opened)+'</td>'
-      +'<td>'+num(x.closed)+' closed'+(x.avg_days?', '+x.avg_days+' days average':'')+'</td></tr>';
+function rank(d){
+  $("#rank").innerHTML=(d.sources.worst||[]).slice(0,5).map(function(w){
+    var s=w[1]>=95?"ok":(w[1]>=85?"warn":"bad");
+    return '<button class="rblk" type="button" data-reg="'+esc(w[0])+'" data-pct="'+w[1]+'">'
+      +'<span class="rrow" data-s="'+s+'"><span class="rname">'+esc(w[0])+'</span>'
+      +'<span class="rv">'+w[1]+'%</span></span>'
+      +'<span class="rbarw"><i style="width:'+w[1]+'%"></i></span></button>';}).join("");
+  document.querySelectorAll("#rank .rblk").forEach(function(el){
+    el.addEventListener("click",function(){ openRegister(el.getAttribute("data-reg"),
+      +el.getAttribute("data-pct")); });
   });
-  if(!(d.rights||[]).length)
-    h+='<tr><td>Access, correction and challenge</td><td class="num">0</td><td>None received in this window</td></tr>';
-  h+='<tr><td>Deletion job</td><td class="num">'+num(del.days_run)+'</td>'
-    +'<td>days run, '+num(del.days_failed)+' failed, '+num(del.deleted)+' records deleted</td></tr>';
-  h+='<tr><td>Incidents</td><td class="num">'+num(inc.total)+'</td>'
-    +'<td>'+num(inc.pi)+' involving personal information, '+num(inc.rrosh)
-    +' meeting the real-risk threshold, '+num(inc.reported)+' reported</td></tr>';
-  if(r.ran_unenforced)
-    h+='<tr><td><span class="pill bad"><i></i>SR-001 UNENFORCED</span></td><td class="num">'
-      +num(r.ran_unenforced)+'</td><td>runs executed with source enforcement off. '
-      +'Investigate: these queried registers the register had not cleared.</td></tr>';
-  h+='</tbody></table></div>';
+}
 
-  h+='<p style="font-size:12.5px;color:var(--ink3);margin-top:6px">Window: '+esc(d.window_days)
-    +' days. Generated '+esc((d.generated||"").slice(0,19).replace("T"," "))+' UTC.</p>';
-  $("#panel").innerHTML=h; $("#panel").hidden=false;
-  wireTips();
-  var vb=document.getElementById("verify");
-  if(vb) vb.addEventListener("click",function(){
-    var o=document.getElementById("vout");
-    o.textContent="Walking the chain...";
-    api("/api/evidence?run=1").then(function(res){
-      if(!res.ok){ o.textContent="Could not verify: "+(res.j&&res.j.error||res.status); return; }
-      var v=res.j;
-      var runsOk = v.intact && v.head_matches;
-      var pol = v.policy || null;
-      var polOk = !pol || !pol.ok || (pol.intact && pol.head_matches);
-      var msg = runsOk
-        ? ("Runs intact. "+num(v.checked)+" rows checked in "+v.ms+"ms, head matches.")
-        : ("Runs BROKEN at sequence "+v.broken_at+". "+num(v.checked)+" rows checked before the break.");
-      if(pol && pol.ok){
-        msg += polOk
-          ? (" Rules intact, "+num(pol.checked)+" changes checked.")
-          : (" Rules BROKEN at sequence "+pol.broken_at+".");
-      }
-      o.textContent = msg;
-      o.style.color = (runsOk && polOk) ? "var(--ok)" : "var(--bad)";
+/* A register row says a name and a percentage. Neither means anything to
+   somebody who has not met that register, so pressing it says what the
+   register is, and what a falling number on it actually costs a reader. */
+function openRegister(name,pct){
+  var d=REG_INFO[name];
+  var band = pct>=95 ? "Inside the line."
+           : pct>=85 ? "Amber. Below 95 per cent of attempts answered."
+                     : "Red. Below 85 per cent of attempts answered.";
+  var rows=[];
+  if(d){ rows.push(["What it is",d[0]]); rows.push(["What it answers",d[1]]); }
+  else  { rows.push(["What it is","One of the 121 registers in the catalogue. Press a check in the flow chart to see which of them it belongs to."]); }
+  rows.push(["The number",pct+" per cent of the times we asked it in this window, it came back with something. "+band]);
+  rows.push(["What a fall means","A register that starts failing quietly is the one hazard this product cannot survive, because a failure reported as a clean result is the only dishonest output it can make. A check that could not reach this register says so, and the run is marked incomplete rather than clean."]);
+  rows.push(["What to do","Check whether the other registers from the same publisher are falling too. One register is usually the publisher. All of them is usually us."]);
+  openInfo({t:name, sub:"Register", rows:rows});
+}
+
+/* Nothing scrolls on a wall board, so the table shows what fits and says out
+   loud how many it could not show. A row cut through the middle is worse than
+   a row that is honestly absent, and a count nobody can see is worse than
+   both. Rows come off the bottom, one at a time, until the last one clears. */
+var PULSE_HTML=[];
+function fitRows(){
+  var body=document.getElementById("pulseRows");
+  if(!body) return;
+  var box=body.parentNode;
+  while(box && !(box.classList && box.classList.contains("scroll"))) box=box.parentNode;
+  if(!box) return;
+  var total=PULSE_HTML.length;
+  var draw=function(n){
+    var more=total-n;
+    body.innerHTML = PULSE_HTML.slice(0,n).join("") + (more
+      ? '<tr><td colspan="5" style="border-bottom:0;padding-top:9px;color:var(--ink-4);'
+        +'font-size:11.5px">and '+more+' more name'+(more>1?'s':'')
+        +' below the bar, no room to show '+(more>1?'them':'it')+'</td></tr>'
+      : "");
+  };
+  var n=total;
+  draw(n);
+  while(n>1 && box.scrollHeight > box.clientHeight + 1){ n--; draw(n); }
+}
+/* the webfont changes the metrics, so the fit settles once it has landed */
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitRows);
+window.addEventListener("resize",fitRows);
+
+function pulse(d){
+  var bar=d.pulse.label_at;
+  var barEl=document.getElementById("bar"); if(barEl) barEl.textContent=bar;
+  PULSE_HTML=(d.pulse.rows||[]).map(function(r){
+    var lift = r.was>0 ? Math.round(r.n/r.was)+"x" : (r.n>bar?"new":"steady");
+    var hot  = r.n>=bar;
+    var advPct = r.n? Math.round(100*r.adverse/r.n) : 0;
+    /* The name where the bar was crossed, the unreadable hash where it was not.
+       The hash is shown deliberately: a row nobody can read is still evidence
+       that something is moving. */
+    var who = r.label
+      ? '<b style="color:var(--ink)">'+esc(r.label)+'</b>'
+      : '<span style="font-family:var(--mono);font-size:11.5px;color:var(--ink-4)">'
+        +esc(r.hash)+' <span style="letter-spacing:.1em">·  BELOW THE BAR</span></span>';
+    var said = r.adverse
+      ? '<span style="color:var(--bad)">'+advPct+'% returned an official adverse record</span>'
+      : (r.clean? advPct+'% adverse, mostly clean' : 'nothing established');
+    return '<tr'+(hot?' style="background:linear-gradient(90deg,rgba(255,83,64,.09),transparent 60%)"':'')
+      +'><td>'+who+'<div style="margin-top:3px;font-family:var(--mono);font-size:9px;'
+      +'letter-spacing:.14em;color:var(--ink-4);text-transform:uppercase">'+esc(r.type)+'</div></td>'
+      +'<td class="n" style="font-size:15px'+(hot?';color:var(--bad)':'')+'">'+num(r.n)+'</td>'
+      +'<td class="n" style="color:'+(hot?'var(--bad)':'var(--ink-3)')+'">'+esc(lift)+'</td>'
+      +'<td>'+said+'</td>'
+      +'<td style="font-family:var(--mono);font-size:11.5px;color:var(--ink-3)">'+esc(r.first)+'</td></tr>';
+  });
+  fitRows();
+}
+
+var MW=620, MH=792;
+var G={ headY:236, footY:626, barH:7, x0:26, x1:594,
+        spineW:7, feedX:26, colX:587,
+        bankX:68, bankW:496, bankH:30, bankY0:254, bankGap:37 };
+function bankCY(i){ return G.bankY0 + i*G.bankGap + G.bankH/2; }
+
+function stageNodes(d){
+  var r=d.runs||{}, sysd=d.systems||{};
+  var S=function(k){return sysd[k]||"warn";};
+  var blocked=((d.by_outcome||[]).filter(function(o){return o[0]==="BLOCKED";})[0]||["",0])[1];
+  var N=[];
+  N.push({id:"ask",  kind:"big", x:190,y:2,  w:240,h:42, t:"The ask",
+          x2:num(r.attempted)+" checks", s:"ok"});
+  N.push({id:"gate", kind:"big", x:190,y:56, w:240,h:42, t:"The gate",
+          x2:num(blocked)+" turned away", s:"ok"});
+  N.push({id:"route",kind:"big", x:190,y:110,w:240,h:42, t:"Routing",
+          x2:"picks the registers", s:S("policy")});
+  N.push({id:"exa", kind:"sm", x:26, y:176, w:180,h:40, t:"Search", x2:"Exa", s:S("search")});
+  N.push({id:"conn",kind:"sm", x:220,y:176, w:180,h:40, t:"Direct feed", x2:"connectors",
+          s:S("connectors")});
+  N.push({id:"par", kind:"sm", x:414,y:176, w:180,h:40, t:"Objective", x2:"Parallel",
+          s:S("search")});
+  REGCATS.forEach(function(c,i){
+    var st=regState(d,i);
+    N.push({id:"cat"+i, cat:i, kind:"wide", x:G.bankX, y:G.bankY0+i*G.bankGap,
+            w:G.bankW, h:G.bankH, t:c[0].replace(/^\d+\s/,""),
+            x2:st.ok+" of "+st.n, s:st.s});
+  });
+  N.push({id:"round2",kind:"big", x:26, y:648, w:270,h:44, t:"Second pass",
+          x2:"cases and siblings", s:S("search")});
+  N.push({id:"read",  kind:"big", x:324,y:648, w:270,h:44, t:"The reading",
+          x2:"one call, no searching", s:S("reason")});
+  N.push({id:"report",kind:"big", x:26, y:718, w:270,h:44, t:"The report",
+          x2:"what a reader sees", s:"ok"});
+  N.push({id:"record",kind:"big", x:324,y:718, w:270,h:44, t:"The record",
+          x2:"hashed and provable", s:S("chain")});
+  return N;
+}
+
+function mimic(d){
+  var N=stageNodes(d), by={}; N.forEach(function(n){by[n.id]=n;});
+  var cls=function(s){ return s==="bad" ? "dead" : (s==="warn" ? "" : "live"); };
+  var P="";
+  var drop=function(a,b,s){
+    var A=by[a],B=by[b], x=A.x+A.w/2;
+    P+='<path class="pipe '+cls(s)+'" d="M'+x+' '+(A.y+A.h)+' L'+x+' '+B.y+'"/>';
+  };
+  drop("ask","gate","ok");
+  drop("gate","route","ok");
+  /* routing and the three providers all drop onto one header bar */
+  P+='<path class="pipe '+cls(by.route.s)+'" d="M310 '+(by.route.y+by.route.h)
+    +' L310 '+by.conn.y+'"/>';
+  ["exa","conn","par"].forEach(function(k){
+    var n=by[k], x=n.x+n.w/2;
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+x+' '+(n.y+n.h)+' L'+x+' '+G.headY+'"/>';
+  });
+  /* The header bar turns down a feed spine on the left. A collector spine on
+     the right gathers what came back and turns into the foot bar. Ten short
+     stubs, not ten full height risers, so no pipe crosses a box. */
+  var bars=
+     '<rect class="mtrunk" x="'+G.x0+'" y="'+G.headY+'" width="'+(G.x1-G.x0)+'" height="'+G.barH+'" rx="3.5"/>'
+   + '<rect class="mtrunk" x="'+G.feedX+'" y="'+G.headY+'" width="'+G.spineW+'" height="'+(G.footY-G.headY)+'" rx="3.5"/>'
+   + '<rect class="mtrunk" x="'+G.colX+'" y="'+bankCY(0)+'" width="'+G.spineW+'" height="'+(G.footY-bankCY(0)+G.barH)+'" rx="3.5"/>'
+   + '<rect class="mtrunk" x="'+G.x0+'" y="'+G.footY+'" width="'+(G.x1-G.x0)+'" height="'+G.barH+'" rx="3.5"/>';
+  REGCATS.forEach(function(c,i){
+    var n=by["cat"+i], cy=bankCY(i);
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+(G.feedX+G.spineW)+' '+cy+' L'+n.x+' '+cy+'"/>';
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+(n.x+n.w)+' '+cy+' L'+G.colX+' '+cy+'"/>';
+  });
+  /* the foot bar feeds the second pass and the reading */
+  [["round2",by.round2.s],["read",by.read.s]].forEach(function(q){
+    var n=by[q[0]], x=n.x+n.w/2;
+    P+='<path class="pipe '+cls(q[1])+'" d="M'+x+' '+(G.footY+G.barH)+' L'+x+' '+n.y+'"/>';
+  });
+  /* what the second pass finds goes across into the reading */
+  P+='<path class="pipe '+cls(by.read.s)+'" d="M'+(by.round2.x+by.round2.w)+' '
+    +(by.round2.y+by.round2.h/2)+' L'+by.read.x+' '+(by.read.y+by.read.h/2)+'"/>';
+  /* and the reading hands over to the report and the record */
+  var rx=by.read.x+by.read.w/2, ry=by.read.y+by.read.h;
+  var px=by.report.x+by.report.w/2, py=by.report.y, mid=(ry+py)/2;
+  P+='<path class="pipe live" d="M'+rx+' '+ry+' C'+rx+' '+mid+' '+px+' '+mid+' '+px+' '+py+'"/>';
+  P+='<path class="pipe '+cls(by.record.s)+'" d="M'+rx+' '+ry+' L'+rx+' '+by.record.y+'"/>';
+  /* the loop: the second pass re-enters retrieval through the feed spine */
+  P+='<path class="pipe loop" d="M'+(by.round2.x+34)+' '+by.round2.y+' L12 '
+    +by.round2.y+' L12 '+(G.headY+16)+' L'+G.feedX+' '+(G.headY+16)
+    +'" marker-end="url(#mrk)"/>';
+
+  var boxes=N.map(function(n){
+    var g='<g class="nnode" data-s="'+n.s+'" data-id="'+n.id+'"'
+      +(n.cat!=null?' data-cat="'+n.cat+'"':'')+'>'
+      +'<rect class="nbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="8"/>';
+    if(n.kind==="wide"){
+      g+='<circle class="nlamp" cx="'+(n.x+18)+'" cy="'+(n.y+17)+'" r="6"/>'
+       + '<text class="ntitle" x="'+(n.x+33)+'" y="'+(n.y+21)+'">'+esc(n.t)+'</text>'
+       + '<text class="nsub end" x="'+(n.x+n.w-13)+'" y="'+(n.y+21)+'">'+esc(n.x2)+'</text>';
+    } else {
+      g+='<circle class="nlamp" cx="'+(n.x+17)+'" cy="'+(n.y+16)+'" r="6.5"/>'
+       + '<text class="ntitle" x="'+(n.x+32)+'" y="'+(n.y+20)+'">'+esc(n.t)+'</text>'
+       + '<text class="nsub" x="'+(n.x+15)+'" y="'+(n.y+36)+'">'+esc(n.x2)+'</text>';
+    }
+    return g+'</g>';
+  }).join("");
+
+  var frame='<rect class="mframe" x="46" y="248" width="540" height="372" rx="10"/>'
+    +'<text class="slab" x="26" y="168">Where the pages come from</text>'
+    +'<text class="slab" x="46" y="642">Then hand over</text>';
+
+  document.getElementById("mimic").innerHTML=
+    '<svg viewBox="0 0 '+MW+' '+MH+'" preserveAspectRatio="xMidYMid meet" role="img" '
+    +'aria-label="The path a check takes, from the ask at the top to the record at the foot">'
+    +'<defs><marker id="mrk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
+    +'markerHeight="6" orient="auto-start-reverse"><path class="mrkh" d="M0 0 L10 5 L0 10 z"/>'
+    +'</marker></defs>'+frame+bars+P+boxes+'</svg>';
+
+  document.querySelectorAll("#mimic .nnode").forEach(function(g){
+    var cat=g.getAttribute("data-cat"), id=g.getAttribute("data-id");
+    if(cat==null && !NODE_INFO[id]) return;
+    g.classList.add("clicky");
+    g.addEventListener("click",function(){
+      if(cat!=null) openStage(+cat); else openInfo(NODE_INFO[id]);
     });
   });
 }
 
-function wireTips(){
-  document.querySelectorAll("rect.hit").forEach(function(el){
-    el.addEventListener("mousemove",function(e){
-      tip.textContent=this.getAttribute("data-t");
-      tip.style.left=(e.clientX+13)+"px"; tip.style.top=(e.clientY-30)+"px";
-      tip.classList.add("on");
-    });
-    el.addEventListener("mouseleave",function(){ tip.classList.remove("on"); });
+/* ------------------------------------------------- what a lamp opens onto */
+var STAGE=null;
+function sheetOpen(title,sub,html){
+  document.getElementById("shT").textContent=title;
+  document.getElementById("shX").textContent=sub;
+  document.getElementById("shB").innerHTML=html;
+  document.getElementById("sheet").classList.add("on");
+}
+function sheetClose(){ document.getElementById("sheet").classList.remove("on"); STAGE=null; }
+document.getElementById("shC").addEventListener("click",sheetClose);
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") sheetClose(); });
+
+function openInfo(spec){
+  if(!spec) return;
+  sheetOpen(spec.t, spec.sub||"",
+    '<dl class="dgrid">'+spec.rows.map(function(r){
+      return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>';}).join("")+'</dl>');
+}
+
+function openStage(ci){
+  STAGE=ci;
+  var c=REGCATS[ci], st=regState(LAST,ci);
+  var plates=c[1].map(function(nm,i){
+    var s2 = i<st.bad ? "bad" : (i<st.bad+st.warn ? "warn" : "ok");
+    var said = s2==="bad" ? "asked and failed"
+             : (s2==="warn" ? "not called today" : "answered");
+    return '<span class="plate" data-s="'+s2+'" title="'+esc(nm)+', '+said+'">'
+      +'<i></i><em>'+esc(plateText(ci,i,nm))+'</em></span>';
+  }).join("");
+  sheetOpen(c[0].replace(/^\d+\s/,"")+" registers",
+    !st.measured
+      ? "Register health is not being reported yet, so none of these can be shown as answered."
+    : st.bad? st.bad+" of "+st.n+" asked and failed. These are the ones to chase."
+    : (st.warn? st.warn+" of "+st.n+" were not called today, which is normal for a register "
+        +"that applies only to certain sectors." : "All "+st.n+" answered."),
+    '<div class="plates">'+plates+'</div>'
+    +'<div class="shleg">'
+    +'<span><i style="background:var(--ok);box-shadow:0 0 9px rgba(51,216,155,.6)"></i>Answered</span>'
+    +'<span><i style="background:var(--warn);box-shadow:0 0 9px rgba(231,199,108,.6)"></i>Not called today</span>'
+    +'<span><i style="background:var(--bad)"></i>Asked and failed</span></div>');
+}
+
+function openLamp(key){
+  var x=BOARD_ROWS[key]; if(!x) return;
+  var rows = x.doc
+    ? [["What it is",x.what],["Amber means",x.amber],["Red means",x.red],["Where it sits",x.go]]
+    : x.sys
+    ? [["What it is",x.what],["Amber means",x.amber],["Red means",x.red],["What to do",x.go]]
+    : [["What it counts",x.what],["The line",x.rule],["What to do",x.go]];
+  if(x.extra && x.extra.length) rows = rows.concat(x.extra);
+  var lit = x.doc
+    ? (x.s==="bad" ? "Red, a blocker is open in it"
+       : (x.s==="warn" ? "Amber, not written yet" : "Green, written and current"))
+    : x.sys
+    ? (x.s==="bad" ? "Red, this is down"
+       : (x.s==="warn" ? "Amber, not seen working today" : "Green, working"))
+    : (x.s==="bad" ? "Red, past the line"
+       : (x.s==="warn" ? "Amber, watch this" : "Green, inside the line"));
+  sheetOpen(x.name || x.plate,
+    (x.v===WORD[x.s] || x.doc) ? lit : lit+" · "+x.v,
+    '<dl class="dgrid">'+rows.map(function(r){
+      return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>';}).join("")+'</dl>');
+}
+
+/* ----------------------------------------------------- the annunciator */
+var BOARD_ROWS=null;
+function board(d){
+  var mach=machine(d).map(function(x){ x.k="m:"+x.k; x.sys=1; return x; });
+  var read=readings(d).map(function(x){ x.k="r:"+x.k; return x; });
+  var docs=file(d);
+  BOARD_ROWS={}; mach.concat(read).concat(docs).forEach(function(x){ BOARD_ROWS[x.k]=x; });
+  var cell=function(x){
+    var say = x.s==="ok" ? "" :
+      '<em><span class="g">'+GLYPH[x.s]+'</span>'+esc(x.v)+'</em>';
+    return '<button class="pl" type="button" data-s="'+x.s+'" data-open="'+x.k
+      +'" title="'+esc(x.v)+'"><i></i><b>'+esc(x.plate)+'</b>'+say+'</button>';
+  };
+  var row=function(label,list){
+    return '<div class="frow"><div class="flab">'+esc(label)+'</div>'
+      +'<div class="lamps" style="grid-template-columns:repeat('+list.length+',1fr)">'
+      +list.map(cell).join("")+'</div></div>';
+  };
+  document.getElementById("board").innerHTML =
+      row("Is the machine running", mach)
+    + row("What the numbers say",   read)
+    + row("Is the paperwork\nin place", docs);
+  document.querySelectorAll("#board .pl").forEach(function(b){
+    b.addEventListener("click",function(){ openLamp(b.getAttribute("data-open")); });
   });
 }
 
-/* ------------------------------------------------------------------ auth
-   Clerk carries the sign-in. Every call to the back office sends the session
-   token, and the server checks the allowlist separately, because being able to
-   prove who you are is not the same as being allowed in here. */
-var CLERK_KEY = document.body.getAttribute("data-clerk") || "";
+/* ============================================== THE READER SCREEN
+   Words, not lamps. It leads with the worst thing on the board, says what
+   that thing means for somebody using the product, and then says what is
+   fine. It never goes blank: on a good day it says so in a sentence. */
+function reader(d){
+  var rows=[], worst="ok";
+  var rank={ok:0,warn:1,bad:2};
+  var mach=machine(d), read=readings(d), docs=file(d);
+  mach.concat(read).concat(docs).forEach(function(x){
+    if(rank[x.s]>rank[worst]) worst=x.s;
+  });
+  var badM=mach.filter(function(x){return x.s==="bad";});
+  var badR=read.filter(function(x){return x.s==="bad";});
+  var badD=docs.filter(function(x){return x.s==="bad";});
+  var warnD=docs.filter(function(x){return x.s==="warn";});
+  var names=function(a){ return a.map(function(x){return x.plate.toLowerCase();}); };
+  var andList=function(a){
+    return a.length<2 ? (a[0]||"") : a.slice(0,-1).join(", ")+" and "+a[a.length-1];
+  };
+  var cap=function(t){ return t.charAt(0).toUpperCase()+t.slice(1); };
 
+  var head;
+  if(worst==="bad"){
+    var n=badM.length+badR.length+badD.length;
+    head = n===1 ? "One thing needs you." : n+" things need you.";
+  } else if(worst==="warn"){
+    head = "Running. Nothing is broken.";
+  } else {
+    head = "Everything is running.";
+  }
+
+  /* Worst first, and always in terms of what it does to somebody reading a
+     check, because that is the only consequence that matters here. */
+  if(badM.length) rows.push(cap(andList(names(badM)))+" "+(badM.length===1?"is":"are")
+    +" down. "+badM[0].red.split(".")[0]+".");
+  if(badR.length) rows.push(cap(badR[0].plate)+" is past the line at "+badR[0].v
+    +(badR.length>1 ? ", and "+(badR.length-1)+" other reading"
+        +(badR.length>2?"s are past too.":" is past too.") : "."));
+  if(badD.length) rows.push(cap(andList(names(badD)))
+    +(badD.length>1?" carry":" carries")+" live exposure with no document behind "
+    +(badD.length>1?"them":"it")+".");
+
+  if(worst!=="bad"){
+    rows.push(num(d.runs.completed)+" of "+num(d.runs.attempted)
+      +" checks reached an answer, and "+d.sources.success_pct
+      +" per cent of the registers we asked came back.");
+    var vv=d.chain.last_verify||{};
+    if(vv.intact) rows.push("Every one of the "+num(vv.checked)
+      +" runs in the log still verifies, so any of them can be proved after the fact.");
+  }
+  if(warnD.length) rows.push(
+    (warnD.length===docs.length ? "Not one of the ten control documents has been written"
+     : warnD.length===1 ? "One of the ten control documents has not been written"
+     : warnD.length+" of the ten control documents have not been written")
+    +". An empty shelf is not a clean shelf.");
+  if(!rows.length) rows.push("Nothing on the board is asking for anything.");
+
+  var el=document.getElementById("reader");
+  el.setAttribute("data-s",worst);
+  document.getElementById("rdline").textContent=head;
+  var shown=rows.slice(0,4);
+  document.getElementById("rdbody").innerHTML=shown.map(function(t,i){
+    return '<p>'+esc(t)+(i===shown.length-1?'<span class="cur"></span>':'')+'</p>';
+  }).join("");
+  document.getElementById("rdfoot").textContent =
+    "Window "+d.window_days+" days · read "+d.generated.slice(11,16)
+    +" UTC · build "+((d.build&&d.build.page)||"not reported");
+}
+
+/* ================================================ WHAT EVERY PART OF THE BOARD MEANS
+   Nothing on this board should be a shape you have to already understand. Every
+   node, every dial and every register row opens the same sheet and says what it
+   is, what the number on it is measuring, and what it means when it moves. */
+
+var NODE_INFO = {
+  ask:{ t:"The ask",
+    rows:[["What it is","What the reader typed. A company name, a website, an email address or a wallet address, and nothing else."],
+          ["What it is not","A person. A person's name is refused at the gate rather than searched, and that refusal is enforced in the code rather than written in a policy."],
+          ["The number on it","Checks that reached the gates in this window."]]},
+  gate:{ t:"The gate",
+    rows:[["What it is","The check that decides whether an ask is allowed to run at all."],
+          ["What it turns away","Anything that reads as a person rather than a party to a transaction, and anything outside the jurisdictions this product operates in."],
+          ["The number on it","Asks turned away in this window. A high count is the gate working, not an error."]]},
+  route:{ t:"Routing",
+    rows:[["What it is","The step that decides which of the 121 registers apply to this particular ask, from its sector and its jurisdiction."],
+          ["Why it matters","A check that asks every register of every subject is slower, more expensive and no more truthful. Routing is what keeps the scope honest."],
+          ["When it fails","Nothing should run. A check with no rules is a check with no scope, and the rulebook lamp turns amber."]]},
+  exa:{ t:"Search",
+    rows:[["What it is","The general search provider. It finds the pages that hold what a register published."],
+          ["When it is down","No register is reached at all. The check says so, and never draws a clean record out of silence."],
+          ["What to look at","Its key, its credit balance and its rate limit, in that order."]]},
+  conn:{ t:"Direct feed",
+    rows:[["What it is","Registers we call through their own interface instead of searching for them."],
+          ["Why both","A direct feed is faster and exact where one exists. Search is the fallback where one does not."],
+          ["When it is down","Those registers fall back to search, which reads fewer pages and takes longer."]]},
+  par:{ t:"Objective",
+    rows:[["What it is","The second retrieval provider, used where a question has a specific answer rather than a page to read."],
+          ["Why a second one","Two providers means one of them failing is a slower check rather than no check."]]},
+  round2:{ t:"The second pass",
+    rows:[["What it is","A second round of retrieval, seeded by what the first round actually found: related cases, sibling entities, named filings."],
+          ["Why it exists","The first round can only ask what the ask told it. The second can ask what the first round learned."],
+          ["What it never does","It never searches a person. The seeds it follows are entities and documents."]]},
+  read:{ t:"The reading",
+    rows:[["What it is","One call that reads everything retrieved and forms the assessment. It does no searching of its own."],
+          ["Why it is separate","Retrieval and judgement are kept apart on purpose. Coverage is counted from what was actually read, never asserted by the step that forms the answer."],
+          ["When it fails","The pages were still read. The reader is shown what was reached and told plainly that there is no assessment, rather than being shown a clean result."]]},
+  report:{ t:"The report",
+    rows:[["What it is","What a reader sees: what the registers hold, where each thing came from, and what could not be reached."],
+          ["The two numbers","Identity confidence and evidence coverage are always shown apart and never combined. There is no single trust score, and there never will be."]]},
+  record:{ t:"The record",
+    rows:[["What it is","The run written into the hashed log, so that months later it can be proved this check ran, when, and against what."],
+          ["Why hashed","Each row hashes to the one before it. Changing a row after the fact breaks every row after it, which is the only thing that makes the log worth keeping."],
+          ["When it is down","Checks may still answer a reader, but there is no proof afterwards that they ran."]]}
+};
+
+var GAUGE_INFO = {
+  completing:{ t:"Checks finished",
+    rows:[["What it measures","Of the checks people started in this window, how many reached an answer."],
+          ["Where it comes from","The run record. A check counts as finished when it produced an assessment, not when it produced a page."],
+          ["The line","Amber below 95 per cent. Red below 85."],
+          ["What to do","Compare it against Registers answering. If the registers are fine and this is not, the fault is after retrieval rather than in it."]]},
+  registers:{ t:"Registers answering",
+    rows:[["What it measures","Of every register we asked in this window, how many came back with something."],
+          ["Where it comes from","The retrieval log, counted per attempt. A register that answered with nothing still counts as answering."],
+          ["The line","Amber below 95 per cent. Red below 85."],
+          ["What to do","Open the worst registers list underneath and see whether it is one publisher or all of them."]]},
+  pace:{ t:"Time to spare",
+    rows:[["What it measures","How much headroom is left against the three minute ceiling a check is allowed to take."],
+          ["Where it comes from","The average run time across the window, not the slowest run."],
+          ["The line","Amber below 60 per cent headroom. Red below 30."],
+          ["What to do","A falling pace is usually a rate limit rather than a fault. Check the provider before checking the code."]]},
+  provable:{ t:"Runs we can prove",
+    rows:[["What it measures","The share of runs that are in the hashed log and still verify against it."],
+          ["Why it is here","It is the only dial on this board that measures whether the record can be defended, rather than whether the machine is quick."],
+          ["The line","Amber below 99 per cent. Red the moment one row fails to verify, because a chain is intact or it is not."],
+          ["What to do","Do not touch the rows. Note the first broken height and keep everything from it."]]},
+  deleted:{ t:"Deleted on time",
+    rows:[["What it measures","The share of days in the window on which the scheduled deletion actually ran."],
+          ["Why it is here","A retention promise nobody measured is a sentence in a document rather than a control."],
+          ["The line","Red on the first missed day."],
+          ["What to do","This is a privacy commitment, not a chore. Run it by hand, then record which days were missed and for how long."]]}
+};
+
+/* The registers named on the hazard list. Descriptions are what each register
+   is, in plain words. No coverage figures and no links, because neither has
+   been verified for this screen. */
+var REG_INFO = {
+  "FINTRAC MSB":["Canada's register of money services businesses, kept by the Financial Transactions and Reports Analysis Centre of Canada.",
+    "A business that moves money for the public in Canada is required to be registered on it. Absence is meaningful here in a way it is not on most registers."],
+  "ASIC Connect":["The Australian Securities and Investments Commission's register of companies, licensees and business names.",
+    "It answers who a company is in Australia and whether it holds a licence."],
+  "SEC EDGAR":["The United States Securities and Exchange Commission's filing system.",
+    "It holds what a company filed and when. It is a filing archive rather than a licence register, so a party absent from it may simply have had nothing to file."],
+  "FCA Register":["The United Kingdom Financial Conduct Authority's register of authorised firms and individuals.",
+    "The FCA states on its own warning list that a firm which is not listed may still be unauthorised, which is why an empty answer here is reported as an empty answer and never as clearance."],
+  "CSA Disciplined":["The Canadian Securities Administrators' record of disciplined persons and firms.",
+    "It holds outcomes of provincial securities enforcement. It is a record of what was decided, not of what was alleged."],
+  "Companies House":["The United Kingdom's register of incorporated companies.",
+    "It answers who a company is, when it was made and who has been named to it."],
+  "IOSCO I-SCAN":["The International Organization of Securities Commissions' consolidated list of investor alerts from member regulators.",
+    "It gathers what individual regulators have published rather than adding findings of its own."]
+};
+
+/* ------------------------------------------- the evidence a regulator asks for
+   Rights handling, deletion and incidents. Three lines, because those are the
+   three a regulator opens with, and each one carries its own state rather than
+   sitting in a table where a failure reads the same as a success. */
+function evidence(d){
+  var del=d.deletion||{}, inc=d.incidents||{};
+  var r=(d.rights||[]).reduce(function(a,x){
+    return {op:a.op+x.opened, cl:a.cl+x.closed, days:Math.max(a.days,x.avg_days||0)};
+  },{op:0,cl:0,days:0});
+  var open=r.op-r.cl;
+  var rows=[
+    { n:num(r.op), s: r.days>30?"bad":(open?"warn":"ok"),
+      t:"<b>rights requests</b> received, "+num(r.cl)+" closed, "
+        +r.days+" days on the oldest. The statutory limit is thirty." },
+    { n:num(del.days_run), s: del.days_failed?"bad":"ok",
+      t:"<b>days the deletion ran</b>"+(del.days_failed
+        ? ", and "+num(del.days_failed)+" days it did not. "+num(del.deleted)
+          +" records deleted."
+        : ". "+num(del.deleted)+" records deleted, none held past its period.") },
+    { n:num(inc.total), s: inc.rrosh?"bad":(inc.total?"warn":"ok"),
+      t:"<b>privacy incidents</b>"+(inc.total
+        ? ", "+num(inc.pi)+" involving personal information, "+num(inc.rrosh)
+          +" at the real risk of significant harm threshold, "+num(inc.reported)+" reported."
+        : " this window. Nothing to report and nothing to hold.") }
+  ];
+  if(d.runs.ran_unenforced) rows.push({ n:num(d.runs.ran_unenforced), s:"bad",
+    t:"<b>runs with the rulebook off</b>. These asked registers the register of "
+      +"record had not cleared." });
+  document.getElementById("evi").innerHTML = rows.map(function(x){
+    return '<div class="evirow" data-s="'+x.s+'"><span class="n">'+x.n+'</span>'
+      +'<span class="t">'+x.t+'</span></div>';
+  }).join("");
+}
+
+/* --------------------------------- checks per day: one series, so no legend
+   and no categorical palette. Magnitude over time is a line. */
+function days(d){
+  var v=d.by_day, W=680, H=132, P=22, n=v.length, max=Math.max.apply(null,v)*1.15;
+  var x=function(i){return P+i*(W-P*2)/(n-1);};
+  var y=function(t){return H-P-(t/max)*(H-P*1.7);};
+  var pts=v.map(function(t,i){return x(i).toFixed(1)+","+y(t).toFixed(1);}).join(" ");
+  var g="",i;
+  for(i=0;i<=2;i++){ var yy=(H-P-(i/2)*(H-P*1.7)).toFixed(1);
+    g+='<line class="grid-l" x1="'+P+'" y1="'+yy+'" x2="'+(W-P)+'" y2="'+yy+'"/>'
+      +'<text class="axl" x="0" y="'+(+yy+3)+'">'+Math.round(max*i/2)+'</text>'; }
+  document.getElementById("days").innerHTML=
+     '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Checks attempted per day">'
+    +'<defs><linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1">'
+    +'<stop offset="0" stop-color="#4C87FF" stop-opacity=".26"/>'
+    +'<stop offset="1" stop-color="#4C87FF" stop-opacity="0"/></linearGradient></defs>'
+    +g+'<polygon class="area" points="'+P+','+(H-P)+' '+pts+' '+(W-P)+','+(H-P)+'"/>'
+    +'<polyline class="line" points="'+pts+'"/>'
+    +'<circle class="dot" cx="'+x(n-1).toFixed(1)+'" cy="'+y(v[n-1]).toFixed(1)+'" r="4"/>'
+    +'<text class="axl" x="'+P+'" y="'+(H-6)+'">Day 1</text>'
+    +'<text class="axl" x="'+(W-P)+'" y="'+(H-6)+'" text-anchor="end">Day '+n+'</text></svg>';
+}
+
+/* ------------------------------------------------------ the masthead stats */
+function mstats(d){
+  var C=[[num(d.runs.attempted),"Checks"],[num(d.people),"People helped"],
+         [num(d.chain.height),"Chain rows"],
+         [num(d.policy.head?d.policy.head.height:0),"Rule changes"]];
+  document.getElementById("mstats").innerHTML=C.map(function(c){
+    return '<div class="mstat"><div class="n">'+c[0]+'</div><div class="k">'
+      +esc(c[1])+'</div></div>';}).join("");
+}
+
+/* ---------------------------------------------- the board scales, never scrolls */
+function fitStage(){
+  var s=Math.min(window.innerWidth/1920, window.innerHeight/1080);
+  document.getElementById("stage").style.transform="scale("+s+")";
+}
+window.addEventListener("resize",fitStage);
+
+function paint(d){
+  LAST=d;
+  mstats(d); board(d); reader(d); mimic(d); gauges(d); rank(d); pulse(d);
+  evidence(d); days(d);
+  /* the table is fitted again on the next frame, once the browser has settled
+     the row heights this paint produced */
+  requestAnimationFrame(function(){ fitRows(); });
+  if(STAGE!=null) openStage(STAGE);
+  fitStage();
+}
+/* ============================================================ THE LIVE BOARD
+   The sample data above is still in this file and is reachable only at
+   ?demo=1, so the render path can be exercised without standing up Clerk and a
+   database. When it is used the board says so along the bottom edge, because a
+   panel showing invented numbers without saying so is the one thing this
+   product exists to refuse. */
+var BUILD = "20260906.0525";
+var DEMO  = /[?&]demo=1\b/.test(window.location.search);
+
+function showErr(title, msg, canRetry){
+  document.getElementById("errT").textContent = title;
+  document.getElementById("errX").textContent = msg;
+  document.getElementById("errRetry").hidden = !canRetry;
+  document.getElementById("err").hidden = false;
+  booted();
+}
+function hideErr(){ document.getElementById("err").hidden = true; }
+function booted(){ document.body.removeAttribute("data-boot"); }
+
+/* Clerk carries the sign in. Every call sends the session token, and the server
+   checks the allowlist separately. */
 function api(path){
   return (window.Clerk && window.Clerk.session
             ? window.Clerk.session.getToken()
@@ -425,114 +1475,156 @@ function api(path){
     });
 }
 
-function load(){
-  var d=$("#days").value;
-  $("#err").hidden=true;
-  api("/api/admin-metrics?days="+encodeURIComponent(d)).then(function(res){
-    if(!res.ok){
-      if(res.status===401) return fail("Your session was not accepted. Sign in again.");
-      if(res.status===403) return fail("You are signed in, and this account is not on the admin "
-        +"allowlist. Add the address to ADMIN_EMAILS on the deployment.");
-      if(res.j&&res.j.error==="admin_disabled")
-        return fail("The back office is switched off. "+(res.j.reason||"")+". It fails closed rather "
-          +"than open, so this is the safe direction.");
-      if(res.j&&res.j.error==="no_database_configured")
-        return fail("POSTGRES_URL is not set, so nothing has been recorded yet. Run db/telemetry.sql "
-          +"once the database is attached.");
-      return fail("Request failed: "+(res.j&&res.j.detail||res.status));
-    }
-    render(res.j);
-  }).catch(function(e){ fail("Could not reach the back office. "+e.message); });
+/* ------------------------------------------------------------- normalise
+   The route emits rows the way the database returns them, which is the right
+   shape for a documented API and the wrong shape for a drawing. This is the
+   one place that turns one into the other, so a change to either end has a
+   single seam to be fixed at rather than twenty. */
+function normalise(j){
+  var d = Object.assign({}, j);
+  d.by_day = (j.by_day || []).map(function(r){
+    return typeof r === "number" ? r : (r.attempted || 0); });
+  var pair = function(rows, k){
+    return (rows || []).map(function(r){
+      return Array.isArray(r) ? r : [r[k], r.n]; });
+  };
+  d.by_outcome = pair(j.by_outcome, "outcome");
+  d.by_input   = pair(j.by_input,   "input_type");
+  d.sources = Object.assign({}, j.sources, {
+    worst: (j.sources && j.sources.worst || []).map(function(w){
+      return Array.isArray(w) ? w : [w.display_name || w.source_id, w.ok_pct]; })
+  });
+  d.pulse = Object.assign({}, j.pulse, {
+    rows: (j.pulse && j.pulse.rows || []).map(function(r){
+      return {
+        label: r.label || null,
+        hash:  r.hash  || r.identifier_hash || "",
+        n:     r.n     || 0,
+        was:   r.was   || 0,
+        adverse:    r.adverse    || 0,
+        clean:      r.clean      || 0,
+        incomplete: r.incomplete || 0,
+        type:  r.type  || r.input_type || "",
+        first: r.first || (r.first_seen ? String(r.first_seen).slice(11,16) : "")
+      };
+    })
+  });
+  /* The route reports the chain height beside the verification. The board reads
+     both off one object. */
+  d.chain = Object.assign({}, j.chain);
+  return d;
 }
-function fail(m){ var e=$("#err"); e.textContent=m; e.hidden=false; $("#panel").hidden=true; }
+
+function load(){
+  if(DEMO){ booted(); hideErr(); paint(normalise(CLEAR)); return; }
+  var d=document.getElementById("win").value;
+  api("/api/admin-metrics?days="+encodeURIComponent(d)+"&build="+encodeURIComponent(BUILD))
+    .then(function(res){
+      if(!res.ok){
+        if(res.status===401) return showErr("Your session was not accepted",
+          "Sign in again.", false);
+        if(res.status===403) return showErr("Not on the allowlist",
+          "You are signed in, and this account is not on the admin allowlist. Add the "
+          +"address to ADMIN_EMAILS on the deployment.", false);
+        if(res.j&&res.j.error==="admin_disabled") return showErr("The back office is switched off",
+          (res.j.reason||"")+". It fails closed rather than open, so this is the safe "
+          +"direction.", false);
+        if(res.j&&res.j.error==="no_database_configured") return showErr("No database attached",
+          "POSTGRES_URL is not set, so nothing has been recorded yet. Run db/telemetry.sql "
+          +"once the database is attached.", true);
+        return showErr("The board could not load",
+          "Request failed: "+((res.j&&res.j.detail)||res.status), true);
+      }
+      hideErr(); booted(); paint(normalise(res.j));
+    })
+    .catch(function(e){ showErr("Could not reach the back office", e.message, true); });
+}
+
+document.getElementById("win").addEventListener("change",load);
+document.getElementById("go").addEventListener("click",load);
+document.getElementById("errRetry").addEventListener("click",function(){ hideErr(); load(); });
+document.getElementById("errOut").addEventListener("click",function(){
+  if(window.Clerk) window.Clerk.signOut(); });
+document.getElementById("out").addEventListener("click",function(){
+  if(window.Clerk) window.Clerk.signOut(); });
 
 function signedIn(){
   var u=window.Clerk && window.Clerk.user;
-  booted();
-  $("#gate").hidden=true;
-  $("#out").hidden=false;
-  $("#who").textContent = u && u.primaryEmailAddress ? u.primaryEmailAddress.emailAddress : "";
+  document.getElementById("gate").hidden=true;
+  document.getElementById("out").hidden=false;
+  document.getElementById("who").textContent =
+    u && u.primaryEmailAddress ? u.primaryEmailAddress.emailAddress : "";
   load();
 }
-function booted(){ document.body.removeAttribute("data-boot"); }
 function signedOut(){
-  $("#gate").hidden=false;
-  $("#panel").hidden=true;
-  $("#out").hidden=true;
-  $("#who").textContent="";
+  document.getElementById("gate").hidden=false;
+  document.getElementById("out").hidden=true;
+  document.getElementById("who").textContent="";
   var m=document.getElementById("clerkMount");
   if(window.Clerk && !m.hasChildNodes()){
-    var HERE = window.location.pathname + window.location.search;
     /* routing:"virtual" keeps the component in this page rather than taking
-       over the path, and the two fallbacks bring an OAuth round trip back to
-       the back office instead of the consumer landing page. */
-    window.Clerk.mountSignIn(m, {
-      routing: "virtual",
-      fallbackRedirectUrl: HERE,
-      signUpFallbackRedirectUrl: HERE
-    });
+       over the path, and the fallbacks bring an OAuth round trip back to the
+       back office instead of the consumer landing page. */
+    var HERE = window.location.pathname + window.location.search;
+    window.Clerk.mountSignIn(m, { routing:"virtual",
+      fallbackRedirectUrl:HERE, signUpFallbackRedirectUrl:HERE });
   }
   booted();
 }
 
-$("#days").addEventListener("change",function(){ if(!$("#panel").hidden) load(); });
-$("#out").addEventListener("click",function(){ if(window.Clerk) window.Clerk.signOut(); });
+fitStage();
 
-if(!CLERK_KEY){
-  document.body.removeAttribute("data-boot");
-  $("#gate").hidden=false;
-  document.getElementById("gateNote").textContent =
-    "Clerk is not configured on this build. Set the publishable key on the body tag "
-    + "(data-clerk) and CLERK_SECRET_KEY plus ADMIN_EMAILS on the deployment.";
-}else{
-  var sc=document.createElement("script");
-  sc.setAttribute("data-clerk-publishable-key", CLERK_KEY);
-  sc.async=true; sc.crossOrigin="anonymous";
-  /* Clerk resolves its own frontend host from the publishable key, so the
-     versioned CDN build is all that has to be loaded here. Pinned to a major
-     rather than latest, because an auth screen is not somewhere to discover a
-     breaking change on a Tuesday. */
-  sc.src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js";
-  sc.onload=function(){
-    /* COME BACK HERE.
-       Clerk sends somebody to "/" after a sign in unless it is told otherwise,
-       and "/" is the consumer landing page. That is why the back office opened
-       for a second and then vanished: the sign in succeeded and Clerk navigated
-       away from the page that asked for it. Every redirect Clerk can take is
-       pinned to this page. */
-    var HERE = window.location.pathname + window.location.search;
-    window.Clerk.load({
-      afterSignOutUrl: HERE,
-      signInUrl: HERE,
-      signInFallbackRedirectUrl: HERE,
-      signUpFallbackRedirectUrl: HERE
-    }).then(function(){
-      window.Clerk.addListener(function(){
-        if(window.Clerk.user) signedIn(); else signedOut();
-      });
-      if(window.Clerk.user) signedIn(); else signedOut();
-      booted();
-    }).catch(function(e){
-      $("#gate").hidden=false;
-      document.getElementById("gateNote").textContent="Clerk failed to load: "+e.message;
-      booted();
-    });
-  };
-  sc.onerror=function(){
-    $("#gate").hidden=false;
-    document.getElementById("gateNote").textContent="Clerk script could not be loaded.";
+if(DEMO){
+  var f=document.createElement("div");
+  f.className="demoflag";
+  f.textContent="Sample data. Nothing on this board is real.";
+  document.body.appendChild(f);
+  booted(); paint(normalise(CLEAR));
+} else {
+  var CLERK_KEY = document.body.getAttribute("data-clerk") || "";
+  if(!CLERK_KEY){
     booted();
-  };
-  /* A gate that never resolves is a page that never appears. If Clerk has not
-     answered in eight seconds, show the gate and say so. */
-  setTimeout(function(){
-    if(!document.body.hasAttribute("data-boot")) return;
-    $("#gate").hidden=false;
+    document.getElementById("gate").hidden=false;
     document.getElementById("gateNote").textContent =
-      "Sign in is taking longer than expected. If this does not clear, reload the page.";
-    booted();
-  }, 8000);
-  document.head.appendChild(sc);
+      "Clerk is not configured on this build. Set the publishable key on the body tag "
+      + "(data-clerk) and CLERK_SECRET_KEY plus ADMIN_EMAILS on the deployment.";
+  } else {
+    var sc=document.createElement("script");
+    sc.setAttribute("data-clerk-publishable-key", CLERK_KEY);
+    sc.async=true; sc.crossOrigin="anonymous";
+    /* Pinned to a major rather than latest, because an auth screen is not
+       somewhere to discover a breaking change on a Tuesday. */
+    sc.src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js";
+    sc.onload=function(){
+      var HERE = window.location.pathname + window.location.search;
+      window.Clerk.load({ afterSignOutUrl:HERE, signInUrl:HERE,
+        signInFallbackRedirectUrl:HERE, signUpFallbackRedirectUrl:HERE })
+        .then(function(){
+          window.Clerk.addListener(function(){
+            if(window.Clerk.user) signedIn(); else signedOut(); });
+          if(window.Clerk.user) signedIn(); else signedOut();
+        })
+        .catch(function(e){
+          booted();
+          document.getElementById("gate").hidden=false;
+          document.getElementById("gateNote").textContent="Clerk failed to load: "+e.message;
+        });
+    };
+    sc.onerror=function(){
+      booted();
+      document.getElementById("gate").hidden=false;
+      document.getElementById("gateNote").textContent="Clerk script could not be loaded.";
+    };
+    /* A gate that never resolves is a page that never appears. */
+    setTimeout(function(){
+      if(!document.body.hasAttribute("data-boot")) return;
+      booted();
+      document.getElementById("gate").hidden=false;
+      document.getElementById("gateNote").textContent =
+        "Clerk did not answer in eight seconds. Reload, and if this repeats check the "
+        + "publishable key on this page.";
+    }, 8000);
+    document.head.appendChild(sc);
+  }
 }
-</script>
-</body></html>
+</script></body></html>

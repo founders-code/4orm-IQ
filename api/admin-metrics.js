@@ -16,6 +16,23 @@
  */
 
 import { requireAdmin } from './_auth.js';
+import { CATALOGUE } from './_catalogue.js';
+import { DOCUMENTS } from './_documents.js';
+
+/* The build this API was deployed from. The page sends its own stamp on the
+   query string and the two are compared here, because guessing which build is
+   live has cost this project hours. */
+const BUILD = '20260906.0525';
+
+/* Amber is not a fault and must never be drawn as one. The rule below has no
+   time threshold in it on purpose: a part is DOWN only when we asked it and it
+   never answered, and QUIET when we had no cause to ask. A register nobody
+   called is not a register that is down, and calling it down would be the same
+   lie the whole product exists to refuse. */
+function health(asked, answered) {
+  if (!asked) return 'warn';
+  return answered > 0 ? 'ok' : 'bad';
+}
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -49,8 +66,8 @@ export default async function handler(req, res) {
     const q = (sql, p = []) => client.query(sql, p).then(r => r.rows);
     const since = `now() - interval '${days} days'`;
 
-    const [runs, byOutcome, byInput, byDay, srcWorst, srcTotals, rights, del, ppl, chain, lastVerify, inc,
-           policyChain, policyRows, schemas, bySector] = await Promise.all([
+    const [runs, byOutcome, byInput, byDay, srcWorst, srcEach, srcTotals, rights, del, ppl, chain,
+           lastVerify, inc, policyChain, policyRows, schemas, bySector, pulse] = await Promise.all([
       q(`select
            count(*)::int                                            as attempted,
            count(*) filter (where outcome='COMPLETED')::int          as completed,
@@ -75,6 +92,8 @@ export default async function handler(req, res) {
          from ops_source_day where day > current_date - $1::int
          group by source_id having sum(attempts) > 0
          order by ok_pct asc nulls last limit 15`, [days]),
+      q(`select source_id, sum(attempts)::int as attempts, sum(ok)::int as ok
+         from ops_source_day where day > current_date - $1::int group by source_id`, [days]),
       q(`select coalesce(sum(attempts),0)::int as attempts,
                 coalesce(sum(ok),0)::int as ok,
                 coalesce(sum(failed),0)::int as failed,
@@ -105,11 +124,78 @@ export default async function handler(req, res) {
       q('select hash_schema, count(*)::int as n from ops_runs group by hash_schema order by hash_schema'),
       q(`select coalesce(sector,'UNDECLARED') as sector, count(*)::int as n
            from ops_runs where at > ${since} group by 1 order by n desc`),
+      /* THE PULSE. Read from the corpus store, which has no visitor column, so
+         nothing here can be turned back into a person. A row is readable only
+         where the tally crossed the bar and a name was written; every other row
+         reports its count against an unreadable hash, which is the honest way
+         to show that something is moving without naming it. */
+      q(`select identifier_hash, input_type, max(label) as label,
+                coalesce(sum(n) filter (where day = current_date),0)::int          as n,
+                coalesce(sum(n) filter (where day < current_date
+                          and day >= current_date - 7),0)::int                     as was,
+                coalesce(sum(adverse)    filter (where day = current_date),0)::int as adverse,
+                coalesce(sum(clean)      filter (where day = current_date),0)::int as clean,
+                coalesce(sum(incomplete) filter (where day = current_date),0)::int as incomplete,
+                min(first_seen) as first_seen
+           from search_pulse
+          where day > current_date - $1::int
+          group by identifier_hash, input_type
+         having coalesce(sum(n) filter (where day = current_date),0) > 0
+          order by n desc limit 40`, [days]).catch(function(){ return []; }),
     ]);
 
     const r = runs[0] || {};
     const s = srcTotals[0] || {};
+
+    /* ------------------------------------------------ registers, per check
+       A source we asked and never got an answer from is down. A source with no
+       row at all was not called, which for a register that applies only to
+       certain sectors is the normal state and reads amber, never green. */
+    const seen = Object.fromEntries(srcEach.map(x => [x.source_id, x]));
+    const registers = { down: {}, quiet: {} };
+    CATALOGUE.filter(x => x.enabled).forEach(src => {
+      const ci = (parseInt(src.category, 10) || 1) - 1;
+      const row = seen[src.source_id];
+      if (!row || !row.attempts) registers.quiet[ci] = (registers.quiet[ci] || 0) + 1;
+      else if (!row.ok)          registers.down[ci]  = (registers.down[ci]  || 0) + 1;
+    });
+
+    /* --------------------------------------------------- is it running
+       Read off the record of what already happened rather than probed. A probe
+       would spend money on every page load and would tell you the probe failed,
+       not that the product is broken. */
+    const byTransport = t => {
+      const ids = CATALOGUE.filter(x => x.enabled && x.transport === t).map(x => x.source_id);
+      let asked = 0, answered = 0;
+      ids.forEach(id => { const x = seen[id]; if (x) { asked += x.attempts; answered += x.ok; } });
+      return health(asked, answered);
+    };
+    const rdapRow = seen.ICANN_RDAP || seen.RDAP_DATE || null;
+    const dl = del[0] || {};
+    const systems = {
+      search:     health(s.attempts || 0, s.ok || 0),
+      reason:     health(r.attempted || 0, r.completed || 0),
+      connectors: byTransport('connector'),
+      rdap:       health(rdapRow ? rdapRow.attempts : 0, rdapRow ? rdapRow.ok : 0),
+      /* This query answered, so the database answered. */
+      db:         'ok',
+      chain:      (chain[0] && chain[0].height)
+                    ? ((lastVerify[0] && lastVerify[0].intact === false) ? 'bad' : 'ok')
+                    : 'warn',
+      policy:     policyChain[0] ? 'ok' : 'warn',
+      retention:  dl.days_failed ? 'bad' : (dl.days_run ? 'ok' : 'warn'),
+      /* This request carried a session the allowlist accepted, so the front
+         door works. There is nothing else to check that this has not proved. */
+      auth:       'ok',
+      deploy:     req.query.build ? (req.query.build === BUILD ? 'ok' : 'bad') : 'warn'
+    };
+
     return res.status(200).json({
+      build: { api: BUILD, page: req.query.build || null,
+               match: req.query.build ? req.query.build === BUILD : null },
+      systems: systems,
+      registers: registers,
+      documents: DOCUMENTS,
       window_days: days,
       generated: new Date().toISOString(),
       runs: r,
@@ -124,7 +210,12 @@ export default async function handler(req, res) {
         failed: s.failed || 0,
         out_of_scope: s.out_of_scope || 0,
         success_pct: s.attempts ? +(100 * s.ok / s.attempts).toFixed(1) : null,
-        worst: srcWorst,
+        /* The id is what the log stores. The name is what a person reads, and
+           the catalogue is the only place that knows both. */
+        worst: srcWorst.map(function(w){
+          var c = CATALOGUE.find(function(x){ return x.source_id === w.source_id; });
+          return Object.assign({}, w, { display_name: (c && c.display_name) || w.source_id });
+        }),
       },
       rights: rights,
       deletion: del[0] || {},
@@ -137,6 +228,12 @@ export default async function handler(req, res) {
          was. Without it the version string on every row points at nothing. */
       policy: { head: policyChain[0] || null, history: policyRows },
       by_sector: bySector,
+      /* Named rows first, because those are the ones that can be acted on, then
+         the loudest unreadable ones so a surge is visible before it is named. */
+      pulse: {
+        label_at: Math.max(5, Number(process.env.KBYS_PULSE_LABEL_AT) || 25),
+        rows: pulse || []
+      },
       incidents: inc[0] || {},
     });
   } catch (e) {
