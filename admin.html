@@ -87,6 +87,21 @@ a.trig{text-decoration:none}
 #mapbtn{border-color:rgba(76,135,255,.55);color:var(--blue)}
 #mapbtn:hover{background:rgba(76,135,255,.12);border-color:var(--blue);color:#9CBBFF}
 .trig[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+#faultbtn{border-color:rgba(255,83,64,.5);color:var(--bad)}
+#faultbtn:hover{background:rgba(255,83,64,.12);border-color:var(--bad);color:#FF8574}
+#faultbtn[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#12060A}
+
+/* ------------------------------------------------------------ faults only
+   Everything that is not in a fault state goes dark, so what is left lit is
+   the list of what is actually wrong. Nothing is removed and nothing is
+   recoloured: a dimmed part is still on the board, still in the same place,
+   and comes straight back when the button is released. A part that is amber
+   goes dark with the rest, because amber is not a fault and a screen that
+   showed it here would be calling it one. */
+body.faults .fdim{opacity:.06;filter:grayscale(1)}
+body.faults .fdim,body.faults .fdim *{animation:none!important;
+  text-shadow:none!important;box-shadow:none!important}
+body.faults .fdim{pointer-events:none}
 
 /* --------------------------------------------------------- the two thirds */
 .body{display:grid;grid-template-columns:2fr 1fr;gap:22px;min-height:0}
@@ -337,6 +352,12 @@ tr:last-child td{border-bottom:0}
 .dgrid dt{font-family:var(--ui);font-size:12px;font-weight:600;letter-spacing:0;
   color:var(--ink-3)}
 .dgrid dd{font-size:15px;color:var(--ink-2);line-height:1.6;max-width:92ch}
+.walk{margin-top:22px;padding-top:18px;border-top:1px solid var(--edge)}
+.walkout{margin-top:12px;font-family:var(--mono);font-size:12.5px;line-height:1.6;
+  color:var(--ink-3);white-space:pre-wrap}
+.walkout b{color:var(--ink)}
+.walkout .no{color:var(--bad)}
+.walkout .yes{color:var(--ok)}
 .plates{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
 .plate{display:flex;flex-direction:column;align-items:center;gap:8px;padding:13px 8px 11px;
   background:var(--sunk);border:1px solid var(--edge);border-radius:var(--r-sm)}
@@ -409,10 +430,11 @@ select.trig option{background:var(--panel);color:var(--ink);
   <header class="mast">
     <span class="brand">4orm IQ <span>·</span> Operations</span>
     <span class="live"><i></i>Live</span>
+    <span class="who" id="who"></span>
     <div class="mstats" id="mstats"></div>
     <div class="mctl">
       <a class="trig" href="evidence.html" id="mapbtn">The map</a>
-      <span class="who" id="who"></span>
+      <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
       <select class="trig" id="win" aria-label="Window">
         <option value="7">7 days</option><option value="30" selected>30 days</option>
         <option value="90">90 days</option><option value="365">12 months</option>
@@ -599,8 +621,14 @@ function machine(d){
      amber:"Nothing has been written in this window.",
      red:"Nothing can be recorded. Checks may still answer a reader, but there is no proof afterwards that they ran.",
      go:"Stop taking new checks until this is back. An unrecorded run is not a run."},
-    {k:"chain", plate:"Evidence chain", s:worse(S("chain"), v.intact?"ok":"bad"),
-     v: v.intact? "Intact, "+num(v.checked)+" rows" : "BROKEN at row "+num(v.broken_at),
+    /* Three states, not two. A log that has never been walked is not a broken
+        log, and drawing it as one is the same lie in the other direction: it
+        says we checked and found a fault when nobody has checked at all. */
+    {k:"chain", plate:"Evidence chain",
+     s:worse(S("chain"), v.intact===true ? "ok" : (v.intact===false ? "bad" : "warn")),
+     v: v.intact===true  ? "Intact, "+num(v.checked)+" rows"
+      : v.intact===false ? "BROKEN at row "+num(v.broken_at)
+      :                    "Never walked, "+num(c.height||0)+" rows",
      name:"The chain",
      /* The evidence layer, which used to be a panel of its own. It belongs
         behind the lamp that watches it: the height, the head, when it was last
@@ -616,7 +644,7 @@ function machine(d){
           : "v1"]
      ],
      what:"The hashed log that makes a run provable afterwards, and whether every row in it still hashes to the one before it.",
-     amber:"Nothing has been chained in this window.",
+     amber:"Either nothing has been chained in this window, or the log has never been walked end to end. A chain nobody has verified is not a chain anybody can rely on. Press Verify the chain.",
      red:"Either the log is not being written, or a row no longer verifies. Everything after the break is unprovable.",
      go:"Do not touch the rows. Note the first broken height and keep everything from it."},
     {k:"rulebook", plate:"The rulebook", s:worse(S("policy"), d.policy.head?"ok":"warn"),
@@ -873,10 +901,11 @@ function gauges(d){
     + gauge(timePct,"Time to spare","%",
         mins+" minutes on average, against a three minute ceiling",
         band(timePct,60,30),"pace")
-    + gauge(proof,"Runs we can prove","%",
-        v.intact ? num(v.checked)+" of "+num(ran)+" verify against the hashed log"
-                 : num(v.checked)+" of "+num(ran)+" verify, then the log breaks",
-        v.intact===false ? "bad" : band(proof,99,90),"provable")
+    + gauge(v.intact===undefined ? null : proof,"Runs we can prove","%",
+        v.intact===true  ? num(v.checked)+" of "+num(ran)+" verify against the hashed log"
+      : v.intact===false ? num(v.checked)+" of "+num(ran)+" verify, then the log breaks"
+      :                    "the log has never been walked, so nothing here is measured yet",
+        v.intact===true ? band(proof,99,90) : (v.intact===false ? "bad" : "warn"),"provable")
     + gauge(delPct,"Deleted on time","%",
         dfail ? "on "+num(dfail)+" of "+num(dall)+" days the deletion did not run"
               : "the deletion ran on all "+num(dall)+" days",
@@ -899,7 +928,12 @@ function counts(d){
 }
 
 function rank(d){
-  $("#rank").innerHTML=(d.sources.worst||[]).slice(0,5).map(function(w){
+  /* A row whose name did not come back is not a register at zero per cent. It
+     is a row we cannot read, and printing it as "undefined, 0.0%" invents a
+     failing register out of a missing field. Drop it and count nothing. */
+  var W=(d.sources.worst||[]).filter(function(w){
+    return w && w[0] && String(w[0])!=="undefined" && typeof w[1]==="number"; });
+  $("#rank").innerHTML=W.slice(0,5).map(function(w){
     var s=w[1]>=95?"ok":(w[1]>=85?"warn":"bad");
     return '<button class="rblk" type="button" data-reg="'+esc(w[0])+'" data-pct="'+w[1]+'">'
       +'<span class="rrow" data-s="'+s+'"><span class="rname">'+esc(w[0])+'</span>'
@@ -1166,10 +1200,63 @@ function openLamp(key){
        : (x.s==="warn" ? "Amber, not seen working today" : "Green, working"))
     : (x.s==="bad" ? "Red, past the line"
        : (x.s==="warn" ? "Amber, watch this" : "Green, inside the line"));
+  /* The chain card is the one place on this board with something to press.
+     Walking the chain is the expensive call on this deployment, so it is never
+     run on a page load: somebody asks for it, and the answer is written to
+     ops_verify, which is what the lamp reads next time. Without this control
+     the lamp can only ever say the log has never been walked. */
+  var walk = (key==="m:chain")
+    ? '<div class="walk"><button class="trig" type="button" id="walkbtn">'
+      + 'Verify the chain</button><div class="walkout" id="walkout">'
+      + 'Every row is hashed to the one before it. This walks all of them and '
+      + 'reports the first that does not verify.</div></div>'
+    : "";
   sheetOpen(x.name || x.plate,
     (x.v===WORD[x.s] || x.doc) ? lit : lit+" · "+x.v,
     '<dl class="dgrid">'+rows.map(function(r){
-      return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>';}).join("")+'</dl>');
+      return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>';}).join("")+'</dl>'+walk);
+  var wb=document.getElementById("walkbtn");
+  if(wb) wb.addEventListener("click",function(){ walkChain(wb); });
+}
+
+/* The walk itself. It reports what came back and nothing else: if the call
+   fails, it says the walk did not run, never that the chain is fine. */
+function walkChain(btn){
+  var out=document.getElementById("walkout");
+  btn.disabled=true; btn.textContent="Walking";
+  out.textContent="Walking every row. On a long chain this takes a moment.";
+  api("/api/evidence?run=1")
+    .then(function(res){
+      /* api() resolves on a refusal as well as on an answer, so the status is
+         checked here. A 401 or a 503 is not a verified chain. */
+      if(!res.ok){
+        out.innerHTML='<span class="no">The walk did not run.</span> '
+          + esc((res.j&&res.j.error)||("HTTP "+res.status))
+          + "\n\nThis says nothing about whether the chain is intact. It says we "
+          + "could not ask.";
+        btn.disabled=false; btn.textContent="Verify the chain"; return;
+      }
+      var j=res.j||{}, pol=j.policy||{};
+      var line=function(name,r){
+        if(!r || r.height===undefined && r.checked===undefined)
+          return name+": no answer.";
+        if(r.intact===true)
+          return name+': <span class="yes">intact</span>, '+num(r.checked||r.height||0)
+            +" rows walked"+(r.ms?" in "+num(r.ms)+" ms":"")+".";
+        if(r.intact===false)
+          return name+': <span class="no">BROKEN</span> at row '+num(r.broken_at)+".";
+        return name+": nothing came back.";
+      };
+      out.innerHTML = line("The operations log", j)+"\n"+line("The rule history", pol)
+        + "\n\nWritten to the verification record. Press Reload to update the lamp.";
+      btn.disabled=false; btn.textContent="Verify the chain";
+    })
+    .catch(function(e){
+      out.innerHTML='<span class="no">The walk did not run.</span> '+esc(e.message)
+        +"\n\nThis says nothing about whether the chain is intact. It says we could "
+        +"not ask.";
+      btn.disabled=false; btn.textContent="Verify the chain";
+    });
 }
 
 /* ----------------------------------------------------- the annunciator */
@@ -1436,10 +1523,49 @@ function fitStage(){
 }
 window.addEventListener("resize",fitStage);
 
+/* ============================================================= FAULTS ONLY
+   One button, and the room shows nothing but what is wrong. The rule is the
+   same everywhere: a part is left lit only when it is red, and a container is
+   left lit only when something red is inside it. The reader screen and the
+   masthead never dim, because they are what tells you how many faults there
+   are and whether the numbers you are looking at are current. */
+var FLEAF = ".pl,.gauge,.plate,.rblk,.evirow,.nnode";
+var FBLOCK = ".card,.floor,.gauges,.chart,.pulsetab tbody tr";
+
+function markFaults(){
+  var prev=document.querySelectorAll(".fdim"), i;
+  for(i=0;i<prev.length;i++) prev[i].classList.remove("fdim");
+  if(!document.body.classList.contains("faults")) return;
+  var stage=document.getElementById("stage"); if(!stage) return;
+  var isBad=function(el){
+    if(el.getAttribute && el.getAttribute("data-s")==="bad") return true;
+    return !!el.querySelector('[data-s="bad"]');
+  };
+  var leaves=stage.querySelectorAll(FLEAF);
+  for(i=0;i<leaves.length;i++) if(!isBad(leaves[i])) leaves[i].classList.add("fdim");
+  var blocks=stage.querySelectorAll(FBLOCK);
+  for(i=0;i<blocks.length;i++){
+    var b=blocks[i];
+    if(b.closest(".reader")) continue;
+    if(!isBad(b)) b.classList.add("fdim");
+  }
+}
+
+function setFaults(on){
+  document.body.classList.toggle("faults", !!on);
+  var b=document.getElementById("faultbtn");
+  b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.textContent = on ? "Show it all" : "Faults only";
+  markFaults();
+}
+document.getElementById("faultbtn").addEventListener("click",function(){
+  setFaults(!document.body.classList.contains("faults"));
+});
+
 function paint(d){
   LAST=d;
   mstats(d); board(d); reader(d); mimic(d); gauges(d); rank(d); pulse(d);
-  evidence(d); days(d);
+  evidence(d); days(d); markFaults();
   /* the table is fitted again on the next frame, once the browser has settled
      the row heights this paint produced */
   requestAnimationFrame(function(){ fitRows(); });
@@ -1452,7 +1578,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260906.0638";
+var BUILD = "20260906.0830";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
