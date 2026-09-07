@@ -97,13 +97,41 @@ body{font:15px/1.5 var(--ui);color:var(--ink);-webkit-font-smoothing:antialiased
 /* Every other control on this board shows a ring. These five never did, and
    they are the ones a keyboard reader meets first. */
 .trig:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* A control that cannot do anything has to look like it. "Clear this list"
+   with nothing on the list was still lit, which is a button that lies about
+   what it will do. */
+.trig:disabled{opacity:.4;cursor:default;pointer-events:none}
 a.trig{text-decoration:none}
 #regbtn{border-color:rgba(76,135,255,.55);color:var(--blue)}
 #regbtn:hover{background:rgba(76,135,255,.12);border-color:var(--blue);color:#9CBBFF}
-.trig[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+/* WHITE ON THE LIT BLUE CHIP IS 3.38:1, WHICH IS A FAIL AT 9.5px.
+   It went unnoticed while nothing on this board was pressed when it loaded.
+   The operations panel opens on a tab, so a pressed chip is now the first
+   thing the gate meets, and it caught it. Dark ink on the lit chip, which is
+   how the red one has always done it: #12060A on red is 6.21:1, and this is
+   5.84:1. */
+.trig[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#050B14}
 #faultbtn{border-color:rgba(255,83,64,.5);color:var(--bad)}
 #faultbtn:hover{background:rgba(255,83,64,.12);border-color:var(--bad);color:#FF8574}
 #faultbtn[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#12060A}
+
+/* ------------------------------------------------------ the two panel pills
+   Two counts, never one. New is what the board has raised and nobody has
+   picked up. The fix list is what somebody has taken on. They are kept apart
+   for the same reason identity confidence and evidence coverage are kept
+   apart on the report: adding them would make one number that answers neither
+   question. A pill is dark when its pile is empty, so an empty panel reads as
+   empty at a glance rather than as a zero somebody has to find. */
+#newbtn i,#fixbtn i{width:8px;height:8px;border-radius:50%;margin-right:7px;flex:none;
+  background:var(--idle)}
+#newbtn b,#fixbtn b{margin-left:7px;font-weight:800}
+#newbtn[data-n="some"]{border-color:rgba(255,83,64,.5);color:var(--bad)}
+#newbtn[data-n="some"] i{background:var(--bad);box-shadow:0 0 7px rgba(255,83,64,.75);
+  animation:alarm 1.15s ease-in-out infinite}
+#newbtn[data-n="some"]:hover{background:rgba(255,83,64,.12);border-color:var(--bad);color:#FF8574}
+#fixbtn[data-n="some"]{border-color:rgba(231,199,108,.5);color:var(--warn)}
+#fixbtn[data-n="some"] i{background:var(--warn-l);box-shadow:0 0 7px rgba(188,155,76,.5)}
+#fixbtn[data-n="some"]:hover{background:rgba(231,199,108,.12);border-color:var(--warn);color:#F2DFA6}
 
 /* ------------------------------------------------------------ faults only
    Everything that is not in a fault state goes dark, so what is left lit is
@@ -315,6 +343,16 @@ tr:last-child td{border-bottom:0}
 @media(prefers-reduced-motion:reduce){.cur{animation:none}}
 
 /* the header dot is the only thing on this screen that changes colour */
+/* ALL CLEAR, AND WHAT IT IS NOT.
+   Green and still is the resting state. Green and flashing is stronger than
+   that: nothing on the board is red AND nothing is waiting on the panel. It
+   can never be reached by clearing rows, because clearing a row does not turn
+   a red lamp green. A lamp that went green because somebody dismissed a list
+   is the one failure this product exists to refuse. */
+.reader[data-clear="yes"] .rdhd i{background:#33D89B;
+  box-shadow:0 0 11px rgba(51,216,155,.9);animation:allclear 1.9s ease-in-out infinite}
+@keyframes allclear{0%,100%{opacity:1}50%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){.reader[data-clear="yes"] .rdhd i{animation:none}}
 .reader[data-s="warn"] .rdhd i{background:#BC9B4C;box-shadow:0 0 6px rgba(188,155,76,.6)}
 .reader[data-s="bad"]{border-color:#5A4046}
 .reader[data-s="bad"] .rdhd i{background:#FF5340;box-shadow:0 0 10px rgba(255,83,64,1);
@@ -674,6 +712,45 @@ body:not(.pathfull) .fullhint{display:none}
 .regsrow{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:9px 0;
   font-size:13px;color:var(--ink-3);line-height:1.55}
 
+/* ================================================== THE OPERATIONS PANEL
+   Same card as the registry, because it is the same kind of thing: a list on
+   the data screen with a way out of it. The head carries the two tabs and the
+   clear, so the control that changes what you are looking at sits on the thing
+   it changes. */
+.fixpanel{position:fixed;inset:0;z-index:80;background:rgba(2,4,7,.86);
+  backdrop-filter:blur(3px);display:flex;align-items:stretch;justify-content:center;
+  padding:26px;opacity:0;pointer-events:none;transition:opacity .22s var(--ease)}
+.fixpanel.on{opacity:1;pointer-events:auto}
+.fixcard{width:min(1080px,100%);display:grid;grid-template-rows:auto auto 1fr;
+  background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
+  border:1px solid var(--edge);border-radius:var(--r);overflow:hidden}
+.fixhd{display:flex;align-items:flex-start;gap:20px;padding:20px 24px 16px;
+  border-bottom:1px solid var(--edge)}
+.fixhd h3{margin:0;font-family:var(--ui);font-size:19px;font-weight:700;
+  letter-spacing:-.01em;color:var(--ink)}
+.fixhd .x{margin-top:5px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--title)}
+.fixhd .c{margin-left:auto;flex:none;display:flex;gap:8px;align-items:center}
+/* The note says what pressing things does, and what it does not do. It is the
+   first thing on the screen because it governs every row under it. */
+.fxnote{margin:0;padding:14px 24px;border-bottom:1px solid var(--edge-2);
+  background:rgba(255,255,255,.025);
+  font-family:var(--mono);font-size:12px;line-height:1.65;color:var(--ink-2)}
+.fxnote b{color:var(--ink);font-weight:700}
+.fxrow{display:grid;grid-template-columns:1fr 168px 132px;gap:18px;align-items:start;
+  padding:16px 0;border-bottom:1px solid var(--edge)}
+.fxrow:last-child{border-bottom:0}
+.fxplate{font-family:var(--ui);font-size:15px;font-weight:600;color:var(--ink);
+  letter-spacing:-.008em}
+.fxval{margin-top:5px;font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-4)}
+.fxwhy{margin-top:8px;font-size:13px;line-height:1.6;color:var(--ink-3);max-width:62ch}
+.fxgo{margin-top:7px;font-size:13px;line-height:1.6;color:var(--ink-2);max-width:62ch}
+.fxgo b{color:var(--ink);font-weight:700}
+.fxact{justify-self:end}
+.fxempty{padding:34px 0 10px;font-size:14px;line-height:1.7;color:var(--ink-2);max-width:64ch}
+.fxempty b{color:var(--ink)}
+
 .hl i{width:7px;height:7px;border-radius:50%;background:var(--idle);flex:none}
 .hl[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 6px rgba(38,161,111,.55)}
 .hl[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 6px rgba(188,155,76,.5)}
@@ -718,6 +795,14 @@ body:not(.pathfull) .fullhint{display:none}
       <a class="trig" href="index.html" id="homebtn">&#8592; Home</a>
       <button class="trig" type="button" id="regbtn">The registry</button>
       <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
+      <!-- The panel, in two counts. New is what the board has raised and
+           nobody has picked up. The fix list is what somebody has taken on.
+           Either one opens the same panel on its own tab.
+
+           After the faults button, not between it and the registry: those two
+           were asked to sit together and the build checks that they still do. -->
+      <button class="trig" type="button" id="newbtn" data-n="none"><i></i>New <b>0</b></button>
+      <button class="trig" type="button" id="fixbtn" data-n="none"><i></i>Fix list <b>0</b></button>
       <select class="trig" id="win" aria-label="Window">
         <option value="7">7 days</option><option value="30" selected>30 days</option>
         <option value="90">90 days</option><option value="365">12 months</option>
@@ -784,6 +869,27 @@ body:not(.pathfull) .fullhint{display:none}
     </div>
     <p class="regpost" id="regPost"></p>
     <div class="regbody" id="regBody"></div>
+  </div>
+</div>
+
+<!-- THE OPERATIONS PANEL, ON THE DATA SCREEN.
+     Two piles and one way through them: a fault is raised, somebody takes it
+     on, somebody clears it. Nothing here changes the machine, and the panel
+     says so at the top rather than leaving it to be discovered. -->
+<div class="fixpanel" id="fixlist" role="dialog" aria-modal="true" aria-labelledby="fxT">
+  <div class="fixcard">
+    <div class="fixhd">
+      <div><h3 id="fxT">The operations panel</h3>
+        <div class="x" id="fxX">What is wrong, and who has picked it up</div></div>
+      <div class="c">
+        <button class="trig" type="button" id="fxTabNew" aria-pressed="true">New</button>
+        <button class="trig" type="button" id="fxTabFix" aria-pressed="false">Fix list</button>
+        <button class="trig" type="button" id="fxClear">Clear this list</button>
+        <button class="trig" type="button" id="fxClose">Close</button>
+      </div>
+    </div>
+    <p class="fxnote" id="fxNote"></p>
+    <div class="regbody" id="fxBody"></div>
   </div>
 </div>
 
@@ -2303,6 +2409,227 @@ document.getElementById("faultbtn").addEventListener("click",function(){
   setFaults(!document.body.classList.contains("faults"));
 });
 
+/* ==================================================== THE OPERATIONS PANEL
+   A board that only ever shows state tells you what is wrong and nothing
+   about whether anybody is dealing with it. This adds the second thing, and
+   keeps it strictly apart from the first.
+
+   THE TWO PILES
+     New       the board has raised it and nobody has picked it up
+     Fix list  somebody has taken it on
+
+   THE THREE MOVES
+     raise     a row goes red, and it appears in New. Nothing does this by
+               hand: the board raises it.
+     take on   press it in New, and it moves to the fix list
+     clear     press it in the fix list, and it comes off the panel
+
+   WHAT A FAULT IS, AND WHAT IT IS NOT
+   A fault is a red row. Amber is not a fault and never raises one, which is
+   the same line the faults-only view draws, so the two can never disagree
+   about what is wrong.
+
+   WHAT CLEARING DOES NOT DO
+   Clearing takes a row off the panel. It does not touch the lamp, the
+   drawing, the reader screen or the machine. A red lamp stays red. That
+   separation is the whole point: this panel records what a person has done
+   about a fault, and the board records what is true, and neither is allowed
+   to answer for the other.
+
+   AND CLEARING IS NOT FOREVER
+   The moment the board carries a row as no longer red, the record of it
+   having been cleared is dropped. So if that row goes red again later, it is
+   a new fact and it comes back as New. A panel that stays quiet through a
+   change is a panel that lies. The same rule takes rows off the fix list:
+   once the machine says a thing is fixed, the row leaves by itself, because a
+   list you have to tidy after the answer has already arrived is a list nobody
+   keeps.
+
+   The state is stored alongside each key as well. It is belt and braces
+   rather than the mechanism, and it is written down as that here so nobody
+   later reads it as the thing doing the work. */
+
+var OPS_KEY = "4ormiq.ops.v1";
+/* Held in this browser, because it is one operator's working note about their
+   own board and not a fact about the product. Nothing here is ever written to
+   the operations log, which only carries what actually ran. */
+function opsLoad(){
+  try{
+    var r = JSON.parse(localStorage.getItem(OPS_KEY) || "{}");
+    return { fix: r.fix || {}, done: r.done || {} };
+  }catch(e){ return { fix:{}, done:{} }; }
+}
+function opsSave(){
+  try{ localStorage.setItem(OPS_KEY, JSON.stringify(OPS)); }catch(e){}
+}
+var OPS = opsLoad();
+var FXTAB = "new";
+
+/* Every red row on the board, in one shape, whatever kind of row it is. */
+function opsFaults(){
+  var out=[], k, x;
+  if(!BOARD_ROWS) return out;
+  for(k in BOARD_ROWS){
+    if(!Object.prototype.hasOwnProperty.call(BOARD_ROWS,k)) continue;
+    x = BOARD_ROWS[k];
+    if(!x || x.s !== "bad") continue;
+    out.push({ k:k, s:x.s, plate:x.plate||k, v:x.v||"",
+               why: x.red || x.why || x.rule || "",
+               go:  x.go  || "" });
+  }
+  out.sort(function(a,b){ return a.plate < b.plate ? -1 : (a.plate > b.plate ? 1 : 0); });
+  return out;
+}
+
+/* The two piles, and the rows that left while nobody was looking. */
+function opsSplit(){
+  var f = opsFaults(), nw=[], fx=[], gone=[], seen={}, i, k, changed=false;
+  for(i=0;i<f.length;i++){
+    var it = f[i];
+    seen[it.k] = 1;
+    if(OPS.done[it.k] === it.s) continue;
+    if(OPS.fix[it.k] === it.s) fx.push(it); else nw.push(it);
+  }
+  /* A ROW LEAVES BECAUSE IT WENT GREEN, NEVER BECAUSE IT WENT MISSING.
+     The first version dropped anything that was not in the current fault set,
+     which meant a board that failed to load, or came back short, silently
+     emptied somebody's fix list. Absent is not fixed. A row only leaves when
+     this payload actually carries it and it is no longer red. */
+  for(k in OPS.fix){
+    if(!Object.prototype.hasOwnProperty.call(OPS.fix,k) || seen[k]) continue;
+    var rf = BOARD_ROWS && BOARD_ROWS[k];
+    if(rf && rf.s !== "bad"){ delete OPS.fix[k]; gone.push(k); changed=true; }
+  }
+  for(k in OPS.done){
+    if(!Object.prototype.hasOwnProperty.call(OPS.done,k) || seen[k]) continue;
+    var rd2 = BOARD_ROWS && BOARD_ROWS[k];
+    if(rd2 && rd2.s !== "bad"){ delete OPS.done[k]; changed=true; }
+  }
+  if(changed) opsSave();
+  return { nw:nw, fx:fx, gone:gone };
+}
+
+/* The pills, and the one lamp that is allowed to say all clear. */
+function opsPills(){
+  var sp = opsSplit();
+  var n = document.getElementById("newbtn"), f = document.getElementById("fixbtn");
+  if(n){ n.innerHTML = '<i></i>New <b>' + sp.nw.length + '</b>';
+         n.setAttribute("data-n", sp.nw.length ? "some" : "none");
+         n.setAttribute("aria-label", sp.nw.length + " new, not picked up. Open the operations panel."); }
+  if(f){ f.innerHTML = '<i></i>Fix list <b>' + sp.fx.length + '</b>';
+         f.setAttribute("data-n", sp.fx.length ? "some" : "none");
+         f.setAttribute("aria-label", sp.fx.length + " on the fix list. Open the operations panel."); }
+  /* THE LAMP READS THE BOARD FIRST, THE PANEL SECOND.
+     Both have to be clear. The board's own state is the veto, so no amount of
+     clearing rows can light this. */
+  var rd = document.getElementById("reader");
+  if(rd){
+    var boardClear = rd.getAttribute("data-s") !== "bad";
+    rd.setAttribute("data-clear",
+      (boardClear && !sp.nw.length && !sp.fx.length) ? "yes" : "no");
+  }
+  if(document.getElementById("fixlist").classList.contains("on")) fxRender();
+  return sp;
+}
+
+/* -------------------------------------------------------- the panel itself */
+function fxTab(t){
+  FXTAB = t === "fix" ? "fix" : "new";
+  document.getElementById("fxTabNew").setAttribute("aria-pressed", FXTAB==="new" ? "true" : "false");
+  document.getElementById("fxTabFix").setAttribute("aria-pressed", FXTAB==="fix" ? "true" : "false");
+  fxRender();
+}
+
+function fxRender(){
+  var sp   = opsSplit();
+  var rows = FXTAB === "fix" ? sp.fx : sp.nw;
+  var rd   = document.getElementById("reader");
+  var boardClear = !rd || rd.getAttribute("data-s") !== "bad";
+
+  document.getElementById("fxX").textContent =
+    FXTAB === "fix" ? "What somebody has taken on" : "Raised by the board, not picked up";
+
+  document.getElementById("fxNote").innerHTML = FXTAB === "fix"
+    ? '<b>Clearing takes a row off this panel and does nothing else.</b> The lamp, '
+      + 'the drawing and the reader screen still say what is true, and a red lamp '
+      + 'stays red until the thing itself is fixed. A row that goes green leaves '
+      + 'this list on its own.'
+    : '<b>Everything red that nobody has picked up.</b> Moving one to the fix list '
+      + 'records that you have taken it on. It does not change anything on the board. '
+      + 'Amber never appears here, because amber is not a fault.';
+
+  var act = FXTAB === "fix" ? "Clear" : "Take it on";
+  var body = document.getElementById("fxBody");
+
+  if(!rows.length){
+    body.innerHTML = '<p class="fxempty">'
+      + (FXTAB === "fix"
+          ? 'Nothing on the fix list. '
+          : 'Nothing new. ')
+      + (boardClear
+          ? 'Nothing on the board is red either, so the operations summary lamp is '
+            + 'flashing green.'
+          : '<b>The board is still red.</b> Something is wrong and it is not on this '
+            + 'panel, which means nobody has it. Open faults only to see it.')
+      + '</p>';
+  } else {
+    body.innerHTML = rows.map(function(r,i){
+      return '<div class="fxrow">'
+        + '<div><div class="fxplate">' + esc(r.plate) + '</div>'
+        + (r.v ? '<div class="fxval">' + esc(r.v) + '</div>' : '')
+        + (r.why ? '<div class="fxwhy">' + esc(r.why) + '</div>' : '')
+        + (r.go ? '<div class="fxgo"><b>What to do.</b> ' + esc(r.go) + '</div>' : '')
+        + '</div>'
+        + '<div><span class="regstate" data-s="bad"><i></i>Down</span></div>'
+        + '<div class="fxact"><button class="trig" type="button" data-fx="' + esc(r.k)
+        + '">' + act + '</button></div></div>';
+    }).join("");
+    body.querySelectorAll("[data-fx]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var key = b.getAttribute("data-fx"), row = null, j;
+        for(j=0;j<rows.length;j++) if(rows[j].k === key) row = rows[j];
+        if(!row) return;
+        if(FXTAB === "fix"){ delete OPS.fix[key]; OPS.done[key] = row.s; }
+        else               { OPS.fix[key] = row.s; }
+        opsSave(); opsPills(); fxRender();
+      });
+    });
+  }
+  var cl = document.getElementById("fxClear");
+  cl.disabled = !rows.length;
+  cl.textContent = FXTAB === "fix" ? "Clear this list" : "Take on all";
+}
+
+function openFix(on, tab){
+  var el = document.getElementById("fixlist");
+  el.classList.toggle("on", !!on);
+  if(on){
+    el.removeAttribute("inert"); el.removeAttribute("aria-hidden");
+    fxTab(tab || FXTAB);
+    var c = document.getElementById("fxClose"); c && c.focus();
+  } else {
+    el.setAttribute("inert",""); el.setAttribute("aria-hidden","true");
+    var b = document.getElementById(FXTAB === "fix" ? "fixbtn" : "newbtn"); b && b.focus();
+  }
+}
+openFix(false);
+document.getElementById("newbtn").addEventListener("click", function(){ openFix(true,"new"); });
+document.getElementById("fixbtn").addEventListener("click", function(){ openFix(true,"fix"); });
+document.getElementById("fxTabNew").addEventListener("click", function(){ fxTab("new"); });
+document.getElementById("fxTabFix").addEventListener("click", function(){ fxTab("fix"); });
+document.getElementById("fxClose").addEventListener("click", function(){ openFix(false); });
+document.getElementById("fxClear").addEventListener("click", function(){
+  var sp = opsSplit(), rows = FXTAB === "fix" ? sp.fx : sp.nw, i;
+  for(i=0;i<rows.length;i++){
+    if(FXTAB === "fix"){ delete OPS.fix[rows[i].k]; OPS.done[rows[i].k] = rows[i].s; }
+    else               { OPS.fix[rows[i].k] = rows[i].s; }
+  }
+  opsSave(); opsPills(); fxRender();
+});
+document.getElementById("fixlist").addEventListener("click", function(e){
+  if(e.target === this) openFix(false);
+});
+
 /* ========================================================== FULL SCREEN
    The drawing is the instrument on this board and it is drawn into a panel
    1,392 by 640 on a stage that is itself scaled to fit. This gives it the
@@ -2450,7 +2777,10 @@ document.getElementById("registry").addEventListener("click",function(e){
 });
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;
-  if(document.getElementById("registry").classList.contains("on")) openRegistry(false);
+  /* Topmost first. The operations panel opens over everything else, so Escape
+     has to close it before it reaches the registry underneath. */
+  if(document.getElementById("fixlist").classList.contains("on")) openFix(false);
+  else if(document.getElementById("registry").classList.contains("on")) openRegistry(false);
   else if(document.body.classList.contains("pathfull")) setFull(false);
 });
 
@@ -2461,6 +2791,10 @@ function paint(d){
      full height, and leaving the functions in is how they come back in one
      line if they are ever wanted. */
   mstats(d); board(d); reader(d); pathmap(d); gauges(d); markFaults();
+  /* Last, because it reads the board rows AND the state the reader screen
+     just wrote. Both have to be current or the pills and the lamp answer for
+     the render before this one. */
+  opsPills();
   if(STAGE!=null) openStage(STAGE);
   fitStage();
 }
@@ -2470,7 +2804,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260907.0808";
+var BUILD = "20260907.0939";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
