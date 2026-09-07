@@ -37,7 +37,9 @@ const st = () => p.evaluate(() => ({
    own CLEAR sample still carries two documents that record a NO-GO on their
    own covers. Those are real and they are supposed to be red, which means the
    all-clear lamp cannot be exercised against it. */
-await p.evaluate(() => {
+/* Held in a function because the checks below reload the page, and a reload
+   takes these two with it. Anything that reloads calls this again. */
+const seedData = () => p.evaluate(() => {
   const allok = JSON.parse(JSON.stringify(CLEAR));
   Object.keys(allok.documents || {}).forEach(k => allok.documents[k] = 'ok');
   if (allok.registry && allok.registry.docs) allok.registry.docs.forEach(r => r.state = 'ok');
@@ -47,6 +49,7 @@ await p.evaluate(() => {
     onebad.registry.docs.forEach(r => { if (r.key === 'mg') r.state = 'bad'; });
   window.__ALLOK = allok; window.__ONEBAD = onebad;
 });
+await seedData();
 
 console.log('\nTHE PILLS');
 say('two pills, each with its own count',
@@ -98,6 +101,62 @@ say('the fix list tab shows what was taken on', (await st()).rows === 1);
 await p.click('#fxBody [data-fx]'); await p.waitForTimeout(200);
 const cleared = await st();
 say('clearing takes it off the panel', cleared.fx === 0);
+
+console.log('\nPRESSING FIX LIST TAKES EVERYTHING ON');
+/* One gesture: the pile nobody has looked at moves to the pile somebody has,
+   and the summary comes off alarm. It is acknowledgement, not clearance, and
+   the difference has to be visible in the words as well as the colour. */
+{
+  await p.evaluate(() => { localStorage.removeItem('4ormiq.ops.v1'); });
+  await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForTimeout(1100);
+  await seedData();
+  await p.evaluate(() => paint(normalise(TROUBLE))); await p.waitForTimeout(300);
+  const before = await st();
+  await p.click('#fixbtn'); await p.waitForTimeout(400);
+  await p.keyboard.press('Escape'); await p.waitForTimeout(300);
+  const after = await p.evaluate(() => ({
+    nw: Number(document.querySelector('#newbtn b').textContent),
+    fx: Number(document.querySelector('#fixbtn b').textContent),
+    ack: document.getElementById('reader').getAttribute('data-ack'),
+    boardS: document.getElementById('reader').getAttribute('data-s'),
+    line: document.getElementById('rdline').textContent.trim(),
+    body: document.getElementById('rdbody').innerText.replace(/\s+/g, ' '),
+    lampAnim: getComputedStyle(document.querySelector('.rdhd i')).animationName,
+    lampBg: getComputedStyle(document.querySelector('.rdhd i')).backgroundColor,
+    lineBg: getComputedStyle(document.getElementById('rdline')).color
+  }));
+  say('everything waiting moves to the fix list in one press',
+    after.nw === 0 && after.fx === before.nw, before.nw + ' new -> ' + after.fx + ' on the list');
+  say('and the summary says all is good to go', after.line === 'All is good to go.', after.line);
+  say('in green, and off alarm',
+    after.ack === 'yes' && after.lampBg === 'rgb(51, 216, 155)' && after.lampAnim === 'none'
+    && after.lineBg === 'rgb(51, 216, 155)', after.lampBg + ' / ' + after.lampAnim);
+  /* THE ONE THING GREEN IS NEVER ALLOWED TO DO HERE.
+     It says nothing is unattended. It never says the machine is well, and the
+     screen has to keep naming what is wrong while it is green, or a person
+     reading it would take the colour for an all clear. */
+  say('while still saying how many faults are on the list',
+    /faults are on the fix list/.test(after.body), after.body.slice(0, 62));
+  say('and still naming them one by one',
+    (after.body.match(/is still down/g) || []).length >= 1);
+  say('and the board itself has not moved', after.boardS === 'bad', after.boardS);
+  /* A NEW FAULT BREAKS THE GREEN. That is the whole value of the state: it
+     lets tomorrow's fault be told apart from the one you already know. */
+  await p.evaluate(() => { for (const k in OPS.fix) { delete OPS.fix[k]; break; } opsPills(); });
+  await p.waitForTimeout(250);
+  const broken = await p.evaluate(() => ({
+    ack: document.getElementById('reader').getAttribute('data-ack'),
+    line: document.getElementById('rdline').textContent.trim() }));
+  say('and one new fault puts it back on alarm',
+    broken.ack === 'no' && broken.line !== 'All is good to go.', broken.line);
+  await p.evaluate(() => { localStorage.removeItem('4ormiq.ops.v1'); });
+  await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForTimeout(1100);
+  await seedData();
+  await p.click('#newbtn'); await p.waitForTimeout(300);
+  await p.click('#fxBody [data-fx]'); await p.waitForTimeout(200);
+  await p.click('#fxTabFix'); await p.waitForTimeout(200);
+  await p.click('#fxBody [data-fx]'); await p.waitForTimeout(200);
+}
 
 console.log('\nAND CLEARING CHANGES NOTHING ELSE');
 say('the board is still red', cleared.board === 'bad');

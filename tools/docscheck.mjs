@@ -28,12 +28,12 @@ await p.goto('file://' + process.cwd() + '/admin.html?demo=1', { waitUntil: 'dom
 await p.waitForTimeout(1100);
 
 console.log('\nTHE WAY IN');
-say('the board carries a control that opens the documents',
-  await p.evaluate(() => !!document.getElementById('docbtn')));
+say('the board carries one control that opens the registry',
+  await p.evaluate(() => !!document.getElementById('regbtn') && !document.getElementById('docbtn')));
 say('the registry is shut, inert and hidden before it is asked for',
   await p.evaluate(() => { const e = document.getElementById('docreg');
     return e.hasAttribute('hidden') && e.hasAttribute('inert') && !e.classList.contains('on'); }));
-await p.click('#docbtn'); await p.waitForTimeout(400);
+await p.click('#regbtn'); await p.waitForTimeout(400);
 say('it opens', await p.evaluate(() => document.getElementById('docreg').classList.contains('on')));
 say('and the board underneath is not reachable while it is up',
   await p.evaluate(() => document.getElementById('fit').hasAttribute('inert')));
@@ -93,34 +93,34 @@ console.log('\nEVERY REGISTRY ROW OPENS ITS DOCUMENT');
    A row that describes a document and cannot open it asks a reader to take
    our word for it, which is the one thing this product refuses. */
 {
-  await p.evaluate(() => { openDocs(false); openRegistry(true); });
-  await p.waitForTimeout(350);
+  await p.evaluate(() => { openDocs(false); });
+  await p.waitForTimeout(200);
+  await p.click('#regbtn'); await p.waitForTimeout(400);
   const reg = await p.evaluate(() => ({
-    rows: document.querySelectorAll('#regBody .regrow').length,
-    openable: document.querySelectorAll('#regBody [data-read]').length,
-    /* The masthead LIVE pill class on a row turns it into an ellipse of
-       shouting capitals. It has happened. */
-    borrowed: [...document.querySelectorAll('#regBody [data-read]')]
-      .filter(e => getComputedStyle(e).textTransform === 'uppercase'
-                || getComputedStyle(e).borderRadius !== '0px').length
+    rows: document.querySelectorAll('#docreg .drrow').length,
+    openable: document.querySelectorAll('#docreg [data-doc]').length,
+    sup: document.querySelectorAll('#docreg .drsrow').length
   }));
-  say('every document with text on this board opens from its registry row',
-    reg.openable === 11, reg.openable + ' of ' + (reg.rows + 1) + ' rows');
-  say('and no row has picked up styling that belongs to another component',
-    reg.borrowed === 0);
-  await p.click('#regBody [data-read="hra"]');
-  await p.waitForTimeout(450);
+  say('the registry pill opens the white screen and lists all eleven',
+    reg.rows === 11 && reg.openable === 11, reg.openable + ' openable rows');
+  say('with the three supporting records under them', reg.sup === 3, reg.sup);
+  await p.click('#docreg [data-doc="hra"]');
+  await p.waitForTimeout(300);
+  say('pressing one opens its summary', await p.evaluate(() => DR_VIEW === 'c:hra'));
+  await p.click('#drFull'); await p.waitForTimeout(400);
   const landed = await p.evaluate(() => ({
-    registryShut: !document.getElementById('registry').classList.contains('on'),
-    docsOpen: document.getElementById('docreg').classList.contains('on'),
     view: DR_VIEW,
     words: (document.querySelector('#docreg .drdoc') || { innerText: '' }).innerText.split(/\s+/).length
   }));
-  say('pressing one lands on that document in full, with the registry out of the way',
-    landed.registryShut && landed.docsOpen && landed.view === 'f:hra' && landed.words > 500,
-    landed.view + ', ' + landed.words + ' words');
-  await p.evaluate(() => { openDocs(false); openDocs(true); });
-  await p.waitForTimeout(300);
+  say('and Read it in full opens the document itself',
+    landed.view === 'f:hra' && landed.words > 500, landed.view + ', ' + landed.words + ' words');
+  /* THERE IS ONLY ONE REGISTRY. Two panels answering the same question is how
+     a reader ends up believing a description because they never found the
+     control that held the thing being described. */
+  say('the dark registry is gone', await p.evaluate(() =>
+    !document.getElementById('registry') && typeof openRegistry === 'undefined'));
+  await p.evaluate(() => { drList(); });
+  await p.waitForTimeout(200);
 }
 
 console.log('\nTHE SCREEN AND THE LAMPS AGREE');

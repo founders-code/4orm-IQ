@@ -244,7 +244,15 @@ for (const id of Object.keys(measured)) {
     if (now > was) rises.push({ id, k, was, now, hard: HARD.includes(k) });
     else if (now < was) falls.push({ id, k, was, now });
   }
-  /* a screen that loses its headings is a screen that stopped being navigable */
+  /* A SCREEN THAT LOSES ITS HEADINGS IS A SCREEN THAT STOPPED BEING NAVIGABLE.
+     One exception has been taken, and it is written down rather than left to
+     be rediscovered. On 7 September 2026 the back office lost a heading
+     because a whole panel was removed: it carried two registries, a dark one
+     listing the ten documents and a separate control holding the documents
+     themselves, and the dark one is gone. Every panel still on the board has
+     its own heading, which is the property this check exists to protect. The
+     ceiling came down from 5 to 4 for that reason and for no other. Owner:
+     Chad Johnston. It may fall again. It may not rise. */
   if (measured[id].headings < budget[id].headings)
     rises.push({ id, k:'headings', was:budget[id].headings, now:measured[id].headings, hard:false, fewer:true });
 }

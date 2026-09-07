@@ -172,26 +172,34 @@ await p.waitForTimeout(400);
 /* THE REGISTRY. Ten rows, the posture quoted rather than written, and shut
    means shut: a faded overlay that keeps its controls in the tab order is
    invisible and reachable at the same time. */
+/* THE REGISTRY. One control, one screen, and it is the white one: the list,
+   what each document governs and where it stands, and the document itself.
+   The dark panel that used to answer here is gone. */
 {
-  const shut = await p.evaluate(()=>{ const e=document.getElementById('registry');
+  const shut = await p.evaluate(()=>{ const e=document.getElementById('docreg');
     return e.hasAttribute('inert') && e.getAttribute('aria-hidden')==='true'; });
   if (!shut) fails.push('the registry is shut and still in the tab order');
   await p.click('#regbtn'); await p.waitForTimeout(500);
   const reg = await p.evaluate(()=>({
-    rows: document.querySelectorAll('#regBody .regrow').length,
-    sup:  document.querySelectorAll('#regBody .regsrow').length,
-    post: document.getElementById('regPost').innerText,
-    inert: document.getElementById('registry').hasAttribute('inert'),
-    ids:  [...document.querySelectorAll('#regBody .regid')].map(x=>x.childNodes[0].nodeValue.trim()) }));
-  console.log('registry rows', reg.rows, '| supporting', reg.sup);
-  if (reg.rows !== 10) fails.push('the registry is '+reg.rows+' documents, not ten');
+    rows: document.querySelectorAll('#docreg .drrow').length,
+    sup:  document.querySelectorAll('#docreg .drsrow').length,
+    post: (document.querySelector('#docreg .drpost')||{innerText:''}).innerText,
+    inert: document.getElementById('docreg').hasAttribute('inert'),
+    kicker: document.getElementById('drK').textContent.trim(),
+    ids:  [...document.querySelectorAll('#docreg .drrow .drid')].map(x=>x.textContent.trim()) }));
+  console.log('registry rows', reg.rows, '| supporting', reg.sup, '|', reg.kicker);
+  if (reg.rows !== 11) fails.push('the registry is '+reg.rows+' documents, not eleven');
+  if (reg.sup !== 3) fails.push('the registry lists '+reg.sup+' supporting records, not three');
+  if (reg.kicker !== 'The registry')
+    fails.push('the screen the registry pill opens does not call itself the registry');
   if (reg.inert) fails.push('the registry is open and still inert');
   if (!/NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH/.test(reg.post))
     fails.push('the registry does not carry the release posture');
   if (!/NO-GO/.test(reg.post)) fails.push('the release posture no longer says NO-GO');
   if (!reg.ids.includes('CDP-001')) fails.push('the counsel pack is not listed under its own id');
+  if (!reg.ids.includes('PIA-001')) fails.push('the privacy assessment is not among the eleven');
   await p.keyboard.press('Escape'); await p.waitForTimeout(400);
-  if (await p.evaluate(()=>document.getElementById('registry').classList.contains('on')))
+  if (await p.evaluate(()=>document.getElementById('docreg').classList.contains('on')))
     fails.push('Escape does not close the registry');
 }
 

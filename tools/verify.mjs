@@ -2302,7 +2302,7 @@ if (!/id="faultbtn"/.test(admin))
   fails.push('the faults only button is gone from the back office');
 if (!/id="faultbtn"[^>]*aria-pressed/.test(admin))
   fails.push('the faults only button does not report its pressed state');
-if (!/id="regbtn">The registry<\/button>\s*<button class="trig" type="button" id="faultbtn"/.test(admin))
+if (!/id="regbtn">The registry<\/button>\s*\n?\s*<button class="trig" type="button" id="faultbtn"/.test(admin))
   fails.push('the faults only button is not beside the registry button');
 /* The panel lamps moved in between the live pill and the address. Both are
    still in the masthead, which is what the guard is protecting. */
@@ -2492,17 +2492,23 @@ for (const h of ['<h2 class="ck">The path a check takes</h2>',
     fails.push('the panel pills are under 32px on the stage, so they land under 24 with the board scaled');
 }
 
-/* THE ROWS THAT OPEN A DOCUMENT CARRY NO BORROWED CLASS.
-   A registry row shipped as class="regrow live" and .live is the masthead's
-   LIVE pill: border-radius 99, uppercase, letter-spacing. Every row in the
-   panel rendered as an ellipse of shouting capitals. That is the sixth time a
-   class owned by one component has been picked up by another on this page. */
-if (/class="(regrow|regsrow) live"/.test(admin))
-  fails.push('a registry row carries the masthead LIVE pill class, which restyles the whole row');
-if (!/<button class="regrow" type="button" data-read=/.test(admin))
-  fails.push('the registry rows no longer open the document they describe');
-if (!/openRegistry\(false\);\s*\n\s*openDocs\(true\);\s*\n\s*drOpen\(k, true\);/.test(admin))
-  fails.push('a registry row does not take a reader through to the document in full');
+/* ONE REGISTRY, AND IT IS THE WHITE ONE.
+   The board carried two: a dark panel listing the ten documents and where
+   each stood, and a separate control holding the documents themselves. A
+   reader had to know the second existed to get from a description of a
+   standard to the standard. The dark one is gone and its pill now opens the
+   white screen, which carries the list, the summary and the full text. */
+if (/id="registry"|class="registry"|function openRegistry/.test(admin))
+  fails.push('the dark registry is back, so the board has two registries answering the same question');
+if (!/document\.getElementById\("regbtn"\)\.addEventListener\("click", function\(\)\{ openDocs\(true\); \}\);/.test(admin))
+  fails.push('the registry pill no longer opens the registry');
+if (/id="docbtn"/.test(admin))
+  fails.push('the second registry control is back beside the first');
+/* And nothing that was on the panel that went may be lost in the move. */
+if (!/REG_SUPPORTING\.filter/.test(admin))
+  fails.push('the supporting records did not come across to the registry that replaced the panel');
+if (!/esc\(REG_POSTURE\)/.test(admin))
+  fails.push('the registry types its own release posture instead of quoting the one constant');
 if (!/\.vh\{position:absolute[^}]*clip-path:inset\(50%\)/.test(admin))
   fails.push('the read-not-seen heading has no clipping rule');
 if (/\.vh\{[^}]*display:none/.test(admin))
@@ -2563,12 +2569,14 @@ for (const sel of ['.trig:focus-visible', '.hl:focus-visible', '.nnode.clicky:fo
     fails.push('the metrics route no longer sends the registry, so the drawer and the lamp can drift');
 }
 
-/* --------------------------------------------------- the registry, on screen */
-if (!/id="registry"/.test(admin)) fails.push('the registry is gone from the back office');
+/* --------------------------------------------------- the registry, on screen
+   It is the white screen now. The dark panel that used to answer to this id
+   is gone, and its checks moved onto the screen that replaced it. */
+if (!/id="docreg"/.test(admin)) fails.push('the registry is gone from the back office');
 if (!/id="regbtn"/.test(admin)) fails.push('there is no way to open the registry');
 if (/href="evidence\.html"/.test(admin))
   fails.push('the map pill is back beside the registry pill');
-if (!/el\.setAttribute\("inert",""\);\s*el\.setAttribute\("aria-hidden","true"\)/.test(admin))
+if (!/el\.setAttribute\("hidden",""\); el\.setAttribute\("inert",""\); el\.setAttribute\("aria-hidden","true"\);/.test(admin))
   fails.push('the registry stays in the tab order while it is shut');
 if (!/REG_POSTURE/.test(admin))
   fails.push('the registry has no posture to show when the route is silent');
