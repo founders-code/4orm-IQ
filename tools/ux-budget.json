@@ -11,7 +11,7 @@
       "headings": 1,
       "stops": 5,
       "h1s": 1,
-      "textRuns": 41,
+      "textRuns": 39,
       "overflow": 0
     },
     "landing@390": {
@@ -23,7 +23,7 @@
       "headings": 1,
       "stops": 5,
       "h1s": 1,
-      "textRuns": 37,
+      "textRuns": 35,
       "overflow": 0
     },
     "landing@320": {
@@ -35,7 +35,7 @@
       "headings": 1,
       "stops": 5,
       "h1s": 1,
-      "textRuns": 37,
+      "textRuns": 35,
       "overflow": 0
     },
     "waiting@1440": {
@@ -104,10 +104,10 @@
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
-      "headings": 4,
-      "stops": 15,
+      "headings": 5,
+      "stops": 17,
       "h1s": 0,
-      "textRuns": 157,
+      "textRuns": 165,
       "overflow": 0
     }
   }

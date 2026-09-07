@@ -16,7 +16,8 @@
   },
   "scripts": {
     "verify": "node tools/verify.mjs",
-    "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs tools/pathcheck.mjs tools/uxgate.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
+    "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs tools/pathcheck.mjs tools/opscheck.mjs tools/uxgate.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
+    "opscheck": "node tools/opscheck.mjs",
     "uxgate": "node tools/uxgate.mjs",
     "uxgate:record": "node tools/uxgate.mjs --record",
     "stamp": "node tools/stamp.mjs",

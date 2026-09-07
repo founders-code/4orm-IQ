@@ -20,16 +20,23 @@ const say=(label,ok,detail)=>{ console.log('  '+label+': '+(detail===undefined?o
 
 console.log('BRAND');
 /* Every one of these is the real file. Nothing here may ever be redrawn. */
-const lock=doc.querySelector('.cbtitle .tlead h1 .iqlock img.iqmark');
-say('the 4ormIQ lockup is in the headline', !!lock);
+/* THE LOCKUP IS IN THE CORNER NOW, AND THE CORNER IS ON EVERY STAGE.
+   It used to live inside the landing headline, so the product named itself on
+   one screen and the house lockup sat in the corner of the rest. */
+const lock=doc.querySelector('.nav .navpill .navbrand .iqlock img.iqmark');
+say('the 4ormIQ lockup is the corner mark', !!lock);
 say('and it is the asset, not a redrawing',
     !!lock && /^data:image\/png;base64,/.test(lock.getAttribute('src')||''));
-say('the corner mark is the asset too',
-    !!doc.querySelector('.navpill img[src^="data:image/png;base64,"]'));
-say('the corner mark is hidden while the lockup is up',
-    /body\[data-stage="landing"\] \.navpill\{display:none\}/.test(html));
-say('the corner mark has a size on the console',
-    /\.navpill img\{height:\d+px/.test(html));
+say('IQ is beside it, and it is the only type in the lockup',
+    (doc.querySelector('.navbrand .iqiq')||{textContent:''}).textContent.trim()==='IQ');
+say('the corner mark is NOT hidden on the landing',
+    !/body\[data-stage="landing"\] \.navpill\{display:none\}/.test(html));
+/* One number sizes it. A pixel height on the img beats .iqmark and the mark
+   and the IQ would then move independently. */
+say('nothing sizes the corner img in pixels', !/\.navpill img\{[^}]*height:\d/.test(html));
+say('the corner lockup is sized by a font-size', /\.navbrand\{[^}]*font-size:\d/.test(html));
+say('the headline is a sentence, not a lockup',
+    !doc.querySelector('.cbtitle .tlead h1 .iqlock'));
 say('find support carries the mark',
     /\.dirbrand img\{height:\d+px;width:\d+px/.test(html));
 /* The chips and the type pills came off on purpose. If either comes back it is

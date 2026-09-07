@@ -802,12 +802,30 @@ if (!/overflow-y:\s*auto/.test(vmoreRule))
     fails.push('the 4orm wordmark has been rebuilt in markup instead of using the asset');
 }
 if (!/class="iqmark" src="data:image\/png;base64,/.test(html))
-  fails.push('the 4 in the headline lockup is not the real mark file');
+  fails.push('the 4 in the 4ormIQ lockup is not the real mark file');
 if (!/<span class="iqlock"/.test(html))
-  fails.push('the headline no longer carries the 4ormIQ lockup');
-/* The "4orm" in the headline is the logo file with FINANCE masked off, so the
+  fails.push('the page no longer carries the 4ormIQ lockup anywhere');
+/* THE LOCKUP MOVED TO THE CORNER, AND THE CORNER IS ON EVERY STAGE.
+   It used to sit inside the landing headline, which meant the product named
+   itself on one screen out of five and the corner carried the house lockup
+   instead. The mark now sits top left on the landing, the console and the
+   report, and the headline is a sentence. Both halves are guarded: the lockup
+   is IN the corner, and the corner is not hidden on the landing. */
+if (!/<span class="navbrand"[^>]*>\s*<span class="iqlock">/.test(html))
+  fails.push('the corner mark is no longer the 4ormIQ lockup');
+if (/body\[data-stage="landing"\] \.navpill\{display:none\}/.test(styleBlock))
+  fails.push('the corner mark is hidden on the landing, which is the one screen that was asked for it');
+/* And it must be sized by ONE number. .navpill img{height:NNpx} used to sit
+   here and it beats .iqmark on specificity, so the mark would take a pixel
+   height while IQ kept an em one and the lockup would come apart at every
+   width. */
+if (/\.navpill img\{[^}]*height:\d/.test(styleBlock))
+  fails.push('the corner mark is sized in pixels on the img, which breaks the lockup apart from its IQ');
+if (!/\.navbrand\{[^}]*font-size:\d/.test(styleBlock))
+  fails.push('the corner lockup has no font-size to size it, so .iqmark has no em to read');
+/* The "4orm" in the lockup is the logo file with FINANCE masked off, so the
    mark and the letterforms are the real ones. IQ is the only type in it, and
-   it is set at the weight of the logo's own strokes, not the headline's 800. */
+   it is set at the weight of the logo's own strokes. */
 const iqRule = (styleBlock.match(/\.iqiq\{[^}]*\}/) || [''])[0];
 if (!/font-weight:\s*600/.test(iqRule))
   fails.push('IQ in the headline lockup is not at the logo\'s stroke weight, so it will read as too heavy');
@@ -1309,7 +1327,7 @@ if (!/We do not publish individuals/.test(script))
       fails.push('the landing lead is no longer set to the size the site sets its hero lead');
   }
   if (!/\.iqmark\{[^}]*height:1\.356em/.test(styleBlock))
-    fails.push('the 4ormIQ mark is no longer sized in em off the headline, so the two can drift apart');
+    fails.push('the 4ormIQ mark is no longer sized in em off its lockup, so the mark and the IQ can drift apart');
   /* Tolerates a comment between the brace and the declaration, which is how
      every other rule in this file is written. */
   const deckRule = (styleBlock.match(/body\[data-stage="landing"\] \.cbdeck\{[\s\S]*?\}/) || [''])[0];
@@ -1874,8 +1892,9 @@ if (!/id="waitForming"/.test(html))
   if (!/rel="apple-touch-icon" sizes="180x180" href="data:image\/png;base64,/.test(head))
     fails.push('the home screen icon is gone');
 }
-if (!/class="cbtwo"/.test(html))
-  fails.push('the landing no longer says how few questions it takes to start');
+/* The two-questions line came off the landing on request, along with the
+   moments list. A guard for a line that was deliberately removed is not a
+   control, so it comes off with the line rather than being weakened. */
 
 /* ------------------------------------------------- THE THREAD OWNS THE PAGE */
 if (!/data-stage="landing"\]\[data-chat="on"\] \.cbtitle/.test(html))
