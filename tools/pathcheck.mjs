@@ -8,7 +8,9 @@ const errs=[]; p.on('pageerror', e=>errs.push('PAGEERROR: '+e.message));
 await p.goto('file:///home/claude/kbys/build/4orm-iq/admin.html?demo=1', { waitUntil:'load' });
 await p.waitForTimeout(2400);
 
-const info = await p.evaluate(()=>{
+/* Revision 3's own acceptance checks, run on BOTH data sets. The trouble data
+   has longer readings and is what catches an overflow. */
+const probe = ()=>{
   const nodes=[...document.querySelectorAll('#pathmap .nnode')];
   const boxes=nodes.map(g=>{ const bb=g.querySelector('rect,path').getBBox();
     return {id:g.getAttribute('data-id'), x:bb.x, y:bb.y, w:bb.width, h:bb.height}; });
@@ -22,11 +24,32 @@ const info = await p.evaluate(()=>{
     g.querySelectorAll('text').forEach(t=>{ const tb=t.getBBox();
       if(tb.x+tb.width > box.x+box.width-3 || tb.x < box.x-1)
         over.push(g.getAttribute('data-id')+' :: '+t.textContent.slice(0,40)); }); });
+  const svg=document.querySelector('#pathmap svg'), vb=svg.viewBox.baseVal;
+  /* a lane plate shaved by the left edge of the viewBox */
+  const clip=[...svg.querySelectorAll('.lanelab,.lanesub')]
+    .filter(t=>t.getBBox().x < vb.x).map(t=>t.textContent);
+  /* THE STAIRCASE RULE. Below the retrieval foot bar no flow segment may
+     travel leftwards. Taps and the second-pass loop are exempt: a reading is
+     not the flow, and the loop is the one deliberate return. */
+  const backwards=[...svg.querySelectorAll('path.pipe')].filter(x=>{
+    const c=x.getAttribute('class'); if(/tap|loop/.test(c)) return false;
+    const pts=[...x.getAttribute('d').matchAll(/([ML])\s*(-?[\d.]+)\s+(-?[\d.]+)/g)]
+      .map(m=>[+m[2], +m[3]]);
+    if(pts[0][1] < 654) return false;
+    for(let i=1;i<pts.length;i++) if(pts[i][0] < pts[i-1][0]-0.5) return true;
+    return false; }).map(x=>x.getAttribute('d'));
+  /* an arrowhead into a reading says the reading is a stage */
+  const arrowIntoMeter=[...svg.querySelectorAll('path.pipe.tap')]
+    .filter(x=>x.getAttribute('marker-end')).length;
   return { count:nodes.length, clicky:document.querySelectorAll('#pathmap .nnode.clicky').length,
+    meters:document.querySelectorAll('#pathmap .nnode[data-kind="meter"]').length,
     panellamps:document.querySelectorAll('#house .pgl').length,
     fullbtn:document.querySelectorAll('#fullbtn').length,
     registry:document.querySelectorAll('#registry .regrow').length,
-    gauges:document.querySelectorAll('#gauges .gauge').length, hits, over }; });
+    gauges:document.querySelectorAll('#gauges .gauge').length,
+    hits, over, clip, backwards, arrowIntoMeter }; };
+
+const info = await p.evaluate(probe);
 
 const fails=[];
 /* The handover's numbers, moved on twice since it was written. The two lamps
@@ -35,7 +58,7 @@ const fails=[];
    the full-screen control instead. The dials went from five to six when the
    one register number that was answering two different questions was split
    into how wide we looked and how often an ask came back. */
-const want={count:46, clicky:43, panellamps:2, gauges:6};
+const want={count:46, clicky:43, panellamps:2, gauges:6, meters:5};
 for (const k of Object.keys(want))
   if (info[k]!==want[k]) fails.push(k+' is '+info[k]+', the handover says '+want[k]);
 if (info.hits.length) fails.push('boxes overlap: '+info.hits.join(', '));
@@ -43,6 +66,28 @@ if (info.over.length) fails.push('text outside its box: '+info.over.slice(0,5).j
 console.log('nodes', info.count, '| clickable', info.clicky, '| panel lamps', info.panellamps,
             '| dials', info.gauges, '| overlaps', info.hits.length, '| text overruns', info.over.length);
 if (info.fullbtn !== 1) fails.push('the full screen control is not on the drawing header');
+if (info.clip.length) fails.push('a lane plate is shaved at the left edge: ' + info.clip.join(', '));
+if (info.backwards.length)
+  fails.push(info.backwards.length + ' flow segment(s) below the retrieval foot bar travel leftwards. '
+    + 'The staircase rule is what stops the eye going backwards: ' + info.backwards[0]);
+if (info.arrowIntoMeter) fails.push('an arrowhead points into a reading, which says the reading is a stage');
+
+/* AGAIN ON THE TROUBLE DATA. Longer readings, and it is what catches an
+   overflow that the clear data hides. */
+{
+  await p.evaluate(()=>paint(normalise(TROUBLE)));
+  await p.waitForTimeout(600);
+  const t = await p.evaluate(probe);
+  console.log('on trouble data: nodes', t.count, '| overlaps', t.hits.length,
+    '| text overruns', t.over.length, '| backwards', t.backwards.length);
+  if (t.count !== 46) fails.push('the trouble board draws ' + t.count + ' nodes, not 46');
+  if (t.hits.length) fails.push('boxes overlap on the trouble data: ' + t.hits.join(', '));
+  if (t.over.length) fails.push('text runs outside its box on the trouble data: ' + t.over.slice(0,4).join(' | '));
+  if (t.backwards.length) fails.push('the trouble board turns back to the left: ' + t.backwards[0]);
+  if (t.clip.length) fails.push('a lane plate is shaved on the trouble data');
+  await p.evaluate(()=>paint(normalise(CLEAR)));
+  await p.waitForTimeout(500);
+}
 
 /* 4. every node opens onto something */
 const empty = await p.evaluate(()=>{
@@ -57,6 +102,68 @@ const empty = await p.evaluate(()=>{
   return out; });
 if (empty.length) fails.push('these open onto nothing: '+empty.join(', '));
 console.log('nodes opening onto nothing:', empty.length);
+
+/* EVERY REGISTER OPENS, IN BOTH SIZES.
+   All 121, walked. A name and a colour raise two questions and this is where
+   they are answered: what the thing is, and what an empty answer from it
+   would mean. */
+{
+  let opened = 0, noLink = 0, silent = [];
+  for (let ci = 0; ci < 10; ci++) {
+    await p.evaluate(i => window.openStage(i), ci);
+    await p.waitForTimeout(60);
+    const names = await p.evaluate(() =>
+      [...document.querySelectorAll('#shB .plate')].map(x => x.getAttribute('data-reg')));
+    for (const nm of names) {
+      await p.evaluate(i => window.openStage(i), ci);
+      await p.evaluate(n => { const b = [...document.querySelectorAll('#shB .plate')]
+        .find(x => x.getAttribute('data-reg') === n); b && b.click(); }, nm);
+      const card = await p.evaluate(() => ({
+        t: document.getElementById('shT').textContent,
+        body: document.getElementById('shB').innerText,
+        link: !!document.querySelector('#shB .reglink'),
+        back: !!document.getElementById('regBack') }));
+      opened++;
+      if (card.t !== nm) silent.push(nm + ' opened as "' + card.t + '"');
+      else if (card.body.trim().length < 140) silent.push(nm + ' opened onto almost nothing');
+      else if (!card.back) silent.push(nm + ' has no way back');
+      if (!card.link) noLink++;
+    }
+  }
+  console.log('registers opened', opened, '| computed here, no outside link', noLink);
+  if (opened !== 121) fails.push('only ' + opened + ' of 121 registers open');
+  if (silent.length) fails.push(silent.length + ' register card(s) are wrong: ' + silent.slice(0,4).join(' | '));
+  /* The ones with no link are the ones we compute. If every register had a
+     link, one of them would be borrowing somebody else's name. */
+  if (noLink < 10 || noLink > 30)
+    fails.push(noLink + ' registers have no outside address. Expected the computed ones, near 19.');
+}
+
+/* THE LEGEND, and full screen carrying the same clicks. */
+{
+  await p.evaluate(() => document.getElementById('shC').click());
+  await p.click('#legendbtn'); await p.waitForTimeout(300);
+  const leg = await p.evaluate(() => ({ t: document.getElementById('shT').textContent,
+    rows: document.querySelectorAll('#shB dt').length }));
+  if (leg.rows < 5) fails.push('the legend explains ' + leg.rows + ' things, expected at least five');
+  await p.evaluate(() => document.getElementById('shC').click()); await p.waitForTimeout(200);
+
+  await p.click('#fullbtn'); await p.waitForTimeout(600);
+  await p.evaluate(() => { const g = [...document.querySelectorAll('#pathmap .nnode')]
+    .find(x => x.getAttribute('data-id') === 'cat7'); g.dispatchEvent(new MouseEvent('click',{bubbles:true})); });
+  await p.waitForTimeout(350);
+  const fs2 = await p.evaluate(() => {
+    const card = document.querySelector('.sheetcard').getBoundingClientRect();
+    const sh = getComputedStyle(document.getElementById('sheet'));
+    return { title: document.getElementById('shT').textContent,
+      onscreen: card.width > 200 && card.top >= 0 && card.top < innerHeight,
+      z: parseInt(sh.zIndex), pos: sh.position }; });
+  console.log('full screen: category opens =', fs2.title, '| card on screen =', fs2.onscreen);
+  if (!fs2.onscreen) fails.push('in full screen the card opens off screen or behind the drawing');
+  if (fs2.z <= 70 || fs2.pos !== 'fixed') fails.push('in full screen the card is under the panel');
+  await p.evaluate(() => document.getElementById('shC').click());
+  await p.keyboard.press('Escape'); await p.waitForTimeout(500);
+}
 
 /* the lamp sheet is left open by the loop above and would swallow the clicks */
 await p.evaluate(()=>{ const c=document.getElementById('shC'); c && c.click(); });

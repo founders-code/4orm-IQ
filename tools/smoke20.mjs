@@ -71,8 +71,7 @@ console.log('path nodes:', nodes.length,
   JSON.stringify({ ok:state('ok'), warn:state('warn'), bad:state('bad') }));
 console.log('panel lamps:', chips.length);
 console.log('dials:', doc.querySelectorAll('#gauges .gauge').length);
-console.log('registers ranked:', doc.querySelectorAll('#rank .rblk').length);
-console.log('clickable:', doc.querySelectorAll('#pathmap .nnode.clicky,.hl,.gauge[data-info],.rblk').length);
+console.log('clickable:', doc.querySelectorAll('#pathmap .nnode.clicky,.pgl,.gauge[data-info]').length);
 
 const t = doc.getElementById('stage').textContent;
 
@@ -107,9 +106,25 @@ if (doc.querySelectorAll('#gauges .gauge').length !== 6) fails.push('a dial is m
     if (!caps.includes(want)) fails.push('the dial "' + want + '" is gone: ' + caps.join(', '));
   if (caps.includes('Time to spare')) fails.push('the time dial is back to a percentage of headroom');
 }
-if (!doc.querySelector('#days svg')) fails.push('the checks per day chart did not draw');
-if (!/OpenCorporates/.test(t)) fails.push('the worst register list is not naming registers');
-if (!/62\.2/.test(t)) fails.push('the worst register list lost its percentage');
+/* The early warning table, the worst-register list and the daily chart came
+   off the board when the drawing took the full left column. rank(), pulse(),
+   evidence() and days() are still in the file and no longer called, which is
+   how they come back in one line if they are ever wanted. The register health
+   they carried is not lost: it is one press further in, behind a family. */
+if (doc.getElementById('rank') || doc.getElementById('days'))
+  fails.push('the two cards are back on the board, so the drawing lost its height');
+for (const fn of ['rank', 'pulse', 'evidence', 'days'])
+  if (typeof window[fn] !== 'function')
+    fails.push(fn + '() was deleted rather than left uncalled, so the card cannot come back');
+{
+  /* Pressing a family still opens its registers with their state. */
+  window.openStage(2);
+  const plates = [...doc.querySelectorAll('#shB .plate')];
+  console.log('enforcement registers behind the family:', plates.length);
+  if (plates.length !== 21) fails.push('the enforcement family opens ' + plates.length + ' registers, not 21');
+  if (!/OFAC/.test(doc.getElementById('shB').textContent))
+    fails.push('the register drill-down is not naming registers');
+}
 
 /* Every lamp, every stage, every dial and every register opens onto something. */
 let empty = [];

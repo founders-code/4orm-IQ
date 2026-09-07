@@ -2360,6 +2360,42 @@ for (const k of ['m:signin', 'r:build'])
     fails.push(k + ' is no longer a header chip, so it has been put on the path or dropped');
 if (!/class="pgl"/.test(admin))
   fails.push('the two panel lamps are gone, so two lamps have been dropped from the board');
+/* ------------------------------------------- steps, meters and the staircase
+
+   Two kinds of thing sit on this drawing and they are drawn differently on
+   purpose. A STEP is something the check does. A METER is a reading taken on
+   that lane, and it hangs off the flow on a dotted tap with no arrowhead,
+   because a reading is not a stage and an arrow into one says that it is.
+   tools/pathcheck.mjs measures both, on the clear and the trouble data. */
+if (!/\.pipe\.tap\{stroke:rgba\(111,129,153,\.45\)/.test(admin))
+  fails.push('a reading is drawn with the same line as the flow, so an instrument reads as a step');
+if (!/\.meterbox\{fill:var\(--sunk\)/.test(admin))
+  fails.push('a meter is drawn raised like a step rather than recessed like a reading');
+if (/var tap=function\([\s\S]{0,300}?marker-end/.test(admin))
+  fails.push('a tap carries an arrowhead, which says a reading is a stage the check takes');
+if (!/var ST=\{ again:/.test(admin))
+  fails.push('the stair treads are gone, so the flow can turn back to the left again');
+/* Routing hands down from its LAST step. An earlier build dropped out of
+   routing from the rulebook, which read as though routing handed straight to
+   the direct feeds. */
+if (!/var sc=by\.scope, scx=cx\(sc\);/.test(admin))
+  fails.push('routing no longer hands down from Scope written in, its last step');
+if (!/tap\("door3","answ"\)/.test(admin))
+  fails.push('Registers answering is wired as a step in retrieval rather than a reading on it');
+
+/* The two cards that came off the board carried the only two headings on it,
+   and losing them left a screen with one. The three panels are three sections
+   and they have their own headings now, which is better than the accident
+   that was there before. The dials one is read and not seen, because the
+   dials carry their own captions and a visible title would repeat them. */
+for (const h of ['<h2 class="ck">The path a check takes</h2>',
+                 '<h2 class="rdhd">', '<h2 class="vh">The instruments</h2>'])
+  if (!admin.includes(h)) fails.push('a panel on the board has no heading: ' + h);
+if (!/\.vh\{position:absolute[^}]*clip-path:inset\(50%\)/.test(admin))
+  fails.push('the read-not-seen heading has no clipping rule');
+if (/\.vh\{[^}]*display:none/.test(admin))
+  fails.push('the read-not-seen heading is display:none, which hides it from a screen reader too');
+
 /* A way out is not the main flow, and faults only has to take the pipework
    down with the boxes or it shows an operator a diagram of nothing. */
 if (!/\.pipe\.out\{stroke:rgba\(111,129,153/.test(admin))
@@ -2456,6 +2492,71 @@ if (!/asked:\s+enabled\.filter/.test(metrics))
 /* The two lamps that watch the panel are not steps in the process. */
 if (!/class="panellamps" id="house"/.test(admin))
   fails.push('the two panel lamps are not in the masthead');
+
+/* ------------------------------------------------- what each register is
+
+   A name and a colour tell an operator that something is amber without saying
+   what the thing is or what an empty answer from it would mean, and those are
+   the two questions a register raises. Every one of the 121 now opens. */
+{
+  const info = [...admin.matchAll(/^  "((?:[^"\\]|\\.)*)": \{ k:/gm)].map(m => m[1].replace(/\\"/g, '"'));
+  if (!/var REGINFO = \{/.test(admin))
+    fails.push('the register readouts are gone, so a register is a name and a colour again');
+  const catNames = [];
+  /* 09 is "09 4orm", which has a digit in its name. A character class of
+     letters and spaces silently skipped the whole category and reported its
+     eleven registers as orphans. */
+  for (const m of admin.matchAll(/\["\d\d [^"]+",\[([\s\S]*?)\]\]/g))
+    for (const n of m[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)) catNames.push(n[1].replace(/\\"/g, '"'));
+  const noInfo = catNames.filter(n => !info.includes(n));
+  const orphan = info.filter(n => !catNames.includes(n));
+  if (noInfo.length)
+    fails.push(noInfo.length + ' register(s) on the board have no readout: ' + noInfo.slice(0,4).join(', '));
+  if (orphan.length)
+    fails.push(orphan.length + ' readout(s) name a register the board does not carry: ' + orphan.slice(0,4).join(', '));
+  if (info.length !== 121)
+    fails.push('the readouts cover ' + info.length + ' registers, the catalogue has 121');
+  /* Every readout says what an empty answer means, because that is the
+     sentence that stops a silence being read as clearance, and it has to be
+     different per register: absent from FINTRAC means something, absent from
+     Glassdoor does not. */
+  const empties = [...admin.matchAll(/ e:"((?:[^"\\]|\\.)*)"/g)].map(m => m[1]);
+  if (empties.length !== info.length)
+    fails.push('a register readout has no sentence for what an empty answer means');
+  if (new Set(empties).size < 40)
+    fails.push('only ' + new Set(empties).size + ' distinct empty-answer sentences across 121 registers. '
+      + 'One sentence copied everywhere is the same as not having one.');
+  /* A link may only ever be the domain retrieval is already pinned to. */
+  if (!/u:null/.test(admin))
+    fails.push('every register claims an outside address. The ones computed here have none, and must say so.');
+  if (/u:"http:\/\//.test(admin)) fails.push('a register address is not https');
+  if (!/openRegister2/.test(admin)) fails.push('a register no longer opens');
+  if (!/rel="noopener noreferrer"/.test(admin))
+    fails.push('a register link opens without noopener');
+  if (!/id="regBack"/.test(admin))
+    fails.push('a register card has no way back to its category');
+}
+
+/* ------------------------------------------------------------- the legend
+   Colour never carries a state by itself. Each of the three has a colour, a
+   shape and a word, which is the rule a control room settles on because
+   somebody who cannot separate two greens still has to read the board. */
+if (!/id="legendbtn"/.test(admin)) fails.push('the legend is gone from the drawing header');
+for (const w of ['Working', 'Quiet', 'Down'])
+  if (!new RegExp('&#\\d+;\\s' + w + '<').test(admin))
+    fails.push('the legend state "' + w + '" has no shape beside its colour');
+if (!/var LEGEND_ROWS = \[/.test(admin))
+  fails.push('the legend has no long version behind it');
+if (!/Colour on its own is the one thing a control panel may not use/.test(admin))
+  fails.push('the legend no longer says why a shape is there as well as a colour');
+
+/* Full screen has to be the same board, not a poster of it. */
+if (!/body\.pathfull \.sheet\{position:fixed;z-index:90/.test(admin))
+  fails.push('in full screen a card opens underneath the drawing');
+
+/* A way back to the consumer page. */
+if (!/id="homebtn"/.test(admin) || !/href="index\.html" id="homebtn"/.test(admin))
+  fails.push('there is no way home from the back office');
 if (/<div class="house" id="house">/.test(admin))
   fails.push('the panel lamps are back on the drawing header, where they read as part of the process');
 
