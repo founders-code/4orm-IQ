@@ -133,7 +133,12 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
      from ID_TYPES rather than typed. */
   {
     const head = (src.match(/<meta name="description"[^>]*>/i) || [''])[0];
-    const landing = (src.match(/class="cb(deck|sub)[^"]*"[^>]*>([^<]*)</g) || []).join(' ');
+    /* Reads the whole element and strips the tags inside it. It used to stop
+       at the first "<", so the moment the deck carried a span for its line
+       break the guard was reading an empty string and could not have caught a
+       blocked type in the copy. */
+    const landing = (src.match(/<p class="cb(?:deck|sub)[^"]*"[^>]*>[\s\S]*?<\/p>/g) || [])
+      .join(' ').replace(/<[^>]*>/g, ' ');
     const hero = (src.match(/<h1[\s\S]*?<\/h1>/gi) || []).join(' ');
     for (const [word, why] of [
       ['person', 'a person name is not an accepted input'],
@@ -2076,6 +2081,41 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
     if (!/class="rp-sub"/.test(sec))
       fails.push('section ' + (i + 1) + ' of sources and method has a heading and then a grid, with nothing saying why it is there');
   });
+  /* AND THE WORKING IS FOLDED AWAY UNDER THAT SENTENCE.
+     The page carried a thousand words of markup and near three thousand once
+     the catalogue and the statutes were written into it, in one column, and
+     almost nobody reached the third heading. The headings and their sentences
+     stay on the page; everything under them is one press away. These check
+     the mechanism rather than the wording, because the wording is allowed to
+     change and the mechanism is not:
+       - every section named in the label map still exists on the page
+       - the fold is built from what is under .rp-sub rather than hand wrapped,
+         so a section that grows a row is still folded
+       - the panel is hidden with the ATTRIBUTE. A class that sets display can
+         be beaten by a later rule, and the page would then ship open with
+         every button still saying "show". */
+  {
+    const labels = (script.match(/var RP_FOLD_LABELS = \{([\s\S]*?)\n\};/) || [])[1];
+    if (labels === undefined) fails.push('sources and method no longer folds its sections');
+    else {
+      const named = labels.match(/^\s*([A-Za-z]+):/gm) || [];
+      named.forEach(n => {
+        const id = n.replace(/[^A-Za-z]/g, '');
+        if (!new RegExp('id="' + id + '"').test(src))
+          fails.push('the fold names a section "' + id + '" that is not on the sources page');
+      });
+      if (named.length < 6)
+        fails.push('only ' + named.length + ' sections of sources and method fold, and there are six');
+    }
+    if (!/querySelector\(":scope > \.rp-sub"\)/.test(script))
+      fails.push('the fold no longer takes everything under the section sentence, so a section that grows a row will not be folded');
+    if (!/fold\.setAttribute\("hidden", ""\)/.test(script))
+      fails.push('the fold is not shut with the hidden attribute, so a stylesheet can ship it open with the button still saying show');
+    if (!/#rpt \.rp-fold\[hidden\]\{display:none\}/.test(styleBlock))
+      fails.push('a shut fold has no rule making it display:none');
+    if (!/#rpt \.rp-open:focus-visible\{outline:/.test(styleBlock))
+      fails.push('the control that opens a section has no focus ring');
+  }
   /* The four nevers are one thing with four parts, framed like every other
      block of rows on the page, not four cards floating in the gutter. */
   const nevers = (styleBlock.match(/#rpt \.rp-nevers\{[^}]*\}/) || [''])[0];
@@ -2192,8 +2232,23 @@ for (const k of ['afterSignOutUrl', 'signInFallbackRedirectUrl', 'fallbackRedire
   if (!admin.includes(k)) fails.push('the back office does not pin Clerk\'s ' + k + ' to itself');
 if (!/data-boot/.test(admin))
   fails.push('the back office renders its shell before it knows whether anybody is signed in');
-if (/[\u2014\u2013]/.test(admin))
-  fails.push('an em dash or en dash is present in the back office');
+/* THE RULE IS ABOUT WHAT WE WRITE, NOT WHAT WE QUOTE.
+   The board now carries the full text of the eleven control documents, and
+   those documents use em dashes. Changing a punctuation mark inside a control
+   document to satisfy a house style rule would be altering the document,
+   which is a far worse thing than a dash. So the embedded text is cut out and
+   everything the board itself writes is still held to the rule. */
+{
+  const i = admin.indexOf('var DOCTEXT = ');
+  const ours = i < 0 ? admin
+    : admin.slice(0, i) + admin.slice(admin.indexOf('\n', admin.indexOf(';', i)));
+  if (/[\u2014\u2013]/.test(ours))
+    fails.push('an em dash or en dash is present in the back office');
+  /* And the exemption only exists while the quoted text is genuinely quoted.
+     If the blob ever stops being one assignment, this stops carving it out. */
+  if (i >= 0 && !/var DOCTEXT = \{"/.test(admin))
+    fails.push('the embedded document text is no longer one assignment, so the dash rule cannot tell quoted text from ours');
+}
 
 /* ---------------------------------------- the back office reads live data
    The board was a demo painting two sample objects for a day. Every one of the

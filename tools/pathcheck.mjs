@@ -204,6 +204,57 @@ await p.waitForTimeout(400);
   if (after <= before) fails.push('full screen did not make the drawing bigger');
   if (!await p.evaluate(()=>document.getElementById('fullbtn').getAttribute('aria-pressed')==='true'))
     fails.push('the full screen control does not report its pressed state');
+
+  /* AND THE TYPE IT PUTS ON THE GLASS.
+     Full screen carries its own, larger set of label sizes, and a label that
+     is bigger than the plate it sits on is worse than one that is too small.
+     This measures every label against its own box on both datasets, and it
+     reports what the tightest one has left, so the next person to raise a
+     size can see how much room they are spending. */
+  const labels = async (set) => {
+    await p.evaluate(n => paint(normalise(window[n])), set);
+    await p.waitForTimeout(450);
+    return p.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('#pathmap .nnode').forEach(g => {
+        const box = g.querySelector('.nbox,.decbox,.regbox,.chipbox,.exitbox,.meterbox');
+        if (!box) return;
+        const bb = box.getBBox();
+        g.querySelectorAll('text').forEach(t => {
+          const tb = t.getBBox();
+          const over = Math.max(0, bb.x - tb.x) + Math.max(0, (tb.x + tb.width) - (bb.x + bb.width));
+          out.push({ t: t.textContent.slice(0, 26), over: Math.round(over * 10) / 10,
+                     slack: Math.round((bb.width - tb.width) * 10) / 10 });
+        });
+      });
+      out.sort((a, b) => a.slack - b.slack);
+      return { over: out.filter(o => o.over > 0.5), tightest: out[0], n: out.length };
+    });
+  };
+  for (const set of ['CLEAR', 'TROUBLE']) {
+    const L = await labels(set);
+    console.log('full screen labels on ' + set.toLowerCase() + ':', L.n,
+      '| overruns', L.over.length, '| tightest "' + L.tightest.t + '" has ' + L.tightest.slack + ' units clear');
+    if (L.over.length)
+      fails.push('in full screen ' + L.over.length + ' label(s) run outside their own box on the '
+        + set.toLowerCase() + ' data: '
+        + L.over.slice(0, 3).map(o => '"' + o.t + '" by ' + o.over).join(', '));
+  }
+  await p.evaluate(() => paint(normalise(CLEAR))); await p.waitForTimeout(400);
+
+  /* AND IT USES THE WHOLE WINDOW. The panel was inset, radiused and padded,
+     which cost seventy points of height on a laptop, and the drawing is
+     height bound at every width, so that came straight off the type. */
+  const box = await p.evaluate(() => {
+    const r = document.querySelector('.path').getBoundingClientRect();
+    return { l: Math.round(r.left), t: Math.round(r.top),
+             w: Math.round(r.width), h: Math.round(r.height),
+             vw: window.innerWidth, vh: window.innerHeight };
+  });
+  if (box.l > 0 || box.t > 0 || box.w < box.vw || box.h < box.vh)
+    fails.push('full screen does not fill the window: the panel is ' + box.w + 'x' + box.h
+      + ' at ' + box.l + ',' + box.t + ' inside ' + box.vw + 'x' + box.vh);
+
   await p.keyboard.press('Escape'); await p.waitForTimeout(600);
   const back = await p.evaluate(()=>Math.round(document.querySelector('.pathwrap').getBoundingClientRect().width));
   if (Math.abs(back-before) > 4) fails.push('the board did not come back from full screen: '+before+' -> '+back);

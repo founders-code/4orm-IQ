@@ -244,6 +244,11 @@ body[data-stage="landing"] .cbdeck{
   margin:44px auto 0;font-size:clamp(17px,1.72vw,21px);font-weight:600;letter-spacing:-.012em;
   color:var(--tx);line-height:1.55;max-width:64ch;
 }
+/* THE SECOND SENTENCE STARTS ITS OWN ROW.
+   A block, not a <br>. A break tag holds at one width and then sits in the
+   middle of a line at every other one; this way the question ends where it
+   ends and the answer begins underneath it, at any size. */
+body[data-stage="landing"] .cbdeck span{display:block}
 /* The line is set to stay on one line at the size it was approved at, so on a
    wide screen it is a little wider than the column the search bar sits in.
    Left as a plain block it would overflow to the right only, which pulls the
@@ -2923,6 +2928,40 @@ body[data-stage="report"] .foot{display:none}
   line-height:1.1;text-wrap:balance}
 #rpt .rp-sub{margin-top:12px;font-size:15px;line-height:1.6;color:var(--tx-2);max-width:62ch}
 
+/* ===================== THE PAGE OPENS, RATHER THAN ARRIVING ALL AT ONCE
+   Sources and method ran to a thousand words in one column. Everything in it
+   earns its place, and almost nobody read past the third heading, which is
+   the worst of both: the page is long AND the argument does not land.
+
+   Every section already carried the two things a reader needs first, a title
+   that states a conclusion and a sentence saying why it is there. So those
+   stay on the page and the working goes behind a control. Nothing was cut and
+   nothing was rewritten: the same words are one press away, and a reader who
+   wants the whole thing can open the ones they care about.
+
+   Hidden with the attribute, never with a class that sets display. A class
+   can be beaten by a later rule and the panel then ships open with the button
+   still saying "show"; the attribute is what the toggle reads and what the
+   accessibility tree reads, so the two cannot disagree. */
+#rpt .rp-open{appearance:none;margin-top:16px;display:inline-flex;align-items:center;gap:10px;
+  padding:10px 16px;min-height:38px;box-sizing:border-box;border-radius:999px;cursor:pointer;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--tx-2);
+  font-family:var(--rmono);font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;text-align:left;
+  transition:border-color .2s var(--ease),color .2s var(--ease),background .2s var(--ease)}
+#rpt .rp-open:hover{border-color:var(--blue);color:var(--tx);background:var(--blue-50)}
+#rpt .rp-open:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+/* A sign, not a spinning chevron. It says which way the control goes without
+   having to be watched. */
+#rpt .rp-open .rp-oi{display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;flex:none;border-radius:50%;background:var(--blue);color:#fff;
+  font-size:12px;font-weight:800;line-height:1}
+#rpt .rp-open[aria-expanded="true"] .rp-oi{background:var(--tx-3)}
+/* The label wraps rather than pushing the control off a phone. */
+#rpt .rp-open .rp-ot{min-width:0}
+#rpt .rp-fold{margin-top:20px}
+#rpt .rp-fold[hidden]{display:none}
+
 /* ------------------------------------------------------------- the clock */
 #rpt .rp-clock{position:relative;z-index:2;margin-top:96px;background:var(--surface-2);
   border:1px solid var(--bad-br);border-radius:var(--r-xl);padding:7px;
@@ -3877,7 +3916,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <div class="cbtitle">
           <div class="tlead">
             <h1 class="cbh1"><span class="console-only">Check who you're dealing with <span class="dim">before the money leaves.</span></span><span class="landing-only">Before you send money, check 4orm</span></h1>
-            <p class="cbdeck landing-only">Not sure about a company, broker, website, auto dealer, bank, or crypto opportunity? See what public sources can confirm, and what they cannot.</p>
+            <p class="cbdeck landing-only">Not sure about a company, broker, website, auto dealer, bank, or crypto opportunity? <span>See what public sources can confirm, and what they cannot.</span></p>
 
             <!-- The line above names the moments and the limit in one breath, so the
                  separate list of moments that used to sit here is gone: it said the
@@ -11518,7 +11557,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260907.0939";
+var KBYS_BUILD = "20260907.1015";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -12648,6 +12687,71 @@ function rpPackFile(d,p){
 }
 
 /* --------------------------------------------------------- sources and method */
+/* ================== SOURCES AND METHOD, FOLDED DOWN TO ITS ARGUMENT
+   Every section on that page is already built the right way round: an eyebrow
+   saying where you are, a heading that states a conclusion, and one or two
+   sentences saying why the section exists. Under that sits the working, and
+   the working is most of the thousand words.
+
+   This runs once and moves the working behind a control, per section. The
+   headings and their sentences stay, so the page still makes its whole case
+   on one screen, and anybody who wants a section in full presses one button.
+
+   It is done here rather than by hand in the markup for a reason: the bodies
+   of these sections are written by rpSourcesFill from the catalogue and the
+   statute list, so a hand-wrapped fold would have to be re-wrapped every time
+   one of those grew a row. This takes whatever is under the sentence,
+   whatever it turns out to be. */
+var RP_FOLD_LABELS = {
+  srcLogic:     ["Show how a record is found and read", "Hide how a record is found and read"],
+  srcCall:      ["Show how we read a pile of complaints", "Hide how we read a pile of complaints"],
+  srcLimits:    ["Show the four", "Hide the four"],
+  srcLawful:    ["Show what we owe a company we name", "Hide what we owe a company we name"],
+  srcLaw:       ["Show the disclaimer and the statutes", "Hide the disclaimer and the statutes"],
+  srcCatalogue: ["Show the five levels", "Hide the five levels"]
+};
+function rpFoldOne(sec, after, labels, key){
+  if(!sec || sec.querySelector(":scope > .rp-fold")) return;
+  var kids = [], n = after.nextElementSibling;
+  while(n){ kids.push(n); n = n.nextElementSibling; }
+  if(!kids.length) return;
+  var fold = document.createElement("div");
+  fold.className = "rp-fold";
+  fold.id = "fold-" + key;
+  fold.setAttribute("hidden", "");
+  var btn = document.createElement("button");
+  btn.className = "rp-open";
+  btn.type = "button";
+  btn.setAttribute("aria-expanded", "false");
+  btn.setAttribute("aria-controls", fold.id);
+  btn.innerHTML = '<span class="rp-oi" aria-hidden="true">+</span><span class="rp-ot"></span>';
+  btn.querySelector(".rp-ot").textContent = labels[0];
+  kids.forEach(function(k){ fold.appendChild(k); });
+  sec.appendChild(btn);
+  sec.appendChild(fold);
+  btn.addEventListener("click", function(){
+    var open = fold.hasAttribute("hidden");
+    if(open) fold.removeAttribute("hidden"); else fold.setAttribute("hidden", "");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.querySelector(".rp-oi").textContent = open ? "−" : "+";
+    btn.querySelector(".rp-ot").textContent = labels[open ? 1 : 0];
+  });
+}
+function rpFoldSources(){
+  var k;
+  for(k in RP_FOLD_LABELS){
+    if(!Object.prototype.hasOwnProperty.call(RP_FOLD_LABELS, k)) continue;
+    var sec = document.getElementById(k);
+    if(!sec) continue;
+    rpFoldOne(sec, sec.querySelector(":scope > .rp-sub"), RP_FOLD_LABELS[k], k);
+  }
+  /* The reason the product exists opens with the sentence that carries it.
+     The two paragraphs under that are the detail behind it. */
+  var why = document.querySelector("#rpSources .rp-why");
+  if(why) rpFoldOne(why, why.querySelector(":scope > .rp-x"),
+    ["Read the rest", "Hide the rest"], "why");
+}
+
 function rpSourcesFill(){
   var out="", i;
   for(i=0;i<RP_METHOD.length;i++){
@@ -12686,6 +12790,9 @@ function rpSourcesFill(){
       +'<div class="rp-cmay">'+rpEsc(t[4])+'</div></div>';
   }
   id("rpCats").innerHTML=out;
+  /* Last, because it moves whatever the fill just wrote. Idempotent: a
+     section that already carries a fold is left alone. */
+  rpFoldSources();
 }
 /* The statutes, grouped. Rendered rather than typed into the markup because
    the same list is printed on the compliance document, and one list printed
