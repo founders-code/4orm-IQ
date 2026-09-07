@@ -322,10 +322,40 @@ tr:last-child td{border-bottom:0}
   background:
     repeating-linear-gradient(180deg,rgba(255,255,255,.045) 0 1px,transparent 1px 3px),
     radial-gradient(120% 130% at 50% 40%,transparent 55%,rgba(0,0,0,.6) 100%)}
-.rdhd{margin:0;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:8px;
-  font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#8A4A40;
-  margin-bottom:11px}
+/* The heading row carries the switch now, so the heading itself takes the
+   space it needs and its rule fills whatever is left before the pills. */
+.rdtop{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.rdhd{margin:0;flex:1;min-width:0;display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:8px;
+  font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#8A4A40}
 .rdhd::after{content:"";flex:1;height:1px;background:#331915}
+/* THE TWO COUNTS, ON THE SCREEN THEY DESCRIBE.
+   Written in the reader's own phosphor rather than the masthead's grey, so
+   they read as part of the instrument and not as chrome parked on top of it.
+
+   The colour is #E8776A and not the heading's #8A4A40 for a measured reason:
+   the heading sits at 3.13:1 on black, which is already below AA and already
+   on the record. Adding two more controls at that level would have been three
+   failures where there were two, and a budget is never raised to make a build
+   green. This clears the line at 6.2:1.
+
+   32 on the stage, not 26. The board is a fixed 1920 scaled to fit, so on a
+   1440 screen a 26px control lands as 19 under the pointer. 32 lands as 24. */
+.rdpills{display:flex;gap:6px;flex:none}
+.rdpill{appearance:none;cursor:pointer;background:none;border:1px solid #3A1C18;
+  border-radius:99px;padding:5px 11px;min-height:32px;box-sizing:border-box;
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:#E8776A;transition:all .18s var(--ease)}
+.rdpill b{font-weight:800;color:#FF8574}
+.rdpill:hover{border-color:#FF5340;color:#FFB3A8}
+.rdpill:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* A pile with something in it pulls; an empty one recedes. Never colour
+   alone: the count beside the word says the same thing in a digit. */
+.rdpill[data-n="some"]{border-color:rgba(255,83,64,.6);
+  box-shadow:0 0 0 1px rgba(255,83,64,.12) inset}
+.rdpill[data-n="some"] b{color:#FF5340;text-shadow:0 0 8px rgba(255,83,64,.7)}
+.rdpill[data-n="none"]{opacity:.62}
 .rdhd i{width:7px;height:7px;border-radius:50%;background:#26A16F;
   box-shadow:0 0 6px rgba(38,161,111,.6)}
 .rdline{font-family:var(--mono);font-size:16px;font-weight:500;line-height:1.55;
@@ -720,6 +750,19 @@ body:not(.pathfull) .fullhint{display:none}
 .regrow{display:grid;grid-template-columns:148px 1fr 168px;gap:18px;
   padding:16px 0;border-bottom:1px solid var(--edge)}
 .regrow:last-child{border-bottom:0}
+/* A ROW THAT OPENS SOMETHING HAS TO LOOK LIKE ONE.
+   Same geometry as the row it replaces, so the panel does not shift when a
+   document gains its text; only the affordances are added. */
+button.regrow,button.regsrow{appearance:none;background:none;font:inherit;color:inherit;
+  width:100%;text-align:left;cursor:pointer;
+  transition:background .18s var(--ease),box-shadow .18s var(--ease)}
+button.regrow:hover,button.regsrow:hover{background:rgba(76,135,255,.055);
+  box-shadow:inset 3px 0 0 var(--blue)}
+button.regrow:focus-visible,button.regsrow:focus-visible{outline:2px solid var(--blue);
+  outline-offset:-2px}
+.regopen{margin-top:9px;font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--blue)}
+button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
 .regid{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink);
   letter-spacing:.04em}
 .regmeta{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;
@@ -784,6 +827,11 @@ body:not(.pathfull) .fullhint{display:none}
 .fxact{justify-self:end}
 .fxempty{padding:34px 0 10px;font-size:14px;line-height:1.7;color:var(--ink-2);max-width:64ch}
 .fxempty b{color:var(--ink)}
+/* The one line somebody opens an empty list to read. Green, and only ever
+   about the list: the sentence beside it says what the board is doing. */
+.fxempty .fxok{display:block;margin-bottom:10px;font-family:var(--mono);font-size:17px;
+  font-weight:700;letter-spacing:.02em;color:var(--ok);
+  text-shadow:0 0 14px rgba(51,216,155,.35)}
 
 /* ================================================== THE DOCUMENT REGISTRY
    All eleven control documents, on a white screen, read at native size.
@@ -969,14 +1017,6 @@ body:not(.pathfull) .fullhint{display:none}
       <a class="trig" href="index.html" id="homebtn">&#8592; Home</a>
       <button class="trig" type="button" id="regbtn">The registry</button>
       <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
-      <!-- The panel, in two counts. New is what the board has raised and
-           nobody has picked up. The fix list is what somebody has taken on.
-           Either one opens the same panel on its own tab.
-
-           After the faults button, not between it and the registry: those two
-           were asked to sit together and the build checks that they still do. -->
-      <button class="trig" type="button" id="newbtn" data-n="none"><i></i>New <b>0</b></button>
-      <button class="trig" type="button" id="fixbtn" data-n="none"><i></i>Fix list <b>0</b></button>
       <!-- The registry above says where each document stands. This one opens
            the documents themselves. Two controls because they answer two
            different questions, and neither can answer the other's.
@@ -1021,7 +1061,18 @@ body:not(.pathfull) .fullhint{display:none}
     <div class="rgt">
       <div class="reader" id="reader" data-s="ok">
         <div class="screen">
-          <h2 class="rdhd"><i></i>Operations summary</h2>
+          <!-- THE SWITCH SITS ON THE PANEL IT IS ABOUT.
+               It was up in the masthead with the window, the reload and the
+               way home, which is the row of things you do TO the board. New
+               and the fix list are not that: they are two readings of what
+               this screen is already saying, so they belong on it. -->
+          <div class="rdtop">
+            <h2 class="rdhd"><i></i>Operations summary</h2>
+            <div class="rdpills" id="rdPills">
+              <button class="rdpill" type="button" id="newbtn" data-n="none">New <b>0</b></button>
+              <button class="rdpill" type="button" id="fixbtn" data-n="none">Fix list <b>0</b></button>
+            </div>
+          </div>
           <div class="rdline" id="rdline"></div>
           <div class="rdbody" id="rdbody"></div>
           <div class="rdfoot" id="rdfoot"></div>
@@ -2730,10 +2781,10 @@ function opsSplit(){
 function opsPills(){
   var sp = opsSplit();
   var n = document.getElementById("newbtn"), f = document.getElementById("fixbtn");
-  if(n){ n.innerHTML = '<i></i>New <b>' + sp.nw.length + '</b>';
+  if(n){ n.innerHTML = 'New <b>' + sp.nw.length + '</b>';
          n.setAttribute("data-n", sp.nw.length ? "some" : "none");
          n.setAttribute("aria-label", sp.nw.length + " new, not picked up. Open the operations panel."); }
-  if(f){ f.innerHTML = '<i></i>Fix list <b>' + sp.fx.length + '</b>';
+  if(f){ f.innerHTML = 'Fix list <b>' + sp.fx.length + '</b>';
          f.setAttribute("data-n", sp.fx.length ? "some" : "none");
          f.setAttribute("aria-label", sp.fx.length + " on the fix list. Open the operations panel."); }
   /* THE LAMP READS THE BOARD FIRST, THE PANEL SECOND.
@@ -2779,15 +2830,19 @@ function fxRender(){
   var body = document.getElementById("fxBody");
 
   if(!rows.length){
-    body.innerHTML = '<p class="fxempty">'
-      + (FXTAB === "fix"
-          ? 'Nothing on the fix list. '
-          : 'Nothing new. ')
+    /* ALL IS GOOD TO GO, AND WHAT THAT IS ALLOWED TO MEAN.
+       An empty list says so in one line, because that is the thing you came
+       to the list to find out. What it never does is stand alone while the
+       board is still red: the second sentence is the difference between a
+       panel that is clear and a machine that is well, and this screen is
+       never permitted to let one pass for the other. */
+    body.innerHTML = '<p class="fxempty"><b class="fxok">All is good to go.</b> '
+      + (FXTAB === "fix" ? 'Nothing is on the fix list. ' : 'Nothing new has been raised. ')
       + (boardClear
           ? 'Nothing on the board is red either, so the operations summary lamp is '
             + 'flashing green.'
-          : '<b>The board is still red.</b> Something is wrong and it is not on this '
-            + 'panel, which means nobody has it. Open faults only to see it.')
+          : '<b>That is this panel, not the machine.</b> The board is still red, so '
+            + 'something is wrong and nobody has picked it up. Open faults only to see it.')
       + '</p>';
   } else {
     body.innerHTML = rows.map(function(r,i){
@@ -3131,25 +3186,53 @@ function registry(d){
     "<b>Release posture.</b> " + esc((R && R.posture) || REG_POSTURE);
   var word=function(st){ return st==="ok" ? "Signed off"
     : (st==="warn" ? "Written, not signed" : "NO-GO on file"); };
+  /* EVERY ROW OPENS THE DOCUMENT IT DESCRIBES.
+     This panel says where a document stands. It used to be the end of the
+     road: to read the thing itself you had to know there was a second
+     control somewhere else that held it. A row that describes a document and
+     cannot open it is a row that makes a reader take our word for it, and
+     this whole product exists to refuse that. A row is a button where the
+     text is on this board, and stays a plain row where it is not. */
   var rows = docs ? docs.map(function(x){
-      return '<div class="regrow">'
-        + '<div><div class="regid">'+esc(x.id)+'</div>'
+      var has = typeof DOCTEXT !== "undefined" && DOCTEXT[x.key];
+      var body = '<div><div class="regid">'+esc(x.id)+'</div>'
         + '<div class="regmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
         + '<div><div class="regtitle">'+esc(x.title)+'</div>'
         + '<div class="reggov">'+esc(x.governs)+'</div>'
-        + '<div class="regwhy">'+esc(x.why)+'</div></div>'
-        + '<div class="regstate" data-s="'+esc(x.state)+'"><i></i>'+esc(word(x.state))+'</div>'
-        + '</div>';
+        + '<div class="regwhy">'+esc(x.why)+'</div>'
+        + (has ? '<div class="regopen">Read it in full &#8594;</div>' : '')+'</div>'
+        + '<div class="regstate" data-s="'+esc(x.state)+'"><i></i>'+esc(word(x.state))+'</div>';
+      return has
+        ? '<button class="regrow" type="button" data-read="'+esc(x.key)+'">'+body+'</button>'
+        : '<div class="regrow">'+body+'</div>';
     }).join("")
 : "";
   var sup=(R && R.supporting) || REG_SUPPORTING;
   if(sup.length) rows += '<div class="regsub"><div class="k">What the ten sit on</div>'
     + sup.map(function(x){
-        return '<div class="regsrow"><div class="regid">'+esc(x.id)
+        /* PIA-001 is on this board in full as well. The other three are
+           not, so they stay as rows rather than pretending to open. */
+        var k = ({"PIA-001":"pia"})[x.id];
+        var has = k && typeof DOCTEXT !== "undefined" && DOCTEXT[k];
+        var body = '<div class="regid">'+esc(x.id)
           + '<div class="regmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
-          + '<div><b style="color:var(--ink-2)">'+esc(x.title)+'.</b> '+esc(x.note)+'</div></div>';
+          + '<div><b style="color:var(--ink-2)">'+esc(x.title)+'.</b> '+esc(x.note)
+          + (has ? ' <span class="regopen">Read it in full &#8594;</span>' : '')+'</div>';
+        return has
+          ? '<button class="regsrow" type="button" data-read="'+esc(k)+'">'+body+'</button>'
+          : '<div class="regsrow">'+body+'</div>';
       }).join("") + '</div>';
   document.getElementById("regBody").innerHTML=rows;
+  /* Reading a document is a bigger move than reading a row about it, so the
+     panel that was covering the board gets out of the way first. */
+  document.querySelectorAll("#regBody [data-read]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var k = b.getAttribute("data-read");
+      openRegistry(false);
+      openDocs(true);
+      drOpen(k, true);
+    });
+  });
 }
 /* The registry fades rather than disappears, which makes it invisible and
    fully focusable at the same time unless it is told otherwise. inert takes
@@ -3204,7 +3287,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260907.1015";
+var BUILD = "20260907.1723";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){

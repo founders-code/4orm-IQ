@@ -22,7 +22,7 @@ import { DOCUMENTS, DOCS, DOCS_SUPPORTING, DOCS_POSTURE } from './_documents.js'
 /* The build this API was deployed from. The page sends its own stamp on the
    query string and the two are compared here, because guessing which build is
    live has cost this project hours. */
-const BUILD = '20260907.1015';
+const BUILD = '20260907.1723';
 
 /* Amber is not a fault and must never be drawn as one. The rule below has no
    time threshold in it on purpose: a part is DOWN only when we asked it and it
