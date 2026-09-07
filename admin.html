@@ -381,6 +381,33 @@ tr:last-child td{border-bottom:0}
    is the one failure this product exists to refuse. */
 .reader[data-clear="yes"] .rdhd i{background:#33D89B;
   box-shadow:0 0 11px rgba(51,216,155,.9);animation:allclear 1.9s ease-in-out infinite}
+/* ACKNOWLEDGED. Everything raised has been picked up, so the screen comes off
+   alarm and reads green. The phosphor changes, the words do not: every fault
+   is still named underneath. Green here is about the list. It is never about
+   the machine, and nothing on this screen is allowed to let one pass for the
+   other. */
+/* [data-s] on the front of these three is not decoration. The alarm rules for
+   data-s="bad" sit further down this stylesheet at the same specificity, so
+   without it the panel went green while its own lamp stayed red and pulsing.
+   The extra attribute wins the argument on specificity rather than on source
+   order, which is the only way to win it that survives an edit. */
+.reader[data-ack="yes"][data-s]{border-color:#2F5B4B}
+.reader[data-ack="yes"] .rdhd{color:#4E8A73}
+.reader[data-ack="yes"] .rdhd::after{background:#153026}
+.reader[data-ack="yes"][data-s] .rdhd i{background:#33D89B;
+  box-shadow:0 0 9px rgba(51,216,155,.75);animation:none}
+.reader[data-ack="yes"] .rdline{color:#33D89B;text-shadow:0 0 13px rgba(51,216,155,.55)}
+.reader[data-ack="yes"] .rdbody p{color:#7FD8B4;text-shadow:0 0 9px rgba(51,216,155,.24)}
+.reader[data-ack="yes"] .rdbody p::before{color:#2F6B54}
+.reader[data-ack="yes"] .rdfoot{color:#4E8A73;border-top-color:#153026}
+.reader[data-ack="yes"] .cur{background:#33D89B}
+.reader[data-ack="yes"] .rdpill{color:#7FD8B4;border-color:#22463A}
+.reader[data-ack="yes"] .rdpill b{color:#33D89B}
+.reader[data-ack="yes"] .rdpill:hover{border-color:#33D89B;color:#B6EDD5}
+.reader[data-ack="yes"] .rdpill[data-n="some"]{border-color:rgba(51,216,155,.6);
+  box-shadow:0 0 0 1px rgba(51,216,155,.12) inset}
+.reader[data-ack="yes"] .rdpill[data-n="some"] b{color:#33D89B;
+  text-shadow:0 0 8px rgba(51,216,155,.7)}
 @keyframes allclear{0%,100%{opacity:1}50%{opacity:.3}}
 @media(prefers-reduced-motion:reduce){.reader[data-clear="yes"] .rdhd i{animation:none}}
 .reader[data-s="warn"] .rdhd i{background:#BC9B4C;box-shadow:0 0 6px rgba(188,155,76,.6)}
@@ -722,55 +749,17 @@ body.pathfull #stage{transform:none!important;width:100vw;height:100vh}
   border-radius:99px;padding:6px 14px;pointer-events:none}
 body:not(.pathfull) .fullhint{display:none}
 
-/* ============================================================ THE REGISTRY
-   The ten control documents, what each governs, and where it actually stands.
-   It opens over the board rather than as a page of its own, because these are
-   internal control records and the board is already the door they are behind. */
-.registry{position:fixed;inset:0;z-index:80;background:rgba(2,4,7,.86);
-  backdrop-filter:blur(3px);display:flex;align-items:stretch;justify-content:center;
-  padding:26px;opacity:0;pointer-events:none;transition:opacity .22s var(--ease)}
-.registry.on{opacity:1;pointer-events:auto}
-.regcard{width:min(1240px,100%);display:grid;grid-template-rows:auto auto 1fr;
-  background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
-  border:1px solid var(--edge);border-radius:var(--r);overflow:hidden}
-.reghd{display:flex;align-items:flex-start;gap:20px;padding:20px 24px 16px;
-  border-bottom:1px solid var(--edge)}
-.reghd h3{margin:0;font-family:var(--ui);font-size:19px;font-weight:700;
-  letter-spacing:-.01em;color:var(--ink)}
-.reghd .x{margin-top:5px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--title)}
-.reghd .c{margin-left:auto;flex:none}
-/* The release posture, quoted from the package rather than written here. It is
-   the first thing on the screen because it governs every row under it. */
-.regpost{margin:0;padding:14px 24px;background:rgba(255,83,64,.07);
-  border-bottom:1px solid rgba(255,83,64,.24);font-family:var(--mono);
-  font-size:12px;line-height:1.65;color:#E8776A}
-.regpost b{color:#FFB3A8;font-weight:700}
+/* ====================================== WHAT SURVIVED THE DARK REGISTRY
+   There used to be a second registry on this board: a dark panel listing the
+   ten documents and where each stood, with the documents themselves behind a
+   separate control. Two registries answering the same question is one too
+   many, so it is gone and the white one carries all of it.
+
+   These two rules stay because other things wear them. .regbody is the
+   scrolling body of the operations panel, and .regstate is the state chip on
+   a fix list row. Deleting a rule because the component that named it went
+   away is how a panel loses its scroll. */
 .regbody{overflow-y:auto;padding:18px 24px 24px}
-.regrow{display:grid;grid-template-columns:148px 1fr 168px;gap:18px;
-  padding:16px 0;border-bottom:1px solid var(--edge)}
-.regrow:last-child{border-bottom:0}
-/* A ROW THAT OPENS SOMETHING HAS TO LOOK LIKE ONE.
-   Same geometry as the row it replaces, so the panel does not shift when a
-   document gains its text; only the affordances are added. */
-button.regrow,button.regsrow{appearance:none;background:none;font:inherit;color:inherit;
-  width:100%;text-align:left;cursor:pointer;
-  transition:background .18s var(--ease),box-shadow .18s var(--ease)}
-button.regrow:hover,button.regsrow:hover{background:rgba(76,135,255,.055);
-  box-shadow:inset 3px 0 0 var(--blue)}
-button.regrow:focus-visible,button.regsrow:focus-visible{outline:2px solid var(--blue);
-  outline-offset:-2px}
-.regopen{margin-top:9px;font-family:var(--mono);font-size:10px;font-weight:600;
-  letter-spacing:.13em;text-transform:uppercase;color:var(--blue)}
-button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
-.regid{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink);
-  letter-spacing:.04em}
-.regmeta{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;
-  color:var(--ink-4)}
-.regtitle{font-family:var(--ui);font-size:15px;font-weight:600;color:var(--ink);
-  letter-spacing:-.008em}
-.reggov{margin-top:5px;font-size:13px;line-height:1.6;color:var(--ink-3)}
-.regwhy{margin-top:8px;font-size:13px;line-height:1.6;color:var(--ink-2)}
 .regstate{display:inline-flex;align-items:center;gap:7px;align-self:start;
   justify-self:end;
   font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.11em;
@@ -783,12 +772,6 @@ button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
 .regstate[data-s="warn"] i{background:var(--warn-l)}
 .regstate[data-s="bad"]{color:var(--bad);border:1px solid rgba(255,83,64,.45)}
 .regstate[data-s="bad"] i{background:var(--bad)}
-.regsub{margin-top:26px;padding-top:18px;border-top:1px solid var(--edge)}
-.regsub .k{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--title);margin-bottom:12px}
-.regsrow{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:9px 0;
-  font-size:13px;color:var(--ink-3);line-height:1.55}
-
 /* ================================================== THE OPERATIONS PANEL
    Same card as the registry, because it is the same kind of thing: a list on
    the data screen with a way out of it. The head carries the two tabs and the
@@ -907,6 +890,16 @@ button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
 #docreg .drstate[data-s="warn"] i{background:var(--p1)}
 #docreg .drstate[data-s="bad"]{color:var(--p0);border:1px solid rgba(158,54,24,.4)}
 #docreg .drstate[data-s="bad"] i{background:var(--p0)}
+/* The three records that are not standards. Listed, not opened, because
+   their text is not on this board and a row that pretends to open is worse
+   than a row that says it does not. */
+#docreg .drsup{margin-top:34px;padding-top:22px;border-top:1px solid var(--drule)}
+#docreg .drsk{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--dink-3);margin-bottom:14px}
+#docreg .drsrow{display:grid;grid-template-columns:126px 1fr;gap:20px;padding:12px 0;
+  border-bottom:1px solid var(--drule-soft);font-size:14px;line-height:1.6;color:var(--dink-2)}
+#docreg .drsrow:last-child{border-bottom:0}
+#docreg .drsrow b{color:var(--dink)}
 #docreg .drgo{justify-self:end;align-self:center;font-family:var(--mono);font-size:10px;
   font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:#2E6BF2;white-space:nowrap}
 /* THE CARD, one document at a glance */
@@ -1017,13 +1010,6 @@ button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
       <a class="trig" href="index.html" id="homebtn">&#8592; Home</a>
       <button class="trig" type="button" id="regbtn">The registry</button>
       <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
-      <!-- The registry above says where each document stands. This one opens
-           the documents themselves. Two controls because they answer two
-           different questions, and neither can answer the other's.
-
-           After the panel pills, because the registry and the faults button
-           were asked to sit together and the build checks that they still do. -->
-      <button class="trig" type="button" id="docbtn">The documents</button>
       <select class="trig" id="win" aria-label="Window">
         <option value="7">7 days</option><option value="30" selected>30 days</option>
         <option value="90">90 days</option><option value="365">12 months</option>
@@ -1088,22 +1074,6 @@ button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
 
   <div class="fullhint">Press Escape or Full screen to come back</div>
 
-<!-- THE REGISTRY. Ten control documents, what each governs, where it stands.
-     The posture at the top is quoted from PACKAGE-001 rather than written
-     here, so a reader is told what the shelf is worth before they read a
-     single row of it. -->
-<div class="registry" id="registry" role="dialog" aria-modal="true" aria-labelledby="regT">
-  <div class="regcard">
-    <div class="reghd">
-      <div><h3 id="regT">The control documents</h3>
-        <div class="x">Ten standards &#183; what each governs &#183; where it stands</div></div>
-      <div class="c"><button class="trig" type="button" id="regClose2">Close</button></div>
-    </div>
-    <p class="regpost" id="regPost"></p>
-    <div class="regbody" id="regBody"></div>
-  </div>
-</div>
-
 <!-- THE OPERATIONS PANEL, ON THE DATA SCREEN.
      Two piles and one way through them: a fault is raised, somebody takes it
      on, somebody clears it. Nothing here changes the machine, and the panel
@@ -1147,7 +1117,7 @@ button.regrow:hover .regopen,button.regsrow:hover .regopen{color:#9CBBFF}
 <div id="docreg" role="dialog" aria-modal="true" aria-labelledby="drT" hidden>
   <div class="drhd">
     <div>
-      <div class="drk" id="drK">The control documents</div>
+      <div class="drk" id="drK">The registry</div>
       <h2 class="drt" id="drT">Eleven documents, in full</h2>
     </div>
     <div class="drc">
@@ -2793,11 +2763,48 @@ function opsPills(){
   var rd = document.getElementById("reader");
   if(rd){
     var boardClear = rd.getAttribute("data-s") !== "bad";
+    /* THREE STATES, NOT TWO, AND THE MIDDLE ONE IS THE POINT.
+         red    something is wrong and nobody has picked it up
+         green  everything raised has been picked up
+         green, flashing  nothing is wrong at all
+
+       This is the acknowledgement state control rooms have always had, and it
+       is the difference between a board that shouts the same thing every
+       morning and one that can tell you what changed overnight.
+
+       What it is NOT is clearance. Green here means nothing is unattended, it
+       never means the machine is well, and the screen says which of the two
+       it is in words rather than leaving the colour to carry it. The lamps on
+       the drawing, the dials and faults only are untouched: they answer for
+       the machine, and this answers for the people. */
     rd.setAttribute("data-clear",
       (boardClear && !sp.nw.length && !sp.fx.length) ? "yes" : "no");
+    rd.setAttribute("data-ack",
+      (!sp.nw.length && sp.fx.length) ? "yes" : "no");
+    if(!sp.nw.length && sp.fx.length) readerAck(sp.fx.length);
+    else if(LAST) reader(LAST);
   }
   if(document.getElementById("fixlist").classList.contains("on")) fxRender();
   return sp;
+}
+
+/* WHAT THE SUMMARY SAYS ONCE EVERYTHING IS PICKED UP.
+   It still names every fault. A screen that went green and stopped saying
+   what was wrong would be a screen you could not run the plant from, and the
+   green is about the list, not the machine, so hiding the machine's state
+   behind it would be exactly the wrong way round. */
+function readerAck(n){
+  var el = document.getElementById("reader"); if(!el) return;
+  document.getElementById("rdline").textContent = "All is good to go.";
+  var faults = opsFaults(), lines = [], i;
+  lines.push(n === 1
+    ? "One fault is on the fix list and somebody has it. Nothing new is waiting."
+    : n + " faults are on the fix list and somebody has them. Nothing new is waiting.");
+  for(i=0;i<faults.length && lines.length<4;i++)
+    lines.push(faults[i].plate + " is still down. " + (faults[i].go || ""));
+  document.getElementById("rdbody").innerHTML = lines.map(function(t,j){
+    return '<p>'+esc(t.trim())+(j===lines.length-1?'<span class="cur"></span>':'')+'</p>';
+  }).join("");
 }
 
 /* -------------------------------------------------------- the panel itself */
@@ -2886,7 +2893,21 @@ function openFix(on, tab){
 }
 openFix(false);
 document.getElementById("newbtn").addEventListener("click", function(){ openFix(true,"new"); });
-document.getElementById("fixbtn").addEventListener("click", function(){ openFix(true,"fix"); });
+/* PRESSING FIX LIST TAKES EVERYTHING ON.
+   New is the pile nobody has looked at, and the fix list is the pile somebody
+   has. Pressing the fix list is that somebody saying "I have these", so it
+   moves whatever is waiting across and then shows you what you just took on.
+   Nothing is cleared and nothing is dismissed: every row is still there, and
+   the drawing, the lamps and the dials have not moved a pixel. What changes
+   is that the board can now tell a fault you have seen from one you have
+   not, which is the only thing this panel was ever for. */
+document.getElementById("fixbtn").addEventListener("click", function(){
+  var sp = opsSplit(), i;
+  for(i=0;i<sp.nw.length;i++) OPS.fix[sp.nw[i].k] = sp.nw[i].s;
+  if(sp.nw.length) opsSave();
+  opsPills();
+  openFix(true,"fix");
+});
 document.getElementById("fxTabNew").addEventListener("click", function(){ fxTab("new"); });
 document.getElementById("fxTabFix").addEventListener("click", function(){ fxTab("fix"); });
 document.getElementById("fxClose").addEventListener("click", function(){ openFix(false); });
@@ -2949,14 +2970,16 @@ function drRender(){
   var back = document.getElementById("drBack");
   if(DR_VIEW === "list"){
     back.hidden = true;
-    document.getElementById("drK").textContent = "The control documents";
+    document.getElementById("drK").textContent = "The registry";
     document.getElementById("drT").textContent = "Eleven documents, in full";
+    /* Quoted from PACKAGE-001 through the one constant the board holds it in,
+       so the sentence on this screen cannot drift from the sentence anywhere
+       else that quotes it. */
     el.innerHTML =
-      '<p class="drpost"><b>NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH.</b> '
-      + 'All ten standards are written and source-linked. They are not evidence that the '
-      + 'controls exist. The release posture remains NO-GO until the controls are implemented, '
-      + 'tested, independently verified where specified, signed off and, for counsel issues, '
-      + 'approved in writing. Quoted from PACKAGE-001, not written here.</p>'
+      '<p class="drpost">' + esc(REG_POSTURE).replace(
+          "NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH.",
+          "<b>NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH.</b>")
+      + ' Quoted from PACKAGE-001, not written here.</p>'
       + drDocs().map(function(d){
           return '<button class="drrow" type="button" data-doc="'+esc(d.k)+'">'
             + '<div><div class="drid">'+esc(d.id)+'</div>'
@@ -2968,6 +2991,19 @@ function drRender(){
             + esc(DR_WORD[d.s]||d.s)+'</span></div>'
             + '<div class="drgo">Read it &#8594;</div></button>';
         }).join("");
+    /* WHAT THE ELEVEN SIT ON.
+       Three records that are not standards and are not on this board in full.
+       They were on the panel that has gone, and losing them in the move would
+       have been the quiet kind of regression: nothing breaks, a reader just
+       stops being told where the governing assessment went. PIA-001 is not
+       among them any more because it is one of the eleven now. */
+    var sup = REG_SUPPORTING.filter(function(x){ return x.id !== "PIA-001"; });
+    if(sup.length) el.innerHTML += '<div class="drsup"><div class="drsk">What the eleven sit on</div>'
+      + sup.map(function(x){
+          return '<div class="drsrow"><div><div class="drid">'+esc(x.id)+'</div>'
+            + '<div class="drmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
+            + '<div><b>'+esc(x.title)+'.</b> '+esc(x.note)+'</div></div>';
+        }).join("") + '</div>';
     el.querySelectorAll("[data-doc]").forEach(function(b){
       b.addEventListener("click", function(){ drOpen(b.getAttribute("data-doc"), false); });
     });
@@ -3071,11 +3107,16 @@ function openDocs(on){
   } else {
     el.setAttribute("hidden",""); el.setAttribute("inert",""); el.setAttribute("aria-hidden","true");
     document.getElementById("fit").removeAttribute("inert");
-    var b = document.getElementById("docbtn"); b && b.focus();
+    var b = document.getElementById("regbtn"); b && b.focus();
   }
 }
 openDocs(false);
-document.getElementById("docbtn").addEventListener("click", function(){ openDocs(true); });
+/* ONE CONTROL, AND IT OPENS THE WHITE SCREEN.
+   The board used to carry two registries: a dark panel saying where each
+   document stood, and a separate control holding the documents themselves.
+   A reader had to know the second one existed to get past a description to
+   the thing being described. There is one now, and it does both. */
+document.getElementById("regbtn").addEventListener("click", function(){ openDocs(true); });
 document.getElementById("drClose").addEventListener("click", function(){ openDocs(false); });
 document.getElementById("drBack").addEventListener("click", drBackStep);
 
@@ -3174,84 +3215,6 @@ var REG_SUPPORTING = [
   }
 ];
 var REG_POSTURE = "NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH. All ten standards are written and source-linked. They are not evidence that the controls exist. The release posture remains NO-GO until the controls are implemented, tested, independently verified where specified, signed off and, for counsel issues, approved in writing.";
-function registry(d){
-  var R=(d && d.registry) || null;
-  /* When the route is silent the local DOCS array answers instead, so the
-     registry is never an empty panel. Both carry the same ten. */
-  var docs=(R && R.docs) || DOCS.map(function(x){
-    var st=(d && d.documents && d.documents[x.k]) || "warn";
-    return { key:x.k, id:x.id, v:x.v, dated:x.dated, title:x.title,
-             governs:x.governs, why:x.why, holds:x.holds, state:st }; });
-  document.getElementById("regPost").innerHTML =
-    "<b>Release posture.</b> " + esc((R && R.posture) || REG_POSTURE);
-  var word=function(st){ return st==="ok" ? "Signed off"
-    : (st==="warn" ? "Written, not signed" : "NO-GO on file"); };
-  /* EVERY ROW OPENS THE DOCUMENT IT DESCRIBES.
-     This panel says where a document stands. It used to be the end of the
-     road: to read the thing itself you had to know there was a second
-     control somewhere else that held it. A row that describes a document and
-     cannot open it is a row that makes a reader take our word for it, and
-     this whole product exists to refuse that. A row is a button where the
-     text is on this board, and stays a plain row where it is not. */
-  var rows = docs ? docs.map(function(x){
-      var has = typeof DOCTEXT !== "undefined" && DOCTEXT[x.key];
-      var body = '<div><div class="regid">'+esc(x.id)+'</div>'
-        + '<div class="regmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
-        + '<div><div class="regtitle">'+esc(x.title)+'</div>'
-        + '<div class="reggov">'+esc(x.governs)+'</div>'
-        + '<div class="regwhy">'+esc(x.why)+'</div>'
-        + (has ? '<div class="regopen">Read it in full &#8594;</div>' : '')+'</div>'
-        + '<div class="regstate" data-s="'+esc(x.state)+'"><i></i>'+esc(word(x.state))+'</div>';
-      return has
-        ? '<button class="regrow" type="button" data-read="'+esc(x.key)+'">'+body+'</button>'
-        : '<div class="regrow">'+body+'</div>';
-    }).join("")
-: "";
-  var sup=(R && R.supporting) || REG_SUPPORTING;
-  if(sup.length) rows += '<div class="regsub"><div class="k">What the ten sit on</div>'
-    + sup.map(function(x){
-        /* PIA-001 is on this board in full as well. The other three are
-           not, so they stay as rows rather than pretending to open. */
-        var k = ({"PIA-001":"pia"})[x.id];
-        var has = k && typeof DOCTEXT !== "undefined" && DOCTEXT[k];
-        var body = '<div class="regid">'+esc(x.id)
-          + '<div class="regmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
-          + '<div><b style="color:var(--ink-2)">'+esc(x.title)+'.</b> '+esc(x.note)
-          + (has ? ' <span class="regopen">Read it in full &#8594;</span>' : '')+'</div>';
-        return has
-          ? '<button class="regsrow" type="button" data-read="'+esc(k)+'">'+body+'</button>'
-          : '<div class="regsrow">'+body+'</div>';
-      }).join("") + '</div>';
-  document.getElementById("regBody").innerHTML=rows;
-  /* Reading a document is a bigger move than reading a row about it, so the
-     panel that was covering the board gets out of the way first. */
-  document.querySelectorAll("#regBody [data-read]").forEach(function(b){
-    b.addEventListener("click", function(){
-      var k = b.getAttribute("data-read");
-      openRegistry(false);
-      openDocs(true);
-      drOpen(k, true);
-    });
-  });
-}
-/* The registry fades rather than disappears, which makes it invisible and
-   fully focusable at the same time unless it is told otherwise. inert takes
-   it out of the tab order and out of the accessibility tree while it is shut,
-   without touching the fade. */
-function openRegistry(on){
-  var el=document.getElementById("registry");
-  el.classList.toggle("on", !!on);
-  if(on){ el.removeAttribute("inert"); el.removeAttribute("aria-hidden");
-          registry(LAST); var c=document.getElementById("regClose2"); c && c.focus(); }
-  else  { el.setAttribute("inert",""); el.setAttribute("aria-hidden","true");
-          var r=document.getElementById("regbtn"); r && r.focus(); }
-}
-openRegistry(false);
-document.getElementById("regbtn").addEventListener("click",function(){ openRegistry(true); });
-document.getElementById("regClose2").addEventListener("click",function(){ openRegistry(false); });
-document.getElementById("registry").addEventListener("click",function(e){
-  if(e.target===this) openRegistry(false);
-});
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;
   /* Topmost first. The operations panel opens over everything else, so Escape
@@ -3263,7 +3226,6 @@ document.addEventListener("keydown",function(e){
     if(DR_VIEW !== "list") drBackStep(); else openDocs(false);
   }
   else if(document.getElementById("fixlist").classList.contains("on")) openFix(false);
-  else if(document.getElementById("registry").classList.contains("on")) openRegistry(false);
   else if(document.body.classList.contains("pathfull")) setFull(false);
 });
 
@@ -3287,7 +3249,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260907.1723";
+var BUILD = "20260907.1834";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
