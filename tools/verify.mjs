@@ -2465,6 +2465,44 @@ if (!/tap\("door3","answ"\)/.test(admin))
 for (const h of ['<h2 class="ck">The path a check takes</h2>',
                  '<h2 class="rdhd">', '<h2 class="vh">The instruments</h2>'])
   if (!admin.includes(h)) fails.push('a panel on the board has no heading: ' + h);
+
+/* THE SWITCH LIVES ON THE PANEL IT IS ABOUT.
+   New and the fix list are two readings of what the operations summary is
+   already saying, so they sit on that screen. The masthead is the row of
+   things you do TO the board, which is a different kind of control. */
+{
+  const rd = (admin.match(/<div class="reader" id="reader"[\s\S]*?<\/div>\s*<\/div>/) || [''])[0];
+  ['newbtn', 'fixbtn'].forEach(id => {
+    if (!new RegExp('id="' + id + '"').test(rd))
+      fails.push('the ' + id + ' pill is no longer on the operations summary panel');
+  });
+  const mctl = (admin.match(/<div class="mctl">[\s\S]*?<\/div>/) || [''])[0];
+  if (/id="(newbtn|fixbtn)"/.test(mctl))
+    fails.push('a panel pill is back in the masthead line-up, where it reads as a thing you do to the board');
+  /* And the pills must clear AA on the reader's black ground. #8A4A40 is the
+     heading colour and it is 3.13:1, which is already on the record; two more
+     controls at that level would have been three failures where there were
+     two, and a budget is never raised to make a build green. */
+  /* admin, not styleBlock. styleBlock is the consumer page's stylesheet, and
+     reading the wrong file is how a guard passes on a rule that is not there. */
+  const pill = (admin.match(/\.rdpill\{[^}]*\}/) || [''])[0];
+  if (/color:#8A4A40/.test(pill))
+    fails.push('the panel pills are set in the heading colour, which is 3.13:1 on this ground');
+  if (!/min-height:32px/.test(pill))
+    fails.push('the panel pills are under 32px on the stage, so they land under 24 with the board scaled');
+}
+
+/* THE ROWS THAT OPEN A DOCUMENT CARRY NO BORROWED CLASS.
+   A registry row shipped as class="regrow live" and .live is the masthead's
+   LIVE pill: border-radius 99, uppercase, letter-spacing. Every row in the
+   panel rendered as an ellipse of shouting capitals. That is the sixth time a
+   class owned by one component has been picked up by another on this page. */
+if (/class="(regrow|regsrow) live"/.test(admin))
+  fails.push('a registry row carries the masthead LIVE pill class, which restyles the whole row');
+if (!/<button class="regrow" type="button" data-read=/.test(admin))
+  fails.push('the registry rows no longer open the document they describe');
+if (!/openRegistry\(false\);\s*\n\s*openDocs\(true\);\s*\n\s*drOpen\(k, true\);/.test(admin))
+  fails.push('a registry row does not take a reader through to the document in full');
 if (!/\.vh\{position:absolute[^}]*clip-path:inset\(50%\)/.test(admin))
   fails.push('the read-not-seen heading has no clipping rule');
 if (/\.vh\{[^}]*display:none/.test(admin))

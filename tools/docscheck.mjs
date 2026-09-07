@@ -87,6 +87,42 @@ for (const k of KEYS) {
 say('every one of the eleven renders its own text', !fails.length,
   seen.reduce((a, s) => a + s.words, 0) + ' words in total');
 
+console.log('\nEVERY REGISTRY ROW OPENS ITS DOCUMENT');
+/* The dark registry says where a document stands. It used to be the end of
+   the road: reading the thing itself needed a second control somewhere else.
+   A row that describes a document and cannot open it asks a reader to take
+   our word for it, which is the one thing this product refuses. */
+{
+  await p.evaluate(() => { openDocs(false); openRegistry(true); });
+  await p.waitForTimeout(350);
+  const reg = await p.evaluate(() => ({
+    rows: document.querySelectorAll('#regBody .regrow').length,
+    openable: document.querySelectorAll('#regBody [data-read]').length,
+    /* The masthead LIVE pill class on a row turns it into an ellipse of
+       shouting capitals. It has happened. */
+    borrowed: [...document.querySelectorAll('#regBody [data-read]')]
+      .filter(e => getComputedStyle(e).textTransform === 'uppercase'
+                || getComputedStyle(e).borderRadius !== '0px').length
+  }));
+  say('every document with text on this board opens from its registry row',
+    reg.openable === 11, reg.openable + ' of ' + (reg.rows + 1) + ' rows');
+  say('and no row has picked up styling that belongs to another component',
+    reg.borrowed === 0);
+  await p.click('#regBody [data-read="hra"]');
+  await p.waitForTimeout(450);
+  const landed = await p.evaluate(() => ({
+    registryShut: !document.getElementById('registry').classList.contains('on'),
+    docsOpen: document.getElementById('docreg').classList.contains('on'),
+    view: DR_VIEW,
+    words: (document.querySelector('#docreg .drdoc') || { innerText: '' }).innerText.split(/\s+/).length
+  }));
+  say('pressing one lands on that document in full, with the registry out of the way',
+    landed.registryShut && landed.docsOpen && landed.view === 'f:hra' && landed.words > 500,
+    landed.view + ', ' + landed.words + ' words');
+  await p.evaluate(() => { openDocs(false); openDocs(true); });
+  await p.waitForTimeout(300);
+}
+
 console.log('\nTHE SCREEN AND THE LAMPS AGREE');
 /* The state beside a document here and the state on its lamp are read from
    the same rows. If they ever came apart, the board and the shelf would be

@@ -51,6 +51,20 @@ await p.evaluate(() => {
 console.log('\nTHE PILLS');
 say('two pills, each with its own count',
   await p.evaluate(() => !!document.querySelector('#newbtn b') && !!document.querySelector('#fixbtn b')));
+/* They read the operations summary, so they sit on it. Measured under the
+   pointer, not in the stylesheet: the board is a fixed 1920 scaled to fit and
+   a 26px control lands as 19. */
+say('the switch is on the operations summary panel, not in the masthead',
+  await p.evaluate(() => { const rd = document.getElementById('reader');
+    return rd.contains(document.getElementById('newbtn'))
+        && rd.contains(document.getElementById('fixbtn'))
+        && !document.querySelector('.mctl #newbtn') && !document.querySelector('.mctl #fixbtn'); }));
+{
+  const h = await p.evaluate(() => ['newbtn', 'fixbtn'].map(i =>
+    Math.round(document.getElementById(i).getBoundingClientRect().height)));
+  say('and both are still 24px under the pointer once the board is scaled',
+    h.every(x => x >= 24), h.join(' / ') + 'px');
+}
 say('and each carries a name a screen reader can use',
   await p.evaluate(() => (document.getElementById('newbtn').getAttribute('aria-label') || '').length > 12
                       && (document.getElementById('fixbtn').getAttribute('aria-label') || '').length > 12));
@@ -92,6 +106,17 @@ await p.click('#fxTabNew'); await p.click('#fxClear'); await p.waitForTimeout(15
 await p.click('#fxTabFix'); await p.click('#fxClear'); await p.waitForTimeout(250);
 const emptied = await st();
 say('with every row cleared the panel reads empty', emptied.nw === 0 && emptied.fx === 0);
+/* THE LINE SOMEBODY OPENS AN EMPTY LIST TO READ.
+   And the sentence that stops it standing alone. An empty list says all is
+   good to go about ITSELF; while the board is still red it has to say which
+   of the two it is talking about, or the panel is answering for the machine. */
+{
+  const t = await p.evaluate(() =>
+    (document.querySelector('#fxBody .fxempty') || { innerText: '' }).innerText.replace(/\s+/g, ' ').trim());
+  say('an empty list says all is good to go', /^All is good to go\./.test(t), t.slice(0, 46));
+  say('and while the board is red it says that is the panel, not the machine',
+    /this panel, not the machine/i.test(t) && /board is still red/i.test(t));
+}
 say('and the lamp STILL does not go green, because the board has not changed',
   emptied.clear === 'no' && emptied.anim === 'alarm', emptied.anim);
 await p.keyboard.press('Escape'); await p.waitForTimeout(250);
