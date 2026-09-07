@@ -2259,6 +2259,109 @@ if (!/v\.intact===undefined \? null : proof/.test(admin))
 if (!/String\(w\[0\]\)!=="undefined"/.test(admin))
   fails.push('the hazard list will print a register it cannot name');
 
+/* ------------------------------------------- the shut overlay, on the
+   consumer page
+
+   Every overlay here fades rather than disappears, so none is display:none
+   while shut. That is right for the eye and wrong for everybody else: a shut
+   overlay stayed in the tab order and in the accessibility tree, and tabbing
+   off the search box walked a keyboard reader through nine controls that were
+   not on the screen. Measured, not assumed: tools/a11ycheck.mjs walks the tab
+   order. These guards keep the mechanism in the file. */
+if (!/var SHEETS = \[[^\]]*"waitBox"[^\]]*\]/.test(html))
+  fails.push('the shut-overlay guard no longer covers the waiting screen, so a keyboard reader can tab into it while it is invisible');
+for (const box of ['sumBox','arBox','waitBox','regBox','dirBox','infoBox'])
+  if (!new RegExp('"' + box + '"').test((html.match(/var SHEETS = \[[^\]]*\]/) || [''])[0]))
+    fails.push('the shut-overlay guard does not cover ' + box);
+if (!/el\.setAttribute\("inert",""\)/.test(html))
+  fails.push('shut overlays are not made inert, so their controls stay in the tab order');
+if (!/el\.setAttribute\("aria-hidden","true"\)/.test(html))
+  fails.push('shut overlays are not hidden from assistive technology');
+if (!/new MutationObserver/.test(html))
+  fails.push('nothing watches the overlays, so one opened by a path nobody remembered is left reachable while shut');
+if (/parseFloat\(getComputedStyle\(el\)\.opacity\) > 0\.01/.test(html))
+  fails.push('the shut test reads computed opacity, which a transition never re-fires, so a box read mid-fade stays reachable forever');
+/* The one field this product runs on had no focus ring at all. */
+if (!/#kbInput:focus-visible\{outline:2px solid/.test(html))
+  fails.push('the search box has no visible focus indicator, so a keyboard reader cannot see where they are');
+
+/* --------------------------------------------------------------- the gate
+   The review found six barriers on a page everybody had looked at many
+   times, and not one was findable by looking. They were a computed contrast
+   ratio, a measured pixel height, a walked tab order and a heading count.
+   tools/uxgate.mjs measures all four on every build against a recorded
+   ceiling that may fall and may never rise. These guards keep the mechanism
+   honest: a budget that can be raised to turn a build green is not a gate. */
+{
+  const gate   = path.join(root, 'tools', 'uxgate.mjs');
+  const bud    = path.join(root, 'tools', 'ux-budget.json');
+  if (!fs.existsSync(gate)) fails.push('the UX gate is gone, so nothing measures contrast, targets, the tab order or headings');
+  else {
+    const g = fs.readFileSync(gate, 'utf8');
+    if (!/const HARD = \[[^\]]*'phantom'/.test(g))
+      fails.push('the UX gate no longer treats a control reachable while shut as a barrier that must stay fixed');
+    if (!/keyboard\.press\('Tab'\)/.test(g))
+      fails.push('the UX gate no longer walks the real tab order, so it is back to reading tabIndex, which says nothing');
+    if (!/now > was/.test(g))
+      fails.push('the UX gate no longer fails when a number rises');
+    if (!/process\.exit\(1\)/.test(g))
+      fails.push('the UX gate cannot fail a build');
+  }
+  if (!fs.existsSync(bud)) fails.push('there is no recorded UX budget, so the gate has nothing to compare against');
+  else {
+    const b = JSON.parse(fs.readFileSync(bud, 'utf8'));
+    for (const scene of ['landing@1440','landing@320','waiting@1440','report@1440','report@320','backoffice@1440'])
+      if (!b.scenes || !b.scenes[scene]) fails.push('the UX budget no longer covers ' + scene);
+    /* The barriers that were fixed are recorded at zero. A budget that lets
+       them come back is the same as not having fixed them. */
+    for (const [k, v] of Object.entries(b.scenes || {})) {
+      if (v.phantom !== 0) fails.push(k + ' records ' + v.phantom + ' controls reachable while shut. That was fixed and the budget must hold it at zero.');
+      if (v.unnamed !== 0) fails.push(k + ' records ' + v.unnamed + ' controls with no accessible name.');
+      if (v.overflow !== 0) fails.push(k + ' records ' + v.overflow + 'px of horizontal overflow.');
+    }
+  }
+  const pkgJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+  if (!/uxgate\.mjs/.test(pkgJson.scripts.test || ''))
+    fails.push('the UX gate is not in npm test, so it can only fail when somebody remembers to run it');
+  if (!/pathcheck\.mjs/.test(pkgJson.scripts.test || ''))
+    fails.push('the path map acceptance checks are not in npm test');
+  if (!fs.existsSync(path.join(root, 'tools', 'pathcheck.mjs')))
+    fails.push('the path map acceptance checks are gone');
+}
+
+/* ------------------------------------------------------------- the path map
+   The annunciator grid and the mimic are gone. One drawing, ten lanes, and
+   every lamp on the step it watches, because a lamp with no step under it
+   says a part is amber without saying what stops working because of it.
+   tools/pathcheck.mjs runs the handover's own acceptance checks. These guards
+   keep the parts that make the drawing honest. */
+if (!/id="pathmap"/.test(admin))
+  fails.push('the path map is gone from the back office');
+if (/id="board"/.test(admin) || /function mimic\(/.test(admin))
+  fails.push('the old annunciator grid or the mimic came back beside the path map');
+if (!/var LANES=\[/.test(admin) || (admin.match(/\{lab:"/g) || []).length !== 10)
+  fails.push('the path map is not ten lanes');
+/* The two lamps that watch the panel rather than the check never go on the
+   path. Putting them on a step is the substitution the product refuses. */
+for (const k of ['m:signin', 'r:build'])
+  if (!new RegExp('\\["' + k + '"').test(admin))
+    fails.push(k + ' is no longer a header chip, so it has been put on the path or dropped');
+if (!/class="hl"/.test(admin))
+  fails.push('the header chips are gone, so two lamps have been dropped from the board');
+/* A way out is not the main flow, and faults only has to take the pipework
+   down with the boxes or it shows an operator a diagram of nothing. */
+if (!/\.pipe\.out\{stroke:rgba\(111,129,153/.test(admin))
+  fails.push('a rejection path is drawn as the animated blue of the way through');
+if (!/body\.faults #pathmap \.pipe:not\(\.dead\)/.test(admin))
+  fails.push('faults only leaves the pipework lit, so the drawing survives with nothing in it');
+/* The board is a fixed 1920 stage scaled to fit, so a control written at 24px
+   lands at 18 under the pointer on a 1440 screen. */
+if (!/\.hl\{[\s\S]{0,700}height:32px/.test(admin))
+  fails.push('the header chips are back under the target size once the stage is scaled');
+for (const sel of ['.trig:focus-visible', '.hl:focus-visible', '.nnode.clicky:focus-visible'])
+  if (!admin.includes(sel + '{outline:2px solid'))
+    fails.push(sel + ' has no focus ring');
+
 /* The chain lamp told a reader to press Verify the chain, and the wall board
    had no such control. That is worse than the wrong wording it replaced: it
    asks somebody to do a thing there is no way to do, and it leaves the log
@@ -2273,6 +2376,20 @@ if (!/This says nothing about whether the chain is intact/.test(admin))
   fails.push('a failed walk does not say that it proves nothing about the chain');
 if (!/key==="m:chain"/.test(admin))
   fails.push('the verify control is not scoped to the chain lamp');
+
+/* Two ways the board contradicted itself on live data, both of them the same
+   shape: a number that arrived under a different name or a different type than
+   the drawing expected, and the drawing said nothing rather than said so. */
+if (!/if\(lv\.checked==null\) lv\.checked = lv\.height/.test(admin))
+  fails.push('the walked-row count is not reconciled, so the provable dial reads nought beside a chain lamp that says intact');
+if (/d\.chain = Object\.assign\(\{\}, j\.chain\);[\s\S]{0,80}\n\s*d\.chain = /.test(admin))
+  fails.push('the chain is rebuilt after it is reconciled, so the reconciliation is thrown away');
+if (/typeof w\[1\]==="number"/.test(admin))
+  fails.push('the hazard list tests the type of a percentage the database returns as a string, which empties the list');
+if (!/Number\(w\[1\]\)/.test(admin))
+  fails.push('the hazard list does not coerce the percentage, so a numeric column read as text will not draw');
+if (!/isFinite\(w\[1\]\)/.test(admin))
+  fails.push('the hazard list will draw a row whose percentage is not a number');
 
 /* ------------------------------------------------------------ the map page
    The page a partner is shown in a room. It carries the three points where the

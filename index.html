@@ -2531,6 +2531,19 @@ body[data-stage="report"] .foot{display:none}
   transition:all .22s var(--ease)}
 #rpt .rp-provb:hover{border-color:var(--blue);color:var(--blue-dp);background:var(--blue-50)}
 #rpt .rp-provb:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ------------------------------------------------ the closed overlay
+   Five overlays sit at opacity 0 with display:flex so they can fade. That
+   makes them invisible and fully focusable at the same time: a keyboard
+   reader tabbing off the search box landed in Print or save as PDF, then
+   Download for your bank, then I understand, then Search the support
+   directory, none of which were on the screen. inert takes them out of the
+   tab order and out of the accessibility tree without touching the fade.
+   aria-hidden is there for the browsers that do not know inert yet. */
+[inert]{pointer-events:none}
+
+/* The one field this whole product runs on had no focus ring at all. */
+#kbInput:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
 #rpt .rp-provb.rp-on{background:var(--blue);border-color:var(--blue);color:#fff}
 #rpt .rp-provout{margin-top:16px;padding:16px 18px;border-radius:var(--r-sm);
   background:var(--surface-2);border:1px solid var(--border)}
@@ -11499,7 +11512,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260906.0830";
+var KBYS_BUILD = "20260907.0457";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -13885,6 +13898,35 @@ document.addEventListener("keydown", function(e){
   if(e.key!=="Escape") return;
   if(RP_PV_OPEN) rpPvHide();
 });
+
+/* ============================================ CLOSED OVERLAYS ARE NOT REACHABLE
+   Every overlay on this page fades rather than disappears, so none of them is
+   display:none while shut. That is right for the eye and wrong for everybody
+   else: a shut overlay stayed in the tab order and in the accessibility tree,
+   so tabbing off the search box walked a keyboard reader through nine controls
+   that were not on the screen. One observer watches the class that opens them
+   and marks the shut ones inert. Doing it here rather than at each call site
+   means an overlay opened by a path nobody remembered is still covered. */
+(function(){
+  var SHEETS = ["sumBox","arBox","waitBox","regBox","dirBox","infoBox","rpPv","wkBal"];
+  /* Open is the class these overlays are actually opened with, plus the
+     hidden attribute for the one that uses it. Computed opacity is not
+     usable here: a transition does not fire a mutation, so a box read
+     mid-fade would be marked open and never corrected. */
+  function shut(el){
+    var open = el.classList.contains("on") ||
+               (el.id === "rpPv" && !el.hasAttribute("hidden")) ||
+               (el.id === "wkBal" && !el.hasAttribute("hidden"));
+    if(open){ el.removeAttribute("inert"); el.removeAttribute("aria-hidden"); }
+    else    { el.setAttribute("inert",""); el.setAttribute("aria-hidden","true"); }
+  }
+  var live=[];
+  SHEETS.forEach(function(k){ var el=document.getElementById(k); if(el){ live.push(el); shut(el); } });
+  var mo=new MutationObserver(function(recs){
+    for(var i=0;i<recs.length;i++) shut(recs[i].target); });
+  live.forEach(function(el){
+    mo.observe(el,{attributes:true,attributeFilter:["class","hidden","style"]}); });
+})();
 
 document.body.setAttribute("data-stage","landing");
 toIdle();

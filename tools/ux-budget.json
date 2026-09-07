@@ -1,0 +1,114 @@
+{
+  "note": "Recorded ceilings, not targets. A number may fall and may never rise. Raising one is a design decision with an owner, not a way past a red build.",
+  "recorded": "2026-09-07",
+  "scenes": {
+    "landing@1440": {
+      "contrast": 5,
+      "targets": 3,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 1,
+      "stops": 5,
+      "h1s": 1,
+      "textRuns": 41,
+      "overflow": 0
+    },
+    "landing@390": {
+      "contrast": 5,
+      "targets": 3,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 1,
+      "stops": 5,
+      "h1s": 1,
+      "textRuns": 37,
+      "overflow": 0
+    },
+    "landing@320": {
+      "contrast": 5,
+      "targets": 3,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 1,
+      "stops": 5,
+      "h1s": 1,
+      "textRuns": 37,
+      "overflow": 0
+    },
+    "waiting@1440": {
+      "contrast": 7,
+      "targets": 3,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 0,
+      "stops": 26,
+      "h1s": 0,
+      "textRuns": 39,
+      "overflow": 0
+    },
+    "waiting@390": {
+      "contrast": 7,
+      "targets": 3,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 0,
+      "stops": 26,
+      "h1s": 0,
+      "textRuns": 35,
+      "overflow": 0
+    },
+    "report@1440": {
+      "contrast": 4,
+      "targets": 20,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 1,
+      "stops": 8,
+      "h1s": 1,
+      "textRuns": 212,
+      "overflow": 0
+    },
+    "report@390": {
+      "contrast": 4,
+      "targets": 20,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 1,
+      "stops": 8,
+      "h1s": 1,
+      "textRuns": 86,
+      "overflow": 0
+    },
+    "report@320": {
+      "contrast": 4,
+      "targets": 20,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 1,
+      "stops": 8,
+      "h1s": 1,
+      "textRuns": 86,
+      "overflow": 0
+    },
+    "backoffice@1440": {
+      "contrast": 15,
+      "targets": 0,
+      "unnamed": 0,
+      "phantom": 0,
+      "noring": 0,
+      "headings": 2,
+      "stops": 16,
+      "h1s": 0,
+      "textRuns": 184,
+      "overflow": 0
+    }
+  }
+}

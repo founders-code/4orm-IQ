@@ -50,7 +50,7 @@ const after = await p.evaluate(() => ({
   note: (document.getElementById('gateNote').textContent || '').trim(),
   board: getComputedStyle(document.getElementById('fit')).visibility !== 'hidden'
          && !document.getElementById('gate').hidden === false,
-  lamps: document.querySelectorAll('#board .pl').length,
+  nodes: document.querySelectorAll('#pathmap .nnode').length,
   stayed: location.pathname.endsWith('admin.html')
 }));
 console.log('after Clerk fails to load:', JSON.stringify(after));

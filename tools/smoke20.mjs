@@ -59,13 +59,20 @@ await new Promise(r => setTimeout(r, 250));
 window.paint(window.normalise(payload));
 await new Promise(r => setTimeout(r, 150));
 
-const lamps = [...doc.querySelectorAll('#board .pl')];
-const state = s => lamps.filter(e => e.getAttribute('data-s') === s).length;
-console.log('lamps:', lamps.length, JSON.stringify({ ok:state('ok'), warn:state('warn'), bad:state('bad') }));
-console.log('flow nodes:', doc.querySelectorAll('#mimic .nnode').length);
+/* The annunciator grid and the mimic are gone. There is one drawing now and
+   every lamp sits on the step it watches, so the lamps are counted where they
+   actually live: on the path, plus the two header chips for the pair that
+   watch this panel rather than the check. Nothing was dropped in that move and
+   this is where that is proved. */
+const nodes = [...doc.querySelectorAll('#pathmap .nnode')];
+const chips = [...doc.querySelectorAll('#house .hl')];
+const state = s => nodes.filter(e => e.getAttribute('data-s') === s).length;
+console.log('path nodes:', nodes.length,
+  JSON.stringify({ ok:state('ok'), warn:state('warn'), bad:state('bad') }));
+console.log('header chips:', chips.length);
 console.log('dials:', doc.querySelectorAll('#gauges .gauge').length);
 console.log('registers ranked:', doc.querySelectorAll('#rank .rblk').length);
-console.log('clickable:', doc.querySelectorAll('.pl,.nnode.clicky,.gauge[data-info],.rblk').length);
+console.log('clickable:', doc.querySelectorAll('#pathmap .nnode.clicky,.hl,.gauge[data-info],.rblk').length);
 
 const t = doc.getElementById('stage').textContent;
 
@@ -74,8 +81,23 @@ for (const bad of ['identifier','searched for','looked up','party name','query v
   if (new RegExp(bad, 'i').test(t)) console.log('  SUSPECT COPY:', bad);
 
 const fails = [];
-if (lamps.length !== 26) fails.push('the annunciator is not 26 lamps');
-if (doc.querySelectorAll('#mimic .nnode').length !== 20) fails.push('the flow chart lost a node');
+if (nodes.length !== 46) fails.push('the path map is ' + nodes.length + ' nodes, not 46');
+if (chips.length !== 2) fails.push('the two lamps that watch the panel are not in the header');
+if (doc.getElementById('board')) fails.push('the old annunciator grid is back');
+if (doc.getElementById('mimic')) fails.push('the old mimic diagram is back');
+/* The move is only honest if every lamp survived it. 8 machine, 8 readings,
+   10 documents, and the two in the header make 26. */
+{
+  const keys = Object.keys(window.BOARD_ROWS || {});
+  const m = keys.filter(k => k.startsWith('m:')).length;
+  const r = keys.filter(k => k.startsWith('r:')).length;
+  const f = keys.filter(k => k.startsWith('f:')).length;
+  console.log('lamps behind the drawing:', m + ' machine, ' + r + ' readings, ' + f + ' documents');
+  if (m !== 8 || r !== 8 || f !== 10)
+    fails.push('a lamp was dropped in the move to the path: ' + m + '/' + r + '/' + f
+      + ', expected 8/8/10');
+  if (!nodes.length) fails.push('the path map drew nothing');
+}
 if (doc.querySelectorAll('#gauges .gauge').length !== 5) fails.push('a dial is missing');
 if (!doc.querySelector('#days svg')) fails.push('the checks per day chart did not draw');
 if (!/OpenCorporates/.test(t)) fails.push('the worst register list is not naming registers');
@@ -83,7 +105,11 @@ if (!/62\.2/.test(t)) fails.push('the worst register list lost its percentage');
 
 /* Every lamp, every stage, every dial and every register opens onto something. */
 let empty = [];
-lamps.forEach(el => { el.dispatchEvent(new window.MouseEvent('click', { bubbles:true }));
+nodes.forEach(el => { if (!el.classList.contains('clicky')) return;
+  el.dispatchEvent(new window.MouseEvent('click', { bubbles:true }));
+  if (doc.getElementById('shB').textContent.trim().length < 80)
+    empty.push(el.getAttribute('data-id')); });
+chips.forEach(el => { el.dispatchEvent(new window.MouseEvent('click', { bubbles:true }));
   if (doc.getElementById('shB').textContent.trim().length < 80)
     empty.push(el.getAttribute('data-open')); });
 for (let i = 0; i < 10; i++) { window.openStage(i);
