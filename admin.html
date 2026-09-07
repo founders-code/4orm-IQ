@@ -119,7 +119,10 @@ body.faults .fdim{pointer-events:none}
 
 /* --------------------------------------------------------- the two thirds */
 .body{display:grid;grid-template-columns:1fr 452px;gap:20px;min-height:0}
-.lft{display:grid;grid-template-rows:1fr 300px;gap:16px;min-height:0}
+/* The drawing takes the whole left column at full height. That is what makes
+   the lines readable: the lanes get the air the diagram needs instead of
+   sharing it with two cards. */
+.lft{display:grid;grid-template-rows:1fr;min-height:0}
 .rgt{display:grid;grid-template-rows:auto 1fr;gap:14px;min-height:0}
 
 /* ----------------------------------------------------- the annunciator */
@@ -291,7 +294,7 @@ tr:last-child td{border-bottom:0}
   background:
     repeating-linear-gradient(180deg,rgba(255,255,255,.045) 0 1px,transparent 1px 3px),
     radial-gradient(120% 130% at 50% 40%,transparent 55%,rgba(0,0,0,.6) 100%)}
-.rdhd{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:8px;
+.rdhd{margin:0;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:8px;
   font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#8A4A40;
   margin-bottom:11px}
 .rdhd::after{content:"";flex:1;height:1px;background:#331915}
@@ -359,6 +362,11 @@ tr:last-child td{border-bottom:0}
    a full screen of empty ground. */
 .sheet{position:absolute;inset:0;background:rgba(3,5,8,.86);backdrop-filter:blur(4px);
   display:none;z-index:60;align-items:center;justify-content:center;padding:60px 70px}
+/* In full screen the panel is a fixed overlay at z-index 70, so the sheet has
+   to leave the stage and come up over it. Otherwise pressing a register on the
+   full-screen drawing opens a card underneath the drawing. */
+body.pathfull .sheet{position:fixed;z-index:90;padding:40px 48px}
+body.pathfull .fullhint{z-index:69}
 .sheet.on{display:flex}
 .sheetcard{width:min(1320px,100%);max-height:100%;background:var(--panel);
   border:1px solid var(--edge-lit);border-radius:var(--r);padding:26px 30px 28px;
@@ -438,24 +446,129 @@ select.trig option{background:var(--panel);color:var(--ink);
   background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
   padding:11px 14px 9px;display:grid;grid-template-rows:auto 1fr;gap:7px;min-height:0}
 .pathhd{display:flex;align-items:baseline;gap:16px}
-.pathhd .ck{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.2em;
+.pathhd .ck{margin:0;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.2em;
   text-transform:uppercase;color:var(--title);opacity:.85;white-space:nowrap}
 .pathhd .sb{font-family:var(--ui);font-size:11px;color:var(--ink-3)}
-.house{margin-left:auto;display:flex;gap:7px;flex:none}
-/* min-height, not more padding. The chip reads the same and the hit area
-   clears the 24px minimum, which it missed at 17. */
-.hl{appearance:none;background:var(--panel-2);border:1px solid var(--edge-2);
-  border-radius:99px;display:inline-flex;align-items:center;gap:7px;padding:5px 12px;
-  /* 32 on the stage, not 24. The board is a fixed 1920 stage scaled to fit,
-     so on a 1440 screen every control renders at 0.75 of its written size. A
-     24px chip lands as 18 real pixels under the pointer, which is the number
-     that matters. 32 lands as 24. */
-  height:32px;box-sizing:border-box;padding:5px 14px;
-  cursor:pointer;font-family:var(--ui);font-size:9px;font-weight:700;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--ink-2);transition:all .18s var(--ease)}
+.pathwrap{min-height:0;position:relative}
+.pathwrap svg{width:100%;height:100%;display:block}
+/* The lanes. A band behind every stage, so a step is read as belonging to a
+   part of the process before it is read as a box. */
+.lane{fill:rgba(76,135,255,.030);stroke:none}
+.lane.alt{fill:rgba(255,255,255,.017)}
+.lanerule{stroke:var(--edge);stroke-width:1}
+.lanelab{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.10em;
+  text-anchor:end;fill:var(--title);opacity:.74;text-transform:uppercase}
+.lanesub{font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-anchor:end;
+  fill:var(--ink-4)}
+/* Node type on this drawing runs a size and a half larger than it did on the
+   mimic, because the mimic was a thumbnail and this is the instrument. */
+.pathwrap .ntitle{font-size:12.5px;font-weight:600}
+.pathwrap .nsub{font-size:9.5px}
+/* A narrow chip gets smaller print rather than a truncated sentence. */
+.pathwrap .nsub.sm{font-size:7.5px;letter-spacing:.03em}
+.pathwrap .nbox{stroke-width:1.4}
+/* A decision is a chamfered plate, not a diamond. A diamond wastes the width
+   it needs to hold a readable question at this scale. */
+.decbox{fill:var(--panel-2);stroke:var(--edge-2);stroke-width:1.4}
+.nnode[data-s="ok"] .decbox{stroke:rgba(51,216,155,.45)}
+.nnode[data-s="warn"] .decbox{stroke:rgba(231,199,108,.6);fill:rgba(231,199,108,.07)}
+.nnode[data-s="bad"] .decbox{stroke:var(--bad);fill:rgba(255,83,64,.13)}
+/* An exit is a way out of the process. Dashed, because nothing continues. */
+.exitbox{fill:var(--sunk);stroke:var(--edge-2);stroke-width:1.4;stroke-dasharray:5 4}
+.nnode[data-s="bad"] .exitbox{stroke:var(--bad);fill:rgba(255,83,64,.10)}
+.nnode[data-s="warn"] .exitbox{stroke:rgba(231,199,108,.6)}
+/* A register family. Thin, wide, and it carries how many of its registers
+   answered on the right hand end. */
+.regbox{fill:var(--panel);stroke:var(--edge-2);stroke-width:1.2}
+.nnode[data-s="ok"] .regbox{stroke:rgba(51,216,155,.40)}
+.nnode[data-s="warn"] .regbox{stroke:rgba(231,199,108,.55);fill:rgba(231,199,108,.055)}
+.nnode[data-s="bad"] .regbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
+/* A control document. It governs a stage rather than running inside one, so
+   it sits on its own lane under the drawing and is drawn as a plate. */
+.chipbox{fill:var(--sunk);stroke:var(--edge);stroke-width:1.2}
+.nnode[data-s="warn"] .chipbox{stroke:rgba(231,199,108,.5);fill:rgba(231,199,108,.05)}
+.nnode[data-s="bad"] .chipbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
+.chipid{font-family:var(--mono);font-size:7.5px;letter-spacing:.09em;fill:var(--ink-4)}
+.nnode[data-s="bad"] .chipid{fill:#FF8574}
+.pathwrap .slab{font-size:8.5px}
+/* Faults only takes the drawing down to what is wrong, and that has to
+   include the lines and the lanes. A board that dimmed every box and left
+   the pipework lit would be showing an operator a diagram of nothing. */
+body.faults #pathmap .pipe:not(.dead),body.faults #pathmap .mtrunk,
+body.faults #pathmap .lane,body.faults #pathmap .lanerule,
+body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
+  animation:none!important}
+/* A way out of the process is drawn quieter than the way through it. Two
+   long animated blue lines running off to "turned away" read as the main
+   flow, and turning somebody away is not the main flow. */
+.pipe.out{stroke:rgba(111,129,153,.5);stroke-width:2;stroke-dasharray:5 7;
+  animation:none}
+.pipe.out.dead{stroke:rgba(255,83,64,.5)}
+/* A reading is not a stage. It hangs off the flow on a dotted tap with no
+   arrowhead, and its box is recessed rather than raised, so nobody reads
+   an instrument as a step the check takes. */
+.pipe.tap{stroke:rgba(111,129,153,.45);stroke-width:1.6;stroke-dasharray:2 5;
+  animation:none}
+.meterbox{fill:var(--sunk);stroke:var(--edge-2);stroke-width:1.4}
+.nnode[data-s="ok"] .meterbox{stroke:rgba(51,216,155,.4)}
+.nnode[data-s="warn"] .meterbox{stroke:rgba(231,199,108,.55);fill:rgba(231,199,108,.05)}
+.nnode[data-s="bad"] .meterbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
+.arwh{fill:rgba(76,135,255,.6)}
+.arwh.dead{fill:rgba(255,83,64,.6)}
+.chipt{font-family:var(--mono);font-size:10.5px;font-weight:600;fill:var(--ink)}
+.nnode[data-s="bad"] .chipt{fill:#FFB3A8}
+.pathwrap .nnode.clicky:hover .nbox,.pathwrap .nnode.clicky:hover .decbox,
+.pathwrap .nnode.clicky:hover .regbox,.pathwrap .nnode.clicky:hover .chipbox,
+.pathwrap .nnode.clicky:hover .exitbox,
+.pathwrap .nnode.clicky:hover .meterbox{stroke:var(--edge-lit);fill:#141F2C}
+
 .hl:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* THE LEGEND. Three states, and every one carries a shape and a word as well
+   as a colour. Colour alone is the one thing a control panel may never do:
+   ISA-101 practice is redundant coding, because an operator who cannot tell
+   two greens apart still has to run the plant. */
+.legend{appearance:none;background:none;border:1px solid var(--edge-2);border-radius:99px;
+  display:inline-flex;align-items:center;gap:0;padding:0 4px;min-height:32px;
+  box-sizing:border-box;cursor:pointer;margin-left:auto;flex:none;
+  transition:border-color .18s var(--ease)}
+.legend:hover{border-color:var(--edge-lit)}
+.legend:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.lgi{display:inline-flex;align-items:center;gap:6px;padding:0 9px;
+  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;white-space:nowrap}
+.lgi+.lgi{border-left:1px solid var(--edge)}
+.lgi i{width:8px;height:8px;border-radius:50%;flex:none}
+.lgi[data-s="ok"]{color:var(--ok)}   .lgi[data-s="ok"] i{background:var(--ok-l);
+  box-shadow:0 0 6px rgba(38,161,111,.55)}
+.lgi[data-s="warn"]{color:var(--warn)} .lgi[data-s="warn"] i{background:var(--warn-l);
+  box-shadow:0 0 6px rgba(188,155,76,.5)}
+.lgi[data-s="bad"]{color:var(--bad)}  .lgi[data-s="bad"] i{background:var(--bad);
+  box-shadow:0 0 7px rgba(255,83,64,.7)}
+#homebtn{text-decoration:none}
+
+/* A register is a control now, so it looks like one and carries its kind.
+   Kind sits under the name and never uses a state colour: one meaning per
+   colour on a panel, or the panel stops being readable. */
+.plate{appearance:none;cursor:pointer;font:inherit;color:inherit;width:100%;
+  transition:border-color .18s var(--ease),background .18s var(--ease)}
+.plate:hover{border-color:var(--edge-lit);background:#141F2C}
+.plate:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.pkind{margin-top:5px;font-family:var(--mono);font-size:8px;
+  font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  white-space:nowrap}
+.shhint{margin-left:auto;color:var(--ink-3)}
+.backrow{margin-top:22px;padding-top:18px;border-top:1px solid var(--edge)}
+.reglink{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(76,135,255,.4);
+  font-family:var(--mono);font-size:13.5px}
+.reglink:hover{color:#9CBBFF;border-bottom-color:#9CBBFF}
+.reglink:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
 /* The two panel lamps in the masthead. Small, quiet, and they still open the
    same sheet they always did. */
+/* Read, not seen. Never display:none, which would take it out of the
+   accessibility tree along with the eye. */
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 .panellamps{display:inline-flex;gap:6px;align-items:center;flex:none}
 /* --ink-4 is 2.9:1 on this ground and these are 8.5px. A lamp label nobody
    can read is a lamp with no label. --ink-3 clears the line at this size, and
@@ -463,11 +576,14 @@ select.trig option{background:var(--panel);color:var(--ink);
 .pgl{appearance:none;background:none;border:0;padding:4px 8px;cursor:pointer;
   display:inline-flex;align-items:center;gap:6px;border-radius:99px;min-height:32px;
   box-sizing:border-box;
-  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;
+  font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink-2);transition:color .18s var(--ease)}
-.pgl i{width:6px;height:6px;border-radius:50%;background:var(--idle);flex:none}
-.pgl[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 5px rgba(38,161,111,.55)}
-.pgl[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 5px rgba(188,155,76,.5)}
+/* The dot matches the lamps on the drawing. A node lamp is r=6 in a 1640
+   viewBox drawn about 0.85 to the panel, which lands near 10px across, so
+   these are 10. */
+.pgl i{width:10px;height:10px;border-radius:50%;background:var(--idle);flex:none}
+.pgl[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 7px rgba(38,161,111,.55)}
+.pgl[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 7px rgba(188,155,76,.5)}
 .pgl[data-s="bad"] i{background:var(--bad);box-shadow:0 0 7px rgba(255,83,64,.75);
   animation:alarm 1.15s ease-in-out infinite}
 .pgl[data-s="bad"]{color:var(--bad)}
@@ -477,6 +593,15 @@ select.trig option{background:var(--panel);color:var(--ink);
 /* Full screen. The drawing is the instrument on this board and at 1440 it is
    drawn into a 1392 by 640 panel. This gives it the whole window without
    redrawing anything: the same SVG, the same viewBox, more room. */
+/* The one control left on the drawing header. It kept the chip shape the two
+   panel lamps used to have, because the shape was right; only the things that
+   were wearing it were wrong. */
+.hl{appearance:none;background:var(--panel-2);border:1px solid var(--edge-2);
+  border-radius:99px;display:inline-flex;align-items:center;gap:7px;padding:5px 14px;
+  height:32px;box-sizing:border-box;margin-left:14px;flex:none;
+  cursor:pointer;font-family:var(--ui);font-size:9px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-2);transition:all .18s var(--ease)}
+.hl:hover{border-color:var(--edge-lit);color:var(--ink)}
 .hl.expand svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;
   stroke-linecap:round;flex:none}
 body.pathfull .path{position:fixed;inset:14px;z-index:70;border-radius:var(--r);
@@ -557,64 +682,6 @@ body:not(.pathfull) .fullhint{display:none}
 .hl:hover{border-color:var(--edge-lit);color:var(--ink)}
 .pathwrap{min-height:0;position:relative}
 .pathwrap svg{width:100%;height:100%;display:block}
-/* The lanes. A band behind every stage, so a step is read as belonging to a
-   part of the process before it is read as a box. */
-.lane{fill:rgba(76,135,255,.030);stroke:none}
-.lane.alt{fill:rgba(255,255,255,.017)}
-.lanerule{stroke:var(--edge);stroke-width:1}
-.lanelab{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.10em;
-  text-anchor:end;fill:var(--title);opacity:.74;text-transform:uppercase}
-.lanesub{font-family:var(--mono);font-size:8px;letter-spacing:.05em;text-anchor:end;
-  fill:var(--ink-4)}
-/* Node type on this drawing runs a size and a half larger than it did on the
-   mimic, because the mimic was a thumbnail and this is the instrument. */
-.pathwrap .ntitle{font-size:11.5px;font-weight:600}
-.pathwrap .nsub{font-size:8.5px}
-.pathwrap .nbox{stroke-width:1.4}
-/* A decision is a chamfered plate, not a diamond. A diamond wastes the width
-   it needs to hold a readable question at this scale. */
-.decbox{fill:var(--panel-2);stroke:var(--edge-2);stroke-width:1.4}
-.nnode[data-s="ok"] .decbox{stroke:rgba(51,216,155,.45)}
-.nnode[data-s="warn"] .decbox{stroke:rgba(231,199,108,.6);fill:rgba(231,199,108,.07)}
-.nnode[data-s="bad"] .decbox{stroke:var(--bad);fill:rgba(255,83,64,.13)}
-/* An exit is a way out of the process. Dashed, because nothing continues. */
-.exitbox{fill:var(--sunk);stroke:var(--edge-2);stroke-width:1.4;stroke-dasharray:5 4}
-.nnode[data-s="bad"] .exitbox{stroke:var(--bad);fill:rgba(255,83,64,.10)}
-.nnode[data-s="warn"] .exitbox{stroke:rgba(231,199,108,.6)}
-/* A register family. Thin, wide, and it carries how many of its registers
-   answered on the right hand end. */
-.regbox{fill:var(--panel);stroke:var(--edge-2);stroke-width:1.2}
-.nnode[data-s="ok"] .regbox{stroke:rgba(51,216,155,.40)}
-.nnode[data-s="warn"] .regbox{stroke:rgba(231,199,108,.55);fill:rgba(231,199,108,.055)}
-.nnode[data-s="bad"] .regbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
-/* A control document. It governs a stage rather than running inside one, so
-   it sits on its own lane under the drawing and is drawn as a plate. */
-.chipbox{fill:var(--sunk);stroke:var(--edge);stroke-width:1.2}
-.nnode[data-s="warn"] .chipbox{stroke:rgba(231,199,108,.5);fill:rgba(231,199,108,.05)}
-.nnode[data-s="bad"] .chipbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
-.chipid{font-family:var(--mono);font-size:7.5px;letter-spacing:.09em;fill:var(--ink-4)}
-.nnode[data-s="bad"] .chipid{fill:#FF8574}
-.pathwrap .slab{font-size:8.5px}
-/* Faults only takes the drawing down to what is wrong, and that has to
-   include the lines and the lanes. A board that dimmed every box and left
-   the pipework lit would be showing an operator a diagram of nothing. */
-body.faults #pathmap .pipe:not(.dead),body.faults #pathmap .mtrunk,
-body.faults #pathmap .lane,body.faults #pathmap .lanerule,
-body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
-  animation:none!important}
-/* A way out of the process is drawn quieter than the way through it. Two
-   long animated blue lines running off to "turned away" read as the main
-   flow, and turning somebody away is not the main flow. */
-.pipe.out{stroke:rgba(111,129,153,.5);stroke-width:2;stroke-dasharray:5 7;
-  animation:none}
-.pipe.out.dead{stroke:rgba(255,83,64,.5)}
-.arwh{fill:rgba(76,135,255,.6)}
-.arwh.dead{fill:rgba(255,83,64,.6)}
-.chipt{font-family:var(--mono);font-size:9.5px;font-weight:600;fill:var(--ink)}
-.nnode[data-s="bad"] .chipt{fill:#FFB3A8}
-.pathwrap .nnode.clicky:hover .nbox,.pathwrap .nnode.clicky:hover .decbox,
-.pathwrap .nnode.clicky:hover .regbox,.pathwrap .nnode.clicky:hover .chipbox,
-.pathwrap .nnode.clicky:hover .exitbox{stroke:var(--edge-lit);fill:#141F2C}
 </style></head><body data-clerk="pk_test_YWN0dWFsLWRvbmtleS03ODYuY2xlcmsuYWNjb3VudHMuZGV2JA" data-boot="1">
 
 <div class="boot" id="boot">Checking your session</div>
@@ -648,6 +715,7 @@ body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
     <span class="who" id="who"></span>
     <div class="mstats" id="mstats"></div>
     <div class="mctl">
+      <a class="trig" href="index.html" id="homebtn">&#8592; Home</a>
       <button class="trig" type="button" id="regbtn">The registry</button>
       <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
       <select class="trig" id="win" aria-label="Window">
@@ -663,54 +731,40 @@ body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
     <div class="lft">
       <div class="path">
         <div class="pathhd">
-          <span class="ck">The path a check takes</span>
-          <span class="sb">Every lamp sits on the step it watches. Press a step to open it.</span>
+          <h2 class="ck">The path a check takes</h2>
+          <span class="sb">Solid is the flow. Dotted is a reading on that lane. Grey dashed is a way out.</span>
+          <!-- THE LEGEND. Colour never carries a state on its own here: every
+               one of the three has a shape and a word beside it, which is the
+               rule high-performance control rooms settle on because an
+               operator who cannot see the difference between two greens still
+               has to read the panel. Press it for the long version. -->
+          <button class="legend" type="button" id="legendbtn"
+                  title="What the lights mean. Press for the full legend.">
+            <span class="lgi" data-s="ok"><i></i>&#9679; Working</span>
+            <span class="lgi" data-s="warn"><i></i>&#9650; Quiet</span>
+            <span class="lgi" data-s="bad"><i></i>&#9632; Down</span>
+          </button>
           <button class="hl expand" type="button" id="fullbtn" aria-pressed="false">
             <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 5V1h4M13 9v4H9M9 1h4v4M5 13H1V9"/></svg>
             Full screen</button>
         </div>
         <div class="pathwrap" id="pathmap"></div>
       </div>
-      <div class="pair">
-        <div class="card">
-          <div class="ck">Early warning</div>
-          <h2>What is being checked, and how often</h2>
-          <div class="sub">A name is kept only once it crosses the bar. Below it, the row is a
-            hash nobody can read.</div>
-          <div class="scroll"><table class="pulsetab">
-            <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4">
-              <col class="c5"></colgroup>
-            <thead><tr><th>Name or hash</th><th>Today</th>
-            <th>Lift</th><th>What came back</th><th>First</th></tr></thead>
-            <tbody id="pulseRows"></tbody></table></div>
-          <div class="floor">
-            <div class="fk">The evidence a regulator asks for</div>
-            <div class="evi" id="evi"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="ck">Hazard</div>
-          <h2>Registers by success rate, worst first</h2>
-          <div class="sub">A register that starts failing quietly is the one hazard this product
-            cannot survive.</div>
-          <div class="scroll" id="rank"></div>
-          <div class="floor">
-            <div class="fk">Checks attempted per day, this window</div>
-            <div class="chart" id="days"></div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="rgt">
       <div class="reader" id="reader" data-s="ok">
         <div class="screen">
-          <div class="rdhd"><i></i>Operations summary</div>
+          <h2 class="rdhd"><i></i>Operations summary</h2>
           <div class="rdline" id="rdline"></div>
           <div class="rdbody" id="rdbody"></div>
           <div class="rdfoot" id="rdfoot"></div>
         </div>
       </div>
+      <!-- The dials are a section too, and a screen reader moving by heading
+           had no way to find them. The heading is read, not seen: the dials
+           carry their own captions and a visible title would repeat them. -->
+      <h2 class="vh">The instruments</h2>
       <div class="gauges" id="gauges"></div>
     </div>
   </div>
@@ -894,7 +948,10 @@ function machine(d){
      red:"Either the log is not being written, or a row no longer verifies. Everything after the break is unprovable.",
      go:"Do not touch the rows. Note the first broken height and keep everything from it."},
     {k:"rulebook", plate:"The rulebook", s:worse(S("policy"), d.policy.head?"ok":"warn"),
-     v: d.policy.head? "v"+d.policy.head.version : "Not recorded",
+     /* A policy head with no version on it printed "vundefined" on the live
+        board. A lamp that prints a broken value is a lamp nobody trusts. */
+     v: (d.policy.head && d.policy.head.version)
+        ? "v"+d.policy.head.version : "Not recorded",
      name:"The rulebook",
      /* A run row commits to a version and never to what that version said,
         which is what lets a rule change without disturbing a hash already
@@ -1079,6 +1136,151 @@ function file(d){
                        ["What it holds",R.holds]] : null};
   });
 }
+
+/* ================================================== WHAT EACH REGISTER IS
+   One entry per register in the catalogue, and nothing here is decoration.
+
+     k  the kind, in one word. What class of source this is, never its state.
+        A control panel that uses colour for two things is a panel nobody can
+        read, so kind and state are kept apart: kind never changes, state does.
+     s  what it holds. One sentence, actor first, under twenty words.
+     e  what an empty answer means HERE. This is the sentence that stops a
+        silence being read as clearance, and it is different for every
+        register: absent from FINTRAC means something, absent from Glassdoor
+        does not.
+     u  the register's own address, or null.
+
+   The address is not typed here. It is generated from the catalogue's own
+   domain field, which is the domain retrieval is already pinned to, so a link
+   can never point somewhere the system does not actually read. The entries
+   with no address are the ones we compute ourselves, and they say so rather
+   than borrowing somebody else's name.
+
+   tools/verify.mjs fails the build if a register in the catalogue has no entry
+   here, or an entry here names a register the catalogue does not have. */
+var REGINFO = {
+  "Alberta Registry": { k:"Register", s:"Alberta's corporate register, covering companies and registered trade names.", e:"Absence means no Alberta registration. Alberta search access is limited, so a gap here is common.", u:"https://alberta.ca" },
+  "BC Registry": { k:"Register", s:"British Columbia's register of incorporated companies and registered firms.", e:"Absence means no BC registration, not that the company does not exist.", u:"https://bcregistry.gov.bc.ca" },
+  "Corporations Canada": { k:"Register", s:"The federal register of companies incorporated under Canadian federal law.", e:"Absence means the company is not federally incorporated. It may still be incorporated in a province.", u:"https://ised-isde.canada.ca" },
+  "Ontario Registry": { k:"Register", s:"Ontario's register of corporations, business names and partnerships.", e:"Absence means no Ontario registration. A company can trade in Ontario while registered elsewhere.", u:"https://ontario.ca" },
+  "Registraire des entreprises du Quebec": { k:"Register", s:"Quebec's register of enterprises, businesses and their named officers.", e:"Absence means no Quebec registration. Quebec is outside our approved service boundary.", u:"https://registreentreprises.gouv.qc.ca" },
+  "Hong Kong Companies Registry": { k:"Register", s:"Hong Kong's register of incorporated companies and registered non-Hong Kong companies.", e:"Absence means no Hong Kong incorporation.", u:"https://cr.gov.hk" },
+  "New Zealand Companies Office": { k:"Register", s:"New Zealand's register of companies, directors and shareholders.", e:"Absence means no New Zealand company.", u:"https://companiesoffice.govt.nz" },
+  "Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones": { k:"Several", s:"Fourteen offshore company registers, read together because a party rarely names which one it used.", e:"Most of these charge for a search or do not publish one. An empty answer here is usually the register, not the party.", u:null },
+  "OpenCorporates": { k:"Aggregate", s:"A gathered copy of company registers from many countries in one place.", e:"It republishes other registers and can lag them. An empty answer sends the question back to the official register.", u:"https://opencorporates.com" },
+  "SEC EDGAR": { k:"Filing", s:"Every document a company has filed with the United States securities regulator.", e:"Absence usually means the company had nothing it was required to file. It is not a licence check.", u:"https://sec.gov" },
+  "ACRA": { k:"Register", s:"Singapore's register of companies and business entities.", e:"Absence means no Singapore entity.", u:"https://acra.gov.sg" },
+  "Companies House": { k:"Register", s:"The United Kingdom's register of incorporated companies, officers and filings.", e:"Absence means no UK incorporation. It says nothing about trading in the UK.", u:"https://find-and-update.company-information.service.gov.uk" },
+  "Florida Sunbiz": { k:"Register", s:"Florida's corporate register, widely used because registration there is fast and cheap.", e:"Absence means no Florida entity. Presence alone is not a sign of substance.", u:"https://sunbiz.org" },
+  "ASIC Professional Register": { k:"Licence", s:"Australia's record of licensed financial services firms and authorised representatives.", e:"Absence means no Australian licence.", u:"https://asic.gov.au" },
+  "Bank of Canada PSP": { k:"Licence", s:"The Bank of Canada's register of payment service providers under the Retail Payment Activities Act.", e:"Absence means not registered as a payment service provider. Registration is not an endorsement of the business.", u:"https://bankofcanada.ca" },
+  "FSRA Ontario, mortgage and insurance licences": { k:"Licence", s:"Ontario's register of mortgage brokerages, agents, insurance agents and credit unions.", e:"Absence means no Ontario licence in those sectors.", u:"https://fsrao.ca" },
+  "RECO real estate register": { k:"Licence", s:"Ontario's register of registered real estate brokerages, brokers and salespeople.", e:"Absence means no Ontario real estate registration.", u:"https://reco.on.ca" },
+  "BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators": { k:"Several", s:"The provincial licence registers outside Ontario, read together for mortgage, real estate and insurance.", e:"Each publishes separately and some have no public search. A gap here is usually the register.", u:null },
+  "CIRO AdvisorReport": { k:"Licence", s:"The Canadian investment industry regulator's record of approved advisors and their history.", e:"Absence means the person is not a CIRO-approved advisor. They may be registered another way.", u:"https://ciro.ca" },
+  "CSA Registration": { k:"Licence", s:"Whether a firm or person is registered to deal in securities anywhere in Canada.", e:"Absence is meaningful. Dealing in securities in Canada without registration is itself the problem.", u:"https://securities-administrators.ca" },
+  "ESMA MiCA CASP": { k:"Licence", s:"The European register of crypto-asset service providers authorised under MiCA.", e:"Absence means no EU crypto authorisation. The regime is recent, so the register is still filling.", u:"https://esma.europa.eu" },
+  "FCA Register": { k:"Licence", s:"The United Kingdom regulator's record of every authorised firm and individual.", e:"The FCA warns on its own site that a firm missing from the register may still be unauthorised. Absence is never clearance.", u:"https://register.fca.org.uk" },
+  "FinCEN MSB": { k:"Licence", s:"The United States register of money services businesses.", e:"Absence is meaningful for a business moving money in the United States.", u:"https://fincen.gov" },
+  "BrokerCheck": { k:"Licence", s:"The United States record of brokers and brokerage firms, with their employment and complaint history.", e:"Absence means no US broker registration. It does not cover investment advisers, which is a separate register.", u:"https://brokercheck.finra.org" },
+  "FINTRAC MSB": { k:"Licence", s:"Canada's register of money services businesses, kept by the financial intelligence unit.", e:"Absence is meaningful. A business moving money for the Canadian public is required to be on it.", u:"https://fintrac-canafe.canada.ca" },
+  "SFC Public Register": { k:"Licence", s:"Hong Kong's register of licensed corporations and registered individuals.", e:"Absence means no Hong Kong licence.", u:"https://sfc.hk" },
+  "NFA BASIC": { k:"Licence", s:"The United States register of futures and derivatives firms and their disciplinary record.", e:"Absence means no US futures registration.", u:"https://nfa.futures.org" },
+  "SEC Form D": { k:"Filing", s:"The notice a company files when it raises money privately in the United States.", e:"Absence does not mean no raise happened. It can mean the raise was not reported.", u:"https://sec.gov" },
+  "SEC IAPD, Form ADV": { k:"Filing", s:"What a United States investment adviser told the regulator about its business, fees and conflicts.", e:"Absence means no US adviser registration. Smaller advisers register with a state instead.", u:"https://adviserinfo.sec.gov" },
+  "MAS Financial Institutions Directory": { k:"Licence", s:"Singapore's directory of regulated financial institutions and payment firms.", e:"Absence means not regulated in Singapore.", u:"https://mas.gov.sg" },
+  "NMLS Consumer Access": { k:"Licence", s:"The United States register of mortgage companies and loan originators, state by state.", e:"Absence means no US mortgage licence.", u:"https://nmlsconsumeraccess.org" },
+  "ASC Caution List": { k:"Watchlist", s:"Alberta's list of firms and people its securities regulator has cautioned investors about.", e:"Absence means Alberta has not cautioned.", u:"https://asc.ca" },
+  "ASIC Investor Alerts": { k:"Watchlist", s:"Australia's warnings about firms it believes are operating without a licence.", e:"Absence means Australia has not warned.", u:"https://asic.gov.au" },
+  "BCSC Caution List": { k:"Watchlist", s:"British Columbia's list of firms and people its regulator has cautioned investors about.", e:"Absence means BC has not cautioned. Other provinces publish separately.", u:"https://bcsc.bc.ca" },
+  "Canadian Consolidated Autonomous Sanctions List": { k:"Sanctions", s:"The people and entities Canada has sanctioned under its own autonomous measures.", e:"A match here is a hard stop. Absence is expected for almost every party and means very little on its own.", u:"https://international.gc.ca" },
+  "CFTC Enforcement": { k:"Order", s:"Enforcement actions brought by the United States derivatives regulator.", e:"Absence means no action found. Actions take years to appear.", u:"https://cftc.gov" },
+  "CFTC RED List": { k:"Watchlist", s:"Foreign firms the United States derivatives regulator says are soliciting without registration.", e:"Absence means not listed. The list is built from complaints, so it lags.", u:"https://cftc.gov" },
+  "CIRO Discipline": { k:"Order", s:"Disciplinary decisions against Canadian investment dealers and their advisors.", e:"A record of what was decided, not what was alleged. Absence means nothing decided.", u:"https://ciro.ca" },
+  "Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts": { k:"Several", s:"Public consumer alerts and actions from five Canadian and United States agencies.", e:"These are announcements, not registers. An empty answer means nothing has been announced that we found.", u:null },
+  "CSA Alerts": { k:"Watchlist", s:"Investor alerts gathered from every Canadian provincial securities regulator.", e:"Absence means no Canadian regulator has published an alert. Alerts lag conduct.", u:"https://securities-administrators.ca" },
+  "DFPI Crypto Scam Tracker": { k:"Complaint", s:"Crypto scam reports made by the public to California's financial regulator.", e:"These are complaints, not findings. One report proves nothing. A pattern is worth reading.", u:"https://dfpi.ca.gov" },
+  "DOJ Press": { k:"Announcement", s:"Charges, indictments and settlements announced by the United States Department of Justice.", e:"Announcements only. Absence means nothing has been announced, not that nothing is under way.", u:"https://justice.gov" },
+  "FCA Warning List": { k:"Watchlist", s:"United Kingdom firms the regulator believes are operating without authorisation.", e:"The FCA states a firm may be unauthorised and still not be listed. Absence is not clearance.", u:"https://fca.org.uk" },
+  "SFC Alert List": { k:"Watchlist", s:"Hong Kong's list of suspicious investment websites and unlicensed firms.", e:"Absence means Hong Kong has not listed.", u:"https://sfc.hk" },
+  "IOSCO I-SCAN": { k:"Watchlist", s:"Investor alerts gathered from securities regulators around the world into one searchable list.", e:"It carries what members chose to publish. An empty answer means no member has published an alert we could read.", u:"https://iosco.org" },
+  "IRS-CI": { k:"Announcement", s:"Criminal investigation cases announced by the United States tax authority.", e:"Announcements only, and heavily weighted to cases already charged.", u:"https://irs.gov" },
+  "OFAC": { k:"Sanctions", s:"The United States list of sanctioned people, entities and blocked property.", e:"A match is a hard stop. Absence is expected for almost every party.", u:"https://sanctionssearch.ofac.treas.gov" },
+  "OSC Alerts": { k:"Watchlist", s:"Ontario's investor warnings about firms and people it has concerns with.", e:"Absence means Ontario has not warned.", u:"https://osc.ca" },
+  "SEC Trading Suspensions": { k:"Order", s:"Securities the United States regulator has suspended from trading, and why.", e:"A suspension is a serious signal. Absence is the normal state for almost every company.", u:"https://sec.gov" },
+  "MAS Investor Alert List": { k:"Watchlist", s:"Singapore's list of firms that may be wrongly holding themselves out as regulated.", e:"Being on it is a warning, not a finding of wrongdoing. Absence is not clearance.", u:"https://mas.gov.sg" },
+  "UN Consolidated": { k:"Sanctions", s:"The United Nations Security Council's consolidated sanctions list.", e:"A match is a hard stop. Absence is expected for almost every party.", u:"https://un.org" },
+  "State AG": { k:"Announcement", s:"Consumer protection actions announced by United States state attorneys general.", e:"Fifty states publish separately. An empty answer covers only what we could reach.", u:"https://ag.ny.gov" },
+  "ASIC Banned": { k:"Order", s:"People and companies Australia has banned or disqualified from financial services.", e:"Absence means not banned in Australia.", u:"https://asic.gov.au" },
+  "Corporations Canada, Individuals with Significant Control": { k:"Register", s:"Who actually controls a federally incorporated Canadian company, not just who is named as a director.", e:"This register is new and thinly populated. An empty answer is common and proves nothing.", u:"https://ised-isde.canada.ca" },
+  "CSA Disciplined": { k:"Order", s:"The Canadian record of firms and people disciplined by a provincial securities regulator.", e:"It records outcomes, not allegations. Absence means nothing has been decided.", u:"https://securities-administrators.ca" },
+  "CSA Disciplined Persons": { k:"Order", s:"The person-level view of Canadian securities discipline, searchable by name.", e:"A common name can match the wrong person, so a hit is checked before it is shown.", u:"https://securities-administrators.ca" },
+  "SEDI Insider Reports": { k:"Filing", s:"What insiders of Canadian public companies filed about their own holdings and trades.", e:"Only covers reporting issuers. Absence is expected for a private company.", u:"https://sedi.ca" },
+  "ISC Ownership": { k:"Register", s:"The beneficial ownership records held for Canadian federal corporations.", e:"Coverage is partial. Absence does not mean there is no controlling owner.", u:"https://ic.gc.ca" },
+  "UK PSC Register": { k:"Register", s:"The people with significant control declared for a United Kingdom company.", e:"Self-declared. A company can name a nominee, so presence is weaker evidence than it looks.", u:"https://find-and-update.company-information.service.gov.uk" },
+  "Bankruptcy Claims": { k:"Court", s:"Claims agent sites for large United States bankruptcies, holding creditor and claim records.", e:"Only large cases use a claims agent. Absence is the normal state.", u:"https://kccllc.net" },
+  "CanLII": { k:"Court", s:"Canadian court and tribunal decisions, free to read, across every province.", e:"It holds decisions, not filings. A case that settled or is still running may never appear.", u:"https://canlii.org" },
+  "Provincial courts and tribunals": { k:"Several", s:"The provincial court and tribunal records that publish outside CanLII.", e:"Coverage differs by province and many do not publish at all. A gap here is usually the court.", u:null },
+  "Supreme Court of Canada and Federal Court": { k:"Court", s:"Decisions of Canada's highest court and its federal trial and appeal courts.", e:"Very few matters reach these courts. Absence is the normal state.", u:"https://decisions.fct-cf.gc.ca" },
+  "Securities tribunals and the Competition Tribunal": { k:"Several", s:"Decisions of Canadian securities tribunals and the Competition Tribunal.", e:"Absence means nothing decided in those forums.", u:null },
+  "CourtListener": { k:"Court", s:"United States federal and state court opinions and dockets, gathered and free to read.", e:"Coverage of state courts is uneven. Absence is not proof of no litigation.", u:"https://courtlistener.com" },
+  "SEDAR+": { k:"Filing", s:"Everything a Canadian public company has filed with its securities regulators.", e:"Only covers reporting issuers. A private company is expected to be absent.", u:"https://sedarplus.ca" },
+  "Justia Dockets": { k:"Court", s:"A free mirror of United States federal court dockets.", e:"It mirrors PACER and can lag it. Absence sends the question back to the court.", u:"https://dockets.justia.com" },
+  "OSB Bankruptcy": { k:"Register", s:"Canada's record of bankruptcies, proposals and insolvency filings.", e:"A paid search covers more. Absence from the free view is not absence from the record.", u:"https://ised-isde.canada.ca" },
+  "PACER": { k:"Court", s:"The United States federal court filing system, covering dockets in every district.", e:"Access is paid and per-document. We read what is reachable, and say when we could not.", u:"https://pacer.gov" },
+  "UK Insolvency": { k:"Register", s:"United Kingdom bankruptcies, company liquidations and disqualified directors.", e:"Absence means no UK insolvency record.", u:"https://gov.uk" },
+  "Certificate Log": { k:"Log", s:"Every public security certificate issued for a domain, with the date each was issued.", e:"The first certificate is a good floor for a site's age. It cannot prove a site is older than that.", u:"https://crt.sh" },
+  "Google Web Risk": { k:"Watchlist", s:"Whether Google has flagged a web address for phishing, malware or unwanted software.", e:"A clean answer means not currently flagged. New sites are usually clean because nobody has reported them.", u:"https://transparencyreport.google.com" },
+  "ICANN RDAP": { k:"Lookup", s:"The registry record for a domain name: when it was made, who registers it, and its status.", e:"Privacy services hide the owner by default, so a blank owner is normal and means nothing.", u:null },
+  "Mail Config": { k:"Computed", s:"Whether the domain is set up to send and receive mail, and how it is protected.", e:"A domain with no mail setup at all is a signal. This is read from public DNS, not from any register.", u:null },
+  "urlscan.io": { k:"Scan", s:"A recorded visit to a web page: what it loaded, where it connected and what it looked like.", e:"It shows what the page did when somebody scanned it. It cannot show what it does today.", u:"https://urlscan.io" },
+  "VirusTotal": { k:"Watchlist", s:"What seventy security vendors say about a web address or file.", e:"One vendor flagging something is noise. Several agreeing is a signal.", u:"https://virustotal.com" },
+  "BBB Scam Tracker": { k:"Complaint", s:"Scam reports made by the public to the Better Business Bureau.", e:"These are reports, not findings. The Bureau does not verify them, and says so.", u:"https://bbb.org" },
+  "Forex Peace Army": { k:"Review", s:"Trader reviews and complaints about foreign exchange and CFD brokers.", e:"Heavily disputed by the firms it covers. Read as complaint volume, not as fact.", u:"https://forexpeacearmy.com" },
+  "Glassdoor": { k:"Review", s:"What current and former staff say about working at the company.", e:"A company with no employer footprint at all is worth noticing. Individual reviews are not evidence.", u:"https://glassdoor.com" },
+  "Reddit": { k:"Discussion", s:"What people are saying about a name in public discussion threads.", e:"Anonymous and unverified. Useful as an early signal, never as evidence on its own.", u:"https://reddit.com" },
+  "Sitejabber": { k:"Review", s:"Public consumer reviews of websites and online sellers.", e:"Same limits as any review site. Volume and timing say more than score.", u:"https://sitejabber.com" },
+  "Trustpilot": { k:"Review", s:"Public reviews of a business, written by people who say they used it.", e:"Reviews can be bought and can be brigaded. We read the pattern, never a single star rating.", u:"https://trustpilot.com" },
+  "Beneficiary Match": { k:"Computed", s:"Whether the account name you were given matches the company you think you are paying.", e:"We work this out here from what you gave us. There is no register to link to.", u:null },
+  "Bitcoin Explorer": { k:"Explorer", s:"Every transaction on the Bitcoin chain for a given wallet address.", e:"The chain is public and complete. An empty answer means the wallet has never been used.", u:"https://blockchain.com" },
+  "Chainabuse": { k:"Complaint", s:"Crypto wallet addresses reported by the public for scams, ransomware and theft.", e:"Reports are unverified. A wallet with no reports is usually just a new wallet.", u:"https://chainabuse.com" },
+  "Chain Analytics": { k:"Computed", s:"What a wallet has done: its age, its counterparties and whether it touches known bad addresses.", e:"We compute this from the public chain. It is our reading, not a register entry.", u:null },
+  "Etherscan": { k:"Explorer", s:"Every transaction on the Ethereum chain for a given wallet address.", e:"The chain is public and complete. An empty answer means the wallet has never been used.", u:"https://etherscan.io" },
+  "IBAN and SWIFT": { k:"Computed", s:"Whether the bank code is real, which bank it belongs to, and which country it sits in.", e:"Checked here against the published code structure. A valid code says the bank exists, not that the account is theirs.", u:null },
+  "Solscan": { k:"Explorer", s:"Every transaction on the Solana chain for a given wallet address.", e:"The chain is public and complete. An empty answer means the wallet has never been used.", u:"https://solscan.io" },
+  "Tronscan": { k:"Explorer", s:"Every transaction on the Tron chain for a given wallet address, where much stablecoin fraud moves.", e:"The chain is public and complete. An empty answer means the wallet has never been used.", u:"https://tronscan.org" },
+  "Beneficiary Reuse": { k:"Computed", s:"Whether this bank account has appeared in an earlier check under a different company name.", e:"Compares against our own record only. A clean answer means we have not seen it before.", u:null },
+  "Site Technology": { k:"Lookup", s:"What the website is built with, and when that stack first appeared on it.", e:"Describes the build, not the business. Useful mostly for dating a site.", u:"https://builtwith.com" },
+  "Host and Certificate Graph": { k:"Log", s:"Internet-wide scan data linking hosts, certificates and services to this domain.", e:"It maps infrastructure, not intent. A link between two hosts is a question, not an answer.", u:"https://censys.io" },
+  "Document Fingerprint": { k:"Computed", s:"Whether a document you were sent shares a template or metadata with documents we have seen before.", e:"Only compares against what we have seen. A clean answer means no match in our own record.", u:null },
+  "Identifier Reuse": { k:"Computed", s:"Whether a phone number, address or email has appeared under a different business name.", e:"Reuse is common and innocent. Reuse across unrelated names in a short window is not.", u:null },
+  "Infrastructure Cluster": { k:"Computed", s:"Other sites sharing this one's server, certificate or hosting fingerprint.", e:"Shared hosting is normal and proves nothing on its own. A cluster of similar sites is the signal.", u:null },
+  "Operator Graph": { k:"Computed", s:"The picture of who and what connects to this party across every source we reached.", e:"Built from what answered. Every gap in retrieval is a gap in this picture, and it says which.", u:null },
+  "People Cluster": { k:"Computed", s:"Whether the people named here also appear together on other companies.", e:"Directors sit on many boards. The signal is repetition across dissolved or flagged entities.", u:null },
+  "Analytics and Pixel Reuse": { k:"Lookup", s:"Other websites carrying the same analytics or advertising identifier as this one.", e:"One operator running several sites is normal. Several near-identical sites is the finding.", u:"https://publicwww.com" },
+  "DNS and IP History": { k:"Log", s:"Where this domain has pointed over time, and who else pointed at the same places.", e:"History is only as deep as the collector's record. Absence is a gap, not a clean sheet.", u:"https://securitytrails.com" },
+  "Wallet Reuse": { k:"Computed", s:"Whether this wallet address has appeared in an earlier check under a different name.", e:"Compares against our own record only. A clean answer means we have not seen it before.", u:null },
+  "App Store First Release": { k:"Listing", s:"When the company's iOS app was first released.", e:"Most companies have no app. Absence means nothing.", u:"https://apps.apple.com" },
+  "Domain History": { k:"Log", s:"How long this domain has resolved, and whether it changed hands.", e:"History depth varies by collector. A short history can mean a new domain or a thin record.", u:"https://securitytrails.com" },
+  "EDGAR First Filing": { k:"Filing", s:"The company's earliest filing of any kind with the United States securities regulator.", e:"A good floor for a company that files. Meaningless for one that never had to.", u:"https://sec.gov" },
+  "First Certificate": { k:"Log", s:"The date the first public security certificate was issued for this domain.", e:"A reliable floor for when the site went live under this name.", u:"https://crt.sh" },
+  "First Press Release": { k:"Announcement", s:"The company's earliest press release on a major wire service.", e:"Wire coverage is paid for. Absence means no paid release, not no company.", u:"https://prnewswire.com" },
+  "First Social Post": { k:"Listing", s:"The company's earliest post on its public social account.", e:"Handles are bought and renamed. Treated as the weakest of the date signals.", u:"https://x.com" },
+  "First YouTube Video": { k:"Listing", s:"When the company's video channel published its first video.", e:"A channel can be created long before it is used, and renamed afterwards.", u:"https://youtube.com" },
+  "Form D First Filing": { k:"Filing", s:"The first time this company told the United States regulator it was raising money privately.", e:"Only applies to US private raises. Absence is expected for most companies.", u:"https://sec.gov" },
+  "Form D First Sale": { k:"Filing", s:"The first date of sale the company reported in its private raise filing.", e:"Self-reported by the company in its own filing.", u:"https://sec.gov" },
+  "GitHub First Commit": { k:"Log", s:"The date of the earliest commit in the company's public code.", e:"Commit dates are set by the author's own machine and can be rewritten.", u:"https://github.com" },
+  "GitHub Repository Created": { k:"Log", s:"When the company's public code repository was created.", e:"Only applies where the company publishes code. A repository can be backdated in appearance.", u:"https://github.com" },
+  "IAPD First Registration": { k:"Licence", s:"When this United States investment adviser first registered.", e:"Only applies to registered advisers.", u:"https://adviserinfo.sec.gov" },
+  "Incorporation Date": { k:"Computed", s:"The earliest incorporation date we found across every company register we reached.", e:"Taken from whichever register answered. If none answered, this says so rather than guessing.", u:null },
+  "Google Play First Release": { k:"Listing", s:"When the company's Android app was first released.", e:"Most companies have no app. Absence means nothing.", u:"https://play.google.com" },
+  "Public Profile": { k:"Profile", s:"When the company's public professional profile was created, and how many people it lists.", e:"Self-reported and easy to backdate in appearance. Weak evidence used only alongside others.", u:"https://linkedin.com" },
+  "ICANN RDAP Date": { k:"Lookup", s:"The date the domain name was first registered, from the registry itself.", e:"A domain can be bought second hand, so the date is a floor for the site, not the business.", u:null },
+  "SEDAR+ First Filing": { k:"Filing", s:"The company's earliest filing with Canadian securities regulators.", e:"Only reporting issuers file. A private Canadian company is expected to be absent.", u:"https://sedarplus.ca" },
+  "SEDI First Insider Record": { k:"Filing", s:"The earliest insider report filed for this Canadian company.", e:"Only applies to reporting issuers.", u:"https://sedi.ca" },
+  "Trademark Filing": { k:"Filing", s:"When the name was first filed as a trademark, and by whom.", e:"Most businesses never file. Absence is the normal state and means nothing.", u:"https://tsdr.uspto.gov" },
+  "Wayback Machine": { k:"Log", s:"The oldest saved copy of the website, and what it looked like then.", e:"The archive only holds what somebody crawled. A newer first capture is not proof of a newer site.", u:"https://web.archive.org" }
+};
 
 /* ------------------------------------------------------- the register board */
 /* Every register by name, in the check it serves. Generated from SOURCES in
@@ -1337,34 +1539,53 @@ function pulse(d){
 }
 
 /* ================================================================== THE PATH
-   One drawing, ten lanes, read top to bottom. Every lamp that used to sit in
-   the annunciator grid now sits on the step it watches, because a lamp with
-   no step under it tells an operator that something is amber without telling
-   them what stops working because of it. Nothing was dropped in the move: the
-   eight machine lamps, the eight readings, the ten control documents and the
-   ten register families are all here, on the stage each one governs. */
-var PW=1640, PH=726;
-var PCOL={ lead:[150,250], main:[430,300], two:[760,250], three:[1040,250],
-           exit:[1370,258] };
+   One drawing, ten lanes, read top to bottom.
+
+   Two kinds of thing sit on it and they are drawn differently on purpose. A
+   STEP is something the check does, and steps are joined by solid arrows. A
+   METER is a reading taken on that lane. It hangs off the flow on a dotted tap
+   with no arrowhead, because a reading is not a stage and an arrow into one
+   says that it is. A way out of the process is grey and dashed.
+
+   Two rules govern where the lines go.
+
+   One: a lane hands to the lane below it from its LAST step, never its first.
+   An earlier build dropped out of routing from the rulebook, which read as
+   though routing handed straight to the direct feeds.
+
+   Two: from the second pass down, the flow is a staircase and never turns back
+   to the left. Each lane starts a little inside the middle of the step above
+   it, so the hand down is a plain vertical drop and the eye only ever travels
+   right and down. The columns below are not a grid; they are stair treads, and
+   moving one means moving every one after it. */
+var PW=1726, PH=1150, PX0=-26, PVW=1726;
+var PCOL={ lead:[150,270], main:[464,330], two:[838,280], three:[1132,270],
+           exit:[1408,280] };
 var LANES=[
-  {lab:"The person",        sub:"before money moves",     y:4,   h:58},
-  {lab:"What is it",        sub:"suitability",            y:62,  h:58},
-  {lab:"The gate",          sub:"who is let through",     y:120, h:58},
-  {lab:"Routing",           sub:"which registers apply",  y:178, h:58},
-  {lab:"Retrieval",         sub:"121 registers",          y:236, h:212},
-  {lab:"Second pass",       sub:"what round one learned", y:448, h:54},
-  {lab:"The reading",       sub:"one call, no searching", y:502, h:54},
-  {lab:"What a reader sees",sub:"publication",            y:556, h:54},
-  {lab:"The record",        sub:"proof and deletion",     y:610, h:54},
-  {lab:"The paperwork",     sub:"governs all of it",      y:664, h:58}
+  {lab:"The person",        sub:"before money moves",     y:6,    h:88},
+  {lab:"What is it",        sub:"suitability",            y:94,   h:88},
+  {lab:"The gate",          sub:"who is let through",     y:182,  h:88},
+  {lab:"Routing",           sub:"which registers apply",  y:270,  h:88},
+  {lab:"Retrieval",         sub:"121 registers",          y:358,  h:296},
+  {lab:"Second pass",       sub:"what round one learned", y:654,  h:86},
+  {lab:"The reading",       sub:"one call, no searching", y:740,  h:86},
+  {lab:"What a reader sees",sub:"publication",            y:826,  h:86},
+  {lab:"The record",        sub:"proof and deletion",     y:912,  h:132},
+  {lab:"The paperwork",     sub:"governs all of it",      y:1044, h:96}
 ];
-var PBX0=136, PBX1=1628;
-/* The ten control documents in the order the process meets them, not the order
-   they were numbered. A reader following the drawing downward meets the legal
-   register before the publishing rules, and that is the order they are in. */
+var PBX0=140, PBX1=1688;
 var DOCLANE=["lr","mg","vend","hra","pub","sub","ir","ret","sec","cou"];
 var DOCID={hra:"HRA-001",mg:"MG-001",lr:"LR-001",pub:"PUB-001",sub:"SUB-001",
            vend:"VEND-001",ret:"RET-001",ir:"IR-001",sec:"SEC-001",cou:"CDP-001"};
+var RG={ bus:382, doorY:398, doorH:46, head:478, barH:6,
+         rowY:494, rowStep:31, rowH:27, foot:648,
+         bankA:[162,746], bankB:[948,740], trunkA:146, trunkB:932, loopX:132 };
+/* The stair treads. Each one starts 30 inside the middle of the step above it,
+   so the drop lands clear of the rounded corner and the lamp. */
+var ST={ again:[150,280], reas:[260,280], nosc:[584,240], comp:[868,270],
+         rep:[674,280], supp:[998,230],
+         db:[1083,183], chn:[1292,183], del:[1501,183],
+         inc:[1292,186], rgt:[1498,186], rowA:928, rowB:990, rowH:46 };
 
 function pathNodes(d){
   var R=function(k){ return (BOARD_ROWS&&BOARD_ROWS[k])||null; };
@@ -1372,95 +1593,94 @@ function pathNodes(d){
   var V=function(k){ var x=R(k); return x?x.v:"no reading"; };
   var mid=function(i){ return LANES[i].y+LANES[i].h/2; };
   var blocked=((d.by_outcome||[]).filter(function(o){return o[0]==="BLOCKED";})[0]||["",0])[1];
-  var N=[], H=40, H2=38;
-  var at=function(i,col,h){ var c=PCOL[col];
-    return {x:c[0], y:Math.round(mid(i)-h/2), w:c[1], h:h}; };
-  var mk=function(i,col,h,o){ var g=at(i,col,h);
-    for(var k in o) g[k]=o[k]; g.kind=g.kind||"step"; N.push(g); return g; };
+  var N=[], H=46;
+  var mk=function(i,col,o){ var c=PCOL[col];
+    var g={x:c[0], y:Math.round(mid(i)-H/2), w:c[1], h:H, kind:"step"};
+    for(var k in o) g[k]=o[k]; N.push(g); return g; };
+  /* a node on a stair tread rather than in a column */
+  var tread=function(i,t,o){ var c=ST[t];
+    var g={x:c[0], y:Math.round(mid(i)-H/2), w:c[1], h:H, kind:"step"};
+    for(var k in o) g[k]=o[k]; N.push(g); return g; };
 
-  /* ------------------------------------------------------ 1  the person */
-  mk(0,"lead",H,{id:"land", t:"Somebody lands", x2:"4ormiq.com", s:"ok"});
-  mk(0,"main",H,{id:"ask",  t:"Types a name or a link",
-                 x2:num(d.runs.attempted)+" checks this window", s:"ok", info:"ask"});
-  mk(0,"two", H,{id:"surge",t:"Surge watch", x2:V("r:pattern"), s:S("r:pattern"),
-                 key:"r:pattern"});
+  /* --------------------------------------------------------- 1  the person */
+  mk(0,"lead",{id:"land", t:"Somebody lands", x2:"4ormiq.com", s:"ok"});
+  mk(0,"main",{id:"ask",  t:"Types a name or a link",
+               x2:num(d.runs.attempted)+" checks this window", s:"ok", info:"ask"});
+  mk(0,"two", {id:"surge",t:"Surge watch", x2:V("r:pattern"), s:S("r:pattern"),
+               key:"r:pattern", kind:"meter"});
 
-  /* --------------------------------------------- 2  what is it, and can it */
-  mk(1,"main",H,{id:"kind", t:"Can this be checked?",
-                 x2:"company, website, person, wallet, payee", s:"ok", kind:"dec",
-                 info:"ask"});
-  mk(1,"exit",H,{id:"nope", t:"Nothing to check", x2:"says so, checks nothing",
-                 s:"ok", kind:"exit"});
+  /* ---------------------------------------------- 2  what is it, and can it */
+  mk(1,"main",{id:"kind", t:"Can this be checked?",
+               x2:"company, website, person, wallet, payee", s:"ok", kind:"dec",
+               info:"ask"});
+  mk(1,"exit",{id:"nope", t:"Nothing to check", x2:"says so, checks nothing",
+               s:"ok", kind:"exit"});
 
-  /* ------------------------------------------------------------ 3  the gate */
-  mk(2,"main",H,{id:"gate", t:"The gate", x2:"rate, abuse and jurisdiction",
-                 s:"ok", info:"gate"});
-  mk(2,"exit",H,{id:"turn", t:"Turned away", x2:num(blocked)+" in this window",
-                 s:"ok", kind:"exit", info:"gate"});
+  /* ------------------------------------------------------------- 3  the gate */
+  mk(2,"main",{id:"gate", t:"The gate", x2:"rate, abuse and jurisdiction",
+               s:"ok", info:"gate"});
+  mk(2,"exit",{id:"turn", t:"Turned away", x2:num(blocked)+" in this window",
+               s:"ok", kind:"exit", info:"gate"});
 
-  /* ------------------------------------------------------------- 4  routing */
-  mk(3,"main", H,{id:"rule", t:"The rulebook", x2:V("m:rulebook"),
-                  s:S("m:rulebook"), key:"m:rulebook"});
-  mk(3,"two",  H,{id:"enf",  t:"Rules applied", x2:V("r:enforced"),
-                  s:S("r:enforced"), key:"r:enforced"});
-  mk(3,"three",H,{id:"scope",t:"Scope written in", x2:"which registers, this check",
-                  s:"ok", info:"route"});
+  /* -------------------------------------------------------------- 4  routing */
+  mk(3,"main", {id:"rule", t:"The rulebook", x2:V("m:rulebook"),
+                s:S("m:rulebook"), key:"m:rulebook"});
+  mk(3,"two",  {id:"enf",  t:"Rules applied", x2:V("r:enforced"),
+                s:S("r:enforced"), key:"r:enforced"});
+  mk(3,"three",{id:"scope",t:"Scope written in", x2:"this check, these registers",
+                s:"ok", info:"route"});
 
-  /* ----------------------------------------------------------- 5  retrieval */
-  var DY=244, DH=42;
-  N.push({id:"door1",x:150, y:DY,w:250,h:DH,t:"Asking registers", x2:"Exa, then Parallel",
-          s:S("m:searching"), key:"m:searching", kind:"step"});
-  N.push({id:"door2",x:430, y:DY,w:300,h:DH,t:"Direct feeds", x2:"called at the publisher",
-          s:S("m:feeds"), key:"m:feeds", kind:"step"});
-  N.push({id:"door3",x:760, y:DY,w:250,h:DH,t:"Domain lookups", x2:"RDAP and certificates",
-          s:S("m:domain"), key:"m:domain", kind:"step"});
-  N.push({id:"answ", x:1040,y:DY,w:588,h:DH,t:"Registers answering", x2:V("r:answering"),
-          s:S("r:answering"), key:"r:answering", kind:"step"});
-  var RY=304, RSTEP=27, RH=23, BA=[162,678], BB=[880,748];
+  /* ------------------------------------------------------------ 5  retrieval */
+  N.push({id:"door1",x:150, y:RG.doorY,w:280,h:RG.doorH,t:"Asking registers",
+          x2:"Exa, then Parallel", s:S("m:searching"), key:"m:searching", kind:"step"});
+  N.push({id:"door2",x:474, y:RG.doorY,w:330,h:RG.doorH,t:"Direct feeds",
+          x2:"called at the publisher", s:S("m:feeds"), key:"m:feeds", kind:"step"});
+  N.push({id:"door3",x:848, y:RG.doorY,w:280,h:RG.doorH,t:"Domain lookups",
+          x2:"RDAP and certificates", s:S("m:domain"), key:"m:domain", kind:"step"});
+  N.push({id:"answ", x:1172,y:RG.doorY,w:516,h:RG.doorH,t:"Registers answering",
+          x2:V("r:answering"), s:S("r:answering"), key:"r:answering", kind:"meter"});
   REGCATS.forEach(function(c,i){
-    var st=regState(d,i), b=(i<5?BA:BB), r=(i<5?i:i-5);
-    N.push({id:"cat"+i, cat:i, kind:"reg", x:b[0], y:RY+r*RSTEP, w:b[1], h:RH,
-            t:c[0].replace(/^\d+\s/,""), x2:st.ok+" of "+st.n, s:st.s});
+    var st=regState(d,i), b=(i<5?RG.bankA:RG.bankB), r=(i<5?i:i-5);
+    N.push({id:"cat"+i, cat:i, kind:"reg", x:b[0], y:RG.rowY+r*RG.rowStep, w:b[1],
+            h:RG.rowH, t:c[0].replace(/^\d+\s/,""), x2:st.ok+" of "+st.n, s:st.s});
   });
 
-  /* --------------------------------------------------------- 6  second pass */
-  mk(5,"main",H2,{id:"again",t:"Second pass", x2:"cases, siblings, named filings",
-                  s:S("m:searching"), info:"round2"});
-
-  /* --------------------------------------------------------- 7  the reading */
-  mk(6,"main", H2,{id:"reas", t:"Forming the answer", x2:V("m:assessing"),
+  /* ------------------------------------------------------- 6  the staircase */
+  tread(5,"again",{id:"again",t:"Second pass", x2:"cases, siblings, named filings",
+                   s:S("m:searching"), info:"round2"});
+  tread(6,"reas", {id:"reas", t:"Forming the answer", x2:V("m:assessing"),
                    s:S("m:assessing"), key:"m:assessing"});
-  mk(6,"two",  H2,{id:"nosc", t:"No composite score", x2:"a rule, not a setting",
+  tread(6,"nosc", {id:"nosc", t:"No composite score", x2:"a rule, not a setting",
                    s:"ok", info:"report"});
-  mk(6,"three",H2,{id:"comp", t:"Checks finishing", x2:V("r:completing"),
-                   s:S("r:completing"), key:"r:completing"});
+  tread(6,"comp", {id:"comp", t:"Checks finishing", x2:V("r:completing"),
+                   s:S("r:completing"), key:"r:completing", kind:"meter"});
+  tread(7,"rep",  {id:"rep",  t:"The report", x2:"what was reached, and what was not",
+                   s:"ok", info:"report"});
+  tread(7,"supp", {id:"supp", t:"Support directory", x2:"never names a firm", s:"ok"});
+  mk(7,"exit",    {id:"corr", t:"Correction and takedown", x2:V("f:pub"),
+                   s:S("f:pub"), key:"f:pub", kind:"exit"});
 
-  /* ------------------------------------------------ 8  what a reader sees */
-  mk(7,"main",H2,{id:"rep",  t:"The report", x2:"what was reached, and what was not",
-                  s:"ok", info:"report"});
-  mk(7,"two", H2,{id:"supp", t:"Support directory", x2:"never names a firm", s:"ok"});
-  mk(7,"exit",H2,{id:"corr", t:"Correction and takedown", x2:V("f:pub"),
-                  s:S("f:pub"), key:"f:pub", kind:"exit"});
+  /* The record is the foot of the stair. Its three steps run right along the
+     top row, and the two standing obligations it creates sit on a second row
+     under them, so nothing on this drawing ever travels back to the left. */
+  var A=ST.rowA, B=ST.rowB, RH=ST.rowH;
+  N.push({id:"db", x:ST.db[0], y:A,w:ST.db[1], h:RH,t:"The database",
+          x2:V("m:database"), s:S("m:database"), key:"m:database", kind:"step"});
+  N.push({id:"chn",x:ST.chn[0],y:A,w:ST.chn[1],h:RH,t:"The chain",
+          x2:V("m:chain"), s:S("m:chain"), key:"m:chain", kind:"step"});
+  N.push({id:"del",x:ST.del[0],y:A,w:ST.del[1],h:RH,t:"Deleting on time",
+          x2:V("r:deletion"), s:S("r:deletion"), key:"r:deletion", kind:"step"});
+  N.push({id:"inc",x:ST.inc[0],y:B,w:ST.inc[1],h:RH,t:"Incidents",
+          x2:V("r:incidents"), s:S("r:incidents"), key:"r:incidents", kind:"meter"});
+  N.push({id:"rgt",x:ST.rgt[0],y:B,w:ST.rgt[1],h:RH,t:"Rights",
+          x2:V("r:requests"), s:S("r:requests"), key:"r:requests", kind:"meter"});
 
-  /* -------------------------------------------------------- 9  the record */
-  mk(8,"main", H2,{id:"db",  t:"The database", x2:V("m:database"),
-                   s:S("m:database"), key:"m:database"});
-  mk(8,"two",  H2,{id:"chn", t:"The chain", x2:V("m:chain"), s:S("m:chain"),
-                   key:"m:chain"});
-  mk(8,"three",H2,{id:"del", t:"Deleting on time", x2:V("r:deletion"),
-                   s:S("r:deletion"), key:"r:deletion"});
-  var KY=Math.round(mid(8)-H2/2);
-  N.push({id:"inc", x:1310,y:KY,w:155,h:H2,t:"Incidents", x2:V("r:incidents"),
-          s:S("r:incidents"), key:"r:incidents", kind:"step", tight:1});
-  N.push({id:"rgt", x:1473,y:KY,w:155,h:H2,t:"Rights", x2:V("r:requests"),
-          s:S("r:requests"), key:"r:requests", kind:"step", tight:1});
-
-  /* ------------------------------------------------------ 10  the paperwork */
-  var CW=144, CN=DOCLANE.length, CSTEP=(PBX1-PBX0-CW)/(CN-1);
-  var CY=Math.round(mid(9)-40/2);
+  /* ------------------------------------------------------- 10  the paperwork */
+  var CW=150, CN=DOCLANE.length, CSTEP=(PBX1-PBX0-CW)/(CN-1);
+  var CY=Math.round(mid(9)-52/2);
   DOCLANE.forEach(function(k,i){
     var row=BOARD_ROWS?BOARD_ROWS["f:"+k]:null;
-    N.push({id:"doc"+k, kind:"chip", x:Math.round(PBX0+i*CSTEP), y:CY, w:CW, h:40,
+    N.push({id:"doc"+k, kind:"chip", x:Math.round(PBX0+i*CSTEP), y:CY, w:CW, h:52,
             t:row?row.plate:k, x2:DOCID[k], s:row?row.s:"warn", key:"f:"+k});
   });
   return N;
@@ -1469,106 +1689,129 @@ function pathNodes(d){
 function pathmap(d){
   var N=pathNodes(d), by={}; N.forEach(function(n){ by[n.id]=n; });
   var cls=function(s){ return s==="bad" ? "dead" : (s==="warn" ? "" : "live"); };
-  var mk=function(s){ return ' marker-end="url(#'+(s==="bad"?"arwd":"arw")+')"'; };
+  var head=function(s){ return ' marker-end="url(#'+(s==="bad"?"arwd":"arw")+')"'; };
   var P="";
-  var down=function(a,b,s){ var A=by[a],B=by[b],x=A.x+A.w/2;
-    P+='<path class="pipe '+cls(s)+'" d="M'+x+' '+(A.y+A.h)+' L'+x+' '+B.y+'"'+mk(s)+'/>'; };
-  var across=function(a,b,s){ var A=by[a],B=by[b],y=A.y+A.h/2;
-    P+='<path class="pipe '+cls(s)+'" d="M'+(A.x+A.w)+' '+y+' L'+B.x+' '+y+'"'+mk(s)+'/>'; };
-  var out=function(a,b,s){ var A=by[a],B=by[b],y=A.y+A.h/2;
-    P+='<path class="pipe out'+(s==="bad"?" dead":"")+'" d="M'+(A.x+A.w)+' '+y+' L'
-      +B.x+' '+y+'"'+mk(s||"ok")+'/>'; };
+  var cx=function(n){ return n.x+n.w/2; };
+  var cy=function(n){ return n.y+n.h/2; };
+  /* a step handing to the next step on the same row */
+  var step=function(a,b){ var A=by[a],B=by[b],y=cy(A);
+    P+='<path class="pipe '+cls(B.s)+'" d="M'+(A.x+A.w)+' '+y+' L'+B.x+' '+y+'"'
+      +head(B.s)+'/>'; };
+  /* a step handing down a tread. It is a plain vertical drop from the middle of
+     the step above, which lands inside the left end of the step below. */
+  var drop=function(a,b){ var A=by[a],B=by[b], x=cx(A), s=B.s;
+    P+='<path class="pipe '+cls(s)+'" d="M'+x+' '+(A.y+A.h)+' L'+x+' '+B.y+'"'
+      +head(s)+'/>'; };
+  /* a lane handing down where the columns line up */
+  var hand=function(a,b,boundary){ var A=by[a],B=by[b], ax=cx(A), bx=cx(B), s=B.s;
+    var dd = Math.abs(ax-bx)<1
+      ? 'M'+ax+' '+(A.y+A.h)+' L'+bx+' '+B.y
+      : 'M'+ax+' '+(A.y+A.h)+' L'+ax+' '+boundary+' L'+bx+' '+boundary+' L'+bx+' '+B.y;
+    P+='<path class="pipe '+cls(s)+'" d="'+dd+'"'+head(s)+'/>'; };
+  /* a reading taken on this lane, not a stage in it */
+  var tap=function(a,b){ var A=by[a],B=by[b],y=cy(B);
+    P+='<path class="pipe tap" d="M'+(A.x+A.w)+' '+y+' L'+B.x+' '+y+'"/>'; };
+  var tapdown=function(a,b){ var A=by[a],B=by[b],x=cx(B);
+    P+='<path class="pipe tap" d="M'+x+' '+(A.y+A.h)+' L'+x+' '+B.y+'"/>'; };
+  /* a way out */
+  var out=function(a,b){ var A=by[a],B=by[b],y=cy(B),s=B.s;
+    P+='<path class="pipe out'+(s==="bad"?" dead":"")+'" d="M'+(A.x+A.w)+' '+y
+      +' L'+B.x+' '+y+'" marker-end="url(#arw)"/>'; };
 
-  across("land","ask","ok"); across("ask","surge",by.surge.s);
-  down("ask","kind","ok");
-  out("kind","nope","ok");
-  down("kind","gate","ok");
-  out("gate","turn","ok");
-  down("gate","rule",by.rule.s);
-  across("rule","enf",by.enf.s); across("enf","scope",by.scope.s);
-  down("rule","door2",by.rule.s);
+  step("land","ask");            tap("ask","surge");
+  hand("ask","kind",  LANES[0].y+LANES[0].h);
+  out("kind","nope");
+  hand("kind","gate", LANES[1].y+LANES[1].h);
+  out("gate","turn");
+  hand("gate","rule", LANES[2].y+LANES[2].h);
+  step("rule","enf"); step("enf","scope");
 
-  /* The header bar carries what routing decided across the whole register
-     bank. Two trunks drop off it, one for each bank of five families, and the
-     foot bar gathers what came back. Short stubs, never full height risers,
-     so no line is ever drawn through a box. */
-  var HB=294, FB=440, BH=5;
-  ["door1","door2","door3","answ"].forEach(function(k){
-    var n=by[k], x=n.x+n.w/2;
-    P+='<path class="pipe '+cls(n.s)+'" d="M'+x+' '+(n.y+n.h)+' L'+x+' '+HB+'"/>';
-  });
+  /* Routing hands down from Scope written in, the last step in the lane, onto
+     a bus that fans into the three doors. The three doors run in parallel and
+     none of them hands to another. */
+  var sc=by.scope, scx=cx(sc);
+  P+='<path class="pipe '+cls(sc.s)+'" d="M'+scx+' '+(sc.y+sc.h)+' L'+scx+' '+RG.bus+'"/>';
+  P+='<rect class="mtrunk" x="274" y="'+(RG.bus-2)+'" width="'+(scx+16-274)+'" height="5" rx="2.5"/>';
+  ["door1","door2","door3"].forEach(function(k){ var n=by[k], x=cx(n);
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+x+' '+(RG.bus+3)+' L'+x+' '+n.y+'"'
+      +head(n.s)+'/>'; });
+  tap("door3","answ");
+
+  ["door1","door2","door3"].forEach(function(k){ var n=by[k], x=cx(n);
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+x+' '+(n.y+n.h)+' L'+x+' '+RG.head+'"/>'; });
   var bars=
-     '<rect class="mtrunk" x="'+PBX0+'" y="'+HB+'" width="'+(PBX1-PBX0)+'" height="'+BH+'" rx="2.5"/>'
-   + '<rect class="mtrunk" x="146" y="'+HB+'" width="5" height="'+(FB-HB+BH)+'" rx="2.5"/>'
-   + '<rect class="mtrunk" x="864" y="'+HB+'" width="5" height="'+(FB-HB+BH)+'" rx="2.5"/>'
-   + '<rect class="mtrunk" x="'+PBX0+'" y="'+FB+'" width="'+(PBX1-PBX0)+'" height="'+BH+'" rx="2.5"/>';
+     '<rect class="mtrunk" x="'+PBX0+'" y="'+RG.head+'" width="'+(PBX1-PBX0)+'" height="'+RG.barH+'" rx="3"/>'
+   + '<rect class="mtrunk" x="'+RG.trunkA+'" y="'+RG.head+'" width="5" height="'+(RG.foot-RG.head+RG.barH)+'" rx="2.5"/>'
+   + '<rect class="mtrunk" x="'+RG.trunkB+'" y="'+RG.head+'" width="5" height="'+(RG.foot-RG.head+RG.barH)+'" rx="2.5"/>'
+   + '<rect class="mtrunk" x="'+PBX0+'" y="'+RG.foot+'" width="'+(PBX1-PBX0)+'" height="'+RG.barH+'" rx="3"/>';
   REGCATS.forEach(function(c,i){
-    var n=by["cat"+i], cy=n.y+n.h/2, tx=(i<5?151:869);
-    P+='<path class="pipe '+cls(n.s)+'" d="M'+tx+' '+cy+' L'+n.x+' '+cy+'"'+mk(n.s)+'/>';
+    var n=by["cat"+i], y=cy(n), tx=(i<5?RG.trunkA+5:RG.trunkB+5);
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+tx+' '+y+' L'+n.x+' '+y+'"'+head(n.s)+'/>';
   });
 
-  down("again","reas",by.reas.s);
-  P+='<path class="pipe '+cls(by.again.s)+'" d="M'+(by.again.x+by.again.w/2)+' '+(FB+BH)
-    +' L'+(by.again.x+by.again.w/2)+' '+by.again.y+'"'+mk(by.again.s)+'/>';
-  /* the loop: what the second pass learned re enters retrieval at the first
-     door, drawn down the left margin where it crosses nothing */
-  P+='<path class="pipe loop" d="M'+by.again.x+' '+(by.again.y+by.again.h/2)
-    +' L132 '+(by.again.y+by.again.h/2)+' L132 '+(by.door1.y+by.door1.h/2)
-    +' L'+by.door1.x+' '+(by.door1.y+by.door1.h/2)+'" marker-end="url(#arw)"/>';
-
-  across("reas","nosc","ok"); across("nosc","comp",by.comp.s);
-  down("reas","rep",by.reas.s);
-  across("rep","supp","ok"); out("supp","corr",by.corr.s);
-  down("rep","db",by.db.s);
-  across("db","chn",by.chn.s); across("chn","del",by.del.s);
-  across("del","inc",by.inc.s); across("inc","rgt",by.rgt.s);
+  /* --------------------------------------------------------- the staircase */
+  var ag=by.again, agx=cx(ag);
+  P+='<path class="pipe '+cls(ag.s)+'" d="M'+agx+' '+(RG.foot+RG.barH)+' L'+agx+' '+ag.y+'"'
+    +head(ag.s)+'/>';
+  P+='<path class="pipe loop" d="M'+ag.x+' '+cy(ag)+' L'+RG.loopX+' '+cy(ag)
+    +' L'+RG.loopX+' '+cy(by.door1)+' L'+by.door1.x+' '+cy(by.door1)
+    +'" marker-end="url(#arw)"/>';
+  drop("again","reas");
+  step("reas","nosc"); tap("nosc","comp");
+  drop("nosc","rep");
+  step("rep","supp");  out("supp","corr");
+  drop("supp","db");
+  step("db","chn");    step("chn","del");
+  tapdown("chn","inc"); tap("inc","rgt");
 
   /* ------------------------------------------------------------- the lanes */
   var lanes="", i;
   for(i=0;i<LANES.length;i++){
     var L=LANES[i];
     lanes+='<rect class="lane'+(i%2?' alt':'')+'" x="'+PBX0+'" y="'+L.y+'" width="'
-      +(PBX1-PBX0)+'" height="'+L.h+'" rx="6"/>'
-      +'<line class="lanerule" x1="0" y1="'+(L.y+L.h)+'" x2="'+PBX1+'" y2="'+(L.y+L.h)+'"/>'
-      +'<text class="lanelab" x="118" y="'+(L.y+L.h/2-1)+'">'+esc(L.lab)+'</text>'
-      +'<text class="lanesub" x="118" y="'+(L.y+L.h/2+11)+'">'+esc(L.sub)+'</text>';
+      +(PBX1-PBX0)+'" height="'+L.h+'" rx="8"/>'
+      +'<line class="lanerule" x1="'+PX0+'" y1="'+(L.y+L.h)+'" x2="'+PBX1+'" y2="'+(L.y+L.h)+'"/>'
+      +'<text class="lanelab" x="120" y="'+(L.y+L.h/2-2)+'">'+esc(L.lab)+'</text>'
+      +'<text class="lanesub" x="120" y="'+(L.y+L.h/2+13)+'">'+esc(L.sub)+'</text>';
   }
 
   /* --------------------------------------------------------------- the boxes */
   var boxes=N.map(function(n){
-    var g='<g class="nnode" data-s="'+n.s+'" data-id="'+n.id+'"'
+    var g='<g class="nnode" data-s="'+n.s+'" data-id="'+n.id+'" data-kind="'+n.kind+'"'
       +(n.cat!=null?' data-cat="'+n.cat+'"':'')+'>';
     if(n.kind==="reg"){
       g+='<rect class="regbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="6"/>'
-       + '<circle class="nlamp" cx="'+(n.x+15)+'" cy="'+(n.y+n.h/2)+'" r="5.5"/>'
-       + '<text class="ntitle" x="'+(n.x+28)+'" y="'+(n.y+n.h/2+4)+'">'+esc(n.t)+'</text>'
-       + '<text class="nsub end" x="'+(n.x+n.w-11)+'" y="'+(n.y+n.h/2+4)+'">'+esc(n.x2)+'</text>';
+       + '<circle class="nlamp" cx="'+(n.x+17)+'" cy="'+(n.y+n.h/2)+'" r="6"/>'
+       + '<text class="ntitle" x="'+(n.x+31)+'" y="'+(n.y+n.h/2+4.5)+'">'+esc(n.t)+'</text>'
+       + '<text class="nsub end" x="'+(n.x+n.w-13)+'" y="'+(n.y+n.h/2+4.5)+'">'+esc(n.x2)+'</text>';
     } else if(n.kind==="chip"){
-      g+='<rect class="chipbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="6"/>'
-       + '<circle class="nlamp" cx="'+(n.x+14)+'" cy="'+(n.y+15)+'" r="5.5"/>'
-       + '<text class="chipt" x="'+(n.x+26)+'" y="'+(n.y+19)+'">'+esc(n.t)+'</text>'
-       + '<text class="chipid" x="'+(n.x+26)+'" y="'+(n.y+32)+'">'+esc(n.x2)+'</text>';
+      g+='<rect class="chipbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="7"/>'
+       + '<circle class="nlamp" cx="'+(n.x+16)+'" cy="'+(n.y+19)+'" r="6"/>'
+       + '<text class="chipt" x="'+(n.x+29)+'" y="'+(n.y+23)+'">'+esc(n.t)+'</text>'
+       + '<text class="chipid" x="'+(n.x+29)+'" y="'+(n.y+39)+'">'+esc(n.x2)+'</text>';
     } else {
       var box = n.kind==="dec"
-        ? '<path class="decbox" d="M'+(n.x+13)+' '+n.y+' H'+(n.x+n.w-13)+' L'+(n.x+n.w)+' '
-          +(n.y+n.h/2)+' L'+(n.x+n.w-13)+' '+(n.y+n.h)+' H'+(n.x+13)+' L'+n.x+' '
+        ? '<path class="decbox" d="M'+(n.x+15)+' '+n.y+' H'+(n.x+n.w-15)+' L'+(n.x+n.w)+' '
+          +(n.y+n.h/2)+' L'+(n.x+n.w-15)+' '+(n.y+n.h)+' H'+(n.x+15)+' L'+n.x+' '
           +(n.y+n.h/2)+' Z"/>'
-        : '<rect class="'+(n.kind==="exit"?"exitbox":"nbox")+'" x="'+n.x+'" y="'+n.y
-          +'" width="'+n.w+'" height="'+n.h+'" rx="8"/>';
-      var lx=n.x+(n.kind==="dec"?24:16);
+        : '<rect class="'+(n.kind==="exit"?"exitbox":(n.kind==="meter"?"meterbox":"nbox"))
+          +'" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="9"/>';
+      var lx=n.x+(n.kind==="dec"?26:18);
       g+=box
-       + '<circle class="nlamp" cx="'+lx+'" cy="'+(n.y+15)+'" r="6"/>'
-       + '<text class="ntitle" x="'+(lx+13)+'" y="'+(n.y+19)+'">'+esc(n.t)+'</text>'
-       + '<text class="nsub" x="'+(n.x+(n.kind==="dec"?24:15))+'" y="'+(n.y+n.h-8)+'">'
-       + esc(n.tight? String(n.x2).slice(0,20) : n.x2)+'</text>';
+       + '<circle class="nlamp" cx="'+lx+'" cy="'+(n.y+19)+'" r="6.5"/>'
+       + '<text class="ntitle" x="'+(lx+14)+'" y="'+(n.y+23)+'">'+esc(n.t)+'</text>'
+       + '<text class="nsub" x="'+(n.x+(n.kind==="dec"?26:17))+'" y="'+(n.y+n.h-11)+'">'
+       + esc(n.x2)+'</text>';
     }
     return g+'</g>';
   }).join("");
 
   document.getElementById("pathmap").innerHTML=
-    '<svg viewBox="0 0 '+PW+' '+PH+'" preserveAspectRatio="xMidYMid meet" role="img" '
+    '<svg viewBox="'+PX0+' 0 '+PVW+' '+PH+'" preserveAspectRatio="xMidYMid meet" role="img" '
     +'aria-label="The path a check takes, from the person at the top to the record and the '
-    +'control documents at the foot. Every lamp sits on the step it watches.">'
+    +'control documents at the foot. Solid lines are the flow, dotted taps are readings, '
+    +'grey dashed lines are ways out. From the second pass down the flow is a staircase '
+    +'that only ever moves right and down.">'
     +'<defs>'
     +'<marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" '
     +'markerHeight="5.5" orient="auto-start-reverse"><path class="arwh" d="M0 0 L10 5 L0 10 z"/></marker>'
@@ -1590,10 +1833,9 @@ function pathmap(d){
 
   /* The two lamps that watch this panel rather than the check. They have no
      step on the path because they are not steps in it, and putting them on one
-     would be the same lie the drawing exists to avoid. They used to sit on the
-     drawing's own header, where being inside the panel read as being inside
-     the process. They are in the masthead now, which is the panel's header,
-     and they open the same sheet they always did. */
+     would be the same lie the drawing exists to avoid. They sit in the
+     masthead, which is the panel's own header, and they open the same sheet
+     they always did. */
   var house=[["m:signin","Sign in"],["r:build","Page and API"]].map(function(h){
     var r=BOARD_ROWS?BOARD_ROWS[h[0]]:null, s=r?r.s:"warn";
     return '<button class="pgl" type="button" data-s="'+s+'" data-open="'+h[0]+'" title="'
@@ -1631,8 +1873,15 @@ function openStage(ci){
     var s2 = i<st.bad ? "bad" : (i<st.bad+st.warn ? "warn" : "ok");
     var said = s2==="bad" ? "asked and failed"
              : (s2==="warn" ? "not called today" : "answered");
-    return '<span class="plate" data-s="'+s2+'" title="'+esc(nm)+', '+said+'">'
-      +'<i></i><em>'+esc(plateText(ci,i,nm))+'</em></span>';
+    var R=REGINFO[nm];
+    /* Every register opens. A name and a colour tell an operator that
+       something is amber without telling them what the thing is or what an
+       empty answer from it would mean, and those are the two questions a
+       register raises. */
+    return '<button class="plate" type="button" data-s="'+s2+'" data-reg="'+esc(nm)+'"'
+      +' data-state="'+said+'" title="'+esc(nm)+', '+said+'. Press to open.">'
+      +'<i></i><em>'+esc(plateText(ci,i,nm))+'</em>'
+      +(R?'<span class="pkind">'+esc(R.k)+'</span>':'')+'</button>';
   }).join("");
   sheetOpen(c[0].replace(/^\d+\s/,"")+" registers",
     !st.measured
@@ -1644,7 +1893,41 @@ function openStage(ci){
     +'<div class="shleg">'
     +'<span><i style="background:var(--ok);box-shadow:0 0 9px rgba(51,216,155,.6)"></i>Answered</span>'
     +'<span><i style="background:var(--warn);box-shadow:0 0 9px rgba(231,199,108,.6)"></i>Not called today</span>'
-    +'<span><i style="background:var(--bad)"></i>Asked and failed</span></div>');
+    +'<span><i style="background:var(--bad)"></i>Asked and failed</span>'
+    +'<span class="shhint">Press any register to see what it is.</span></div>');
+  document.querySelectorAll("#shB .plate").forEach(function(b){
+    b.addEventListener("click",function(){
+      openRegister2(b.getAttribute("data-reg"), b.getAttribute("data-state"), ci); });
+  });
+}
+
+/* One register, opened from its category. Four things, in the order somebody
+   actually needs them: what it is, what it holds, what an empty answer means,
+   and where to read it for yourself. */
+function openRegister2(nm, state, ci){
+  var R=REGINFO[nm];
+  var rows=[];
+  if(R){
+    rows.push(["What it is", R.k+". "+R.s]);
+    rows.push(["What an empty answer means", R.e]);
+  } else {
+    rows.push(["What it is","One of the 121 registers in the catalogue. No readout has been written for it yet."]);
+  }
+  rows.push(["In this window", state==="answered" ? "It answered."
+    : state==="not called today" ? "We had no cause to call it. That is not a fault."
+    : "We asked it and it did not answer. The runs that needed it are marked incomplete."]);
+  rows.push(["Where to read it", R && R.u
+    ? '<a class="reglink" href="'+esc(R.u)+'" target="_blank" rel="noopener noreferrer">'
+      +esc(R.u.replace(/^https:\/\//,""))+'</a>'
+    : "Nowhere. This one is worked out here from what we already hold, so there is "
+      +"no outside register to send you to."]);
+  sheetOpen(nm, R ? R.k : "Register", '<dl class="dgrid">'+rows.map(function(r){
+      return '<dt>'+esc(r[0])+'</dt><dd>'+(r[0]==="Where to read it"?r[1]:esc(r[1]))+'</dd>';
+    }).join("")+'</dl>'
+    + '<div class="backrow"><button class="trig" type="button" id="regBack">'
+    + '\u2190 Back to '+esc(REGCATS[ci][0].replace(/^\d+\s/,""))+'</button></div>');
+  var bk=document.getElementById("regBack");
+  if(bk) bk.addEventListener("click",function(){ openStage(ci); });
 }
 
 function openLamp(key){
@@ -2033,6 +2316,46 @@ function setFull(on){
   b.lastChild.nodeValue = on ? " Close" : " Full screen";
   if(!on) fitStage();
 }
+/* ============================================================= THE LEGEND
+   Three states, and the long version behind them. The rule the chips follow
+   is the one high-performance control rooms settle on: colour never carries a
+   state by itself. Each state has a colour, a shape and a word, so an
+   operator who cannot separate two greens can still read the panel, and so
+   can a printed screenshot.
+
+   The three words are chosen to be true of every family of lamp on this
+   board, because one legend that is right everywhere beats three that are
+   each right in one place. */
+var LEGEND_ROWS = [
+  ["\u25CF  Working, green",
+   "This part did its job in the window you are looking at. It is not a promise "
+   + "about the next check, and it is never a statement about whoever was checked."],
+  ["\u25B2  Quiet, amber",
+   "Either nobody had cause to call it, or it is short of the line we hold it to. "
+   + "Amber is not a fault. A register nobody asked is not a register that failed, "
+   + "and drawing it as one would teach an operator to ignore the colour."],
+  ["\u25A0  Down, red",
+   "We asked and it did not answer, or a blocker is open against it. Every run "
+   + "that needed it is marked incomplete rather than clean."],
+  ["Why a shape as well as a colour",
+   "Colour on its own is the one thing a control panel may not use to carry a "
+   + "state. Somebody who cannot tell two greens apart still has to read the "
+   + "board, and so does a screenshot in a report."],
+  ["What is on the drawing",
+   "A rounded box is a step. A chamfered plate is a decision. A dashed box is a "
+   + "way out of the process and is drawn quieter, because turning somebody away "
+   + "is not the main flow. A thin wide row is a family of registers. A small "
+   + "plate along the foot is a control document."],
+  ["What opens",
+   "Every box, every register family, every register inside one, every dial and "
+   + "both masthead lamps. If it is on this board it says what it is."]
+];
+document.getElementById("legendbtn").addEventListener("click",function(){
+  sheetOpen("How to read this board","The three states, and what the shapes mean",
+    '<dl class="dgrid">'+LEGEND_ROWS.map(function(r){
+      return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd>'; }).join("")+'</dl>');
+});
+
 document.getElementById("fullbtn").addEventListener("click",function(){
   setFull(!document.body.classList.contains("pathfull"));
 });
@@ -2133,11 +2456,11 @@ document.addEventListener("keydown",function(e){
 
 function paint(d){
   LAST=d;
-  mstats(d); board(d); reader(d); pathmap(d); gauges(d); rank(d); pulse(d);
-  evidence(d); days(d); markFaults();
-  /* the table is fitted again on the next frame, once the browser has settled
-     the row heights this paint produced */
-  requestAnimationFrame(function(){ fitRows(); });
+  /* rank, pulse, evidence and days are still in the file and no longer called.
+     The two cards they drew came off the board so the drawing could have the
+     full height, and leaving the functions in is how they come back in one
+     line if they are ever wanted. */
+  mstats(d); board(d); reader(d); pathmap(d); gauges(d); markFaults();
   if(STAGE!=null) openStage(STAGE);
   fitStage();
 }
@@ -2147,7 +2470,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260907.0608";
+var BUILD = "20260907.0808";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
