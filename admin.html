@@ -18,7 +18,13 @@
 :root{
   --bg:#04060A; --panel:#0A1018; --panel-2:#0E1620; --sunk:#070C13;
   --edge:#1A2534; --edge-2:#26344A; --edge-lit:#3B4E6B;
-  --ink:#EAF0F8; --ink-2:#A7B6C9; --ink-3:#6F8199; --ink-4:#4B5A70;
+  --ink:#EAF0F8; --ink-2:#A7B6C9; --ink-3:#6F8199;
+  /* --ink-4 was #4B5A70, which is 2.7:1 on this panel. It carries hashes,
+     timestamps, register counts and the line that says how many names were
+     dropped off the bottom of the table, all at 9 to 11.5px. Dim is a look;
+     unreadable is a defect. #6F8199 clears 4.5:1 at these sizes and the tier
+     below it stays quieter than --ink-2, which is what the tier was for. */
+  --ink-4:#6F8199;
   --ok:#33D89B; --warn:#E7C76C; --bad:#FF5340; --blue:#4C87FF; --idle:#3A4658;
   /* The glass runs cooler than the text. A lamp is read by colour from across
      the room and does not need to be the brightest thing on the board; the
@@ -78,8 +84,13 @@ body{font:15px/1.5 var(--ui);color:var(--ink);-webkit-font-smoothing:antialiased
 .mstat .k{margin-top:5px;font-family:var(--ui);font-size:10.5px;font-weight:500;
   letter-spacing:0;color:var(--ink-3)}
 .mctl{display:flex;gap:8px;margin-left:26px}
+/* 32 on the stage, not 29. The board is a fixed 1920 stage scaled to fit, so
+   on a 1440 screen everything here renders at 0.75 of its written size and a
+   29px control lands as 22 under the pointer. 32 lands as 24. */
 .trig{appearance:none;background:var(--panel-2);border:1px solid var(--edge-2);
-  color:var(--ink-2);border-radius:99px;padding:8px 15px;font-family:var(--ui);
+  color:var(--ink-2);border-radius:99px;padding:8px 15px;min-height:32px;
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--ui);
   font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
   cursor:pointer;transition:all .18s var(--ease)}
 .trig:hover{border-color:var(--edge-lit);color:var(--ink)}
@@ -87,8 +98,8 @@ body{font:15px/1.5 var(--ui);color:var(--ink);-webkit-font-smoothing:antialiased
    they are the ones a keyboard reader meets first. */
 .trig:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 a.trig{text-decoration:none}
-#mapbtn{border-color:rgba(76,135,255,.55);color:var(--blue)}
-#mapbtn:hover{background:rgba(76,135,255,.12);border-color:var(--blue);color:#9CBBFF}
+#regbtn{border-color:rgba(76,135,255,.55);color:var(--blue)}
+#regbtn:hover{background:rgba(76,135,255,.12);border-color:var(--blue);color:#9CBBFF}
 .trig[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 #faultbtn{border-color:rgba(255,83,64,.5);color:var(--bad)}
 #faultbtn:hover{background:rgba(255,83,64,.12);border-color:var(--bad);color:#FF8574}
@@ -161,8 +172,8 @@ body.faults .fdim{pointer-events:none}
   border:1px solid var(--edge);border-radius:var(--r);align-content:center;
   background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
   padding:12px 10px}
-.gauges .gauge:nth-child(5){grid-column:1/-1}
-.gauges .gauge:nth-child(5) .gwrap{max-width:150px}
+/* Six now, in three rows of two, so none of them is the odd one out and the
+   fifth no longer has to be stretched across to hide that there were five. */
 .gauge{text-align:center;appearance:none;background:none;border:0;padding:6px 4px;
   font:inherit;color:inherit;cursor:pointer;border-radius:10px;
   transition:background .18s var(--ease)}
@@ -413,7 +424,7 @@ body[data-boot] #fit{visibility:hidden}
   font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:#0A0D12;background:var(--warn)}
 .who{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-4)}
-select.trig{appearance:none;min-width:96px;padding:8px 14px;text-align:center;
+select.trig{appearance:none;min-width:96px;padding:8px 14px;min-height:32px;text-align:center;
   background-image:none}
 select.trig option{background:var(--panel);color:var(--ink);
   font-family:var(--ui);text-transform:none;letter-spacing:0}
@@ -443,6 +454,101 @@ select.trig option{background:var(--panel);color:var(--ink);
   cursor:pointer;font-family:var(--ui);font-size:9px;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink-2);transition:all .18s var(--ease)}
 .hl:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* The two panel lamps in the masthead. Small, quiet, and they still open the
+   same sheet they always did. */
+.panellamps{display:inline-flex;gap:6px;align-items:center;flex:none}
+/* --ink-4 is 2.9:1 on this ground and these are 8.5px. A lamp label nobody
+   can read is a lamp with no label. --ink-3 clears the line at this size, and
+   the height matches the other masthead controls once the stage is scaled. */
+.pgl{appearance:none;background:none;border:0;padding:4px 8px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;border-radius:99px;min-height:32px;
+  box-sizing:border-box;
+  font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-2);transition:color .18s var(--ease)}
+.pgl i{width:6px;height:6px;border-radius:50%;background:var(--idle);flex:none}
+.pgl[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 5px rgba(38,161,111,.55)}
+.pgl[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 5px rgba(188,155,76,.5)}
+.pgl[data-s="bad"] i{background:var(--bad);box-shadow:0 0 7px rgba(255,83,64,.75);
+  animation:alarm 1.15s ease-in-out infinite}
+.pgl[data-s="bad"]{color:var(--bad)}
+.pgl:hover{color:var(--ink)}
+.pgl:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* Full screen. The drawing is the instrument on this board and at 1440 it is
+   drawn into a 1392 by 640 panel. This gives it the whole window without
+   redrawing anything: the same SVG, the same viewBox, more room. */
+.hl.expand svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;flex:none}
+body.pathfull .path{position:fixed;inset:14px;z-index:70;border-radius:var(--r);
+  box-shadow:0 40px 120px rgba(0,0,0,.7);padding:16px 20px 14px}
+body.pathfull #stage>.body>.rgt,body.pathfull #stage>.body>.lft>*:not(.path),
+body.pathfull .mast{visibility:hidden}
+body.pathfull .pathhd .sb{display:none}
+body.pathfull .pathwrap{min-height:0}
+/* The stage is a fixed 1920 scaled to fit, so a fixed overlay inside it would
+   be scaled too. This takes the panel out of that transform for the duration,
+   which is why the rule sits on body rather than on the stage. */
+body.pathfull #stage{transform:none!important;width:100vw;height:100vh}
+.fullhint{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:71;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-4);background:var(--panel-2);border:1px solid var(--edge-2);
+  border-radius:99px;padding:6px 14px;pointer-events:none}
+body:not(.pathfull) .fullhint{display:none}
+
+/* ============================================================ THE REGISTRY
+   The ten control documents, what each governs, and where it actually stands.
+   It opens over the board rather than as a page of its own, because these are
+   internal control records and the board is already the door they are behind. */
+.registry{position:fixed;inset:0;z-index:80;background:rgba(2,4,7,.86);
+  backdrop-filter:blur(3px);display:flex;align-items:stretch;justify-content:center;
+  padding:26px;opacity:0;pointer-events:none;transition:opacity .22s var(--ease)}
+.registry.on{opacity:1;pointer-events:auto}
+.regcard{width:min(1240px,100%);display:grid;grid-template-rows:auto auto 1fr;
+  background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
+  border:1px solid var(--edge);border-radius:var(--r);overflow:hidden}
+.reghd{display:flex;align-items:flex-start;gap:20px;padding:20px 24px 16px;
+  border-bottom:1px solid var(--edge)}
+.reghd h3{margin:0;font-family:var(--ui);font-size:19px;font-weight:700;
+  letter-spacing:-.01em;color:var(--ink)}
+.reghd .x{margin-top:5px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--title)}
+.reghd .c{margin-left:auto;flex:none}
+/* The release posture, quoted from the package rather than written here. It is
+   the first thing on the screen because it governs every row under it. */
+.regpost{margin:0;padding:14px 24px;background:rgba(255,83,64,.07);
+  border-bottom:1px solid rgba(255,83,64,.24);font-family:var(--mono);
+  font-size:12px;line-height:1.65;color:#E8776A}
+.regpost b{color:#FFB3A8;font-weight:700}
+.regbody{overflow-y:auto;padding:18px 24px 24px}
+.regrow{display:grid;grid-template-columns:148px 1fr 168px;gap:18px;
+  padding:16px 0;border-bottom:1px solid var(--edge)}
+.regrow:last-child{border-bottom:0}
+.regid{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink);
+  letter-spacing:.04em}
+.regmeta{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;
+  color:var(--ink-4)}
+.regtitle{font-family:var(--ui);font-size:15px;font-weight:600;color:var(--ink);
+  letter-spacing:-.008em}
+.reggov{margin-top:5px;font-size:13px;line-height:1.6;color:var(--ink-3)}
+.regwhy{margin-top:8px;font-size:13px;line-height:1.6;color:var(--ink-2)}
+.regstate{display:inline-flex;align-items:center;gap:7px;align-self:start;
+  justify-self:end;
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;padding:6px 11px;border-radius:99px;min-height:24px;
+  box-sizing:border-box;white-space:nowrap}
+.regstate i{width:7px;height:7px;border-radius:50%;flex:none}
+.regstate[data-s="ok"]{color:var(--ok);border:1px solid rgba(51,216,155,.4)}
+.regstate[data-s="ok"] i{background:var(--ok-l)}
+.regstate[data-s="warn"]{color:var(--warn);border:1px solid rgba(231,199,108,.4)}
+.regstate[data-s="warn"] i{background:var(--warn-l)}
+.regstate[data-s="bad"]{color:var(--bad);border:1px solid rgba(255,83,64,.45)}
+.regstate[data-s="bad"] i{background:var(--bad)}
+.regsub{margin-top:26px;padding-top:18px;border-top:1px solid var(--edge)}
+.regsub .k{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--title);margin-bottom:12px}
+.regsrow{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:9px 0;
+  font-size:13px;color:var(--ink-3);line-height:1.55}
+
 .hl i{width:7px;height:7px;border-radius:50%;background:var(--idle);flex:none}
 .hl[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 6px rgba(38,161,111,.55)}
 .hl[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 6px rgba(188,155,76,.5)}
@@ -534,10 +640,15 @@ body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
   <header class="mast">
     <span class="brand">4orm IQ <span>·</span> Operations</span>
     <span class="live"><i></i>Live</span>
+    <!-- The two lamps that watch this panel rather than the check. They sat on
+         the drawing header, where they read as part of the process and are
+         not. The masthead is the panel's own header, which is where a lamp
+         about the panel belongs. -->
+    <span class="panellamps" id="house"></span>
     <span class="who" id="who"></span>
     <div class="mstats" id="mstats"></div>
     <div class="mctl">
-      <a class="trig" href="evidence.html" id="mapbtn">The map</a>
+      <button class="trig" type="button" id="regbtn">The registry</button>
       <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
       <select class="trig" id="win" aria-label="Window">
         <option value="7">7 days</option><option value="30" selected>30 days</option>
@@ -554,7 +665,9 @@ body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
         <div class="pathhd">
           <span class="ck">The path a check takes</span>
           <span class="sb">Every lamp sits on the step it watches. Press a step to open it.</span>
-          <div class="house" id="house"></div>
+          <button class="hl expand" type="button" id="fullbtn" aria-pressed="false">
+            <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 5V1h4M13 9v4H9M9 1h4v4M5 13H1V9"/></svg>
+            Full screen</button>
         </div>
         <div class="pathwrap" id="pathmap"></div>
       </div>
@@ -602,7 +715,25 @@ body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
     </div>
   </div>
 
-  <div class="sheet" id="sheet">
+  <div class="fullhint">Press Escape or Full screen to come back</div>
+
+<!-- THE REGISTRY. Ten control documents, what each governs, where it stands.
+     The posture at the top is quoted from PACKAGE-001 rather than written
+     here, so a reader is told what the shelf is worth before they read a
+     single row of it. -->
+<div class="registry" id="registry" role="dialog" aria-modal="true" aria-labelledby="regT">
+  <div class="regcard">
+    <div class="reghd">
+      <div><h3 id="regT">The control documents</h3>
+        <div class="x">Ten standards &#183; what each governs &#183; where it stands</div></div>
+      <div class="c"><button class="trig" type="button" id="regClose2">Close</button></div>
+    </div>
+    <p class="regpost" id="regPost"></p>
+    <div class="regbody" id="regBody"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
     <div class="sheetcard">
       <div class="shhd">
         <div><h3 id="shT"></h3><div class="x" id="shX"></div></div>
@@ -636,10 +767,15 @@ var CLEAR = {
   systems:{search:"ok",reason:"ok",connectors:"ok",rdap:"ok",db:"ok",chain:"ok",
            policy:"ok",retention:"ok",auth:"ok",deploy:"ok"},
   registers:{down:{},quiet:{0:1,3:2,6:1,7:2,9:3}},
-  /* Not wired to a store yet. These are the honest states as of today: none of
-     the ten control documents has been written, so every one of them is amber.
-     An empty shelf is not a clean shelf. */
-  documents:{hra:"warn",mg:"warn",lr:"warn",pub:"warn",sub:"warn",
+  /* How wide we looked, counted once per register, against the catalogue. A
+     different question from how often an ask came back, and they used to be
+     one number. */
+  reach:{catalogue:121,asked:104,answered:101},
+  /* All ten are written as of 6 September 2026, which is a real change: the
+     shelf is no longer empty. None is signed off, so none is green, and the
+     two that record a NO-GO on their own cover are red for that reason rather
+     than for being missing. */
+  documents:{hra:"bad",mg:"bad",lr:"warn",pub:"warn",sub:"warn",
              vend:"warn",ret:"warn",ir:"warn",sec:"warn",cou:"warn"},
   pulse:{label_at:25,named:0,adverse:0,unknown:0,rows:[
     {label:null,hash:"a41f77c9e0b3",n:9,was:6,adverse:0,clean:7,incomplete:2,type:"Company",first:"09:12"},
@@ -660,11 +796,11 @@ TROUBLE.rights=[{kind:"ACCESS",opened:5,closed:1,avg_days:27.4}];
 TROUBLE.by_outcome=[["COMPLETED",1017],["ERROR",198],["BLOCKED",69]];
 TROUBLE.build={match:false,page:"20260905.0838"};
 TROUBLE.registers={down:{0:2,1:5,2:7,4:2,7:1},quiet:{0:1,3:3,5:2,6:2,8:1,9:5}};
-/* In trouble the three with live exposure go red: a published claim with no
-   completed test, a published adverse finding with no release record, and a
-   security control that is claimed but cannot be evidenced. */
-TROUBLE.documents={hra:"warn",mg:"warn",lr:"warn",pub:"bad",sub:"bad",
+/* In trouble, three more of the written standards have picked up an open
+   blocker on top of the two that already record a NO-GO. */
+TROUBLE.documents={hra:"bad",mg:"bad",lr:"warn",pub:"bad",sub:"bad",
                    vend:"warn",ret:"warn",ir:"warn",sec:"bad",cou:"warn"};
+TROUBLE.reach={catalogue:121,asked:52,answered:38};
 TROUBLE.systems={search:"bad",reason:"bad",connectors:"warn",rdap:"ok",db:"ok",
                  chain:"bad",policy:"ok",retention:"bad",auth:"ok",deploy:"bad"};
 TROUBLE.pulse={label_at:25,named:2,adverse:1,unknown:1,rows:[
@@ -849,65 +985,98 @@ function readings(d){
    Nothing here is wired to a real store yet. The states below are the honest
    position as of today, which is that none of the ten has been written. */
 var DOCS = [
-  {k:"hra", id:"HRA-001", plate:"Human rights",
+  {k:"hra", id:"HRA-001",
+   v:"1.0", dated:"2026-09-06", title:"Human Rights Impact Assessment",
+   governs:"Language, dialect and related proxy risk in the service, assessed against Alberta Human Rights Act s.4 and the Canadian Human Rights Act.",
+   why:"Written, and it records NO-GO, high inherent risk and residual risk unquantified on its own cover. Release blockers are open.",
+   holds:"Feature-level proxy assessment, deletion record, release blockers and counsel questions.", plate:"Human rights",
    what:"Every feature checked against the fifteen grounds in the Alberta Human Rights Act, including the deleted dialect feature.",
-   amber:"Not written. A feature that reads language is one adverse-effect finding away from a protected ground, and nothing on file says it was tested.",
-   red:"Written, and it carries a release blocker that has not been cleared.",
    go:"Ranked third. The dialect feature was already deleted, so the exposure is historic rather than live."},
-  {k:"mg", id:"MG-001", plate:"Feature control",
+  {k:"mg", id:"MG-001",
+   v:"1.0", dated:"2026-09-05", title:"Model and Feature Governance Standard",
+   governs:"Every model, rule, feature, derived variable and prompt-driven component operating inside the approved boundary: registry, testing, release manifest, deletion and monitoring.",
+   why:"Written, and it records a NO-GO on its own cover. Current release decision is NO-GO until the feature registry, proxy review, ablation and false-negative tests and independent challenge are complete.",
+   holds:"Feature registry, protected-ground proxy review, release manifest and version binding.", plate:"Feature control",
    what:"The registry of every model and feature inside the approved boundary, with owner, proxy review, testing and a formal deletion record.",
-   amber:"Not written. There is no single list of what the system actually runs, so nobody can say what was tested and what was not.",
-   red:"Written, and a feature is running that the registry does not carry.",
    go:"Needed before anything new ships, because it is the thing that makes the other nine checkable."},
-  {k:"lr", id:"LR-001", plate:"Legal register",
+  {k:"lr", id:"LR-001",
+   v:"1.0", dated:"2026-09-05", title:"Legal Authority Register",
+   governs:"Every statute, regulation, case and regulator publication the product relies on, with the section, the words relied on and the date each was checked.",
+   why:"Written. 46 authorities recorded, each with its own confidence level. Not signed off, and several rows are marked partial or unverified and cannot carry launch reliance.",
+   holds:"46 authorities. Verified, partial and unverified are separated and counted apart.", plate:"Legal register",
    what:"One row per statute, case and regulator publication the assessment relies on, with the operative words, a source link and a verification date.",
-   amber:"Not written. Every other document cites law, so this is the spine they all hang from.",
-   red:"Written, and an authority in it failed reverification.",
    go:"Build this first. A citation nobody checked is the cheapest way to lose a file."},
-  {k:"pub", id:"PUB-001", plate:"Publishing rules",
+  {k:"pub", id:"PUB-001",
+   v:"1.0", dated:"2026-09-05", title:"Publication and Defamation Standard",
+   governs:"Every adverse finding, attributable statement, evidence card, account result, export and share about a named or identifiable party.",
+   why:"Written. It sets the release, correction and persistence rules that findings about named parties are already published under. Not signed off.",
+   holds:"Approval classes, correction and takedown route, persistence limits.", plate:"Publishing rules",
    what:"What may be said about a named party, how a finding is worded, and how a correction or takedown is handled.",
-   amber:"Not written. Findings are being displayed with no release record behind them.",
-   red:"An adverse finding is published and no responsible-communication record exists for it.",
    go:"Live exposure. Ranked second."},
-  {k:"sub", id:"SUB-001", plate:"Claims proof",
+  {k:"sub", id:"SUB-001",
+   v:"1.0", dated:"2026-09-06", title:"Marketing Substantiation File",
+   governs:"Every objectively testable claim made about the product: the pre-publication test, the exact permitted wording, and when permission expires.",
+   why:"Written. Testable claims are already published, and no claim record in this file has a completed test and approved wording bound to it yet.",
+   holds:"Claim register, test evidence, permitted wording and expiry.", plate:"Claims proof",
    what:"Every objectively testable claim we make in public, with the test that was completed before it was published.",
-   amber:"Not written. Claims about source count, coverage and speed are already published.",
-   red:"A published claim has no completed test behind it. The burden of proving adequate and proper testing sits on us, not on a complainant.",
    go:"Live exposure the day the site went up. Ranked first."},
-  {k:"vend", id:"VEND-001", plate:"Vendors",
+  {k:"vend", id:"VEND-001",
+   v:"2.0", dated:"2026-09-06", title:"Vendor and Cross-Border Register",
+   governs:"Every external service that stores, transmits, can access or is sent 4orm IQ information, plus cross-border notice, contract review and exit.",
+   why:"Written. The default is local processing until a provider-specific transfer decision is signed, and no such decision is signed yet.",
+   holds:"Provider inventory, transfer decisions, contract and exit assurance.", plate:"Vendors",
    what:"Every service provider, what it processes, where it is stored, who can reach it, and the cross-border notice that follows.",
-   amber:"Not written. Needs contract text and production configuration that is not in this workspace.",
-   red:"A provider is processing information under terms nobody has read.",
    go:"Gather the contracts and the region settings first. This one cannot be written from the outside."},
-  {k:"ret", id:"RET-001", plate:"Retention",
+  {k:"ret", id:"RET-001",
+   v:"2.0", dated:"2026-09-06", title:"Retention and Deletion Schedule",
+   governs:"Every information class in the approved boundary: purpose, owner, trigger, maximum period, destruction route and backup ageing.",
+   why:"Written. It is approved only for the classes listed in a signed retention register, and that register is not signed.",
+   holds:"Record classes, expiry triggers, deletion assurance and backup ageing.", plate:"Retention",
    what:"Every class of information, how long it is kept, how it is deleted and what evidence proves the deletion ran.",
-   amber:"Not written. The schedule is enforced in code, but the document that governs it is not on file.",
-   red:"A class is being kept past its period, or a deletion cannot be evidenced.",
    go:"Keep retention separate from publication. Deleting our copy does not take a published result down."},
-  {k:"ir", id:"IR-001", plate:"Incident plan",
+  {k:"ir", id:"IR-001",
+   v:"2.0", dated:"2026-09-06", title:"Incident and Material-Error Response",
+   governs:"Privacy breaches, unauthorized access, materially incorrect findings, false negatives and source failures: containment, correction, notice and learning.",
+   why:"Written. The workflow is defined and mandatory. It has not been exercised in a tabletop and the response roles are not signed.",
+   holds:"Containment, evidence preservation, correction, notification and remediation.", plate:"Incident plan",
    what:"What happens when a finding is wrong, a register goes dark, a breach occurs, or a claim turns out to be unsupported.",
-   amber:"Not written. There is no rehearsed path for correcting an adverse finding before it costs somebody a transaction.",
-   red:"An incident is open and being handled without a plan.",
    go:"The workflow that matters most is the one that corrects a wrong finding fast."},
-  {k:"sec", id:"SEC-001", plate:"Security",
+  {k:"sec", id:"SEC-001",
+   v:"1.0", dated:"2026-09-06", title:"Security Control Standard",
+   governs:"The launch environment: secrets, privileged access, multifactor authentication, production separation, encryption, logging and restore testing.",
+   why:"Written. The controls are specified and the launch blocker checklist is unclosed, so the standard describes what must be true rather than evidencing that it is.",
+   holds:"Control framework, accountability, launch blocker checklist and approval record.", plate:"Security",
    what:"Secrets, access, encryption, separation, logging, backups and deployment approval, each mapped to evidence that can be shown.",
-   amber:"Not written. Needs production configuration that is not in this workspace.",
-   red:"A control is claimed that cannot be evidenced.",
    go:"Separate implemented from planned. A control nobody can demonstrate is a planned control."},
-  {k:"cou", id:"COU-001", plate:"Counsel questions",
+  {k:"cou", id:"CDP-001",
+   v:"1.0", dated:"2026-09-06", title:"Counsel Disposition Pack",
+   governs:"The unresolved legal questions that cannot be decided from statute text alone, and the written decisions counsel must give before pilot, launch, disclosure or marketing reliance.",
+   why:"Written. It isolates the questions and names what counsel needs. No disposition has been returned, so the sign-off register is empty.",
+   holds:"Counsel questions, response standard and the sign-off register.", plate:"Counsel questions",
    what:"The unresolved questions carried out of the assessment, each with the facts needed and the exact written approval required.",
-   amber:"Not written. Four questions are carried forward in the assessment with no disposition.",
-   red:"A question is unresolved and the product is operating as though it were answered.",
    go:"Built last. It is the residue of the other nine."}
 ];
 function file(d){
   var st=(d.documents)||{};
+  /* The route sends the registry whole. When it does, the drawer is written
+     from it, so a lamp and the registry behind the same document can never say
+     different things. DOCS below is the fallback and the sample. */
+  var reg=(d.registry&&d.registry.docs)||null, byKey={};
+  if(reg) reg.forEach(function(r){ byKey[r.key]=r; });
   return DOCS.map(function(x){
     var v=st[x.k]||"warn";
-    return {k:"f:"+x.k, plate:x.plate, s:v, sys:1, doc:1,
-            name:x.id+" \u00b7 "+x.plate,
-            v: v==="ok" ? "Current" : (v==="warn" ? "Not written" : "Blocker open"),
-            what:x.what, amber:x.amber, red:x.red, go:x.go};
+    var R=byKey[x.k];
+    return {k:"f:"+x.k, plate:x.plate, s:v, sys:1, doc:1, reg:R||null,
+            name:(R?R.id:x.id)+" \u00b7 "+x.plate,
+            /* "Not written" was true until 6 September and is false now. All
+               ten are written. None is signed off, so none is green, and the
+               word on the lamp says which of those two it is rather than
+               collapsing them into one amber. */
+            v: v==="ok" ? "Signed off" : (v==="warn" ? "Written, not signed" : "NO-GO on file"),
+            what:(R&&R.governs)||x.what,
+            why:(R&&R.why)||x.why, go:x.go,
+            extra:R ? [["Version",R.id+" v"+R.v+", dated "+R.dated],
+                       ["What it holds",R.holds]] : null};
   });
 }
 
@@ -966,8 +1135,15 @@ function regState(d,ci){
 
 /* ------------------------------------------------------------- the gauges */
 var ARC=2*Math.PI*62*0.75;
-function gauge(pct,cap,unit,note,state,key){
-  var off=ARC*(1-(pct==null?0:pct)/100);
+/* `fill` is how far round the needle goes, 0 to 100, and it is separate from
+   the number printed in the middle. They are the same thing on a percentage
+   dial and they are not the same thing on a dial that reads in seconds, where
+   the number is 74 and the needle is 74 against a 180 second ceiling. Passing
+   one value for both is how a seconds dial ends up reading 74 per cent of
+   nothing. */
+function gauge(pct,cap,unit,note,state,key,fill){
+  var f = fill==null ? pct : fill;
+  var off=ARC*(1-(f==null?0:Math.max(0,Math.min(100,f)))/100);
   var ticks="",i;
   for(i=0;i<=30;i++){
     var a=(-225+i*270/30)*Math.PI/180, maj=i%5===0, r1=maj?76:79, r2=84;
@@ -977,7 +1153,7 @@ function gauge(pct,cap,unit,note,state,key){
   }
   return '<button class="gauge" type="button" data-s="'+state+'"'
     +(key?' data-info="'+key+'"':'')+'><div class="gwrap">'
-    +'<svg viewBox="0 0 180 180" role="img" aria-label="'+esc(cap)+' '+(pct==null?"no reading":pct+"%")+'">'
+    +'<svg viewBox="0 0 180 180" role="img" aria-label="'+esc(cap)+' '+(pct==null?"no reading":pct+esc(unit))+'">'
     +ticks
     +'<circle class="gtrack" cx="90" cy="90" r="62" stroke-dasharray="'+ARC+' 999"'
     +' transform="rotate(135 90 90)"/>'
@@ -990,9 +1166,30 @@ function gauge(pct,cap,unit,note,state,key){
 }
 function gauges(d){
   var s=d.sources, band=function(v,a,b){return v==null?"idle":(v>=a?"ok":(v>=b?"warn":"bad"));};
-  var mins=Math.round((d.runs.avg_ms||0)/600)/100;
-  var timePct=Math.max(0,Math.min(100,Math.round(100-((d.runs.avg_ms||0)/1000-40)/1.4)));
   var v=d.chain.last_verify||{}, ran=d.runs.attempted||0, del=d.deletion||{};
+
+  /* TIME TO RESULT, in seconds, because that is the unit a person waiting has.
+     The old dial read "time to spare, 46 per cent", which is a percentage of a
+     ceiling nobody could see. The line is the one the product actually holds
+     itself to: under two minutes is green, two to three is amber, past three
+     is red. The needle runs against the three minute ceiling. */
+  var secs = Math.round((d.runs.avg_ms||0)/1000);
+  var secState = !d.runs.avg_ms ? "idle" : (secs<=120 ? "ok" : (secs<=180 ? "warn" : "bad"));
+  var secFill = Math.max(0,Math.min(100, 100-(secs/180)*100));
+
+  /* THE TWO REGISTER NUMBERS, WHICH WERE ONE.
+     Coverage and reliability are different questions and the old dial answered
+     neither cleanly: "40.5% of 126" is a share of attempts, printed beside a
+     catalogue of 121, and a reader has to work out which number is which.
+       Registers reached  how many of the catalogue we put a question to
+       Answers back       how many of the times we asked came back with something
+     A register nobody had cause to call is not a register that failed, so the
+     first dial is coverage and is allowed to be amber without anything being
+     broken. */
+  var rc = d.reach || {};
+  var cat = rc.catalogue || 0, asked = rc.asked || 0;
+  var reachPct = cat ? Math.round(100*asked/cat) : null;
+
   /* Provable: the share of runs that are in the hashed log and still verify
      against it. The only instrument here that measures whether the record can
      be defended rather than whether the machine is quick. */
@@ -1001,16 +1198,22 @@ function gauges(d){
      deletion actually ran. A retention promise nobody measured is a sentence. */
   var dfail = del.days_failed||0, dall = d.window_days || (del.days_run||0);
   var delPct = dall ? Math.round(100*(dall-dfail)/dall) : null;
+
   $("#gauges").innerHTML =
       gauge(d.completion_pct,"Checks finished","%",
         num(d.runs.completed)+" of "+num(d.runs.attempted)+" reached an answer",
         band(d.completion_pct,95,85),"completing")
-    + gauge(s.success_pct,"Registers answering","%",
-        num(s.ok)+" of "+num(s.attempts)+" times we asked, a register answered",
+    + gauge(secs===0?null:secs,"Time to result","s",
+        d.runs.avg_ms ? "seconds on average. Green under two minutes, red past three."
+                      : "nothing has run in this window",
+        secState,"pace",secFill)
+    + gauge(reachPct,"Registers reached","%",
+        cat ? num(asked)+" of the "+num(cat)+" in the catalogue were asked at all"
+            : "the catalogue has not been counted",
+        band(reachPct,80,50),"reach")
+    + gauge(s.success_pct,"Answers back","%",
+        num(s.ok)+" of "+num(s.attempts)+" asks came back with something",
         band(s.success_pct,95,85),"registers")
-    + gauge(timePct,"Time to spare","%",
-        mins+" minutes on average, against a three minute ceiling",
-        band(timePct,60,30),"pace")
     + gauge(v.intact===undefined ? null : proof,"Runs we can prove","%",
         v.intact===true  ? num(v.checked)+" of "+num(ran)+" verify against the hashed log"
       : v.intact===false ? num(v.checked)+" of "+num(ran)+" verify, then the log breaks"
@@ -1161,7 +1364,7 @@ var PBX0=136, PBX1=1628;
    register before the publishing rules, and that is the order they are in. */
 var DOCLANE=["lr","mg","vend","hra","pub","sub","ir","ret","sec","cou"];
 var DOCID={hra:"HRA-001",mg:"MG-001",lr:"LR-001",pub:"PUB-001",sub:"SUB-001",
-           vend:"VEND-001",ret:"RET-001",ir:"IR-001",sec:"SEC-001",cou:"COU-001"};
+           vend:"VEND-001",ret:"RET-001",ir:"IR-001",sec:"SEC-001",cou:"CDP-001"};
 
 function pathNodes(d){
   var R=function(k){ return (BOARD_ROWS&&BOARD_ROWS[k])||null; };
@@ -1386,15 +1589,18 @@ function pathmap(d){
   });
 
   /* The two lamps that watch this panel rather than the check. They have no
-     step on the path because they are not steps in it, and putting them on
-     one would be the same lie the drawing exists to avoid. */
+     step on the path because they are not steps in it, and putting them on one
+     would be the same lie the drawing exists to avoid. They used to sit on the
+     drawing's own header, where being inside the panel read as being inside
+     the process. They are in the masthead now, which is the panel's header,
+     and they open the same sheet they always did. */
   var house=[["m:signin","Sign in"],["r:build","Page and API"]].map(function(h){
     var r=BOARD_ROWS?BOARD_ROWS[h[0]]:null, s=r?r.s:"warn";
-    return '<button class="hl" type="button" data-s="'+s+'" data-open="'+h[0]+'" title="'
+    return '<button class="pgl" type="button" data-s="'+s+'" data-open="'+h[0]+'" title="'
       +esc(r?r.v:"")+'"><i></i>'+esc(h[1])+'</button>';
   }).join("");
   document.getElementById("house").innerHTML=house;
-  document.querySelectorAll("#house .hl").forEach(function(b){
+  document.querySelectorAll("#house .pgl").forEach(function(b){
     b.addEventListener("click",function(){ openLamp(b.getAttribute("data-open")); });
   });
 }
@@ -1443,15 +1649,18 @@ function openStage(ci){
 
 function openLamp(key){
   var x=BOARD_ROWS[key]; if(!x) return;
+  /* A document row is not a lamp with two colours any more. All ten are
+     written, so the question is not amber-or-red, it is what this governs and
+     where it actually stands. */
   var rows = x.doc
-    ? [["What it is",x.what],["Amber means",x.amber],["Red means",x.red],["Where it sits",x.go]]
+    ? [["What it governs",x.what],["Where it stands",x.v2||x.why||""],["Where it sits",x.go]]
     : x.sys
     ? [["What it is",x.what],["Amber means",x.amber],["Red means",x.red],["What to do",x.go]]
     : [["What it counts",x.what],["The line",x.rule],["What to do",x.go]];
   if(x.extra && x.extra.length) rows = rows.concat(x.extra);
   var lit = x.doc
-    ? (x.s==="bad" ? "Red, a blocker is open in it"
-       : (x.s==="warn" ? "Amber, not written yet" : "Green, written and current"))
+    ? (x.s==="bad" ? "Red, it records a NO-GO"
+       : (x.s==="warn" ? "Amber, written and not signed off" : "Green, signed off"))
     : x.sys
     ? (x.s==="bad" ? "Red, this is down"
        : (x.s==="warn" ? "Amber, not seen working today" : "Green, working"))
@@ -1649,16 +1858,23 @@ var GAUGE_INFO = {
           ["Where it comes from","The run record. A check counts as finished when it produced an assessment, not when it produced a page."],
           ["The line","Amber below 95 per cent. Red below 85."],
           ["What to do","Compare it against Registers answering. If the registers are fine and this is not, the fault is after retrieval rather than in it."]]},
-  registers:{ t:"Registers answering",
-    rows:[["What it measures","Of every register we asked in this window, how many came back with something."],
-          ["Where it comes from","The retrieval log, counted per attempt. A register that answered with nothing still counts as answering."],
+  reach:{ t:"Registers reached",
+    rows:[["What it measures","How many of the registers in the catalogue we put a question to at all, in this window."],
+          ["Why it is separate","Coverage and reliability are different questions and this board used to answer them with one number. This one says how wide we looked. Answers back says how well what we asked performed."],
+          ["Where it comes from","The retrieval log, counted once per register rather than once per attempt."],
+          ["The line","Amber below 80 per cent of the catalogue. Red below 50."],
+          ["What a low number means","Usually that the checks in this window did not need the rest, not that anything is broken. A register nobody had cause to call is not a register that failed. It is only a fault when a check should have reached one and did not, and that shows up as an incomplete run rather than here."]]},
+  registers:{ t:"Answers back",
+    rows:[["What it measures","Of every time we asked a register in this window, how often something came back."],
+          ["Where it comes from","The retrieval log, counted per attempt. A register that answered with nothing found still counts as answering, because it answered."],
           ["The line","Amber below 95 per cent. Red below 85."],
-          ["What to do","Open the worst registers list underneath and see whether it is one publisher or all of them."]]},
-  pace:{ t:"Time to spare",
-    rows:[["What it measures","How much headroom is left against the three minute ceiling a check is allowed to take."],
-          ["Where it comes from","The average run time across the window, not the slowest run."],
-          ["The line","Amber below 60 per cent headroom. Red below 30."],
-          ["What to do","A falling pace is usually a rate limit rather than a fault. Check the provider before checking the code."]]},
+          ["What to do","Open the worst registers list underneath and see whether it is one publisher or all of them. One register is usually the publisher. All of them is usually us."]]},
+  pace:{ t:"Time to result",
+    rows:[["What it measures","How many seconds a check takes on average, from the moment somebody presses Check to the moment they have an answer."],
+          ["Why it is in seconds","It used to read as a percentage of headroom against a ceiling nobody could see. The person waiting has seconds, so the dial has seconds."],
+          ["Where it comes from","The average run time across the window, not the slowest run. The needle runs against the three minute ceiling."],
+          ["The line","Green to two minutes. Amber from two to three. Red past three."],
+          ["What to do","A rising time is usually a rate limit rather than a fault. Check the provider before checking the code."]]},
   provable:{ t:"Runs we can prove",
     rows:[["What it measures","The share of runs that are in the hashed log and still verify against it."],
           ["Why it is here","It is the only dial on this board that measures whether the record can be defended, rather than whether the machine is quick."],
@@ -1771,7 +1987,7 @@ window.addEventListener("resize",fitStage);
    left lit only when something red is inside it. The reader screen and the
    masthead never dim, because they are what tells you how many faults there
    are and whether the numbers you are looking at are current. */
-var FLEAF = ".hl,.gauge,.plate,.rblk,.evirow,.nnode";
+var FLEAF = ".pgl,.gauge,.plate,.rblk,.evirow,.nnode";
 var FBLOCK = ".card,.floor,.gauges,.chart,.pulsetab tbody tr";
 
 function markFaults(){
@@ -1804,6 +2020,117 @@ document.getElementById("faultbtn").addEventListener("click",function(){
   setFaults(!document.body.classList.contains("faults"));
 });
 
+/* ========================================================== FULL SCREEN
+   The drawing is the instrument on this board and it is drawn into a panel
+   1,392 by 640 on a stage that is itself scaled to fit. This gives it the
+   whole window with nothing redrawn: same SVG, same viewBox, more room. The
+   stage transform has to come off for the duration, because a fixed overlay
+   inside a scaled ancestor is scaled with it. */
+function setFull(on){
+  document.body.classList.toggle("pathfull", !!on);
+  var b=document.getElementById("fullbtn");
+  b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.lastChild.nodeValue = on ? " Close" : " Full screen";
+  if(!on) fitStage();
+}
+document.getElementById("fullbtn").addEventListener("click",function(){
+  setFull(!document.body.classList.contains("pathfull"));
+});
+
+/* ============================================================ THE REGISTRY
+   The ten control documents. The posture at the top is quoted from
+   PACKAGE-001 rather than written here, so a reader is told what the shelf is
+   worth before they read a single row of it. */
+/* The supporting records and the posture, as a fallback for when the route has
+   not answered. They are written from the same source as api/_documents.js and
+   a guard in verify keeps the two the same. */
+var REG_SUPPORTING = [
+  {
+    "id": "PIA-001",
+    "v": "2.0",
+    "dated": "2026-09-05",
+    "title": "Privacy Impact Assessment",
+    "note": "The controlling privacy assessment. Every one of the ten sits inside the boundary it draws."
+  },
+  {
+    "id": "PACKAGE-001",
+    "v": "1.0",
+    "dated": "2026-09-06",
+    "title": "Controlled Standards Implementation Package",
+    "note": "The release posture for all ten. Its own words: they are not evidence that the controls exist."
+  },
+  {
+    "id": "LR-001.json",
+    "v": "1.0",
+    "dated": "2026-09-05",
+    "title": "Legal Authority Register, machine-readable",
+    "note": "The same 46 authorities as a validated JSON record."
+  },
+  {
+    "id": "UX-001",
+    "v": "1.0",
+    "dated": "2026-09-07",
+    "title": "UX/UI Development Manual",
+    "note": "The design and comprehension standard for every screen. Its own validation status: no live product audit or participant study."
+  }
+];
+var REG_POSTURE = "NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH. All ten standards are written and source-linked. They are not evidence that the controls exist. The release posture remains NO-GO until the controls are implemented, tested, independently verified where specified, signed off and, for counsel issues, approved in writing.";
+function registry(d){
+  var R=(d && d.registry) || null;
+  /* When the route is silent the local DOCS array answers instead, so the
+     registry is never an empty panel. Both carry the same ten. */
+  var docs=(R && R.docs) || DOCS.map(function(x){
+    var st=(d && d.documents && d.documents[x.k]) || "warn";
+    return { key:x.k, id:x.id, v:x.v, dated:x.dated, title:x.title,
+             governs:x.governs, why:x.why, holds:x.holds, state:st }; });
+  document.getElementById("regPost").innerHTML =
+    "<b>Release posture.</b> " + esc((R && R.posture) || REG_POSTURE);
+  var word=function(st){ return st==="ok" ? "Signed off"
+    : (st==="warn" ? "Written, not signed" : "NO-GO on file"); };
+  var rows = docs ? docs.map(function(x){
+      return '<div class="regrow">'
+        + '<div><div class="regid">'+esc(x.id)+'</div>'
+        + '<div class="regmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
+        + '<div><div class="regtitle">'+esc(x.title)+'</div>'
+        + '<div class="reggov">'+esc(x.governs)+'</div>'
+        + '<div class="regwhy">'+esc(x.why)+'</div></div>'
+        + '<div class="regstate" data-s="'+esc(x.state)+'"><i></i>'+esc(word(x.state))+'</div>'
+        + '</div>';
+    }).join("")
+: "";
+  var sup=(R && R.supporting) || REG_SUPPORTING;
+  if(sup.length) rows += '<div class="regsub"><div class="k">What the ten sit on</div>'
+    + sup.map(function(x){
+        return '<div class="regsrow"><div class="regid">'+esc(x.id)
+          + '<div class="regmeta">v'+esc(x.v)+' &#183; '+esc(x.dated)+'</div></div>'
+          + '<div><b style="color:var(--ink-2)">'+esc(x.title)+'.</b> '+esc(x.note)+'</div></div>';
+      }).join("") + '</div>';
+  document.getElementById("regBody").innerHTML=rows;
+}
+/* The registry fades rather than disappears, which makes it invisible and
+   fully focusable at the same time unless it is told otherwise. inert takes
+   it out of the tab order and out of the accessibility tree while it is shut,
+   without touching the fade. */
+function openRegistry(on){
+  var el=document.getElementById("registry");
+  el.classList.toggle("on", !!on);
+  if(on){ el.removeAttribute("inert"); el.removeAttribute("aria-hidden");
+          registry(LAST); var c=document.getElementById("regClose2"); c && c.focus(); }
+  else  { el.setAttribute("inert",""); el.setAttribute("aria-hidden","true");
+          var r=document.getElementById("regbtn"); r && r.focus(); }
+}
+openRegistry(false);
+document.getElementById("regbtn").addEventListener("click",function(){ openRegistry(true); });
+document.getElementById("regClose2").addEventListener("click",function(){ openRegistry(false); });
+document.getElementById("registry").addEventListener("click",function(e){
+  if(e.target===this) openRegistry(false);
+});
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Escape") return;
+  if(document.getElementById("registry").classList.contains("on")) openRegistry(false);
+  else if(document.body.classList.contains("pathfull")) setFull(false);
+});
+
 function paint(d){
   LAST=d;
   mstats(d); board(d); reader(d); pathmap(d); gauges(d); rank(d); pulse(d);
@@ -1820,7 +2147,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260907.0457";
+var BUILD = "20260907.0608";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){

@@ -17,12 +17,12 @@
 
 import { requireAdmin } from './_auth.js';
 import { CATALOGUE } from './_catalogue.js';
-import { DOCUMENTS } from './_documents.js';
+import { DOCUMENTS, DOCS, DOCS_SUPPORTING, DOCS_POSTURE } from './_documents.js';
 
 /* The build this API was deployed from. The page sends its own stamp on the
    query string and the two are compared here, because guessing which build is
    live has cost this project hours. */
-const BUILD = '20260907.0457';
+const BUILD = '20260907.0608';
 
 /* Amber is not a fault and must never be drawn as one. The rule below has no
    time threshold in it on purpose: a part is DOWN only when we asked it and it
@@ -170,6 +170,18 @@ export default async function handler(req, res) {
       ids.forEach(id => { const x = seen[id]; if (x) { asked += x.attempts; answered += x.ok; } });
       return health(asked, answered);
     };
+    /* Two different numbers that were being shown as one. HOW MANY REGISTERS
+       we put a question to is a coverage number, out of the catalogue. HOW
+       MANY TIMES we asked and got an answer back is a reliability number, out
+       of the attempts. A board that prints "40.5% of 126" leaves a reader
+       working out which of the two it is, and 126 is neither the catalogue nor
+       a percentage of anything they can see. */
+    const enabled = CATALOGUE.filter(x => x.enabled);
+    const reach = {
+      catalogue: enabled.length,
+      asked:     enabled.filter(x => (seen[x.source_id] || {}).attempts > 0).length,
+      answered:  enabled.filter(x => (seen[x.source_id] || {}).ok > 0).length
+    };
     const rdapRow = seen.ICANN_RDAP || seen.RDAP_DATE || null;
     const dl = del[0] || {};
     const systems = {
@@ -196,6 +208,11 @@ export default async function handler(req, res) {
       systems: systems,
       registers: registers,
       documents: DOCUMENTS,
+      /* The registry the board opens. Sent whole rather than as ten words, so
+         the drawer and the lamp cannot say different things about the same
+         document. */
+      registry: { docs: DOCS, supporting: DOCS_SUPPORTING, posture: DOCS_POSTURE },
+      reach: reach,
       window_days: days,
       generated: new Date().toISOString(),
       runs: r,
