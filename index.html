@@ -11512,7 +11512,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260907.0457";
+var KBYS_BUILD = "20260907.0608";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -13920,10 +13920,37 @@ document.addEventListener("keydown", function(e){
     if(open){ el.removeAttribute("inert"); el.removeAttribute("aria-hidden"); }
     else    { el.setAttribute("inert",""); el.setAttribute("aria-hidden","true"); }
   }
+  /* A MODAL THAT DOES NOT TRAP FOCUS IS NOT A MODAL.
+     The other half of the same problem. A shut overlay must not be reachable,
+     and while one IS open the page behind it must not be either: a keyboard
+     reader inside the waiting dialog could tab straight out to the console
+     header underneath, which is off the screen behind the scrim. Marking the
+     rest of the page inert for the duration is what aria-modal="true" is
+     already promising. */
+  var MODAL = ["sumBox","arBox","waitBox","regBox","dirBox","infoBox","rpPv"];
+  function trap(){
+    var open = MODAL.some(function(k){ var e=document.getElementById(k);
+      return e && !e.hasAttribute("inert"); });
+    var kids = document.body.children;
+    for(var i=0;i<kids.length;i++){
+      var el = kids[i];
+      if(el.tagName==="SCRIPT") continue;
+      /* The overlays are shut() territory and this must never touch them.
+         Clearing inert from every child when no modal is open undid the shut
+         fix on all five and put nine invisible controls back in the tab
+         order. Two mechanisms, one attribute, and they have to stay out of
+         each other's way. */
+      if(MODAL.indexOf(el.id) >= 0 || SHEETS.indexOf(el.id) >= 0) continue;
+      if(open && !el.contains(document.activeElement)) el.setAttribute("inert","");
+      else if(!open) el.removeAttribute("inert");
+    }
+  }
   var live=[];
   SHEETS.forEach(function(k){ var el=document.getElementById(k); if(el){ live.push(el); shut(el); } });
   var mo=new MutationObserver(function(recs){
-    for(var i=0;i<recs.length;i++) shut(recs[i].target); });
+    for(var i=0;i<recs.length;i++) shut(recs[i].target);
+    trap(); });
+  trap();
   live.forEach(function(el){
     mo.observe(el,{attributes:true,attributeFilter:["class","hidden","style"]}); });
 })();

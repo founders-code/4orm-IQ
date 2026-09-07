@@ -45,7 +45,7 @@
       "phantom": 0,
       "noring": 0,
       "headings": 0,
-      "stops": 26,
+      "stops": 8,
       "h1s": 0,
       "textRuns": 39,
       "overflow": 0
@@ -57,7 +57,7 @@
       "phantom": 0,
       "noring": 0,
       "headings": 0,
-      "stops": 26,
+      "stops": 8,
       "h1s": 0,
       "textRuns": 35,
       "overflow": 0
@@ -99,15 +99,15 @@
       "overflow": 0
     },
     "backoffice@1440": {
-      "contrast": 15,
+      "contrast": 2,
       "targets": 0,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
-      "headings": 2,
-      "stops": 16,
+      "headings": 3,
+      "stops": 18,
       "h1s": 0,
-      "textRuns": 184,
+      "textRuns": 189,
       "overflow": 0
     }
   }

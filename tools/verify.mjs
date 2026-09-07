@@ -2228,9 +2228,11 @@ if (!/id="faultbtn"/.test(admin))
   fails.push('the faults only button is gone from the back office');
 if (!/id="faultbtn"[^>]*aria-pressed/.test(admin))
   fails.push('the faults only button does not report its pressed state');
-if (!/<a class="trig" href="evidence\.html" id="mapbtn">[\s\S]{0,140}id="faultbtn"/.test(admin))
-  fails.push('the faults only button is not beside the map button');
-if (!/<span class="live">[\s\S]{0,80}?<span class="who" id="who">/.test(admin))
+if (!/id="regbtn">The registry<\/button>\s*<button class="trig" type="button" id="faultbtn"/.test(admin))
+  fails.push('the faults only button is not beside the registry button');
+/* The panel lamps moved in between the live pill and the address. Both are
+   still in the masthead, which is what the guard is protecting. */
+if (!/<span class="live">[\s\S]{0,420}?<span class="who" id="who">/.test(admin))
   fails.push('the signed in address is no longer beside the live pill');
 if (/<div class="mctl">[\s\S]{0,400}?class="who"/.test(admin))
   fails.push('the signed in address is still down in the controls');
@@ -2277,6 +2279,16 @@ if (!/el\.setAttribute\("inert",""\)/.test(html))
   fails.push('shut overlays are not made inert, so their controls stay in the tab order');
 if (!/el\.setAttribute\("aria-hidden","true"\)/.test(html))
   fails.push('shut overlays are not hidden from assistive technology');
+
+/* A modal that does not trap focus is not a modal. The other half of the shut
+   overlay problem: while one IS open, the page behind it must not be
+   reachable either. A keyboard reader inside the waiting dialog could tab
+   straight out to the console header underneath it. */
+if (!/function trap\(\)/.test(html))
+  fails.push('nothing holds focus inside an open overlay, so a keyboard reader can tab out behind it');
+if (!/if\(MODAL\.indexOf\(el\.id\) >= 0 \|\| SHEETS\.indexOf\(el\.id\) >= 0\) continue;/.test(html))
+  fails.push('the focus trap touches the overlays themselves, which undoes the shut-overlay fix and '
+    + 'puts every invisible control back in the tab order');
 if (!/new MutationObserver/.test(html))
   fails.push('nothing watches the overlays, so one opened by a path nobody remembered is left reachable while shut');
 if (/parseFloat\(getComputedStyle\(el\)\.opacity\) > 0\.01/.test(html))
@@ -2346,8 +2358,8 @@ if (!/var LANES=\[/.test(admin) || (admin.match(/\{lab:"/g) || []).length !== 10
 for (const k of ['m:signin', 'r:build'])
   if (!new RegExp('\\["' + k + '"').test(admin))
     fails.push(k + ' is no longer a header chip, so it has been put on the path or dropped');
-if (!/class="hl"/.test(admin))
-  fails.push('the header chips are gone, so two lamps have been dropped from the board');
+if (!/class="pgl"/.test(admin))
+  fails.push('the two panel lamps are gone, so two lamps have been dropped from the board');
 /* A way out is not the main flow, and faults only has to take the pipework
    down with the boxes or it shows an operator a diagram of nothing. */
 if (!/\.pipe\.out\{stroke:rgba\(111,129,153/.test(admin))
@@ -2361,6 +2373,91 @@ if (!/\.hl\{[\s\S]{0,700}height:32px/.test(admin))
 for (const sel of ['.trig:focus-visible', '.hl:focus-visible', '.nnode.clicky:focus-visible'])
   if (!admin.includes(sel + '{outline:2px solid'))
     fails.push(sel + ' has no focus ring');
+
+/* ----------------------------------------------- the ten control documents
+
+   On 6 September all ten were written. That is a real change and the board
+   says so. It is not clearance, and PACKAGE-001 says why in its own words:
+   they are not evidence that the controls exist. A lamp that goes green
+   because a file exists is the same failure as a check that reads clean
+   because nobody asked, and this product exists to refuse that one. */
+{
+  const docsFile = fs.readFileSync(path.join(root, 'api', '_documents.js'), 'utf8');
+  const mod = docsFile;
+  if (!/export const DOCS = \[/.test(mod))
+    fails.push('the control-document registry is gone from api/_documents.js');
+  if (!/DOCS_POSTURE/.test(mod) || !/NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH/.test(mod))
+    fails.push('the release posture is no longer carried with the documents');
+  if (!/NO-GO/.test(mod))
+    fails.push('the release posture no longer records the NO-GO');
+  /* Nothing is signed off yet, so nothing may be green. When one is, this
+     guard is the thing that has to be changed deliberately. */
+  const greens = [...mod.matchAll(/state:\s*'ok'/g)].length;
+  if (greens) fails.push(greens + ' control document(s) are marked signed off. '
+    + 'No approval record is signed, and a written document is not a cleared one.');
+  for (const id of ['LR-001','MG-001','VEND-001','HRA-001','PUB-001','SUB-001',
+                    'IR-001','RET-001','SEC-001','CDP-001'])
+    if (!mod.includes(id)) fails.push('the registry no longer carries ' + id);
+  /* The two that record a NO-GO on their own cover are red for that reason. */
+  for (const k of ['mg', 'hra'])
+    if (!new RegExp("key: '" + k + "'[\\s\\S]{0,900}?state: 'bad'").test(mod))
+      fails.push(k.toUpperCase() + '-001 records a NO-GO on its cover and is not drawn red');
+  /* Comments are stripped first. A comment explaining that the old wording is
+     gone must not read as the old wording still being there. This is the
+     fourth guard in this suite to have flagged a sentence promising not to do
+     a thing rather than the thing. */
+  const noComments = admin.replace(/\/\*[\s\S]*?\*\//g, '');
+  if (/["']Not written["']/.test(noComments))
+    fails.push('a document lamp still reads "Not written". All ten are written.');
+  if (!/Written, not signed/.test(admin))
+    fails.push('the document lamps no longer distinguish written from signed off');
+  if (!/registry: \{ docs: DOCS/.test(metrics))
+    fails.push('the metrics route no longer sends the registry, so the drawer and the lamp can drift');
+}
+
+/* --------------------------------------------------- the registry, on screen */
+if (!/id="registry"/.test(admin)) fails.push('the registry is gone from the back office');
+if (!/id="regbtn"/.test(admin)) fails.push('there is no way to open the registry');
+if (/href="evidence\.html"/.test(admin))
+  fails.push('the map pill is back beside the registry pill');
+if (!/el\.setAttribute\("inert",""\);\s*el\.setAttribute\("aria-hidden","true"\)/.test(admin))
+  fails.push('the registry stays in the tab order while it is shut');
+if (!/REG_POSTURE/.test(admin))
+  fails.push('the registry has no posture to show when the route is silent');
+
+/* ------------------------------------------------------------ full screen */
+if (!/id="fullbtn"/.test(admin)) fails.push('the full screen control is gone');
+if (!/body\.pathfull #stage\{transform:none!important/.test(admin))
+  fails.push('full screen leaves the stage transform on, so the overlay is scaled with it');
+if (!/function setFull\(/.test(admin)) fails.push('nothing drives full screen');
+if (!/if\(!on\) fitStage\(\);/.test(admin))
+  fails.push('the board is not refitted when full screen closes');
+
+/* ------------------------------------------------- the dials, and their units
+   One register number was answering two different questions and a time dial
+   was reading as a percentage of a ceiling nobody could see. */
+if (!/"Time to result","s"/.test(admin))
+  fails.push('the time dial no longer reads in seconds');
+if (/"Time to spare"/.test(admin))
+  fails.push('the time dial is back to a percentage of headroom');
+if (!/gauge\(reachPct,"Registers reached"/.test(admin)
+    || !/gauge\(s\.success_pct,"Answers back"/.test(admin))
+  fails.push('coverage and reliability are back to being one register number');
+if (!/secs<=120 \? "ok" : \(secs<=180 \? "warn" : "bad"\)/.test(admin))
+  fails.push('the time dial no longer turns at two and three minutes');
+if (!/function gauge\(pct,cap,unit,note,state,key,fill\)/.test(admin))
+  fails.push('the dial cannot separate what it prints from how far the needle goes, '
+    + 'so a seconds dial will read as a percentage again');
+if (!/reach: reach/.test(metrics))
+  fails.push('the metrics route does not report how much of the catalogue was reached');
+if (!/asked:\s+enabled\.filter/.test(metrics))
+  fails.push('registers reached is not counted once per register');
+
+/* The two lamps that watch the panel are not steps in the process. */
+if (!/class="panellamps" id="house"/.test(admin))
+  fails.push('the two panel lamps are not in the masthead');
+if (/<div class="house" id="house">/.test(admin))
+  fails.push('the panel lamps are back on the drawing header, where they read as part of the process');
 
 /* The chain lamp told a reader to press Verify the chain, and the wall board
    had no such control. That is worse than the wrong wording it replaced: it
@@ -2395,8 +2492,8 @@ if (!/isFinite\(w\[1\]\)/.test(admin))
    The page a partner is shown in a room. It carries the three points where the
    intelligence sits, and the one distinction that page exists to make: the
    intake is a conversation built on motivational interviewing, not a chatbot. */
-if (!/href="evidence\.html"/.test(admin))
-  fails.push('there is no way to reach the map from the back office');
+/* The map pill became the registry pill. evidence.html is still a page and
+   still reachable at its own address; it is no longer on the masthead. */
 if (!/href="admin\.html"/.test(eviPage))
   fails.push('the map has no way back to the back office');
 for (const id of ['intake', 'read', 'corpus'])

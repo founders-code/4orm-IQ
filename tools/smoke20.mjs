@@ -65,11 +65,11 @@ await new Promise(r => setTimeout(r, 150));
    watch this panel rather than the check. Nothing was dropped in that move and
    this is where that is proved. */
 const nodes = [...doc.querySelectorAll('#pathmap .nnode')];
-const chips = [...doc.querySelectorAll('#house .hl')];
+const chips = [...doc.querySelectorAll('#house .pgl')];
 const state = s => nodes.filter(e => e.getAttribute('data-s') === s).length;
 console.log('path nodes:', nodes.length,
   JSON.stringify({ ok:state('ok'), warn:state('warn'), bad:state('bad') }));
-console.log('header chips:', chips.length);
+console.log('panel lamps:', chips.length);
 console.log('dials:', doc.querySelectorAll('#gauges .gauge').length);
 console.log('registers ranked:', doc.querySelectorAll('#rank .rblk').length);
 console.log('clickable:', doc.querySelectorAll('#pathmap .nnode.clicky,.hl,.gauge[data-info],.rblk').length);
@@ -82,7 +82,7 @@ for (const bad of ['identifier','searched for','looked up','party name','query v
 
 const fails = [];
 if (nodes.length !== 46) fails.push('the path map is ' + nodes.length + ' nodes, not 46');
-if (chips.length !== 2) fails.push('the two lamps that watch the panel are not in the header');
+if (chips.length !== 2) fails.push('the two lamps that watch the panel are not in the masthead');
 if (doc.getElementById('board')) fails.push('the old annunciator grid is back');
 if (doc.getElementById('mimic')) fails.push('the old mimic diagram is back');
 /* The move is only honest if every lamp survived it. 8 machine, 8 readings,
@@ -98,7 +98,15 @@ if (doc.getElementById('mimic')) fails.push('the old mimic diagram is back');
       + ', expected 8/8/10');
   if (!nodes.length) fails.push('the path map drew nothing');
 }
-if (doc.querySelectorAll('#gauges .gauge').length !== 5) fails.push('a dial is missing');
+/* Six now. The one register number that was answering two different questions
+   became two dials: how wide we looked, and how often an ask came back. */
+if (doc.querySelectorAll('#gauges .gauge').length !== 6) fails.push('a dial is missing');
+{
+  const caps = [...doc.querySelectorAll('#gauges .gcap')].map(x => x.textContent.trim());
+  for (const want of ['Time to result','Registers reached','Answers back'])
+    if (!caps.includes(want)) fails.push('the dial "' + want + '" is gone: ' + caps.join(', '));
+  if (caps.includes('Time to spare')) fails.push('the time dial is back to a percentage of headroom');
+}
 if (!doc.querySelector('#days svg')) fails.push('the checks per day chart did not draw');
 if (!/OpenCorporates/.test(t)) fails.push('the worst register list is not naming registers');
 if (!/62\.2/.test(t)) fails.push('the worst register list lost its percentage');

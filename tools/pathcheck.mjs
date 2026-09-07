@@ -23,17 +23,26 @@ const info = await p.evaluate(()=>{
       if(tb.x+tb.width > box.x+box.width-3 || tb.x < box.x-1)
         over.push(g.getAttribute('data-id')+' :: '+t.textContent.slice(0,40)); }); });
   return { count:nodes.length, clicky:document.querySelectorAll('#pathmap .nnode.clicky').length,
-    house:document.querySelectorAll('#house .hl').length,
+    panellamps:document.querySelectorAll('#house .pgl').length,
+    fullbtn:document.querySelectorAll('#fullbtn').length,
+    registry:document.querySelectorAll('#registry .regrow').length,
     gauges:document.querySelectorAll('#gauges .gauge').length, hits, over }; });
 
 const fails=[];
-const want={count:46, clicky:43, house:2, gauges:5};
+/* The handover's numbers, moved on twice since it was written. The two lamps
+   that watch this panel rather than the check left the drawing header for the
+   masthead, where a lamp about the panel belongs, and the header now carries
+   the full-screen control instead. The dials went from five to six when the
+   one register number that was answering two different questions was split
+   into how wide we looked and how often an ask came back. */
+const want={count:46, clicky:43, panellamps:2, gauges:6};
 for (const k of Object.keys(want))
   if (info[k]!==want[k]) fails.push(k+' is '+info[k]+', the handover says '+want[k]);
 if (info.hits.length) fails.push('boxes overlap: '+info.hits.join(', '));
 if (info.over.length) fails.push('text outside its box: '+info.over.slice(0,5).join(' | '));
-console.log('nodes', info.count, '| clickable', info.clicky, '| header chips', info.house,
+console.log('nodes', info.count, '| clickable', info.clicky, '| panel lamps', info.panellamps,
             '| dials', info.gauges, '| overlaps', info.hits.length, '| text overruns', info.over.length);
+if (info.fullbtn !== 1) fails.push('the full screen control is not on the drawing header');
 
 /* 4. every node opens onto something */
 const empty = await p.evaluate(()=>{
@@ -42,12 +51,56 @@ const empty = await p.evaluate(()=>{
     g.dispatchEvent(new MouseEvent('click',{bubbles:true}));
     const b=document.getElementById('shB');
     if(!b || b.textContent.trim().length < 60) out.push(g.getAttribute('data-id')); });
-  document.querySelectorAll('#house .hl').forEach(b2=>{
+  document.querySelectorAll('#house .pgl').forEach(b2=>{
     b2.click(); const b=document.getElementById('shB');
     if(!b || b.textContent.trim().length < 60) out.push(b2.getAttribute('data-open')); });
   return out; });
 if (empty.length) fails.push('these open onto nothing: '+empty.join(', '));
 console.log('nodes opening onto nothing:', empty.length);
+
+/* the lamp sheet is left open by the loop above and would swallow the clicks */
+await p.evaluate(()=>{ const c=document.getElementById('shC'); c && c.click(); });
+await p.waitForTimeout(400);
+
+/* THE REGISTRY. Ten rows, the posture quoted rather than written, and shut
+   means shut: a faded overlay that keeps its controls in the tab order is
+   invisible and reachable at the same time. */
+{
+  const shut = await p.evaluate(()=>{ const e=document.getElementById('registry');
+    return e.hasAttribute('inert') && e.getAttribute('aria-hidden')==='true'; });
+  if (!shut) fails.push('the registry is shut and still in the tab order');
+  await p.click('#regbtn'); await p.waitForTimeout(500);
+  const reg = await p.evaluate(()=>({
+    rows: document.querySelectorAll('#regBody .regrow').length,
+    sup:  document.querySelectorAll('#regBody .regsrow').length,
+    post: document.getElementById('regPost').innerText,
+    inert: document.getElementById('registry').hasAttribute('inert'),
+    ids:  [...document.querySelectorAll('#regBody .regid')].map(x=>x.childNodes[0].nodeValue.trim()) }));
+  console.log('registry rows', reg.rows, '| supporting', reg.sup);
+  if (reg.rows !== 10) fails.push('the registry is '+reg.rows+' documents, not ten');
+  if (reg.inert) fails.push('the registry is open and still inert');
+  if (!/NOT READY FOR UNCONDITIONAL PUBLIC LAUNCH/.test(reg.post))
+    fails.push('the registry does not carry the release posture');
+  if (!/NO-GO/.test(reg.post)) fails.push('the release posture no longer says NO-GO');
+  if (!reg.ids.includes('CDP-001')) fails.push('the counsel pack is not listed under its own id');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(400);
+  if (await p.evaluate(()=>document.getElementById('registry').classList.contains('on')))
+    fails.push('Escape does not close the registry');
+}
+
+/* FULL SCREEN. The drawing has to get bigger and come back. */
+{
+  const before = await p.evaluate(()=>Math.round(document.querySelector('.pathwrap').getBoundingClientRect().width));
+  await p.click('#fullbtn'); await p.waitForTimeout(700);
+  const after = await p.evaluate(()=>Math.round(document.querySelector('.pathwrap').getBoundingClientRect().width));
+  console.log('map width', before, '->', after);
+  if (after <= before) fails.push('full screen did not make the drawing bigger');
+  if (!await p.evaluate(()=>document.getElementById('fullbtn').getAttribute('aria-pressed')==='true'))
+    fails.push('the full screen control does not report its pressed state');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(600);
+  const back = await p.evaluate(()=>Math.round(document.querySelector('.pathwrap').getBoundingClientRect().width));
+  if (Math.abs(back-before) > 4) fails.push('the board did not come back from full screen: '+before+' -> '+back);
+}
 
 /* the chain still offers the walk */
 const walk = await p.evaluate(()=>{ window.openLamp('m:chain');
