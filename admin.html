@@ -83,6 +83,9 @@ body{font:15px/1.5 var(--ui);color:var(--ink);-webkit-font-smoothing:antialiased
   font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
   cursor:pointer;transition:all .18s var(--ease)}
 .trig:hover{border-color:var(--edge-lit);color:var(--ink)}
+/* Every other control on this board shows a ring. These five never did, and
+   they are the ones a keyboard reader meets first. */
+.trig:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 a.trig{text-decoration:none}
 #mapbtn{border-color:rgba(76,135,255,.55);color:var(--blue)}
 #mapbtn:hover{background:rgba(76,135,255,.12);border-color:var(--blue);color:#9CBBFF}
@@ -104,8 +107,8 @@ body.faults .fdim,body.faults .fdim *{animation:none!important;
 body.faults .fdim{pointer-events:none}
 
 /* --------------------------------------------------------- the two thirds */
-.body{display:grid;grid-template-columns:2fr 1fr;gap:22px;min-height:0}
-.lft{display:grid;grid-template-rows:auto auto 1fr;gap:16px;min-height:0}
+.body{display:grid;grid-template-columns:1fr 452px;gap:20px;min-height:0}
+.lft{display:grid;grid-template-rows:1fr 300px;gap:16px;min-height:0}
 .rgt{display:grid;grid-template-rows:auto 1fr;gap:14px;min-height:0}
 
 /* ----------------------------------------------------- the annunciator */
@@ -151,7 +154,15 @@ body.faults .fdim{pointer-events:none}
 @media(prefers-reduced-motion:reduce){.pl[data-s="bad"] i,.live i{animation:none}}
 
 /* ------------------------------------------------------------- the dials */
-.gauges{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+/* The dials moved to the right rail when the drawing took the left of the
+   board. Two across, and the fifth takes the full width, so the one that
+   measures whether the record can be defended is not the odd one out. */
+.gauges{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 10px;
+  border:1px solid var(--edge);border-radius:var(--r);align-content:center;
+  background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
+  padding:12px 10px}
+.gauges .gauge:nth-child(5){grid-column:1/-1}
+.gauges .gauge:nth-child(5) .gwrap{max-width:150px}
 .gauge{text-align:center;appearance:none;background:none;border:0;padding:6px 4px;
   font:inherit;color:inherit;cursor:pointer;border-radius:10px;
   transition:background .18s var(--ease)}
@@ -209,6 +220,7 @@ tr:last-child td{border-bottom:0}
   transition:background .18s var(--ease)}
 .rblk:hover{background:rgba(255,255,255,.035)}
 .rblk:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.nnode.clicky:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .rrow{display:flex;align-items:baseline;gap:10px;margin-top:2px}
 .rname{font-size:12px;color:var(--ink-2)}
 .rv{margin-left:auto;font-family:var(--mono);font-size:11.5px;font-weight:700;
@@ -405,6 +417,98 @@ select.trig{appearance:none;min-width:96px;padding:8px 14px;text-align:center;
   background-image:none}
 select.trig option{background:var(--panel);color:var(--ink);
   font-family:var(--ui);text-transform:none;letter-spacing:0}
+/* ================================================================ THE PATH
+   The annunciator grid and the little mimic diagram are gone. There is one
+   drawing now, and every lamp sits on the step it watches. A lamp with no
+   step under it was always the weaker half of that pair: it told an operator
+   that something was amber without telling them what stops working because
+   of it. Ten lanes, read top to bottom, the way the check actually runs. */
+.path{border:1px solid var(--edge);border-radius:var(--r);
+  background:linear-gradient(180deg,var(--panel) 0%,var(--sunk) 100%);
+  padding:11px 14px 9px;display:grid;grid-template-rows:auto 1fr;gap:7px;min-height:0}
+.pathhd{display:flex;align-items:baseline;gap:16px}
+.pathhd .ck{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--title);opacity:.85;white-space:nowrap}
+.pathhd .sb{font-family:var(--ui);font-size:11px;color:var(--ink-3)}
+.house{margin-left:auto;display:flex;gap:7px;flex:none}
+/* min-height, not more padding. The chip reads the same and the hit area
+   clears the 24px minimum, which it missed at 17. */
+.hl{appearance:none;background:var(--panel-2);border:1px solid var(--edge-2);
+  border-radius:99px;display:inline-flex;align-items:center;gap:7px;padding:5px 12px;
+  /* 32 on the stage, not 24. The board is a fixed 1920 stage scaled to fit,
+     so on a 1440 screen every control renders at 0.75 of its written size. A
+     24px chip lands as 18 real pixels under the pointer, which is the number
+     that matters. 32 lands as 24. */
+  height:32px;box-sizing:border-box;padding:5px 14px;
+  cursor:pointer;font-family:var(--ui);font-size:9px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-2);transition:all .18s var(--ease)}
+.hl:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.hl i{width:7px;height:7px;border-radius:50%;background:var(--idle);flex:none}
+.hl[data-s="ok"] i{background:var(--ok-l);box-shadow:0 0 6px rgba(38,161,111,.55)}
+.hl[data-s="warn"] i{background:var(--warn-l);box-shadow:0 0 6px rgba(188,155,76,.5)}
+.hl[data-s="bad"] i{background:var(--bad);box-shadow:0 0 8px rgba(255,83,64,.75);
+  animation:alarm 1.15s ease-in-out infinite}
+.hl:hover{border-color:var(--edge-lit);color:var(--ink)}
+.pathwrap{min-height:0;position:relative}
+.pathwrap svg{width:100%;height:100%;display:block}
+/* The lanes. A band behind every stage, so a step is read as belonging to a
+   part of the process before it is read as a box. */
+.lane{fill:rgba(76,135,255,.030);stroke:none}
+.lane.alt{fill:rgba(255,255,255,.017)}
+.lanerule{stroke:var(--edge);stroke-width:1}
+.lanelab{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.10em;
+  text-anchor:end;fill:var(--title);opacity:.74;text-transform:uppercase}
+.lanesub{font-family:var(--mono);font-size:8px;letter-spacing:.05em;text-anchor:end;
+  fill:var(--ink-4)}
+/* Node type on this drawing runs a size and a half larger than it did on the
+   mimic, because the mimic was a thumbnail and this is the instrument. */
+.pathwrap .ntitle{font-size:11.5px;font-weight:600}
+.pathwrap .nsub{font-size:8.5px}
+.pathwrap .nbox{stroke-width:1.4}
+/* A decision is a chamfered plate, not a diamond. A diamond wastes the width
+   it needs to hold a readable question at this scale. */
+.decbox{fill:var(--panel-2);stroke:var(--edge-2);stroke-width:1.4}
+.nnode[data-s="ok"] .decbox{stroke:rgba(51,216,155,.45)}
+.nnode[data-s="warn"] .decbox{stroke:rgba(231,199,108,.6);fill:rgba(231,199,108,.07)}
+.nnode[data-s="bad"] .decbox{stroke:var(--bad);fill:rgba(255,83,64,.13)}
+/* An exit is a way out of the process. Dashed, because nothing continues. */
+.exitbox{fill:var(--sunk);stroke:var(--edge-2);stroke-width:1.4;stroke-dasharray:5 4}
+.nnode[data-s="bad"] .exitbox{stroke:var(--bad);fill:rgba(255,83,64,.10)}
+.nnode[data-s="warn"] .exitbox{stroke:rgba(231,199,108,.6)}
+/* A register family. Thin, wide, and it carries how many of its registers
+   answered on the right hand end. */
+.regbox{fill:var(--panel);stroke:var(--edge-2);stroke-width:1.2}
+.nnode[data-s="ok"] .regbox{stroke:rgba(51,216,155,.40)}
+.nnode[data-s="warn"] .regbox{stroke:rgba(231,199,108,.55);fill:rgba(231,199,108,.055)}
+.nnode[data-s="bad"] .regbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
+/* A control document. It governs a stage rather than running inside one, so
+   it sits on its own lane under the drawing and is drawn as a plate. */
+.chipbox{fill:var(--sunk);stroke:var(--edge);stroke-width:1.2}
+.nnode[data-s="warn"] .chipbox{stroke:rgba(231,199,108,.5);fill:rgba(231,199,108,.05)}
+.nnode[data-s="bad"] .chipbox{stroke:var(--bad);fill:rgba(255,83,64,.12)}
+.chipid{font-family:var(--mono);font-size:7.5px;letter-spacing:.09em;fill:var(--ink-4)}
+.nnode[data-s="bad"] .chipid{fill:#FF8574}
+.pathwrap .slab{font-size:8.5px}
+/* Faults only takes the drawing down to what is wrong, and that has to
+   include the lines and the lanes. A board that dimmed every box and left
+   the pipework lit would be showing an operator a diagram of nothing. */
+body.faults #pathmap .pipe:not(.dead),body.faults #pathmap .mtrunk,
+body.faults #pathmap .lane,body.faults #pathmap .lanerule,
+body.faults #pathmap .lanelab,body.faults #pathmap .lanesub{opacity:.05;
+  animation:none!important}
+/* A way out of the process is drawn quieter than the way through it. Two
+   long animated blue lines running off to "turned away" read as the main
+   flow, and turning somebody away is not the main flow. */
+.pipe.out{stroke:rgba(111,129,153,.5);stroke-width:2;stroke-dasharray:5 7;
+  animation:none}
+.pipe.out.dead{stroke:rgba(255,83,64,.5)}
+.arwh{fill:rgba(76,135,255,.6)}
+.arwh.dead{fill:rgba(255,83,64,.6)}
+.chipt{font-family:var(--mono);font-size:9.5px;font-weight:600;fill:var(--ink)}
+.nnode[data-s="bad"] .chipt{fill:#FFB3A8}
+.pathwrap .nnode.clicky:hover .nbox,.pathwrap .nnode.clicky:hover .decbox,
+.pathwrap .nnode.clicky:hover .regbox,.pathwrap .nnode.clicky:hover .chipbox,
+.pathwrap .nnode.clicky:hover .exitbox{stroke:var(--edge-lit);fill:#141F2C}
 </style></head><body data-clerk="pk_test_YWN0dWFsLWRvbmtleS03ODYuY2xlcmsuYWNjb3VudHMuZGV2JA" data-boot="1">
 
 <div class="boot" id="boot">Checking your session</div>
@@ -446,8 +550,14 @@ select.trig option{background:var(--panel);color:var(--ink);
 
   <div class="body">
     <div class="lft">
-      <div class="field" id="board"></div>
-      <div class="gauges" id="gauges"></div>
+      <div class="path">
+        <div class="pathhd">
+          <span class="ck">The path a check takes</span>
+          <span class="sb">Every lamp sits on the step it watches. Press a step to open it.</span>
+          <div class="house" id="house"></div>
+        </div>
+        <div class="pathwrap" id="pathmap"></div>
+      </div>
       <div class="pair">
         <div class="card">
           <div class="ck">Early warning</div>
@@ -488,7 +598,7 @@ select.trig option{background:var(--panel);color:var(--ink);
           <div class="rdfoot" id="rdfoot"></div>
         </div>
       </div>
-      <div class="mimic" id="mimic"></div>
+      <div class="gauges" id="gauges"></div>
     </div>
   </div>
 
@@ -931,8 +1041,13 @@ function rank(d){
   /* A row whose name did not come back is not a register at zero per cent. It
      is a row we cannot read, and printing it as "undefined, 0.0%" invents a
      failing register out of a missing field. Drop it and count nothing. */
-  var W=(d.sources.worst||[]).filter(function(w){
-    return w && w[0] && String(w[0])!=="undefined" && typeof w[1]==="number"; });
+  var W=(d.sources.worst||[]).map(function(w){
+    /* A percentage computed in the database comes back as a string, so it is
+       coerced here rather than tested for its type. Testing the type emptied
+       this list entirely, which is a worse failure than the row it was meant
+       to drop: a hazard list showing nothing reads as no hazards. */
+    return w ? [w[0], Number(w[1])] : null; }).filter(function(w){
+    return w && w[0] && String(w[0])!=="undefined" && isFinite(w[1]); });
   $("#rank").innerHTML=W.slice(0,5).map(function(w){
     var s=w[1]>=95?"ok":(w[1]>=85?"warn":"bad");
     return '<button class="rblk" type="button" data-reg="'+esc(w[0])+'" data-pct="'+w[1]+'">'
@@ -1018,127 +1133,269 @@ function pulse(d){
   fitRows();
 }
 
-var MW=620, MH=792;
-var G={ headY:236, footY:626, barH:7, x0:26, x1:594,
-        spineW:7, feedX:26, colX:587,
-        bankX:68, bankW:496, bankH:30, bankY0:254, bankGap:37 };
-function bankCY(i){ return G.bankY0 + i*G.bankGap + G.bankH/2; }
+/* ================================================================== THE PATH
+   One drawing, ten lanes, read top to bottom. Every lamp that used to sit in
+   the annunciator grid now sits on the step it watches, because a lamp with
+   no step under it tells an operator that something is amber without telling
+   them what stops working because of it. Nothing was dropped in the move: the
+   eight machine lamps, the eight readings, the ten control documents and the
+   ten register families are all here, on the stage each one governs. */
+var PW=1640, PH=726;
+var PCOL={ lead:[150,250], main:[430,300], two:[760,250], three:[1040,250],
+           exit:[1370,258] };
+var LANES=[
+  {lab:"The person",        sub:"before money moves",     y:4,   h:58},
+  {lab:"What is it",        sub:"suitability",            y:62,  h:58},
+  {lab:"The gate",          sub:"who is let through",     y:120, h:58},
+  {lab:"Routing",           sub:"which registers apply",  y:178, h:58},
+  {lab:"Retrieval",         sub:"121 registers",          y:236, h:212},
+  {lab:"Second pass",       sub:"what round one learned", y:448, h:54},
+  {lab:"The reading",       sub:"one call, no searching", y:502, h:54},
+  {lab:"What a reader sees",sub:"publication",            y:556, h:54},
+  {lab:"The record",        sub:"proof and deletion",     y:610, h:54},
+  {lab:"The paperwork",     sub:"governs all of it",      y:664, h:58}
+];
+var PBX0=136, PBX1=1628;
+/* The ten control documents in the order the process meets them, not the order
+   they were numbered. A reader following the drawing downward meets the legal
+   register before the publishing rules, and that is the order they are in. */
+var DOCLANE=["lr","mg","vend","hra","pub","sub","ir","ret","sec","cou"];
+var DOCID={hra:"HRA-001",mg:"MG-001",lr:"LR-001",pub:"PUB-001",sub:"SUB-001",
+           vend:"VEND-001",ret:"RET-001",ir:"IR-001",sec:"SEC-001",cou:"COU-001"};
 
-function stageNodes(d){
-  var r=d.runs||{}, sysd=d.systems||{};
-  var S=function(k){return sysd[k]||"warn";};
+function pathNodes(d){
+  var R=function(k){ return (BOARD_ROWS&&BOARD_ROWS[k])||null; };
+  var S=function(k){ var x=R(k); return x?x.s:"warn"; };
+  var V=function(k){ var x=R(k); return x?x.v:"no reading"; };
+  var mid=function(i){ return LANES[i].y+LANES[i].h/2; };
   var blocked=((d.by_outcome||[]).filter(function(o){return o[0]==="BLOCKED";})[0]||["",0])[1];
-  var N=[];
-  N.push({id:"ask",  kind:"big", x:190,y:2,  w:240,h:42, t:"The ask",
-          x2:num(r.attempted)+" checks", s:"ok"});
-  N.push({id:"gate", kind:"big", x:190,y:56, w:240,h:42, t:"The gate",
-          x2:num(blocked)+" turned away", s:"ok"});
-  N.push({id:"route",kind:"big", x:190,y:110,w:240,h:42, t:"Routing",
-          x2:"picks the registers", s:S("policy")});
-  N.push({id:"exa", kind:"sm", x:26, y:176, w:180,h:40, t:"Search", x2:"Exa", s:S("search")});
-  N.push({id:"conn",kind:"sm", x:220,y:176, w:180,h:40, t:"Direct feed", x2:"connectors",
-          s:S("connectors")});
-  N.push({id:"par", kind:"sm", x:414,y:176, w:180,h:40, t:"Objective", x2:"Parallel",
-          s:S("search")});
+  var N=[], H=40, H2=38;
+  var at=function(i,col,h){ var c=PCOL[col];
+    return {x:c[0], y:Math.round(mid(i)-h/2), w:c[1], h:h}; };
+  var mk=function(i,col,h,o){ var g=at(i,col,h);
+    for(var k in o) g[k]=o[k]; g.kind=g.kind||"step"; N.push(g); return g; };
+
+  /* ------------------------------------------------------ 1  the person */
+  mk(0,"lead",H,{id:"land", t:"Somebody lands", x2:"4ormiq.com", s:"ok"});
+  mk(0,"main",H,{id:"ask",  t:"Types a name or a link",
+                 x2:num(d.runs.attempted)+" checks this window", s:"ok", info:"ask"});
+  mk(0,"two", H,{id:"surge",t:"Surge watch", x2:V("r:pattern"), s:S("r:pattern"),
+                 key:"r:pattern"});
+
+  /* --------------------------------------------- 2  what is it, and can it */
+  mk(1,"main",H,{id:"kind", t:"Can this be checked?",
+                 x2:"company, website, person, wallet, payee", s:"ok", kind:"dec",
+                 info:"ask"});
+  mk(1,"exit",H,{id:"nope", t:"Nothing to check", x2:"says so, checks nothing",
+                 s:"ok", kind:"exit"});
+
+  /* ------------------------------------------------------------ 3  the gate */
+  mk(2,"main",H,{id:"gate", t:"The gate", x2:"rate, abuse and jurisdiction",
+                 s:"ok", info:"gate"});
+  mk(2,"exit",H,{id:"turn", t:"Turned away", x2:num(blocked)+" in this window",
+                 s:"ok", kind:"exit", info:"gate"});
+
+  /* ------------------------------------------------------------- 4  routing */
+  mk(3,"main", H,{id:"rule", t:"The rulebook", x2:V("m:rulebook"),
+                  s:S("m:rulebook"), key:"m:rulebook"});
+  mk(3,"two",  H,{id:"enf",  t:"Rules applied", x2:V("r:enforced"),
+                  s:S("r:enforced"), key:"r:enforced"});
+  mk(3,"three",H,{id:"scope",t:"Scope written in", x2:"which registers, this check",
+                  s:"ok", info:"route"});
+
+  /* ----------------------------------------------------------- 5  retrieval */
+  var DY=244, DH=42;
+  N.push({id:"door1",x:150, y:DY,w:250,h:DH,t:"Asking registers", x2:"Exa, then Parallel",
+          s:S("m:searching"), key:"m:searching", kind:"step"});
+  N.push({id:"door2",x:430, y:DY,w:300,h:DH,t:"Direct feeds", x2:"called at the publisher",
+          s:S("m:feeds"), key:"m:feeds", kind:"step"});
+  N.push({id:"door3",x:760, y:DY,w:250,h:DH,t:"Domain lookups", x2:"RDAP and certificates",
+          s:S("m:domain"), key:"m:domain", kind:"step"});
+  N.push({id:"answ", x:1040,y:DY,w:588,h:DH,t:"Registers answering", x2:V("r:answering"),
+          s:S("r:answering"), key:"r:answering", kind:"step"});
+  var RY=304, RSTEP=27, RH=23, BA=[162,678], BB=[880,748];
   REGCATS.forEach(function(c,i){
-    var st=regState(d,i);
-    N.push({id:"cat"+i, cat:i, kind:"wide", x:G.bankX, y:G.bankY0+i*G.bankGap,
-            w:G.bankW, h:G.bankH, t:c[0].replace(/^\d+\s/,""),
-            x2:st.ok+" of "+st.n, s:st.s});
+    var st=regState(d,i), b=(i<5?BA:BB), r=(i<5?i:i-5);
+    N.push({id:"cat"+i, cat:i, kind:"reg", x:b[0], y:RY+r*RSTEP, w:b[1], h:RH,
+            t:c[0].replace(/^\d+\s/,""), x2:st.ok+" of "+st.n, s:st.s});
   });
-  N.push({id:"round2",kind:"big", x:26, y:648, w:270,h:44, t:"Second pass",
-          x2:"cases and siblings", s:S("search")});
-  N.push({id:"read",  kind:"big", x:324,y:648, w:270,h:44, t:"The reading",
-          x2:"one call, no searching", s:S("reason")});
-  N.push({id:"report",kind:"big", x:26, y:718, w:270,h:44, t:"The report",
-          x2:"what a reader sees", s:"ok"});
-  N.push({id:"record",kind:"big", x:324,y:718, w:270,h:44, t:"The record",
-          x2:"hashed and provable", s:S("chain")});
+
+  /* --------------------------------------------------------- 6  second pass */
+  mk(5,"main",H2,{id:"again",t:"Second pass", x2:"cases, siblings, named filings",
+                  s:S("m:searching"), info:"round2"});
+
+  /* --------------------------------------------------------- 7  the reading */
+  mk(6,"main", H2,{id:"reas", t:"Forming the answer", x2:V("m:assessing"),
+                   s:S("m:assessing"), key:"m:assessing"});
+  mk(6,"two",  H2,{id:"nosc", t:"No composite score", x2:"a rule, not a setting",
+                   s:"ok", info:"report"});
+  mk(6,"three",H2,{id:"comp", t:"Checks finishing", x2:V("r:completing"),
+                   s:S("r:completing"), key:"r:completing"});
+
+  /* ------------------------------------------------ 8  what a reader sees */
+  mk(7,"main",H2,{id:"rep",  t:"The report", x2:"what was reached, and what was not",
+                  s:"ok", info:"report"});
+  mk(7,"two", H2,{id:"supp", t:"Support directory", x2:"never names a firm", s:"ok"});
+  mk(7,"exit",H2,{id:"corr", t:"Correction and takedown", x2:V("f:pub"),
+                  s:S("f:pub"), key:"f:pub", kind:"exit"});
+
+  /* -------------------------------------------------------- 9  the record */
+  mk(8,"main", H2,{id:"db",  t:"The database", x2:V("m:database"),
+                   s:S("m:database"), key:"m:database"});
+  mk(8,"two",  H2,{id:"chn", t:"The chain", x2:V("m:chain"), s:S("m:chain"),
+                   key:"m:chain"});
+  mk(8,"three",H2,{id:"del", t:"Deleting on time", x2:V("r:deletion"),
+                   s:S("r:deletion"), key:"r:deletion"});
+  var KY=Math.round(mid(8)-H2/2);
+  N.push({id:"inc", x:1310,y:KY,w:155,h:H2,t:"Incidents", x2:V("r:incidents"),
+          s:S("r:incidents"), key:"r:incidents", kind:"step", tight:1});
+  N.push({id:"rgt", x:1473,y:KY,w:155,h:H2,t:"Rights", x2:V("r:requests"),
+          s:S("r:requests"), key:"r:requests", kind:"step", tight:1});
+
+  /* ------------------------------------------------------ 10  the paperwork */
+  var CW=144, CN=DOCLANE.length, CSTEP=(PBX1-PBX0-CW)/(CN-1);
+  var CY=Math.round(mid(9)-40/2);
+  DOCLANE.forEach(function(k,i){
+    var row=BOARD_ROWS?BOARD_ROWS["f:"+k]:null;
+    N.push({id:"doc"+k, kind:"chip", x:Math.round(PBX0+i*CSTEP), y:CY, w:CW, h:40,
+            t:row?row.plate:k, x2:DOCID[k], s:row?row.s:"warn", key:"f:"+k});
+  });
   return N;
 }
 
-function mimic(d){
-  var N=stageNodes(d), by={}; N.forEach(function(n){by[n.id]=n;});
+function pathmap(d){
+  var N=pathNodes(d), by={}; N.forEach(function(n){ by[n.id]=n; });
   var cls=function(s){ return s==="bad" ? "dead" : (s==="warn" ? "" : "live"); };
+  var mk=function(s){ return ' marker-end="url(#'+(s==="bad"?"arwd":"arw")+')"'; };
   var P="";
-  var drop=function(a,b,s){
-    var A=by[a],B=by[b], x=A.x+A.w/2;
-    P+='<path class="pipe '+cls(s)+'" d="M'+x+' '+(A.y+A.h)+' L'+x+' '+B.y+'"/>';
-  };
-  drop("ask","gate","ok");
-  drop("gate","route","ok");
-  /* routing and the three providers all drop onto one header bar */
-  P+='<path class="pipe '+cls(by.route.s)+'" d="M310 '+(by.route.y+by.route.h)
-    +' L310 '+by.conn.y+'"/>';
-  ["exa","conn","par"].forEach(function(k){
-    var n=by[k], x=n.x+n.w/2;
-    P+='<path class="pipe '+cls(n.s)+'" d="M'+x+' '+(n.y+n.h)+' L'+x+' '+G.headY+'"/>';
-  });
-  /* The header bar turns down a feed spine on the left. A collector spine on
-     the right gathers what came back and turns into the foot bar. Ten short
-     stubs, not ten full height risers, so no pipe crosses a box. */
-  var bars=
-     '<rect class="mtrunk" x="'+G.x0+'" y="'+G.headY+'" width="'+(G.x1-G.x0)+'" height="'+G.barH+'" rx="3.5"/>'
-   + '<rect class="mtrunk" x="'+G.feedX+'" y="'+G.headY+'" width="'+G.spineW+'" height="'+(G.footY-G.headY)+'" rx="3.5"/>'
-   + '<rect class="mtrunk" x="'+G.colX+'" y="'+bankCY(0)+'" width="'+G.spineW+'" height="'+(G.footY-bankCY(0)+G.barH)+'" rx="3.5"/>'
-   + '<rect class="mtrunk" x="'+G.x0+'" y="'+G.footY+'" width="'+(G.x1-G.x0)+'" height="'+G.barH+'" rx="3.5"/>';
-  REGCATS.forEach(function(c,i){
-    var n=by["cat"+i], cy=bankCY(i);
-    P+='<path class="pipe '+cls(n.s)+'" d="M'+(G.feedX+G.spineW)+' '+cy+' L'+n.x+' '+cy+'"/>';
-    P+='<path class="pipe '+cls(n.s)+'" d="M'+(n.x+n.w)+' '+cy+' L'+G.colX+' '+cy+'"/>';
-  });
-  /* the foot bar feeds the second pass and the reading */
-  [["round2",by.round2.s],["read",by.read.s]].forEach(function(q){
-    var n=by[q[0]], x=n.x+n.w/2;
-    P+='<path class="pipe '+cls(q[1])+'" d="M'+x+' '+(G.footY+G.barH)+' L'+x+' '+n.y+'"/>';
-  });
-  /* what the second pass finds goes across into the reading */
-  P+='<path class="pipe '+cls(by.read.s)+'" d="M'+(by.round2.x+by.round2.w)+' '
-    +(by.round2.y+by.round2.h/2)+' L'+by.read.x+' '+(by.read.y+by.read.h/2)+'"/>';
-  /* and the reading hands over to the report and the record */
-  var rx=by.read.x+by.read.w/2, ry=by.read.y+by.read.h;
-  var px=by.report.x+by.report.w/2, py=by.report.y, mid=(ry+py)/2;
-  P+='<path class="pipe live" d="M'+rx+' '+ry+' C'+rx+' '+mid+' '+px+' '+mid+' '+px+' '+py+'"/>';
-  P+='<path class="pipe '+cls(by.record.s)+'" d="M'+rx+' '+ry+' L'+rx+' '+by.record.y+'"/>';
-  /* the loop: the second pass re-enters retrieval through the feed spine */
-  P+='<path class="pipe loop" d="M'+(by.round2.x+34)+' '+by.round2.y+' L12 '
-    +by.round2.y+' L12 '+(G.headY+16)+' L'+G.feedX+' '+(G.headY+16)
-    +'" marker-end="url(#mrk)"/>';
+  var down=function(a,b,s){ var A=by[a],B=by[b],x=A.x+A.w/2;
+    P+='<path class="pipe '+cls(s)+'" d="M'+x+' '+(A.y+A.h)+' L'+x+' '+B.y+'"'+mk(s)+'/>'; };
+  var across=function(a,b,s){ var A=by[a],B=by[b],y=A.y+A.h/2;
+    P+='<path class="pipe '+cls(s)+'" d="M'+(A.x+A.w)+' '+y+' L'+B.x+' '+y+'"'+mk(s)+'/>'; };
+  var out=function(a,b,s){ var A=by[a],B=by[b],y=A.y+A.h/2;
+    P+='<path class="pipe out'+(s==="bad"?" dead":"")+'" d="M'+(A.x+A.w)+' '+y+' L'
+      +B.x+' '+y+'"'+mk(s||"ok")+'/>'; };
 
+  across("land","ask","ok"); across("ask","surge",by.surge.s);
+  down("ask","kind","ok");
+  out("kind","nope","ok");
+  down("kind","gate","ok");
+  out("gate","turn","ok");
+  down("gate","rule",by.rule.s);
+  across("rule","enf",by.enf.s); across("enf","scope",by.scope.s);
+  down("rule","door2",by.rule.s);
+
+  /* The header bar carries what routing decided across the whole register
+     bank. Two trunks drop off it, one for each bank of five families, and the
+     foot bar gathers what came back. Short stubs, never full height risers,
+     so no line is ever drawn through a box. */
+  var HB=294, FB=440, BH=5;
+  ["door1","door2","door3","answ"].forEach(function(k){
+    var n=by[k], x=n.x+n.w/2;
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+x+' '+(n.y+n.h)+' L'+x+' '+HB+'"/>';
+  });
+  var bars=
+     '<rect class="mtrunk" x="'+PBX0+'" y="'+HB+'" width="'+(PBX1-PBX0)+'" height="'+BH+'" rx="2.5"/>'
+   + '<rect class="mtrunk" x="146" y="'+HB+'" width="5" height="'+(FB-HB+BH)+'" rx="2.5"/>'
+   + '<rect class="mtrunk" x="864" y="'+HB+'" width="5" height="'+(FB-HB+BH)+'" rx="2.5"/>'
+   + '<rect class="mtrunk" x="'+PBX0+'" y="'+FB+'" width="'+(PBX1-PBX0)+'" height="'+BH+'" rx="2.5"/>';
+  REGCATS.forEach(function(c,i){
+    var n=by["cat"+i], cy=n.y+n.h/2, tx=(i<5?151:869);
+    P+='<path class="pipe '+cls(n.s)+'" d="M'+tx+' '+cy+' L'+n.x+' '+cy+'"'+mk(n.s)+'/>';
+  });
+
+  down("again","reas",by.reas.s);
+  P+='<path class="pipe '+cls(by.again.s)+'" d="M'+(by.again.x+by.again.w/2)+' '+(FB+BH)
+    +' L'+(by.again.x+by.again.w/2)+' '+by.again.y+'"'+mk(by.again.s)+'/>';
+  /* the loop: what the second pass learned re enters retrieval at the first
+     door, drawn down the left margin where it crosses nothing */
+  P+='<path class="pipe loop" d="M'+by.again.x+' '+(by.again.y+by.again.h/2)
+    +' L132 '+(by.again.y+by.again.h/2)+' L132 '+(by.door1.y+by.door1.h/2)
+    +' L'+by.door1.x+' '+(by.door1.y+by.door1.h/2)+'" marker-end="url(#arw)"/>';
+
+  across("reas","nosc","ok"); across("nosc","comp",by.comp.s);
+  down("reas","rep",by.reas.s);
+  across("rep","supp","ok"); out("supp","corr",by.corr.s);
+  down("rep","db",by.db.s);
+  across("db","chn",by.chn.s); across("chn","del",by.del.s);
+  across("del","inc",by.inc.s); across("inc","rgt",by.rgt.s);
+
+  /* ------------------------------------------------------------- the lanes */
+  var lanes="", i;
+  for(i=0;i<LANES.length;i++){
+    var L=LANES[i];
+    lanes+='<rect class="lane'+(i%2?' alt':'')+'" x="'+PBX0+'" y="'+L.y+'" width="'
+      +(PBX1-PBX0)+'" height="'+L.h+'" rx="6"/>'
+      +'<line class="lanerule" x1="0" y1="'+(L.y+L.h)+'" x2="'+PBX1+'" y2="'+(L.y+L.h)+'"/>'
+      +'<text class="lanelab" x="118" y="'+(L.y+L.h/2-1)+'">'+esc(L.lab)+'</text>'
+      +'<text class="lanesub" x="118" y="'+(L.y+L.h/2+11)+'">'+esc(L.sub)+'</text>';
+  }
+
+  /* --------------------------------------------------------------- the boxes */
   var boxes=N.map(function(n){
     var g='<g class="nnode" data-s="'+n.s+'" data-id="'+n.id+'"'
-      +(n.cat!=null?' data-cat="'+n.cat+'"':'')+'>'
-      +'<rect class="nbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="8"/>';
-    if(n.kind==="wide"){
-      g+='<circle class="nlamp" cx="'+(n.x+18)+'" cy="'+(n.y+17)+'" r="6"/>'
-       + '<text class="ntitle" x="'+(n.x+33)+'" y="'+(n.y+21)+'">'+esc(n.t)+'</text>'
-       + '<text class="nsub end" x="'+(n.x+n.w-13)+'" y="'+(n.y+21)+'">'+esc(n.x2)+'</text>';
+      +(n.cat!=null?' data-cat="'+n.cat+'"':'')+'>';
+    if(n.kind==="reg"){
+      g+='<rect class="regbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="6"/>'
+       + '<circle class="nlamp" cx="'+(n.x+15)+'" cy="'+(n.y+n.h/2)+'" r="5.5"/>'
+       + '<text class="ntitle" x="'+(n.x+28)+'" y="'+(n.y+n.h/2+4)+'">'+esc(n.t)+'</text>'
+       + '<text class="nsub end" x="'+(n.x+n.w-11)+'" y="'+(n.y+n.h/2+4)+'">'+esc(n.x2)+'</text>';
+    } else if(n.kind==="chip"){
+      g+='<rect class="chipbox" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="'+n.h+'" rx="6"/>'
+       + '<circle class="nlamp" cx="'+(n.x+14)+'" cy="'+(n.y+15)+'" r="5.5"/>'
+       + '<text class="chipt" x="'+(n.x+26)+'" y="'+(n.y+19)+'">'+esc(n.t)+'</text>'
+       + '<text class="chipid" x="'+(n.x+26)+'" y="'+(n.y+32)+'">'+esc(n.x2)+'</text>';
     } else {
-      g+='<circle class="nlamp" cx="'+(n.x+17)+'" cy="'+(n.y+16)+'" r="6.5"/>'
-       + '<text class="ntitle" x="'+(n.x+32)+'" y="'+(n.y+20)+'">'+esc(n.t)+'</text>'
-       + '<text class="nsub" x="'+(n.x+15)+'" y="'+(n.y+36)+'">'+esc(n.x2)+'</text>';
+      var box = n.kind==="dec"
+        ? '<path class="decbox" d="M'+(n.x+13)+' '+n.y+' H'+(n.x+n.w-13)+' L'+(n.x+n.w)+' '
+          +(n.y+n.h/2)+' L'+(n.x+n.w-13)+' '+(n.y+n.h)+' H'+(n.x+13)+' L'+n.x+' '
+          +(n.y+n.h/2)+' Z"/>'
+        : '<rect class="'+(n.kind==="exit"?"exitbox":"nbox")+'" x="'+n.x+'" y="'+n.y
+          +'" width="'+n.w+'" height="'+n.h+'" rx="8"/>';
+      var lx=n.x+(n.kind==="dec"?24:16);
+      g+=box
+       + '<circle class="nlamp" cx="'+lx+'" cy="'+(n.y+15)+'" r="6"/>'
+       + '<text class="ntitle" x="'+(lx+13)+'" y="'+(n.y+19)+'">'+esc(n.t)+'</text>'
+       + '<text class="nsub" x="'+(n.x+(n.kind==="dec"?24:15))+'" y="'+(n.y+n.h-8)+'">'
+       + esc(n.tight? String(n.x2).slice(0,20) : n.x2)+'</text>';
     }
     return g+'</g>';
   }).join("");
 
-  var frame='<rect class="mframe" x="46" y="248" width="540" height="372" rx="10"/>'
-    +'<text class="slab" x="26" y="168">Where the pages come from</text>'
-    +'<text class="slab" x="46" y="642">Then hand over</text>';
+  document.getElementById("pathmap").innerHTML=
+    '<svg viewBox="0 0 '+PW+' '+PH+'" preserveAspectRatio="xMidYMid meet" role="img" '
+    +'aria-label="The path a check takes, from the person at the top to the record and the '
+    +'control documents at the foot. Every lamp sits on the step it watches.">'
+    +'<defs>'
+    +'<marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" '
+    +'markerHeight="5.5" orient="auto-start-reverse"><path class="arwh" d="M0 0 L10 5 L0 10 z"/></marker>'
+    +'<marker id="arwd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" '
+    +'markerHeight="5.5" orient="auto-start-reverse"><path class="arwh dead" d="M0 0 L10 5 L0 10 z"/></marker>'
+    +'</defs>'+lanes+bars+P+boxes+'</svg>';
 
-  document.getElementById("mimic").innerHTML=
-    '<svg viewBox="0 0 '+MW+' '+MH+'" preserveAspectRatio="xMidYMid meet" role="img" '
-    +'aria-label="The path a check takes, from the ask at the top to the record at the foot">'
-    +'<defs><marker id="mrk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
-    +'markerHeight="6" orient="auto-start-reverse"><path class="mrkh" d="M0 0 L10 5 L0 10 z"/>'
-    +'</marker></defs>'+frame+bars+P+boxes+'</svg>';
-
-  document.querySelectorAll("#mimic .nnode").forEach(function(g){
-    var cat=g.getAttribute("data-cat"), id=g.getAttribute("data-id");
-    if(cat==null && !NODE_INFO[id]) return;
+  document.querySelectorAll("#pathmap .nnode").forEach(function(g){
+    var id=g.getAttribute("data-id"), n=by[id];
+    if(!n) return;
+    if(n.cat==null && !n.key && !n.info) return;
     g.classList.add("clicky");
     g.addEventListener("click",function(){
-      if(cat!=null) openStage(+cat); else openInfo(NODE_INFO[id]);
+      if(n.cat!=null) openStage(n.cat);
+      else if(n.key) openLamp(n.key);
+      else openInfo(NODE_INFO[n.info]);
     });
+  });
+
+  /* The two lamps that watch this panel rather than the check. They have no
+     step on the path because they are not steps in it, and putting them on
+     one would be the same lie the drawing exists to avoid. */
+  var house=[["m:signin","Sign in"],["r:build","Page and API"]].map(function(h){
+    var r=BOARD_ROWS?BOARD_ROWS[h[0]]:null, s=r?r.s:"warn";
+    return '<button class="hl" type="button" data-s="'+s+'" data-open="'+h[0]+'" title="'
+      +esc(r?r.v:"")+'"><i></i>'+esc(h[1])+'</button>';
+  }).join("");
+  document.getElementById("house").innerHTML=house;
+  document.querySelectorAll("#house .hl").forEach(function(b){
+    b.addEventListener("click",function(){ openLamp(b.getAttribute("data-open")); });
   });
 }
 
@@ -1259,31 +1516,16 @@ function walkChain(btn){
     });
 }
 
-/* ----------------------------------------------------- the annunciator */
+/* ------------------------------------------------------ the lamp register
+   The lamps are no longer a grid of their own. This builds the row behind
+   every one of them and hands the set to the drawing, which puts each lamp
+   on the step it watches. Nothing was dropped in the move. */
 var BOARD_ROWS=null;
 function board(d){
   var mach=machine(d).map(function(x){ x.k="m:"+x.k; x.sys=1; return x; });
   var read=readings(d).map(function(x){ x.k="r:"+x.k; return x; });
   var docs=file(d);
   BOARD_ROWS={}; mach.concat(read).concat(docs).forEach(function(x){ BOARD_ROWS[x.k]=x; });
-  var cell=function(x){
-    var say = x.s==="ok" ? "" :
-      '<em><span class="g">'+GLYPH[x.s]+'</span>'+esc(x.v)+'</em>';
-    return '<button class="pl" type="button" data-s="'+x.s+'" data-open="'+x.k
-      +'" title="'+esc(x.v)+'"><i></i><b>'+esc(x.plate)+'</b>'+say+'</button>';
-  };
-  var row=function(label,list){
-    return '<div class="frow"><div class="flab">'+esc(label)+'</div>'
-      +'<div class="lamps" style="grid-template-columns:repeat('+list.length+',1fr)">'
-      +list.map(cell).join("")+'</div></div>';
-  };
-  document.getElementById("board").innerHTML =
-      row("Is the machine running", mach)
-    + row("What the numbers say",   read)
-    + row("Is the paperwork\nin place", docs);
-  document.querySelectorAll("#board .pl").forEach(function(b){
-    b.addEventListener("click",function(){ openLamp(b.getAttribute("data-open")); });
-  });
 }
 
 /* ============================================== THE READER SCREEN
@@ -1529,7 +1771,7 @@ window.addEventListener("resize",fitStage);
    left lit only when something red is inside it. The reader screen and the
    masthead never dim, because they are what tells you how many faults there
    are and whether the numbers you are looking at are current. */
-var FLEAF = ".pl,.gauge,.plate,.rblk,.evirow,.nnode";
+var FLEAF = ".hl,.gauge,.plate,.rblk,.evirow,.nnode";
 var FBLOCK = ".card,.floor,.gauges,.chart,.pulsetab tbody tr";
 
 function markFaults(){
@@ -1564,7 +1806,7 @@ document.getElementById("faultbtn").addEventListener("click",function(){
 
 function paint(d){
   LAST=d;
-  mstats(d); board(d); reader(d); mimic(d); gauges(d); rank(d); pulse(d);
+  mstats(d); board(d); reader(d); pathmap(d); gauges(d); rank(d); pulse(d);
   evidence(d); days(d); markFaults();
   /* the table is fitted again on the next frame, once the browser has settled
      the row heights this paint produced */
@@ -1578,7 +1820,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260906.0830";
+var BUILD = "20260907.0457";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
@@ -1641,7 +1883,18 @@ function normalise(j){
   });
   /* The route reports the chain height beside the verification. The board reads
      both off one object. */
+  /* The verification row records how many rows were walked as height. The board
+     asks for checked. One name for one number, settled here rather than in five
+     places, because the gauge read nought per cent provable while the lamp
+     beside it said the chain was intact, and both were drawing the same walk.
+     This has to come after the chain is copied, not before: an earlier version
+     of this fix was overwritten two lines later and changed nothing. */
   d.chain = Object.assign({}, j.chain);
+  if(d.chain.last_verify){
+    var lv = Object.assign({}, d.chain.last_verify);
+    if(lv.checked==null) lv.checked = lv.height;
+    d.chain.last_verify = lv;
+  }
   return d;
 }
 
