@@ -1701,6 +1701,46 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
     fails.push('the two readings lost the mono label that marks them as our reading');
 
   /* ---------------------------------------------------------------- *
+   * THE SCALE OF THE TWO ONWARD SCREENS
+   *
+   * Walking forward through the report used to make the type get bigger: a
+   * 58px title and a 21px lead against the result page's 50px. That reads as
+   * the product raising its voice at a reader who is already worried. The
+   * ceiling on these screens is now the result page's.
+   * ---------------------------------------------------------------- */
+  {
+    const ceil = s => { const m = s && s.match(/clamp\([^,]+,[^,]+,\s*([\d.]+)px\)/); return m ? parseFloat(m[1]) : null; };
+    const h1res = ceil((styleBlock.match(/#rpt \.rp-who\{[^}]*\}/) || [''])[0]);
+    const h1act = ceil((styleBlock.match(/#rpt \.rp-stitle\{[^}]*\}/) || [''])[0]);
+    if (h1act && h1res && h1act > h1res)
+      fails.push('the onward screens carry a ' + h1act + 'px title against the result page\'s ' + h1res + 'px, so the type grows as the reader walks forward');
+    const lead = ceil((styleBlock.match(/#rpt \.rp-slead\{[^}]*\}/) || [''])[0]);
+    if (lead && lead > 18)
+      fails.push('the onward lead is back up to ' + lead + 'px');
+    const menu = ceil((styleBlock.match(/#rpt \.rp-acct\{[^}]*\}/) || [''])[0]);
+    const find = (styleBlock.match(/#rpt \.rp-find \.rp-t\{[^}]*font-size:([\d.]+)px/) || [])[1];
+    if (menu && find && menu > parseFloat(find))
+      fails.push('a menu label is louder than the findings above it: ' + menu + 'px against ' + find + 'px');
+  }
+
+  /* Find support is not navigation. It is the last thing on the list of things
+     to do, so it is row 05 and not a pill beside the way back. */
+  {
+    const nav = (html.match(/<nav class="rp-nav"[\s\S]*?<\/nav>[\s\S]*?id="rpActTitle"/) || [''])[0];
+    if (nav && /Find support/.test(nav))
+      fails.push('Find support is back in the act screen navigation');
+    const acc = (html.match(/<div class="rp-accs" id="rpStepsSec">[\s\S]*?<div class="rp-sec rp-tight">/) || [''])[0];
+    const nums = [...acc.matchAll(/class="rp-accn"[^>]*>(\d\d)</g)].map(m => m[1]);
+    if (nums.join(',') !== '01,02,03,04,05')
+      fails.push('the things to do are numbered ' + (nums.join(',') || 'none') + ', expected 01,02,03,04,05');
+    if (!/id="rpFindSupport"[^>]*data-dir="open"/.test(acc))
+      fails.push('row 05 is not wired to open the support directory');
+    const order = ['Download the one page summary', 'Find support'].map(t => acc.indexOf(t));
+    if (order[0] < 0 || order[1] < 0 || order[0] > order[1])
+      fails.push('Find support no longer sits below the download');
+  }
+
+  /* ---------------------------------------------------------------- *
    * THE ACT SCREEN'S ROUTING
    *
    * Sector picks the instructions. It may never pick a verdict, and the one

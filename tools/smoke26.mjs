@@ -61,7 +61,11 @@ for (let i = 0; i < 6; i++) {
 await p.waitForTimeout(1000);
 await one('rpReport', 'a finished check');
 
-/* Every screen carries both pills, and the reader can reach them from anywhere. */
+/* Sources and method is reachable from every screen. Find support is too, but
+   on the act screen it is row 05 of the things to do rather than a pill beside
+   the way back, because it is not navigation: it is the last thing on the list.
+   So the assertion is that the reader can always reach support, not that it is
+   always drawn the same way. */
 const pillPair = async where => {
   const n = await p.evaluate(() => {
     const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
@@ -69,7 +73,15 @@ const pillPair = async where => {
     return t;
   });
   if (!n.some(t => /Sources and method/.test(t))) fail(where + ' has no sources and method pill');
-  if (!n.some(t => /Find support/.test(t))) fail(where + ' has no find support pill');
+  const support = await p.evaluate(() => {
+    const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
+    return [...s.querySelectorAll('[data-dir="open"]')]
+      .filter(e => e.checkVisibility && e.checkVisibility({checkVisibilityCSS:true, contentVisibilityAuto:true}))
+      .length;
+  });
+  if (!support) fail(where + ' offers no way to reach support at all');
+  if (where.indexOf('what to do') >= 0 && n.some(t => /Find support/.test(t)))
+    fail('find support is back in the act screen navigation, it belongs at row 05');
 };
 /* THE RESULT SCREEN IS THE OTHER ONE WITHOUT THEM.
    A reader who has just been told something about their money has two moves
