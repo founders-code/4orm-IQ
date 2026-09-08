@@ -34,8 +34,18 @@
   --blue:#4C87FF; --blue-lt:#82AAFF; --blue-dp:#2E6BF2; --blue-deep:#1F57D6;
   --blue-50:#0E1A31; --blue-100:#16294A;
 
-  /* Gold is the human annotation. Never a surface, never a button fill. */
-  --gold:#E7C76C; --gold-dp:#C49A3A; --gold-50:#211B0C; --gold-br:#5C4B22;
+  /* THE ACCENT. It was gold, and gold is now the 4orm blue everywhere it was
+     decoration or annotation. The token is renamed rather than redefined,
+     because a variable called --acc holding a blue is the kind of trap this
+     page has been caught by before. Caution is its own thing below: an accent
+     and a warning are two different jobs and they never share a colour. */
+  --acc:#82AAFF; --acc-dp:#4C87FF; --acc-50:#0E1A31; --acc-br:#16294A;
+
+  /* CAUTION. Not the old soft gold, which was an accent wearing a warning's
+     clothes. This is a road sign: the colour a person reads as stop and look
+     before they read the words. */
+  --caution:#F5B301; --caution-lit:#F5B301;
+  --caution-bg:#241A04; --caution-br:#5E4708;
   /* readable dim. --tx-4 at reduced opacity fell under 2:1 on the board,
      and the state it was carrying is the one that matters most. */
   --dim:#8B99AD;
@@ -99,7 +109,7 @@ svg{display:block}
   font-family:var(--mono);font-size:9px;font-weight:700;
   letter-spacing:.2em;text-transform:uppercase;color:var(--tx-3);
 }
-.lbl.gold{color:var(--gold)}
+.lbl.gold{color:var(--acc)}
 .lbl.blue{color:var(--blue-lt)}
 
 .kb-rv{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--spring)}
@@ -138,11 +148,11 @@ svg{display:block}
 @media(max-width:820px){.dirbrand{display:none}}
 .helpbtn{
   display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;
-  border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold);
+  border:1px solid var(--acc-dp);background:var(--acc-50);color:var(--acc);
   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
   transition:all .28s var(--ease);white-space:nowrap;
 }
-.helpbtn:hover{background:#2C240F;border-color:var(--gold);transform:translateY(-1px)}
+.helpbtn:hover{background:#2C240F;border-color:var(--acc);transform:translateY(-1px)}
 .helpbtn .hi{font-size:12px;line-height:1}
 .navactions{display:flex;align-items:center;gap:12px;pointer-events:auto}
 @media(max-width:620px){
@@ -242,13 +252,30 @@ body[data-stage="landing"] .cbdeck{
      at the site's own hero lead scale: read second, never competing with the
      headline above it. */
   margin:44px auto 0;font-size:clamp(17px,1.72vw,21px);font-weight:600;letter-spacing:-.012em;
-  color:var(--tx);line-height:1.55;max-width:64ch;
+  color:var(--tx);line-height:1.55;
+  /* THE QUESTION HOLDS ONE LINE, AND THE MEASURE IS WHAT LETS IT.
+     It is 81 characters, which at the 21px ceiling is about 850 points, and
+     a 64ch measure was cutting it at 60 and dropping "opportunity" onto a row
+     of its own. A one word orphan under a question is the reader's eye going
+     back to look for what it belongs to. 84ch clears it with room, and below
+     the desk it wraps on its own terms because there is no width to hold. */
+  max-width:84ch;
 }
 /* THE SECOND SENTENCE STARTS ITS OWN ROW.
    A block, not a <br>. A break tag holds at one width and then sits in the
    middle of a line at every other one; this way the question ends where it
    ends and the answer begins underneath it, at any size. */
 body[data-stage="landing"] .cbdeck span{display:block}
+/* AND THE QUESTION IS ALLOWED OUT OF THE COLUMN.
+   The console bar is capped at 820 points and the question needs about 850 at
+   the 21px ceiling, so inside that column it can never be one line whatever
+   its own measure says. This is the same escape the headline above it already
+   uses: sized to its own content, centred on the axis rather than in the box,
+   and held to 96vw so it can never push the page sideways. Below the desk
+   there is no width to escape into and it wraps on its own terms. */
+body[data-stage="landing"] .cbdeck .q{
+  width:max-content;max-width:96vw;position:relative;left:50%;
+  transform:translateX(-50%);margin-bottom:2px}
 /* The line is set to stay on one line at the size it was approved at, so on a
    wide screen it is a little wider than the column the search bar sits in.
    Left as a plain block it would overflow to the right only, which pulls the
@@ -581,7 +608,7 @@ body[data-stage="console"] .lampgo{display:none}
   font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
   text-transform:uppercase;color:var(--tx-2);white-space:nowrap;
 }
-.hl i{width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none}
+.hl i{width:5px;height:5px;border-radius:50%;background:var(--acc);flex:none}
 
 /* the search bar, taller */
 .searchbox{
@@ -601,7 +628,7 @@ body[data-stage="console"] .lampgo{display:none}
 }
 .srwarn b{font-weight:700}
 .kbblocked{
-  margin-top:12px;font-size:13.5px;line-height:1.5;color:var(--gold);
+  margin-top:12px;font-size:13.5px;line-height:1.5;color:var(--acc);
   max-width:52ch;
 }
 /* THE DOOR IN THE BLOCK.
@@ -615,9 +642,9 @@ body[data-stage="landing"] .kbblocked{margin-left:auto;margin-right:auto;text-al
 .kb-ovr{display:inline-flex;align-items:center;margin-top:11px;padding:8px 16px;
   border-radius:999px;border:1px solid rgba(214,168,74,.42);background:rgba(214,168,74,.09);
   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--gold);transition:all .25s var(--ease)}
-.kb-ovr:hover{border-color:var(--gold);background:rgba(214,168,74,.18)}
-.kb-ovr:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  text-transform:uppercase;color:var(--acc);transition:all .25s var(--ease)}
+.kb-ovr:hover{border-color:var(--acc);background:rgba(214,168,74,.18)}
+.kb-ovr:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 .kbblocked[data-ok] .kb-ovr{border-color:rgba(51,216,155,.4);background:rgba(51,216,155,.09);
   color:var(--ok)}
 .kbblocked[data-ok] .kb-ovr:hover{border-color:var(--ok);background:rgba(51,216,155,.17)}
@@ -773,12 +800,12 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 .scell .sp{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:11px}
 .scell .sp i{display:block;height:100%;width:0%;border-radius:3px;transition:width 1.1s var(--spring)}
 .scell .sp i[data-c="a"]{background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt))}
-.scell .sp i[data-c="c"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.scell .sp i[data-c="c"]{background:linear-gradient(90deg,var(--acc-dp),var(--acc))}
 .scell .sp i[data-c="n"]{background:linear-gradient(90deg,#CCD6E4,#A7B4C6)}
 /* The caption is a note about the figure, not another label, so it does not
    share the label's colour. */
 .scell .sc{font-size:11.5px;color:var(--blue-lt);margin-top:auto;padding-top:10px;line-height:1.5}
-.scell[data-t="warn"] .sc{color:var(--gold)}
+.scell[data-t="warn"] .sc{color:var(--caution)}
 .scell[data-t="bad"] .sc{color:var(--bad)}
 .scell .sl{margin-bottom:0}
 
@@ -881,9 +908,9 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
   border-bottom:1px solid var(--border);background:var(--bg-2);flex:none}
 .sumhd .an{font-size:15px;font-weight:800;letter-spacing:-.025em;margin-top:3px}
 .sumbtn{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
-  padding:9px 15px;border-radius:999px;border:1px solid var(--gold-dp);background:var(--gold-50);color:var(--gold);
+  padding:9px 15px;border-radius:999px;border:1px solid var(--acc-dp);background:var(--acc-50);color:var(--acc);
   transition:all .25s var(--ease);white-space:nowrap}
-.sumbtn:hover{background:#2C240F;border-color:var(--gold)}
+.sumbtn:hover{background:#2C240F;border-color:var(--acc)}
 .sumhd .dirclose{margin-left:auto}
 .sumbody{overflow-y:auto;overscroll-behavior:contain;padding:0}
 
@@ -1074,7 +1101,10 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
   --bg:#EDF1F7; --bg-2:#F3F6FB; --surface:#FFFFFF; --surface-2:#F5F8FC;
   --border:#DCE4EF; --border-strong:#C3CFDF;
   --tx:#131E31; --tx-2:#44546E; --tx-3:#5F7089; --tx-4:#8394AB;
-  --gold:#8A6A1E; --bad:#C22B45; --bad-bg:#FCE6EA; --bad-br:#EBB6C0;
+  --acc:#2E6BF2; --acc-dp:#1B4ABE; --acc-br:#CFE0FD; --acc-50:#EAF1FE;
+  --caution:#8A5200; --caution-lit:#F2A104;
+  --caution-bg:#FFF6E5; --caution-br:#F2C879;
+  --bad:#C22B45; --bad-bg:#FCE6EA; --bad-br:#EBB6C0;
   --warn:#8F5C12; --warn-bg:#FBF1DC; --warn-br:#E2C88B;
   --ok:#0E8A5F; --ok-bg:#E3F6EE; --ok-br:#9CCFBB;
   --blue:#2E6BF2; --blue-dp:#1B4ABE; --blue-50:#EAF1FE; --blue-100:#CFE0FD;
@@ -1086,7 +1116,7 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
   border-bottom:1px solid var(--border-strong);background:#fff;flex:none}
 .reghd img{height:38px;width:38px;border-radius:9px;display:block;flex:none}
 .reghd .reg-k{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--gold)}
+  text-transform:uppercase;color:var(--acc)}
 .reghd .reg-t{font-size:17px;font-weight:800;letter-spacing:-.028em;margin-top:4px;color:var(--tx)}
 .regclose{margin-left:auto;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx-3);border:1px solid var(--border-strong);border-radius:999px;
@@ -1109,7 +1139,7 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 .regrules p b{color:var(--tx);font-weight:700}
 .regsec{padding:34px 0 0}
 .regsec .reg-sk{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--gold)}
+  text-transform:uppercase;color:var(--acc)}
 .regsec .reg-sh{margin-top:11px;font-size:clamp(19px,2.1vw,25px);font-weight:800;letter-spacing:-.03em;
   color:var(--tx);line-height:1.16}
 .regsec .reg-sx{margin-top:10px;font-size:14px;line-height:1.62;color:var(--tx-2);max-width:80ch}
@@ -1184,8 +1214,8 @@ body.wait-up .dirbox{z-index:501}
   padding:9px 16px;border-radius:999px;background:var(--bg);border:1px solid var(--border-lit);
   transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
 }
-.dirfilter:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,154,58,.12)}
-.dirfilter span{font-family:var(--mono);font-size:12px;color:var(--gold);flex:none}
+.dirfilter:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px rgba(196,154,58,.12)}
+.dirfilter span{font-family:var(--mono);font-size:12px;color:var(--acc);flex:none}
 .dirfilter input{flex:1;min-width:0;font-size:14px}
 .dirfilter input::placeholder{color:var(--tx-4)}
 .dirclose{
@@ -1209,16 +1239,16 @@ body.wait-up .dirbox{z-index:501}
 }
 .railitem:hover{background:var(--surface-2)}
 .railitem.on{background:var(--surface-2)}
-.railitem.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.railitem.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--acc)}
 .railitem .ri{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-4);flex:none}
-.railitem.on .ri{color:var(--gold)}
+.railitem.on .ri{color:var(--acc)}
 .railitem .rn{font-size:13px;font-weight:600;letter-spacing:-.01em;line-height:1.3;color:var(--tx-2)}
 .railitem.on .rn{color:var(--tx)}
 .railitem .rc{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--tx-4);flex:none}
 @media(max-width:820px){
   .railitem{width:auto;white-space:nowrap;border-radius:999px;border:1px solid var(--border);padding:8px 13px}
   .railitem.on::before{display:none}
-  .railitem.on{border-color:var(--gold)}
+  .railitem.on{border-color:var(--acc)}
   .railitem .rc{display:none}
 }
 
@@ -1252,14 +1282,14 @@ body.wait-up .dirbox{z-index:501}
 .tbtn[data-tone="stop"]{border-color:var(--bad);background:linear-gradient(150deg,var(--bad-bg),var(--surface) 70%)}
 .tbtn[data-tone="stop"] .tx{color:var(--bad)}
 .tbtn[data-tone="stop"] .tt{color:var(--tx)}
-.tbtn.on{box-shadow:0 0 0 2px var(--gold) inset}
+.tbtn.on{box-shadow:0 0 0 2px var(--acc) inset}
 .tbtn.on .tt{font-weight:700}
 /* the answer to the situation they picked, carried down to the section it
    sends them to rather than left behind at the top of the pane */
 .tcarry{display:flex;gap:13px;align-items:flex-start;margin:0 24px;padding:14px 16px;
-  border-radius:var(--r-sm);border:1px solid var(--warn-br);background:var(--gold-50)}
-.tcarry .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:20px}
-.tcarry .x{font-size:13px;color:var(--gold);line-height:1.6;max-width:80ch}
+  border-radius:var(--r-sm);border:1px solid var(--warn-br);background:var(--acc-50)}
+.tcarry .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--caution-lit);min-height:20px}
+.tcarry .x{font-size:13px;color:var(--caution);line-height:1.6;max-width:80ch}
 .dsec .tcarry{margin-top:20px}
 
 .dirintro{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--bg-2)}
@@ -1322,7 +1352,7 @@ body.wait-up .dirbox{z-index:501}
   border:1px solid var(--border-strong);color:var(--tx-3)}
 .readrow .rl2[data-k="hit"]{color:var(--bad);border-color:var(--bad-br);background:var(--bad-bg)}
 .readrow .rl2[data-k="miss"]{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
-.readrow .rl2[data-k="look"]{color:var(--gold);border-color:var(--gold-br);background:var(--gold-50)}
+.readrow .rl2[data-k="look"]{color:var(--caution);border-color:var(--caution-br);background:var(--caution-bg)}
 .readrow .rv2{font-size:12px;color:var(--tx-2);line-height:1.5}
 /* ---- the waiting screen. A check takes a minute or two. The page goes quiet,
        a bar fills, and the wait is spent on the two things a reader needs:
@@ -1374,7 +1404,7 @@ body.wait-up .dirbox{z-index:501}
 .waitprog{padding:16px 0 0}
 .waitbar{height:3px;border-radius:3px;background:var(--border);overflow:hidden}
 .waitbar i{display:block;height:100%;width:0;border-radius:3px;
-  background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt),var(--gold));
+  background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt),var(--acc));
   background-size:420px 100%;box-shadow:0 0 22px rgba(76,135,255,.55), inset 0 1px 0 rgba(255,255,255,.14);
   transition:width .7s var(--ease);animation:topshim 1.5s linear infinite}
 .waitmeta{display:flex;justify-content:space-between;gap:12px;margin-top:10px;min-height:16px;
@@ -1388,7 +1418,7 @@ body.wait-up .dirbox{z-index:501}
    character short is not a reservation. */
 .waitmeta .wclock{min-width:7.5ch}
 .waitmeta #waitPct{min-width:5.5ch}
-.waitmeta span:last-child{color:var(--gold)}
+.waitmeta span:last-child{color:var(--acc)}
 .waitmeta .wclock{color:var(--tx-3);font-variant-numeric:tabular-nums}
 /* Lower than it was, and still on the right. It sat hard against the meta
    row, which made two lines of small type read as one block; dropped clear of
@@ -1430,15 +1460,15 @@ body.wait-up .dirbox{z-index:501}
   padding:0 0 0 22px;min-height:150px;overflow:hidden;
   display:flex;flex-direction:column;justify-content:center;
   transition:opacity .5s var(--ease)}
-.edu::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--tone,var(--gold))}
+.edu::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--tone,var(--acc))}
 .edu.fade{opacity:0}
-.edu .ek{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tone,var(--gold))}
+.edu .ek{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tone,var(--acc))}
 .edu .eduv{font-family:var(--mono);font-size:46px;font-weight:700;color:var(--tone,var(--tx));letter-spacing:-.03em;margin-top:16px;display:block;line-height:1}
 /* Four tones, and each one means something. Red is what it costs people.
    Gold is the number that reframes every other number. Blue is how the check
    works. Green is what you can do about it before the money moves. */
 .edu[data-tone="loss"]   {--tone:var(--bad)}
-.edu[data-tone="scale"]  {--tone:var(--gold)}
+.edu[data-tone="scale"]  {--tone:var(--acc)}
 .edu[data-tone="method"] {--tone:var(--blue-lt)}
 .edu[data-tone="act"]    {--tone:var(--ok)}
 .edu .esrc{display:block;margin-top:16px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
@@ -1473,8 +1503,8 @@ body.wait-up .dirbox{z-index:501}
 .edudots button{width:8px;height:8px;padding:0;border-radius:50%;border:none;
   background:var(--border-lit);transition:all .3s var(--ease);cursor:pointer}
 .edudots button:hover{background:var(--tx-4);transform:scale(1.3)}
-.edudots button.on{background:var(--gold);width:20px;border-radius:4px}
-.edudots button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.edudots button.on{background:var(--acc);width:20px;border-radius:4px}
+.edudots button:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 /* ------------------------------------------------------------------ *
  * THE NETWORK
  * ------------------------------------------------------------------ */
@@ -1598,7 +1628,7 @@ body.wait-up .dirbox{z-index:501}
 .waitslot{margin-left:auto;flex:none;min-width:214px;min-height:16px;display:flex;justify-content:flex-end;
   align-items:center}
 .waitleft{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--gold);white-space:nowrap;text-align:right}
+  text-transform:uppercase;color:var(--acc);white-space:nowrap;text-align:right}
 /* Fixed. The label goes from "I understand" to "Show the result" when the
    assessment lands, the button grows by twenty four pixels, the sentence beside
    it rewraps, and the row loses a line. That line comes out of the network. */
@@ -1684,10 +1714,10 @@ body[data-stage="console"] .summaryband.on{display:grid}
 .rulerow[data-v="GREEN"] .rk{color:var(--ok);border-color:var(--ok-br);background:var(--ok-bg)}
 .rulerow[data-v="GREY"] .rk{color:var(--nul);border-color:var(--nul-br);background:var(--nul-bg)}
 .rulerow[data-v="NEVER"]{background:var(--bg-2)}
-.rulerow[data-v="NEVER"] .rk{color:var(--gold);border-color:var(--gold-br);background:var(--gold-50);font-size:8px}
+.rulerow[data-v="NEVER"] .rk{color:var(--acc);border-color:var(--acc-br);background:var(--acc-50);font-size:8px}
 .rulerow[data-v="NEVER"] .rt{color:var(--tx-3);font-size:11.5px}
 .ghmore{margin-top:16px;display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:999px;
-  border:1px solid var(--gold-dp);background:transparent;color:var(--gold);
+  border:1px solid var(--acc-dp);background:transparent;color:var(--acc);
   font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 .ghmore:hover{background:#2C240F}
 .gateok{padding:13px 30px;border-radius:999px;background:var(--blue);color:#fff;border:none;
@@ -1751,7 +1781,7 @@ button.snaprow:hover{background:var(--surface-2)}
        page always says whether something is running. ---- */
 .topbar{position:fixed;top:0;left:0;right:0;height:9px;z-index:300;background:transparent;pointer-events:none}
 .topbar i{display:block;height:100%;width:0;border-radius:0 5px 5px 0;
-  background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt),var(--gold),var(--ok));
+  background:linear-gradient(90deg,var(--blue-dp),var(--blue-lt),var(--acc),var(--ok));
   box-shadow:0 0 14px rgba(76,135,255,.75);
   transition:width .5s var(--ease),opacity .6s var(--ease);opacity:0}
 .topbar.on i{opacity:1}
@@ -1762,7 +1792,7 @@ button.snaprow:hover{background:var(--surface-2)}
 /* ---- the top bar figures earn their attention ---- */
 .cbtop .r span{padding:4px 0;border:none;background:none}
 .cbtop .r span.key{color:var(--tx-2)}
-.cbtop .r span.key b{color:var(--gold);font-size:11px}
+.cbtop .r span.key b{color:var(--acc);font-size:11px}
 /* ---- the answer leads ----
    Dashboard hierarchy: the highest level result sits top left, immediately
    under the control that produced it, above the fold. The board and the
@@ -1799,7 +1829,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface-2);color:var(--tx-3)}
 .infosec{margin-top:26px;padding-top:20px;border-top:1px solid var(--border)}
 .infosec:first-child{margin-top:0;padding-top:0;border-top:none}
-.infoh{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.infoh{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
 .infolink{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;
   color:var(--blue-lt);text-decoration:none;border-bottom:1px solid var(--border-lit)}
 .infolink:hover{border-bottom-color:var(--blue)}
@@ -1837,7 +1867,12 @@ body[data-stage="console"] .verdictwrap.on{display:block}
   --surface:#FFFFFF; --surface-2:#F5F8FC; --surface-3:#E9EFF7; --surface-4:#DEE7F2;
   --border:#DCE4EF; --border-strong:#C3CFDF; --border-lit:#9FB1C8;
   --tx:#131E31; --tx-2:#44546E; --tx-3:#5F7089; --tx-4:#8394AB;
-  --gold:#8A6A1E; --gold-dp:#6E5417; --gold-br:#E0CE9E; --gold-50:#FAF4E4;
+  --acc:#2E6BF2; --acc-dp:#1B4ABE; --acc-br:#CFE0FD; --acc-50:#EAF1FE;
+  /* Caution on a white ground. The chip and the dot carry the road sign
+     yellow; the words are the dark of it, because #F2A104 on white is 2.13:1
+     and a warning nobody can read is not a warning. */
+  --caution:#8A5200; --caution-lit:#F2A104;
+  --caution-bg:#FFF6E5; --caution-br:#F2C879;
   --blue:#2E6BF2; --blue-lt:#2E6BF2; --blue-dp:#1B4ABE;
   --blue-50:#EAF1FE; --blue-100:#CFE0FD;
   --ok:#0E8A5F; --ok-bg:#E3F6EE; --ok-br:#9CCFBB;
@@ -1850,7 +1885,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 /* ---- processing: the lights change colour while a register is being read ---- */
 @keyframes scanhue{
   0%   {background:var(--blue); box-shadow:0 0 10px var(--blue)}
-  30%  {background:var(--gold); box-shadow:0 0 11px var(--gold)}
+  30%  {background:var(--acc); box-shadow:0 0 11px var(--acc)}
   60%  {background:var(--ok);   box-shadow:0 0 10px var(--ok)}
   100% {background:var(--blue); box-shadow:0 0 10px var(--blue)}
 }
@@ -1860,7 +1895,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .src[data-s="check"]:nth-child(4n+3) i{animation-delay:-1.08s}
 @keyframes rowscan{
   0%,100%{border-left-color:var(--blue-dp)}
-  33%{border-left-color:var(--gold-dp)}
+  33%{border-left-color:var(--acc-dp)}
   66%{border-left-color:var(--ok-br)}
 }
 .brows.scanning .brow{border-left:2px solid var(--border);animation:rowscan 1.9s var(--ease) infinite}
@@ -1877,7 +1912,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
    band. A page somebody opens after their money has gone should not shout at
    them; it should be legible. */
 .actnow{padding:22px 24px 26px;border-bottom:1px solid var(--border);
-  border-left:3px solid var(--gold-dp);background:var(--surface)}
+  border-left:3px solid var(--acc-dp);background:var(--surface)}
 .actnow .anh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
 .actnow .anx{font-size:12.5px;color:var(--warn);line-height:1.6}
 /* The gold was the seam colour showing through a two pixel grid gap, which on
@@ -1886,17 +1921,17 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .anrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;margin-top:14px;
   background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
 .ancard{background:var(--surface);padding:16px 18px;display:flex;gap:13px;align-items:flex-start}
-.ancard .ann{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--gold-dp);flex:none;padding-top:2px}
+.ancard .ann{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--acc-dp);flex:none;padding-top:2px}
 .anb{flex:1;min-width:0}
 .ancard .ant{font-size:14px;font-weight:700;letter-spacing:-.018em;color:var(--tx);line-height:1.35}
 .ancard .anw{font-size:12.5px;color:var(--tx-2);line-height:1.62;margin-top:6px;max-width:60ch}
 .ancontacts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:11px}
-.triage .tnote{margin-top:13px;font-size:13px;color:var(--gold-dp);line-height:1.6;max-width:80ch;display:none}
+.triage .tnote{margin-top:13px;font-size:13px;color:var(--acc-dp);line-height:1.6;max-width:80ch;display:none}
 .triage .tnote.on{display:block}
 .dsec{border-bottom:1px solid var(--border);scroll-margin-top:12px;transition:background .5s var(--ease)}
 .dsec.flash{background:var(--blue-50)}
 .dsech{display:flex;align-items:flex-start;gap:14px;padding:24px 24px 0}
-.dsech .dsn{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--gold-dp);flex:none;padding-top:5px}
+.dsech .dsn{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--acc-dp);flex:none;padding-top:5px}
 .dsech .dst{font-size:19px;font-weight:800;letter-spacing:-.028em;color:var(--tx);line-height:1.2}
 .dsech .dsx{font-size:13px;color:var(--tx-3);line-height:1.55;margin-top:5px;max-width:74ch}
 .dsech .dsc{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--tx-4);flex:none;padding-top:6px}
@@ -1934,16 +1969,16 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .contact.tel .cv{font-size:13.5px;font-weight:700;letter-spacing:.02em}
 .enote{margin-top:10px;font-size:12px;color:var(--tx-4);line-height:1.55}
 .step{background:var(--surface);padding:20px 24px;display:flex;gap:18px}
-.step .sn{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);flex:none;width:22px;padding-top:3px;letter-spacing:.08em}
+.step .sn{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--acc);flex:none;width:22px;padding-top:3px;letter-spacing:.08em}
 .step .sb{flex:1;min-width:0}
 .step .st{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
 .step .sx{display:block;font-size:13px;color:var(--tx-2);line-height:1.62;margin-top:7px}
 .dirfoot{padding:17px 24px;background:var(--bg-2);border-top:1px solid var(--border);font-size:12px;color:var(--tx-4);line-height:1.65}
 .hint{padding:20px 24px;background:var(--bg-3);border-top:1px solid var(--border);display:flex;gap:16px;align-items:flex-start}
-.hint .hk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:30px}
+.hint .hk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--acc);min-height:30px}
 .hint .hx{font-size:13px;color:var(--tx-2);line-height:1.65;max-width:74ch}
 .hint .hx b{color:var(--tx);font-weight:600}
-.hitcat{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+.hitcat{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);margin-bottom:7px}
 .noresult{padding:30px 24px;font-size:14px;color:var(--tx-3);line-height:1.6}
 
 /* ================= instrument deck ================= */
@@ -2017,7 +2052,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .bar.clik{cursor:pointer;border-radius:var(--r-sm);padding:9px 11px;margin:-9px -11px;
   transition:background .22s var(--ease)}
 .bar.clik:hover{background:var(--surface-2)}
-.bar.clik:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bar.clik:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .bar .bt{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
 .bar .bn{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-2)}
 .bar .bv{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--tx);font-variant-numeric:tabular-nums}
@@ -2025,7 +2060,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .bar .bg i{display:block;height:100%;width:0%;border-radius:4px;transition:width 1.1s var(--spring)}
 .bar .bg i[data-c="a"]{background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt))}
 .bar .bg i[data-c="b"]{background:linear-gradient(90deg,#8FB0E8,#C3D5F2)}
-.bar .bg i[data-c="c"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.bar .bg i[data-c="c"]{background:linear-gradient(90deg,var(--acc-dp),var(--acc))}
 .bar .bg i[data-c="n"]{background:linear-gradient(90deg,#CCD6E4,#8494AB)}
 .barfoot{margin-top:18px;padding-top:15px;border-top:1px solid var(--border);font-size:12px;color:var(--tx-3);line-height:1.6}
 
@@ -2059,7 +2094,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .tile .sp{height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:11px}
 .tile .sp i{display:block;height:100%;width:0%;border-radius:3px;transition:width 1.1s var(--spring)}
 .tile .sp i[data-s="RED"]{background:linear-gradient(90deg,#8E2033,var(--bad))}
-.tile .sp i[data-s="YELLOW"]{background:linear-gradient(90deg,var(--gold-dp),var(--gold))}
+.tile .sp i[data-s="YELLOW"]{background:linear-gradient(90deg,var(--acc-dp),var(--acc))}
 .tile .sp i[data-s="GREEN"]{background:linear-gradient(90deg,#0A6A49,var(--ok))}
 .tile .sp i[data-s="GREY"],.tile .sp i[data-s="IDLE"]{background:linear-gradient(90deg,#CCD6E4,#A7B4C6)}
 .tile .scap{margin-top:auto;padding-top:11px;font-size:10.5px;color:var(--tx-4);line-height:1.45}
@@ -2089,7 +2124,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .drill.on{max-height:4200px;margin-top:18px}
 
 .rule{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg-3);display:flex;gap:14px;align-items:flex-start}
-.rule .rk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:34px}
+.rule .rk{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--acc);min-height:34px}
 .rule .rx{font-size:13px;color:var(--tx-2);line-height:1.62}
 .rule .rx b{color:var(--tx);font-weight:600}.srcwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .srctbl{width:100%;border-collapse:collapse;min-width:720px}
@@ -2107,12 +2142,12 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 }
 .tier[data-t="A"]{background:var(--blue-100);color:var(--blue-lt);border:1px solid var(--blue-50)}
 .tier[data-t="B"]{background:var(--surface-3);color:var(--tx-2);border:1px solid var(--border-strong)}
-.tier[data-t="C"],.tier[data-t="D"]{background:var(--gold-50);color:var(--gold);border:1px solid var(--warn-br)}
+.tier[data-t="C"],.tier[data-t="D"]{background:var(--acc-50);color:var(--acc);border:1px solid var(--warn-br)}
 .tier[data-t="4orm"]{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-br)}
 .use{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
 .use[data-u="open"]{color:var(--ok)}
 .use[data-u="restricted"]{color:var(--warn)}
-.use[data-u="licence"]{color:var(--gold)}
+.use[data-u="licence"]{color:var(--acc)}
 .use[data-u="mixed"]{color:var(--warn)}
 .use[data-u="unknown"]{color:var(--tx-4)}
 
@@ -2138,7 +2173,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .rcstat .l{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3);margin-top:7px}
 
 .rcnote{padding:16px 22px;border-bottom:1px solid var(--border);background:var(--bg-3);display:flex;gap:14px;align-items:flex-start}
-.rcnote .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold);min-height:26px}
+.rcnote .k{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--acc);min-height:26px}
 .rcnote .x{font-size:13px;color:var(--tx-2);line-height:1.62;max-width:80ch}
 
 .narrs{display:grid;gap:2px;background:var(--border)}
@@ -2302,7 +2337,7 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .bys h3{font-size:clamp(20px,2.6vw,29px);font-weight:800;letter-spacing:-.035em;line-height:1.1;margin-top:10px}
 .byslist{margin-top:24px;display:grid;gap:2px;border-radius:var(--r);overflow:hidden;background:var(--border)}
 .bysitem{display:flex;gap:16px;padding:18px 20px;background:var(--bg-2)}
-.bysitem .n{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--gold);flex:none;width:20px;padding-top:3px}
+.bysitem .n{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;color:var(--acc);flex:none;width:20px;padding-top:3px}
 .bysitem .t{font-size:13.5px;line-height:1.6;color:var(--tx)}
 @media(max-width:640px){.bys{padding:24px 18px}}
 
@@ -2414,7 +2449,15 @@ body[data-stage="report"] .foot{display:none}
   --tx:#142036; --tx-2:#46556E; --tx-3:#5E6E88;
   --blue:#2E6BF2; --blue-lt:#5B8CFF; --blue-dp:#1B4ABE;
   --blue-50:#EAF1FE; --blue-100:#CFE0FD;
-  --gold:#E7C76C; --gold-dp:#C49A3A; --gold-50:#FBF3DC;
+  /* The accent, and it is the 4orm blue. It was gold everywhere it meant
+     "we are pointing at this", and gold and caution are two different jobs
+     that were sharing one colour. */
+  --acc:#2E6BF2; --acc-dp:#1B4ABE; --acc-br:#CFE0FD; --acc-50:#EAF1FE;
+  /* Caution, on a white ground. The chip and the dot carry the road sign
+     yellow. The words are the dark of it, because #F2A104 on white is 2.13:1
+     and a warning nobody can read is not a warning. */
+  --caution:#8A5200; --caution-lit:#F2A104;
+  --caution-bg:#FFF6E5; --caution-br:#F2C879;
   --ok:#0E8A5F; --ok-bg:#E3F6EE; --ok-br:#9CCFBB;
   --warn:#8F5C12; --warn-bg:#FBF1DC; --warn-br:#E2C88B;
   --bad:#D6334E; --bad-bg:#FCE6EA; --bad-br:#EBB6C0;
@@ -2555,8 +2598,8 @@ body[data-stage="report"] .foot{display:none}
 
 /* the clock */
 #rpt .rp-pvclock{margin:20px 26px 0;padding:14px 16px;border-radius:var(--r);
-  border-left:3px solid var(--gold-dp,#8A6A1E);background:var(--gold-50,#FBF6EA)}
-#rpt .rp-pvclock .rp-k{margin-bottom:5px;font-size:13px;font-weight:800;color:var(--gold-dp,#8A6A1E)}
+  border-left:3px solid var(--acc-dp,#8A6A1E);background:var(--acc-50,#FBF6EA)}
+#rpt .rp-pvclock .rp-k{margin-bottom:5px;font-size:13px;font-weight:800;color:var(--acc-dp,#8A6A1E)}
 #rpt .rp-pvclock .rp-k::before{display:none}
 #rpt .rp-pvclock p{margin:0;font-size:14px;line-height:1.55;color:#5C4712}
 
@@ -2788,9 +2831,21 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-eyebrow[data-v="GREEN"]{background:var(--ok-bg);border-color:var(--ok-br);
   color:var(--ok);box-shadow:0 10px 30px rgba(14,138,95,.18)}
 #rpt .rp-eyebrow[data-v="GREEN"] i{background:var(--ok);animation:none}
-#rpt .rp-eyebrow[data-v="GREY"]{background:var(--surface-2);border-color:var(--border-strong);
-  color:var(--tx-2);box-shadow:none}
-#rpt .rp-eyebrow[data-v="GREY"] i{background:var(--tx-3);animation:none}
+/* WE COULD NOT CHECK ENOUGH TO GIVE YOU AN ANSWER.
+   This used to be grey on grey, which reads as a shrug, and a reader in the
+   middle of deciding whether to send money took it for a mild result rather
+   than for the one state on this page that means the page has told them
+   nothing. It is caution now: the road sign yellow, and the dot pulses like
+   the red one does, because "we do not know" is a thing to stop on. It is
+   never green and it is never a verdict. */
+#rpt .rp-eyebrow[data-v="GREY"]{background:var(--caution-bg);border-color:var(--caution-br);
+  color:var(--caution);box-shadow:0 10px 30px rgba(242,161,4,.18)}
+#rpt .rp-eyebrow[data-v="GREY"] i{background:var(--caution-lit);
+  animation-name:rp-pulse-caution}
+@keyframes rp-pulse-caution{
+  0%{box-shadow:0 0 0 0 rgba(242,161,4,.55)}
+  70%{box-shadow:0 0 0 10px rgba(242,161,4,0)}
+  100%{box-shadow:0 0 0 0 rgba(242,161,4,0)}}
 #rpt .rp-who{margin-top:20px;font-size:clamp(31px,4vw,50px);font-weight:800;letter-spacing:-.038em;
   line-height:1.06;text-wrap:balance}
 #rpt .rp-dom{margin-top:10px;font-family:var(--rmono);font-size:12.5px;color:var(--tx-3);
@@ -2799,16 +2854,6 @@ body[data-stage="report"] .foot{display:none}
   color:var(--tx-2);max-width:56ch}
 #rpt .rp-saylab{margin-top:26px;font-family:var(--rmono);font-size:9.5px;font-weight:800;
   letter-spacing:.17em;text-transform:uppercase;color:var(--tx-3)}
-/* the base rate. It is the line with the largest measured effect on how a
-   warning is read, so it sits with the answer and not in a footnote. */
-/* display:flex outranks the hidden attribute, so the statistic went on painting
-   on the one screen it must never appear on. */
-#rpt .rp-rate[hidden]{display:none}
-#rpt .rp-rate{display:flex;gap:12px;margin-top:22px;padding:13px 16px;border-radius:var(--r-sm);
-  background:var(--gold-50);border:1px solid var(--gold);max-width:46ch}
-#rpt .rp-rate i{flex:none;width:3px;align-self:stretch;border-radius:2px;background:var(--gold-dp)}
-#rpt .rp-rate span{font-size:13.5px;line-height:1.55;color:#5C4A18}
-#rpt .rp-rate b{color:#3E3110;font-weight:700}
 
 /* the identity card */
 #rpt .rp-idtray{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);
@@ -2839,7 +2884,7 @@ body[data-stage="report"] .foot{display:none}
 @media(max-width:520px){#rpt .rp-retry{gap:10px}#rpt .rp-retryx{font-size:12px}}
 #rpt .rp-cardhd{padding-bottom:16px;border-bottom:1px solid var(--border-strong);margin-bottom:14px}
 #rpt .rp-cardk{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--gold-dp)}
+  text-transform:uppercase;color:var(--acc-dp)}
 #rpt .rp-cardref{margin-top:8px;font-family:var(--rmono);font-size:clamp(17px,1.9vw,21px);
   font-weight:800;letter-spacing:.03em;color:var(--tx);word-break:break-all}
 #rpt .rp-cardmeta{margin-top:12px;display:grid;gap:7px}
@@ -2908,22 +2953,13 @@ body[data-stage="report"] .foot{display:none}
    hundred pixel grey slab that reads as a panel that failed to load. The same
    fault as the four wrapper grids on sources and method, in a different place.
    Auto columns make the row fit whatever it is given. */
-#rpt .rp-figs{position:relative;z-index:2;display:grid;gap:2px;margin-top:48px;
-  grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);background:var(--border);
-  border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-@media(max-width:620px){#rpt .rp-figs{grid-auto-flow:row;grid-auto-columns:auto}}
-#rpt .rp-fig{background:var(--surface);padding:26px 24px 24px}
-#rpt .rp-fig .rp-v{font-family:var(--rmono);font-size:clamp(28px,3.4vw,40px);font-weight:700;
-  letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums;color:var(--tx);
-  white-space:nowrap}
-#rpt .rp-fig .rp-l{margin-top:14px;font-size:13.5px;line-height:1.52;color:var(--tx-2);max-width:28ch}
 
 
 /* sections */
 #rpt .rp-sec{position:relative;z-index:2;padding:96px 0 0}
 #rpt .rp-sec.rp-tight{padding-top:48px}
 #rpt .rp-kick{font-family:var(--rmono);font-size:10px;font-weight:800;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--gold-dp)}
+  text-transform:uppercase;color:var(--acc-dp)}
 #rpt .rp-h2{margin-top:12px;font-size:clamp(22px,2.5vw,30px);font-weight:800;letter-spacing:-.03em;
   line-height:1.1;text-wrap:balance}
 #rpt .rp-sub{margin-top:12px;font-size:15px;line-height:1.6;color:var(--tx-2);max-width:62ch}
@@ -2978,12 +3014,12 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-winc{background:var(--surface-2);padding:18px 20px 20px;position:relative}
 #rpt .rp-winc::before{content:"";position:absolute;left:0;right:0;top:0;height:3px}
 #rpt .rp-winc[data-w="now"]::before{background:var(--bad)}
-#rpt .rp-winc[data-w="soon"]::before{background:var(--gold-dp)}
+#rpt .rp-winc[data-w="soon"]::before{background:var(--acc-dp)}
 #rpt .rp-winc[data-w="after"]::before{background:var(--border-strong)}
 #rpt .rp-winc .rp-wt{font-family:var(--rmono);font-size:9px;font-weight:800;letter-spacing:.16em;
   text-transform:uppercase}
 #rpt .rp-winc[data-w="now"] .rp-wt{color:var(--bad)}
-#rpt .rp-winc[data-w="soon"] .rp-wt{color:var(--gold-dp)}
+#rpt .rp-winc[data-w="soon"] .rp-wt{color:var(--acc-dp)}
 #rpt .rp-winc[data-w="after"] .rp-wt{color:var(--tx-3)}
 #rpt .rp-winc .rp-wv{margin-top:11px;font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 #rpt .rp-winc .rp-wx{margin-top:8px;font-size:13px;line-height:1.52;color:var(--tx-2)}
@@ -3128,15 +3164,49 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-brow .rp-bv{font-size:13.5px;line-height:1.5;color:var(--tx);font-weight:600;word-break:break-word}
 #rpt .rp-brow .rp-bv.rp-you{font-weight:500;color:var(--tx-3);font-style:normal}
 #rpt .rp-brow .rp-bv.rp-you::before{content:"You add this. ";font-family:var(--rmono);font-size:8.5px;
-  font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--gold-dp)}
+  font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--acc-dp)}
 @media(max-width:680px){#rpt .rp-brow{grid-template-columns:1fr;gap:5px;padding:14px 18px}}
 
 /* the honest half */
-#rpt .rp-gapnote{margin-top:32px;background:var(--surface-2);border:1px solid var(--border);
-  border-left:3px solid var(--gold-dp);border-radius:0 var(--r-lg) var(--r-lg) 0;padding:25px 28px}
+/* WHAT WE COULD NOT ANSWER, IN GREY.
+   It is the one block on this page that is neither a finding nor a warning:
+   it is the shape of the hole. So it takes no state colour at all. A blue
+   edge made it read as a note we were adding; grey says it is the part of the
+   record that is missing, which is the only honest way to draw an absence. */
+#rpt .rp-gapnote{margin-top:30px;max-width:74ch;background:#F1F2F4;border:1px solid #DCDFE4;
+  border-left:3px solid #98A0AC;border-radius:0 var(--r-lg) var(--r-lg) 0;padding:25px 28px}
 #rpt .rp-gapnote .rp-t{font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
 #rpt .rp-gapnote .rp-x{margin-top:10px;font-size:14.5px;line-height:1.6;color:var(--tx-2);max-width:74ch}
 #rpt .rp-gapnote .rp-x+.rp-x{margin-top:11px}
+
+/* THE SCROLL CUE. Fixed to the foot of the window rather than to the page,
+   because it has to be visible from wherever the reader is when the report
+   lands, and gone the moment they have understood it. */
+#rpt .rp-more{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);
+  z-index:40;display:inline-flex;align-items:center;gap:12px;cursor:pointer;
+  padding:12px 16px 12px 20px;border-radius:999px;
+  background:var(--tx);border:1px solid var(--tx);color:#fff;
+  box-shadow:0 14px 40px rgba(16,32,64,.32);
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;white-space:nowrap;max-width:calc(100vw - 32px);
+  opacity:0;transition:opacity .4s var(--ease),transform .4s var(--ease)}
+#rpt .rp-more[hidden]{display:none}
+#rpt .rp-more.rp-on{opacity:1;transform:translateX(-50%) translateY(0)}
+#rpt .rp-more:hover{background:#000;border-color:#000}
+#rpt .rp-more:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+#rpt .rp-more .rp-morex{font-weight:400;letter-spacing:.06em;text-transform:none;
+  font-family:var(--rsans);font-size:13px;color:#C7D3E6;
+  overflow:hidden;text-overflow:ellipsis}
+#rpt .rp-more .rp-morec{flex:none;display:inline-flex;width:22px;height:22px;
+  align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.14);animation:rp-nudge 2.2s var(--ease) infinite}
+#rpt .rp-more .rp-morec svg{width:14px;height:14px;stroke:#fff;stroke-width:2.4;fill:none}
+@keyframes rp-nudge{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
+@media(prefers-reduced-motion:reduce){#rpt .rp-more .rp-morec{animation:none}}
+@media(max-width:520px){
+  #rpt .rp-more{bottom:16px;padding:10px 12px 10px 16px;gap:9px;font-size:10px}
+  #rpt .rp-more .rp-morex{display:none}
+}
 
 /* the control */
 #rpt .rp-behind{position:relative;z-index:2;margin:96px 0 0}
@@ -3492,8 +3562,8 @@ body[data-stage="console"] .statstrip{margin-top:22px}
 .navbtn.green:hover{border-color:var(--ok);background:rgba(51,216,155,.18);
   color:#BDF3DA}
 .navbtn.gold{border-color:rgba(231,199,108,.5);background:rgba(231,199,108,.09);
-  color:var(--gold)}
-.navbtn.gold:hover{border-color:var(--gold);background:rgba(231,199,108,.16);
+  color:var(--acc)}
+.navbtn.gold:hover{border-color:var(--acc);background:rgba(231,199,108,.16);
   color:#F2DFA6}
 .navleft{display:flex;align-items:center;gap:16px;pointer-events:auto;min-width:0}
 .navbtn[data-when]{display:none}
@@ -3557,12 +3627,34 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-pill svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;flex:none}
 #rpt .rp-pill-green{background:var(--ok-bg);border-color:var(--ok-br);color:#0A5C40}
 #rpt .rp-pill-green:hover{background:#D6F0E5;border-color:var(--ok)}
-#rpt .rp-pill-gold{background:var(--gold-50,#FBF4E2);border-color:#EBDCB2;color:#8A6A1E}
-#rpt .rp-pill-gold:hover{background:#F6EBCE;border-color:var(--gold-dp,#C49A3A)}
+#rpt .rp-pill-gold{background:var(--acc-50,#FBF4E2);border-color:#EBDCB2;color:#8A6A1E}
+#rpt .rp-pill-gold:hover{background:#F6EBCE;border-color:var(--acc-dp,#C49A3A)}
 /* Blue, because it is the only pill in the row that starts something rather
    than opening something already on the page. */
 #rpt .rp-pill-new{background:var(--blue-50);border-color:var(--blue-100);color:var(--blue-dp)}
 #rpt .rp-pill-new:hover{background:#DCE8FE;border-color:var(--blue)}
+/* A step up from a header pill, because it is the only control at the top of
+   the page now and it should read as one rather than as a label. */
+#rpt .rp-pill-lg{padding:13px 22px;font-size:11.5px;letter-spacing:.13em;gap:10px;min-height:46px}
+#rpt .rp-pill-lg svg{width:15px;height:15px}
+#rpt .rp-cardcol{min-width:0}
+/* ON A PHONE IT STAYS WHERE IT IS, AND THAT IS DELIBERATE.
+   The column stacks below the summary at this width, so the control lands
+   well down the page. It was moved to the top for one build and that is worse:
+   the first thing on the one screen whose whole job is to deliver a verdict
+   was a navigation control sitting above the verdict. A reader who has just
+   been told a regulator has warned about this firm is not looking for a way
+   to check something else. It stays above the card at every width, which is
+   where it was asked to be, and the verdict comes first on the narrow one.
+   Full width here, because a right-aligned pill on a phone is a small target
+   in the hardest place to reach. */
+@media(max-width:680px){
+  #rpt .rp-newrow{justify-content:stretch}
+  #rpt .rp-newrow .rp-pill{flex:1 1 auto;justify-content:center}
+}
+#rpt .rp-newrow{display:flex;justify-content:flex-end;margin-bottom:14px}
+#rpt .rp-newrow[hidden]{display:none}
+@media(max-width:980px){#rpt .rp-newrow{justify-content:flex-start}}
 #rpt .rp-pill:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 #rpt .rp-pill.rp-on{box-shadow:inset 0 0 0 1px var(--ok);cursor:default}
 #rpt .rp-flag{font-size:11px;line-height:1}
@@ -3681,8 +3773,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
    This is the page telling the reader that a rule we set ourselves cost them
    something. It is the most important paragraph in the report and it had no
    rule of its own, so it read as an afterthought in body copy. */
-#rpt .rp-held{margin-top:20px;padding:15px 18px;border-left:3px solid var(--gold-dp);
-  border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--gold-50,#FBF6EA);
+#rpt .rp-held{margin-top:20px;padding:15px 18px;border-left:3px solid var(--acc-dp);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--acc-50,#FBF6EA);
   font-size:14px;line-height:1.6;color:#5C4712;max-width:68ch}
 #rpt .rp-held b{color:#3E300C;font-weight:700}
 
@@ -3916,7 +4008,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <div class="cbtitle">
           <div class="tlead">
             <h1 class="cbh1"><span class="console-only">Check who you're dealing with <span class="dim">before the money leaves.</span></span><span class="landing-only">Before you send money, check 4orm</span></h1>
-            <p class="cbdeck landing-only">Not sure about a company, broker, website, auto dealer, bank, or crypto opportunity? <span>See what public sources can confirm, and what they cannot.</span></p>
+            <p class="cbdeck landing-only"><span class="q">Not sure about a company, broker, website, auto dealer, bank, or crypto opportunity?</span><span>See what public sources can confirm, and what they cannot.</span></p>
 
             <!-- The line above names the moments and the limit in one breath, so the
                  separate list of moments that used to sit here is gone: it said the
@@ -4187,26 +4279,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
   <div class="rp-wash"></div>
   <div class="rp-wrap">
 
-    <div class="rp-head">
+        <!-- TWO MOVES ON THIS PAGE AND NO MORE.
+         The header carried three pills: sources and method, find support, and
+         a new check. A reader who has just been told something about their
+         money does not need three ways off the page. They read it, they go on
+         to what we found, or they check another name. The other two are still
+         reachable from the foot, with the rest of the small print. -->
+<div class="rp-head">
       <div class="rp-hlogo"><img src="data:image/png;base64,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" alt="4orm Finance"></div>
-      <nav class="rp-nav" aria-label="Around this report">
-        <button class="rp-pill rp-pill-green" type="button" id="rpToSources_report">
-          <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v18H6.5A2.5 2.5 0 014 18.5zM20 5.5A2.5 2.5 0 0017.5 3H12v18h5.5a2.5 2.5 0 002.5-2.5z" stroke-linejoin="round"/></svg>
-          Sources and method
-        </button>
-        <button class="rp-pill rp-pill-gold" type="button" data-dir="open">
-          <span class="rp-flag" aria-hidden="true">&#9873;</span>
-          Find support
-        </button>
-        <!-- The search bar is off the board once a report is open, so this is
-             the way to check the next name without hunting for the back
-             button. The report just read is held, and the landing page offers
-             the way back into it. -->
-        <button class="rp-pill rp-pill-new" type="button" id="rpNewCheck">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
-          New check
-        </button>
-      </nav>
     </div>
 
     <div class="rp-hero">
@@ -4230,6 +4310,22 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
           <div class="rp-saylab">In our own words</div>
           <p class="rp-say" id="rpSay"></p>
+
+          <!-- STRAIGHT UNDER THE SUMMARY, IN THE SAME COLUMN, BECAUSE IT IS
+               PART OF IT. A reader who has just been given a verdict needs the
+               size of the hole in it before anything else. It used to sit four
+               sections down, below the good news, which put the shape of what
+               we do not know at the end of a page most people never reached.
+               It also fills the column: the card beside this is tall and the
+               summary is short, and the void between them was the page looking
+               like it had stopped. Grey, because an absence takes no state
+               colour: it is neither a finding nor a warning. -->
+          <div class="rp-gapnote">
+            <div class="rp-t">What we could not answer</div>
+            <div class="rp-x" id="rpGap1"></div>
+            <div class="rp-x" id="rpGap2"></div>
+            <div class="rp-x" id="rpGap3"></div>
+          </div>
           <!-- The only control a check that did not run can honestly offer.
                Hidden on every run that did. -->
           <!-- WHAT ACTUALLY WENT WRONG, FOR WHOEVER RUNS THIS.
@@ -4245,9 +4341,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             <button type="button" class="rp-retryb" id="rpRetryB">Run the check again</button>
             <span class="rp-retryx">Nothing was recorded, so nothing is repeated.</span>
           </div>
-          <div class="rp-rate" id="rpRate"><i></i><span>Of the people who reported an investment or crypto
-            approach to BBB Scam Tracker in 2025, <b>more than 77% said they lost money.</b> Almost
-            none of them expected to.</span></div>
+          <!-- The BBB base rate sat here. It is a true and well sourced
+               number about other people, and this page is about one party and
+               one decision. A statistic below the verdict is a second thing to
+               weigh at the moment a reader is trying to act on the first. -->
         </div>
         <!-- THE REPORT CARD.
              It used to be a list of what the record holds with the reference
@@ -4256,6 +4353,22 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
              at the top, and the date and the log entry go with it, because the
              three of them together are what makes this run findable again. The
              rows below are the same fields every document pack is built from. -->
+        <!-- THE ONE CONTROL AT THE TOP, AND IT SITS ON THE CARD.
+             In the header it was one of three pills a reader scanned past.
+             Here it is the only thing above the report card, which is where
+             the eye lands after the verdict, and it is a step bigger than a
+             header pill because it is the only move at the top of the page. -->
+        <!-- ONE GRID CELL, NOT TWO. rp-heromain is a two column grid and its
+             children are auto placed, so adding the control as a third child
+             put it in the right column and pushed the card it belongs to into
+             the left one, underneath the summary. They share a cell. -->
+        <div class="rp-cardcol">
+        <div class="rp-newrow">
+          <button class="rp-pill rp-pill-new rp-pill-lg" type="button" id="rpNewCheck">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+            New check
+          </button>
+        </div>
         <div class="rp-idtray" id="rpIdTray"><div class="rp-idplate">
           <div class="rp-cardhd">
             <div class="rp-cardk">Report card</div>
@@ -4267,8 +4380,32 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <div id="rpIdent"></div>
           <p class="rp-cardfoot" id="rpCardFoot"></p>
         </div></div>
+        </div>
       </div>
-      <div class="rp-figs" id="rpFigs"></div>
+      <!-- THE CUE THAT THERE IS MORE.
+           The reader this page was designed for is frightened, on a phone, at
+           eleven at night, and the worst thing that can happen to them is
+           reading the verdict and stopping, because everything that tells
+           them what to do is below it. This is the one piece of motion on the
+           page: it appears a moment after the report lands, it says what is
+           down there rather than just pointing, it is a real control so a
+           thumb or the keyboard can take it, and it goes the instant the page
+           is scrolled and never comes back in that session. -->
+      <button class="rp-more" id="rpMore" type="button" hidden>
+        <span class="rp-moret">Keep reading</span>
+        <span class="rp-morex" id="rpMoreX"></span>
+        <span class="rp-morec" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round"
+            stroke-linejoin="round"/></svg></span>
+      </button>
+
+      <!-- THREE BIG NUMBERS USED TO SIT HERE: "2 of 10 checks we finished
+           found something wrong", the count of contradicted claims, and
+           "26 of 83 places answered us". Every one of them is on this page
+           already, in a sentence, in the verdict and in what we could not
+           answer. A reader deciding whether to send money was being asked to
+           hold three ratios in their head on the way to a decision the words
+           had already made for them. The card and the summary are the page. -->
     </div>
 
     <!-- The page could only ever say what was wrong. A registered firm with a
@@ -4281,15 +4418,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         that nothing will go wrong. It means a regulator knows who they are, they have rules
         to follow, and there is somewhere to complain.</p>
       <div class="rp-goods" id="rpGoods"></div>
-    </div>
-
-    <div class="rp-sec rp-tight">
-      <div class="rp-gapnote">
-        <div class="rp-t">What we could not answer</div>
-        <div class="rp-x" id="rpGap1"></div>
-        <div class="rp-x" id="rpGap2"></div>
-        <div class="rp-x" id="rpGap3"></div>
-      </div>
     </div>
 
     <!-- The most frightened reader on this page is the one who has already paid,
@@ -10096,7 +10224,7 @@ function buildAudit(d){
          '<div class="m3"><i style="width:'+esc(d.idc)+'%;background:linear-gradient(90deg,var(--blue-deep),var(--blue-lt))"></i></div>'+
          '</div>'+
        '<div class="armeter"><div class="m1">Evidence coverage</div><div class="m2 tnum">'+esc(d.cov)+'%</div>'+
-         '<div class="m3"><i style="width:'+esc(d.cov)+'%;background:linear-gradient(90deg,var(--gold-dp),var(--gold))"></i></div>'+
+         '<div class="m3"><i style="width:'+esc(d.cov)+'%;background:linear-gradient(90deg,var(--acc-dp),var(--acc))"></i></div>'+
          '</div>'+
      '</div>'+
      '<div class="statstrip" style="margin-top:24px">'+
@@ -11557,7 +11685,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260907.1834";
+var KBYS_BUILD = "20260908.0033";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -12162,38 +12290,6 @@ function rpCounts(d){
   return {adverse:adverse, checked:checked, watch:watch, contra:contra, reached:reached,
           applic:applic, unreached:unreached, unsettled:unsettled,
           claims:cl.length, issues:(d.issues||[]).length};
-}
-function rpFig(v,tone,l){
-  return '<div class="rp-fig"><div class="rp-v rp-'+tone+'">'+rpEsc(v)+'</div>'
-    +'<div class="rp-l">'+rpEsc(l)+'</div></div>';
-}
-function rpFigs(d){
-  /* Three bare numbers gave a reader no way to tell whether high was good. Each
-     one now says which way it points, in a sentence. */
-  var c=rpCounts(d), out="";
-  if(c.checked){
-    if(c.adverse){
-      out+=rpFig(c.adverse+" of "+c.checked, "bad", "checks we finished found something wrong.");
-    } else if(c.watch){
-      out+=rpFig(c.watch+" of "+c.checked, "warn",
-        c.watch===1 ? "check found something worth a second look. Nothing came back wrong."
-                    : "checks found something worth a second look. Nothing came back wrong.");
-    } else {
-      out+=rpFig("0 of "+c.checked, "ok", "checks found anything wrong.");
-    }
-  }
-  if(c.claims){
-    out+=rpFig(String(c.contra), c.contra?"bad":"ok",
-      c.contra===1
-        ? "thing they say is contradicted by an official record."
-        : "things they say are contradicted by official records.");
-  }
-  if(c.applic){
-    out+=rpFig(c.reached+" of "+c.applic, c.reached*2<c.applic?"warn":"ok",
-      "places that might hold a record on them answered us."
-      + (c.reached*2<c.applic ? " This report is a long way from complete." : ""));
-  }
-  return out;
 }
 
 /* -------------------------------------------------- findings, claims, steps */
@@ -13230,9 +13326,11 @@ function renderReport(d){
     /* No reference for a run with no log entry behind it. A reference somebody
        can read down a phone to a fraud desk has to lead somewhere. */
     if(card) card.hidden = failed;
-    /* Not beside a name we did not check. */
-    var rate = id("rpRate");
-    if(rate) rate.hidden = failed;
+    /* The new check control goes with the card. On a run that did not happen
+       there is nothing to check twice, and the retry below is the one honest
+       thing to offer. */
+    var nrow = document.querySelector("#rpReport .rp-newrow");
+    if(nrow) nrow.hidden = failed;
     var retry = id("rpRetry");
     if(retry) retry.hidden = !failed;
     /* And on a debug run only, what the provider actually said. */
@@ -13265,7 +13363,6 @@ function renderReport(d){
   id("rpSay").textContent=rpScrubPeople(d.statement||d.note||"", d);
   id("rpIdent").innerHTML=rpIdent(d);
   rpCard(d);
-  id("rpFigs").innerHTML=rpFigs(d);
 
   var w="", i;
   for(i=0;i<RP_WINDOWS.length;i++){
@@ -13493,6 +13590,9 @@ var RP_DOCBACK = { sources:"rpBackToReport", compliance:"rpCompBack", privacy:"r
 var RP_AT = "result";
 function rpShow(which){
   if(!RP_SCREENS[which]) which="result";
+  /* The cue belongs to the result screen only. Leaving it up over what we
+     found would be pointing at a page the reader is no longer on. */
+  if(which!=="result"){ var mc=id("rpMore"); if(mc){ mc.hidden=true; mc.classList.remove("rp-on"); } }
   RP_AT = which;
   for(var k in RP_SCREENS){
     var el = id(RP_SCREENS[k]); if(el) el.hidden = (k!==which);
@@ -13532,6 +13632,10 @@ function rpEnter(d,label){
   RP_HELD=d; RP_HELD_LABEL=RP_LABEL;
   rpHoldSync();
   rpShow("result");
+  /* Last, and after the screen is up, because the cue measures whether there
+     is anything below the fold and that cannot be known until the page it is
+     measuring is the page on screen. */
+  if(window.rpCue) setTimeout(function(){ window.rpCue(d); }, 0);
   RP_OPENING=false;
 }
 /* Where the reader came from. Sources and method is reachable from the landing,
@@ -13938,6 +14042,64 @@ id("navSources").addEventListener("click", function(){
   rpSources();
 });
 id("rpToFound").addEventListener("click", rpFound);
+
+/* ===================================================== THE SCROLL CUE
+   The reader this page was built for is frightened, on a phone, late, and the
+   worst thing that can happen to them is that they read the verdict and stop:
+   everything that tells them what to do is below it.
+
+   Four rules, and each one is there because the obvious version of this
+   control is worse:
+
+     it names what is below rather than pointing at it, because an arrow on
+     its own asks a frightened person to gamble a scroll on nothing;
+
+     it appears a moment after the report lands, not with it, so it never
+     competes with the verdict for the first look;
+
+     it is a button, so a thumb, a keyboard and a screen reader can all take
+     it, and it moves the page to the first thing under the fold rather than
+     leaving somebody to hunt;
+
+     and it goes on the first scroll and does not come back, because a hint
+     that keeps reappearing after it has been understood is nagging. It is
+     also never shown when there is nothing below the fold to reach. */
+(function(){
+  var el = id("rpMore"); if(!el) return;
+  var timer = null, done = false;
+  function hide(){
+    if(done) return; done = true;
+    el.classList.remove("rp-on");
+    clearTimeout(timer);
+    setTimeout(function(){ el.hidden = true; }, 420);
+    window.removeEventListener("scroll", onScroll);
+  }
+  function onScroll(){ if(window.scrollY > 40) hide(); }
+  el.addEventListener("click", function(){
+    var t = id("rpGoodSec") || document.querySelector("#rpReport .rp-gapnote");
+    if(t && t.scrollIntoView)
+      t.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+    else window.scrollBy({ top: window.innerHeight * .82,
+                           behavior: reduceMotion() ? "auto" : "smooth" });
+    hide();
+  });
+  window.rpCue = function(d){
+    done = false; clearTimeout(timer);
+    window.removeEventListener("scroll", onScroll);
+    /* Nothing below the fold is nothing to hint at. */
+    var below = document.documentElement.scrollHeight - window.innerHeight > 120;
+    if(!below || (d && d.failed)){ el.hidden = true; el.classList.remove("rp-on"); return; }
+    /* What is actually down there, in its own words, so the cue is never a
+       promise the page does not keep. */
+    var x = id("rpMoreX");
+    if(x) x.textContent = (d && d.verdict === "GREY")
+      ? "what we could not answer, and what to do"
+      : "what we could not answer, and what to do next";
+    el.hidden = false;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    timer = setTimeout(function(){ if(!done) el.classList.add("rp-on"); }, 900);
+  };
+})();
 id("rpToAct").addEventListener("click", rpAct);
 id("rpFoundBack").addEventListener("click", rpBackToReport);
 id("rpActBack").addEventListener("click", rpFound);

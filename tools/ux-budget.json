@@ -1,6 +1,6 @@
 {
   "note": "Recorded ceilings, not targets. A number may fall and may never rise. Raising one is a design decision with an owner, not a way past a red build.",
-  "recorded": "2026-09-07",
+  "recorded": "2026-09-08",
   "scenes": {
     "landing@1440": {
       "contrast": 5,
@@ -63,39 +63,39 @@
       "overflow": 0
     },
     "report@1440": {
-      "contrast": 4,
+      "contrast": 3,
       "targets": 20,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
       "headings": 1,
-      "stops": 8,
+      "stops": 7,
       "h1s": 1,
-      "textRuns": 212,
+      "textRuns": 208,
       "overflow": 0
     },
     "report@390": {
-      "contrast": 4,
+      "contrast": 3,
       "targets": 20,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
       "headings": 1,
-      "stops": 8,
+      "stops": 7,
       "h1s": 1,
-      "textRuns": 86,
+      "textRuns": 81,
       "overflow": 0
     },
     "report@320": {
-      "contrast": 4,
+      "contrast": 3,
       "targets": 20,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
       "headings": 1,
-      "stops": 8,
+      "stops": 7,
       "h1s": 1,
-      "textRuns": 86,
+      "textRuns": 81,
       "overflow": 0
     },
     "backoffice@1440": {

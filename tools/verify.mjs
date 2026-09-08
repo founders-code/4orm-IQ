@@ -1143,22 +1143,92 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
    has already sent the money. Order, not presence. */
 {
   const r = sheets_.rpReport;
-  if (r.indexOf('What we could not answer') > r.indexOf('id="rpAlready"'))
-    fails.push('what we could not answer sits below the already-sent door, it belongs just above it');
-  if (r.indexOf('id="rpAlready"') > r.indexOf('id="rpToFound"'))
+  /* THE ORDER OF THE RESULT SCREEN, TOP TO BOTTOM.
+       the summary and the card
+       what we could not answer, grey, because the hole belongs with the verdict
+       what came back in their favour
+       the door for somebody who has already sent the money
+       the way on to what we found, last, because nothing may sit below it
+     The gap note used to sit fourth, which put the shape of what we do not
+     know at the end of a page most people never reached. */
+  const at = k => r.indexOf(k);
+  if (at('What we could not answer') > at('id="rpGoodSec"'))
+    fails.push('what we could not answer sits below the good news, and it belongs with the verdict');
+  if (at('What we could not answer') > at('id="rpAlready"'))
+    fails.push('what we could not answer sits below the already-sent door, it belongs above it');
+  if (at('id="rpAlready"') > at('id="rpToFound"'))
     fails.push('the way on to what we found sits above the already-sent door');
+  /* Nothing below the way on but the small print. A reader who takes the next
+     step never comes back up, so anything under that door is unread. */
+  if (at('id="rpGoodSec"') > at('id="rpToFound"'))
+    fails.push('what came back in their favour sits below the way on, where nobody will read it');
+  /* A TRUE GREY, not the page's cool wash. --bg-3 is #EFF3F9, which is a pale
+     blue, and beside a blue accent it read as another note we were adding
+     rather than as the shape of what is missing. */
+  if (!/#rpt \.rp-gapnote\{[^}]*background:#F1F2F4/.test(styleBlock))
+    fails.push('what we could not answer is no longer grey, and an absence must not wear a state colour');
 }
 
-/* THE TWO PILLS, and the ONE screen that does not carry them.
-   What we found is the middle of a read. A reader gets there by choosing to go
-   deeper, and the only thing they should be offered at the top is the way back;
-   the way on is the door at the foot of the page. Three ways off a screen whose
-   whole job is to be read to the bottom is two too many. Everywhere else the
-   pair stays, side by side, hard right. */
-const PILLED_ = ['rpReport', 'rpAct', 'rpSources'];
+/* THE PILLS, AND THE TWO SCREENS THAT DO NOT CARRY THEM.
+   The result screen is the second. A reader who has just been told something
+   about their money has two moves at the top and no more: read on, or check
+   another name. Three ways off that screen was two too many, and the pair is
+   still reachable from the foot with the rest of the small print.
+
+   What we found is the first, and for the same reason pointed the other way:
+   it is the middle of a read, so the only thing offered at its top is the way
+   back. Everywhere else the pair stays, side by side, hard right. */
+const PILLED_ = ['rpAct', 'rpSources'];
 for (const x of PILLED_) {
   if (!/Sources and method/.test(sheets_[x])) fails.push(x + ' has lost the sources and method pill');
   if (!/Find support/.test(sheets_[x])) fails.push(x + ' has lost the find support pill');
+}
+{
+  const r = sheets_.rpReport;
+  if (/Sources and method/.test(r) || /Find support/.test(r))
+    fails.push('the result screen has the pills back in its header, and it is meant to offer two moves');
+  /* And the one control it does keep has to be ON the card rather than in the
+     header it came out of, or it is a pill floating in an empty bar. */
+  if (r.indexOf('id="rpNewCheck"') > r.indexOf('id="rpIdTray"'))
+    fails.push('new check sits below the report card, and it belongs above it');
+  if (!/class="rp-pill rp-pill-new rp-pill-lg"/.test(r))
+    fails.push('new check is back at header-pill size, and it is the only control at the top of that page');
+  /* The way to the rest of the small print has to survive the pills going. */
+  if (!/id="rpToSourcesR"/.test(r))
+    fails.push('the result screen has no route to how we decide at all now');
+  /* AND THE CONTROL SHARES A GRID CELL WITH THE CARD.
+     rp-heromain is a two column grid whose children are auto placed. Adding
+     the control as a third child put it in the right column and pushed the
+     card it belongs to into the left one, underneath the summary. */
+  if (!/<div class="rp-cardcol">[\s\S]{0,400}?class="rp-newrow"[\s\S]{0,400}?id="rpIdTray"/.test(r))
+    fails.push('new check and the report card are not in one grid cell, so the card will drop into the other column');
+}
+
+/* THE SCROLL CUE.
+   The reader this screen was built for is frightened, on a phone, late, and
+   the worst thing that can happen is that they read the verdict and stop:
+   everything telling them what to do is below it. Four properties, each one
+   there because the obvious version of this control is worse. */
+{
+  if (!/id="rpMore"/.test(html))
+    fails.push('the result screen has no cue that there is more below the fold');
+  if (!/window\.rpCue\s*=\s*function/.test(script))
+    fails.push('nothing arms the scroll cue when a report lands');
+  /* It names what is down there. An arrow on its own asks a frightened person
+     to gamble a scroll on nothing. */
+  if (!/id="rpMoreX"/.test(html))
+    fails.push('the scroll cue points at the page below without saying what is on it');
+  /* It is a button, so a thumb, a keyboard and a screen reader can take it. */
+  if (!/<button class="rp-more" id="rpMore" type="button" hidden>/.test(html))
+    fails.push('the scroll cue is not a control, so only a mouse can use it');
+  /* It goes on the first scroll and does not come back. */
+  if (!/window\.removeEventListener\("scroll", onScroll\)/.test(script))
+    fails.push('the scroll cue keeps listening after it has been dismissed, so it can come back');
+  /* And it is never shown when there is nothing below the fold to reach. */
+  if (!/scrollHeight - window\.innerHeight > 120/.test(script))
+    fails.push('the scroll cue is shown without checking there is anything below the fold');
+  if (!/#rpt \.rp-more\[hidden\]\{display:none\}/.test(styleBlock))
+    fails.push('a hidden scroll cue has no rule taking it off the page');
 }
 {
   const f = sheets_.rpFound;
@@ -1998,7 +2068,11 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
     'rp-accs':         /#rpt \.rp-accs\{[^}]*margin-top:(\d+)px;/,
     'rp-why':          /#rpt \.rp-why\{margin-top:(\d+)px;/,
     'rp-clock':        /#rpt \.rp-clock\{[^}]*margin-top:(\d+)px;/,
-    'rp-figs':         /#rpt \.rp-figs\{[^}]*margin-top:(\d+)px;/,
+    /* .rp-figs was the three big ratios beside the verdict. They came off
+       the result screen: every one of them is already on the page in a
+       sentence, and a reader deciding whether to send money was being
+       asked to hold three ratios in their head on the way to a decision
+       the words had already made. Nothing to hold to the scale now. */
     'rp-foot':         /#rpt \.rp-foot\{[^}]*margin-top:(\d+)px;/,
     'rp-stitle':       /#rpt \.rp-stitle\{margin-top:(\d+)px;/,
   };

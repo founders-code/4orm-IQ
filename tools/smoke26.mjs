@@ -71,7 +71,26 @@ const pillPair = async where => {
   if (!n.some(t => /Sources and method/.test(t))) fail(where + ' has no sources and method pill');
   if (!n.some(t => /Find support/.test(t))) fail(where + ' has no find support pill');
 };
-await pillPair('the result screen');
+/* THE RESULT SCREEN IS THE OTHER ONE WITHOUT THEM.
+   A reader who has just been told something about their money has two moves
+   at the top and no more: read on, or check another name. Three ways off that
+   screen was two too many. The pair is still reachable from its foot, with
+   the rest of the small print. */
+{
+  const n = await p.evaluate(() => {
+    const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
+    return { pills: [...s.querySelectorAll('.rp-nav .rp-pill')].map(e => e.textContent.trim()),
+             newcheck: !!s.querySelector('#rpNewCheck'),
+             /* And the one control it keeps sits on the card, above it. */
+             onCard: !!s.querySelector('.rp-cardcol .rp-newrow #rpNewCheck'),
+             foot: !!s.querySelector('#rpToSourcesR') };
+  });
+  if (n.pills.length) fail('the result screen has ' + n.pills.length
+    + ' pills in its header and should have none: ' + n.pills.join(', '));
+  if (!n.newcheck) fail('the result screen has lost the way to check another name');
+  if (!n.onCard) fail('new check is not on the report card, where it was asked to sit');
+  if (!n.foot) fail('the result screen has no route to how we decide at all now');
+}
 
 /* Forward. */
 await p.click('#rpToFound'); await p.waitForTimeout(500); await one('rpFound', 'the way on to what we found');
@@ -136,7 +155,7 @@ if (order.gap === null || order.already === null || order.onward === null)
 if (!(order.gap < order.already && order.already < order.onward))
   fail('the result screen reads in the wrong order: ' + JSON.stringify(order));
 
-console.log('screens walked, both pills on every one, order held');
+console.log('screens walked, two moves on the result, both pills on the rest, order held');
 if (errs.length) fail('page errors ' + errs.slice(0,2).join(' | '));
 console.log('PASSED');
 await b.close();
