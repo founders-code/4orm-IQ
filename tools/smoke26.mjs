@@ -94,22 +94,111 @@ const pillPair = async where => {
 
 /* Forward. */
 await p.click('#rpToFound'); await p.waitForTimeout(500); await one('rpFound', 'the way on to what we found');
-/* WHAT WE FOUND IS THE ONE SCREEN WITHOUT THEM.
-   A reader gets here by choosing to go deeper, and the only thing offered at
-   the top is the way back; the way on is the door at the foot of the page.
-   Three ways off a screen whose whole job is to be read to the bottom is two
-   too many. */
+/* WHAT WE FOUND OFFERS ONE THING AT THE TOP AND IT IS THE WAY BACK.
+   A reader gets here by choosing to go deeper, and the way on is the door at
+   the foot of the page. Three ways off a screen whose whole job is to be read
+   to the bottom is two too many. The way back is a pill now, in the row on the
+   right where every other control on this product lives, rather than an
+   underlined word stranded mid-header where nobody looks for one. */
 {
   const n = await p.evaluate(() => {
     const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
-    return { pills: s.querySelectorAll('.rp-nav .rp-pill').length,
-             backs: s.querySelectorAll('.rp-navb.rp-back').length };
+    return { pills: [...s.querySelectorAll('.rp-nav .rp-pill')].map(e => e.textContent.trim()),
+             backs: s.querySelectorAll('.rp-navb.rp-back').length,
+             right: (() => {
+               const b = s.querySelector('.rp-nav .rp-pill-back'), h = s.querySelector('.rp-head');
+               if (!b || !h) return null;
+               const br = b.getBoundingClientRect(), hr = h.getBoundingClientRect();
+               return Math.round(hr.right - br.right);
+             })() };
   });
-  if (n.pills) fail('what we found has ' + n.pills + ' pills in its header and should have none');
-  if (n.backs !== 1) fail('what we found has ' + n.backs + ' ways back and should have exactly one');
+  if (n.pills.length !== 1)
+    fail('what we found has ' + n.pills.length + ' pills and should have exactly one, the way back: '
+      + n.pills.join(', '));
+  if (!/^Back to\s+the result$/i.test(n.pills[0].replace(/\s+/g,' ')))
+    fail('the one pill on what we found is not the way back, it says: ' + n.pills[0]);
+  if (n.backs) fail('the way back on what we found is an underlined word again; it belongs in the pill row');
+  if (n.right === null || n.right > 4)
+    fail('the way back on what we found is not on the right edge, it sits ' + n.right + 'px in');
+}
+
+/* AND THE FINDINGS ARE ONE LINE EACH UNTIL SOMEBODY OPENS ONE. */
+{
+  const f = await p.evaluate(() => {
+    const rows = [...document.querySelectorAll('#rpFound .rp-fd')];
+    return rows.map(d => ({
+      open: d.open,
+      lines: (d.querySelector('.rp-t').textContent.match(/\S/g) || []).length > 0,
+      bodyShown: d.querySelector('.rp-fdbody')
+        .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true }),
+      h: Math.round(d.getBoundingClientRect().height)
+    }));
+  });
+  if (f.length < 2) fail('what we found is showing ' + f.length + ' findings');
+  for (const r of f) {
+    if (r.open) fail('a finding is open before anybody pressed it');
+    if (r.bodyShown) fail('a finding is closed and its detail is on the screen anyway');
+    if (r.h > 190) fail('a closed finding is ' + r.h + 'px tall, which is not a line');
+  }
+  /* Opening them shows what each one rests on and who says it. The link to the
+     record itself is there wherever the evidence carries a URL, and some of the
+     specimen records honestly do not, so that one is asserted across the set
+     rather than on every row. */
+  const rows = await p.$$('#rpFound .rp-fd summary');
+  for (const r of rows) { await r.click(); }
+  await p.waitForTimeout(400);
+  const o = await p.evaluate(() => {
+    const has = (d, s) => !!d.querySelector(s) && d.querySelector(s)
+      .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true });
+    return [...document.querySelectorAll('#rpFound .rp-fd')].map(d =>
+      ({ open: d.open, x: has(d, '.rp-x'), from: has(d, '.rp-from'), lk: has(d, '.rp-lk') }));
+  });
+  o.forEach((r, i) => {
+    if (!r.open) fail('pressing finding ' + (i + 1) + ' did not open it');
+    if (!r.x) fail('open finding ' + (i + 1) + ' does not show what it rests on');
+    if (!r.from) fail('open finding ' + (i + 1) + ' does not say who says it');
+  });
+  /* The link to the record is data driven: it appears wherever that finding's
+     evidence carries a URL, and the specimen this smoke walks honestly carries
+     none. So the assertion here is that a missing link is missing, rather than
+     present and hidden. That the emitter puts .rp-lk inside the open body at
+     all is checked statically in verify.mjs. */
+  const ghost = await p.evaluate(() => [...document.querySelectorAll('#rpFound .rp-fd')]
+    .filter(d => d.querySelector('.rp-lk') && !d.querySelector('.rp-lk')
+      .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true })).length);
+  if (ghost) fail(ghost + ' open finding(s) carry a link to the record that cannot be seen');
+  for (const r of rows) { await r.click(); }
+  await p.waitForTimeout(300);
 }
 await p.click('#rpToAct');   await p.waitForTimeout(500); await one('rpAct', 'the way on to what to do');
 await pillPair('the act screen');
+
+/* THE DEEPEST SCREEN CARRIES BOTH WAYS BACK, AS PILLS.
+   One step to the findings, and one all the way to the verdict, because this
+   is the screen a reader is furthest from where they started. */
+{
+  const n = await p.evaluate(() => {
+    const s = document.getElementById('rpAct');
+    return { pills: [...s.querySelectorAll('.rp-nav .rp-pill')].map(e => e.textContent.trim()),
+             navb: s.querySelectorAll('.rp-navb.rp-back').length,
+             order: (() => {
+               const y = q => { const e = s.querySelector(q); return e
+                 ? Math.round(e.getBoundingClientRect().top + window.scrollY) : null; };
+               return { title: y('.rp-stitle'), already: y('#rpAlready'),
+                        menus: y('#rpStepsSec'), dl: y('#rpDownloadSummary'),
+                        where: y('.rp-kick'), room: y('#rpOpenRecord') };
+             })() };
+  });
+  const flat = n.pills.map(t => t.replace(/\s+/g, ' ').trim().toLowerCase());
+  for (const w of ['back to what we found', 'back to the result'])
+    if (!flat.includes(w)) fail('what to do is missing the pill: ' + w + ', it has ' + n.pills.join(' / '));
+  if (n.navb) fail('a way back on what to do is an underlined word again');
+  const o = n.order;
+  for (const k of Object.keys(o)) if (o[k] === null) fail('what to do is missing ' + k);
+  if (!(o.title < o.already && o.already < o.menus && o.menus < o.dl
+        && o.dl < o.where && o.where < o.room))
+    fail('what to do reads in the wrong order: ' + JSON.stringify(o));
+}
 
 /* Back, one step at a time, to where the reader actually came from. */
 await p.click('#rpActBack');   await p.waitForTimeout(500); await one('rpFound', 'back from what to do');
@@ -167,8 +256,13 @@ const actOrder = await p.evaluate(() => {
 });
 if (actOrder.already === null || actOrder.title === null)
   fail('what to do is missing the already-sent door or its title');
-if (!(actOrder.already < actOrder.title))
-  fail('the already-sent door must sit above the what-to-do title: ' + JSON.stringify(actOrder));
+/* Directly under the title, not above it. The title and its one line say where
+   the reader is; the door is the next thing they meet. Above the title opened
+   the page with a red panel about money already gone before the page had said
+   what it was. */
+if (!(actOrder.title < actOrder.already))
+  fail('the already-sent door sits above the what-to-do title; it belongs under it: '
+    + JSON.stringify(actOrder));
 
 console.log('screens walked, two moves on the result, both pills on the rest, order held');
 if (errs.length) fail('page errors ' + errs.slice(0,2).join(' | '));

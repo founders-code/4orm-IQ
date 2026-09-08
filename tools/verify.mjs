@@ -739,6 +739,33 @@ if (operatorClaims.length)
   fails.push('a finding asserts a shared operator, which the sources page says we never do: ' +
     operatorClaims.slice(0, 2).join(' | '));
 
+/* --------------------- THE FINDINGS ARE ONE LINE EACH UNTIL THEY ARE OPENED.
+   A finding's heading is a complete conclusion, so four of them read as the
+   whole shape of the result. Everything underneath is one press away. Fully
+   open, the four ran past the fold and the fourth was never reached. */
+{
+  const fn = script.slice(script.indexOf('function rpFinds('),
+                          script.indexOf('function rpFinds(') + 3000);
+  if (!/<details class="rp-fd">/.test(fn))
+    fails.push('the findings are not collapsed; each one should be a line that opens');
+  if (/<details class="rp-fd" open/.test(fn))
+    fails.push('a finding is emitted already open, so the page loads as a wall of text again');
+  /* The heading is the closed line, so it is the only thing in the summary
+     besides the number, the severity and the chevron. */
+  const sum = fn.slice(fn.indexOf('<summary class="rp-find">'), fn.indexOf('</summary>'));
+  if (/rp-x|rp-plain|rp-from|rp-lk/.test(sum))
+    fails.push('the closed line carries the detail, the source or the link, and it should carry only the heading');
+  /* And the record itself is behind the line, not gone. */
+  const body = fn.slice(fn.indexOf('rp-fdbody'));
+  for (const part of ['rp-x', 'rp-plain', 'rp-from', 'rp-lk'])
+    if (!body.includes(part)) fails.push('opening a finding no longer shows ' + part);
+  if (!/#rpt \.rp-fd summary::-webkit-details-marker\{display:none\}/.test(styleBlock))
+    fails.push('the default disclosure triangle is back on a finding, beside ours');
+}
+
+/* The waiting nav offered to show somebody "round" rather than "around". */
+if (/Show me round/.test(html)) fails.push('the walkthrough control says "Show me round"');
+
 /* the plain sentence is written for a reader, so it has to be a sentence */
 const shortPlain = [...script.matchAll(/plain:"((?:[^"\\]|\\.)*)"/g)]
   .map(m => m[1]).filter(t => t.length < 40);
@@ -1179,13 +1206,59 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
     fails.push('what we could not answer sits below the good news, and it belongs with the verdict');
   if (at('What we could not answer') > at('id="rpToFound"'))
     fails.push('what we could not answer sits below the way on, and it belongs with the verdict');
-  /* AND THE DOOR IS THE FIRST THING ON THE SCREEN IT MOVED TO.
-     Above the title, because the reader it is for has the shortest clock in
-     the product and the least attention to spend finding things. */
+  /* AND ON THE SCREEN IT MOVED TO IT SITS DIRECTLY UNDER THE TITLE.
+     The title and its one line say where the reader is; the door is the next
+     thing they meet, ahead of every step, every menu and the way out. Above
+     the title is worse, not better: it opens the page with a red panel about
+     money already gone before the page has said what it is. */
   {
     const a = sheets_.rpAct;
-    if (a.indexOf('id="rpAlready"') > a.indexOf('class="rp-stitle"'))
-      fails.push('the already-sent door is below the title on do this right now, and it belongs above it');
+    if (a.indexOf('id="rpAlready"') < a.indexOf('class="rp-stitle"'))
+      fails.push('the already-sent door is above the title on do this right now; it belongs directly under it');
+    if (a.indexOf('id="rpAlready"') > a.indexOf('id="rpStepsSec"'))
+      fails.push('the already-sent door has fallen below the steps, and it belongs above every one of them');
+  }
+  /* --------------------- WHAT TO DO, IN THE ORDER IT WAS ASKED FOR.
+   The title, then the one line, then the door for somebody who has already
+   paid, then the extra steps, then the four numbered things, then where we
+   looked. Every one of these has been in the wrong place at least once. */
+{
+  const a = sheets_.rpAct;
+  const at = t => a.indexOf(t);
+  const want = ['What to have ready before the call', 'Who to tell',
+                'Their words against the records', 'Download the one page summary'];
+  want.forEach((t, i) => {
+    if (at(t) < 0) return fails.push('what to do has lost the menu: ' + t);
+    const n = a.slice(0, at(t)).lastIndexOf('class="rp-accn"');
+    const num = a.slice(n, n + 60).match(/>([^<]+)</);
+    const got = num ? num[1].trim() : '?';
+    if (got !== '0' + (i + 1))
+      fails.push('"' + t + '" is numbered ' + got + ' and should be 0' + (i + 1));
+  });
+  /* The extra steps sit above the four and take no number off them. */
+  if (at('id="rpStepsH"') > at('What to have ready before the call'))
+    fails.push('the extra steps sit below the four menus, and they belong above them');
+  if (/rp-accn">01<\/span>[\s\S]{0,200}rpStepsH/.test(a))
+    fails.push('the extra steps have taken 01 back off the four menus');
+  /* The download is a thing to do, up with the other three, not a second door
+     buried under where we looked. */
+  const WHERE = '<div class="rp-kick">Where we looked</div>';
+  if (at(WHERE) < 0) fails.push('what to do has lost the where we looked heading');
+  if (at('id="rpDownloadSummary"') > at(WHERE))
+    fails.push('the one page summary is back under where we looked, where nobody heading for a bank finds it');
+  if (at('id="rpOpenRecord"') < at(WHERE))
+    fails.push('the data room sits above where we looked, and it belongs under it');
+  /* Both ways back, as pills, in the row the reader already uses. */
+  /* "Back to " sits in its own span so a phone can drop it and let the arrow
+     carry the direction, so the label is matched in two pieces. */
+  for (const w of ['What we found', 'The result'])
+    if (!new RegExp('rp-pill rp-pill-back"[\\s\\S]{0,300}rp-pw">Back to </span>' + w).test(a))
+      fails.push('what to do is missing the pill: Back to ' + w.toLowerCase());
+  if (/class="rp-navb rp-back"/.test(a))
+    fails.push('a way back on what to do is an underlined word again; both belong in the pill row');
+}
+  {
+    const a = sheets_.rpAct;
   }
   /* Nothing below the way on but the small print. A reader who takes the next
      step never comes back up, so anything under that door is unread. */
@@ -1263,8 +1336,13 @@ for (const x of PILLED_) {
   const f = sheets_.rpFound;
   if (/Sources and method/.test(f) || /Find support/.test(f))
     fails.push('what we found has the pills back in its header, and it is meant to offer only the way back');
-  const backs = (f.match(/class="rp-navb rp-back"/g) || []).length;
+  /* The way back is a pill now, sitting on the right with the other controls,
+     rather than an underlined word stranded in the middle of the header. Still
+     exactly one, and still the only control on this screen. */
+  const backs = (f.match(/class="rp-pill rp-pill-back"/g) || []).length;
   if (backs !== 1) fails.push('what we found has ' + backs + ' controls in its header and should have exactly one');
+  if (/class="rp-navb rp-back"/.test(f))
+    fails.push('the way back on what we found is an underlined word again; it belongs in the pill row');
 }
 
 /* THE REFERENCE IS NOT PRINTED TWICE.
