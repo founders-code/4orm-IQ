@@ -993,6 +993,53 @@ if (/<span class="statq" aria-hidden="true">\?<\/span>/.test(script))
      appear twice: once here and once as the YELLOW verdict headline. The
      headline was entity specific and answered "should I send my money to this
      firm", so it went. This one stays and is required. */
+  /* ---------------------------------------------------------------- *
+   * THE AUDIT FIXES, SEPTEMBER 2026. Each of these was found in the product,
+   * not imagined, so each one gets a guard rather than a good intention.
+   * ---------------------------------------------------------------- */
+  {
+    /* 1. The badge beside a named company is COMPUTED from what the registers
+       returned. It is never read off the payload, because a payload can carry
+       a rating and this product says on its own sources page that it is a
+       verification desk and not a rating agency. It also prints top right of
+       the one page summary handed to a bank. */
+    if (!/function rpBadge\(/.test(script))
+      fails.push('rpBadge is gone, so the badge beside a named company has no computed source');
+    if (/textContent\s*=\s*d\.headline|esc\(d\.headline/.test(script))
+      fails.push('the badge is being read off the payload again, so an outside rating can reach a named company');
+    const rated = script.match(/"(High risk|Low risk|Medium risk|Safe|Unsafe|Trusted|Untrusted)"/g);
+    if (rated && /rpBadge[\s\S]{0,400}(High risk|Low risk)/.test(script))
+      fails.push('rpBadge returns a rating of the party rather than a description of the record');
+
+    /* 2. The strong wording needs a record behind it. It used to run whenever
+       the party was not registered, so absence of an entry produced a fright.
+       That is silence driving a warning, the mirror of the rule the rest of
+       the product defends. */
+    const del = (script.match(/function rpDelivery\([\s\S]*?\n\}/) || [''])[0];
+    if (del && !/esc2==="OFFICIAL"\s*\|\|\s*esc2==="PATTERN"/.test(del))
+      fails.push('the urgent wording no longer requires a finding, so an absent register can trigger a fright');
+
+    /* 3, 4, 5. Words the house standard bans, checked in rendered copy only:
+       comments are stripped first, because a comment is not something a
+       frightened person reads. */
+    const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '');
+    const rendered = strip(html), renderedEvi = strip(eviPage);
+    [['problem', 'the house standard says challenge or fault, never problem, in any form'],
+     ['quietly', 'banned word'], ['clearly', 'banned word'], ['honestly', 'banned word'],
+     ['genuinely', 'banned word'], ['really', 'banned word'], ['seamless', 'banned word'],
+     ['robust', 'banned word'], ['comprehensive', 'banned word']
+    ].forEach(([w, why]) => {
+      const re = new RegExp('\\b' + w.replace(/ /g, '\\s+') + '\\b', 'gi');
+      [['index.html', rendered], ['evidence.html', renderedEvi]].forEach(([f, src]) => {
+        const n = (src.match(re) || []).length;
+        if (n) fails.push(f + ' has "' + w + '" in rendered copy ' + n + ' time(s): ' + why);
+      });
+    });
+    /* Own-voice copy never names AI. The system, or automated processing. */
+    if (/\bAI\b/.test(renderedEvi.replace(/<style[\s\S]*?<\/style>/g, '')))
+      fails.push('evidence.html names AI in rendered copy');
+  }
+
   const n = (script.match(/Do not send anything tonight\./g) || []).length;
   if (n < 1) fails.push('the tonight banner is gone, which is the one line the '
     + 'page exists to deliver');
@@ -1632,16 +1679,98 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
      the thing that puts the border and the last word in different places. */
   const inside = ['#rpt .rp-claim .rp-q', '#rpt .rp-claim .rp-r', '#rpt .rp-row .rp-rv',
                   '#rpt .rp-why .rp-x'];
-  /* .rp-twoways is the third answer to the same question and the right one.
+  /* .rp-twoways is the fourth answer to the same question and the right one.
      Capping the text left a hairline crossing half a filled panel and stopping;
      capping the panel made it the only block on the screen that did not reach
-     the edges its neighbours reach. The separator is drawn by a pseudo element
-     that spans the panel, and the sentence under it keeps a measure. A
-     border-top back on .rp-last is the first mistake returning. */
+     the edges its neighbours reach; a pseudo element spanning the panel worked
+     but had to be re-measured against the padding on every breakpoint. The rule
+     now sits on a full width wrapper and the sentence inside keeps its measure.
+     A border-top back on .rp-last is the first mistake returning. */
   if (/#rpt \.rp-twoways \.rp-last\{[^}]*border-top:/.test(styleBlock))
     fails.push('the pattern note draws its rule with a border again, so the rule is only as wide as the paragraph');
-  if (!/#rpt \.rp-twoways \.rp-last::before\{/.test(styleBlock))
+  if (!/#rpt \.rp-twrule\{[^}]*border-top:/.test(styleBlock))
     fails.push('the pattern note has no separator spanning its panel');
+  if (!/<div class="rp-twrule">/.test(html))
+    fails.push('the pattern note lost the wrapper its separator is drawn on');
+  /* The two readings are our reading, so they may not wear the house pull quote.
+     A left rule on each was what made the panel read as though somebody had said
+     them, which is the thing this rebuild removed. */
+  if (/#rpt \.rp-tw2 \.rp-x\{[^}]*border-left:/.test(styleBlock))
+    fails.push('the two readings are drawn as pull quotes again, which attributes them to somebody');
+  if (!/#rpt \.rp-twk\{/.test(styleBlock))
+    fails.push('the two readings lost the mono label that marks them as our reading');
+
+  /* ---------------------------------------------------------------- *
+   * THE ACT SCREEN'S ROUTING
+   *
+   * Sector picks the instructions. It may never pick a verdict, and the one
+   * sentence on the impersonation screen that asserts an institution is real
+   * may never rest on anything but a signed register.
+   * ---------------------------------------------------------------- */
+  const sectorFn = (html.match(/function rpApplySector\([\s\S]*?\n\}/) || [''])[0];
+  const depositFn = (html.match(/function rpDepositConfirmed\([\s\S]*?\n\}/) || [''])[0];
+  const impFn = (html.match(/function rpImpersonation\([\s\S]*?\n\}/) || [''])[0];
+
+  if (!depositFn) fails.push('rpDepositConfirmed is gone, so the bank line has no gate');
+  /* The whole threat model on this screen is parties that look like banks, so
+     the affirmative line has to come off a register somebody signed. Reading it
+     off a name, a domain or a search result is the failure this guard exists
+     for, and srEnabled is the only thing that proves a row is ENABLED. */
+  else if (!/srEnabled\(/.test(depositFn))
+    fails.push('the deposit register gate no longer runs through srEnabled, so it can confirm a bank off an uncleared source');
+  if (depositFn && /return true;\s*\n\}/.test(depositFn))
+    fails.push('rpDepositConfirmed has an unconditional true in it');
+
+  if (!impFn) fails.push('rpImpersonation is gone, so nothing routes the impersonation screen');
+  /* Routing on the word clone in a sentence would be us asserting something we
+     never read. It routes on an explicit tier A record or not at all. */
+  else {
+    if (!/kind==="CLONE"/.test(impFn) || !/tier==="A"/.test(impFn))
+      fails.push('the impersonation route no longer requires an explicit tier A clone record');
+    if (/\.test\(|indexOf\(|toLowerCase\(\)/.test(impFn))
+      fails.push('the impersonation route reads prose, so it asserts something no register said');
+  }
+
+  /* Sector changes instructions and order. The moment it writes a verdict, a
+     finding, a headline or the board, the box somebody ticked has promoted an
+     answer, which is the one thing stage and sector are both forbidden to do. */
+  if (sectorFn) {
+    const forbidden = ['rpVerdict','rpFinds','rpHead','rpSay','rpBoard','rpGoods','verdict'];
+    forbidden.forEach(t => {
+      if (sectorFn.includes(t))
+        fails.push('rpApplySector touches ' + t + ', so the sector can promote an answer');
+    });
+  } else fails.push('rpApplySector is gone, so the act screen has no sector routing');
+
+  /* The verify panel starts closed. Shipping it open puts bank instructions on
+     every report, whoever the party is. */
+  {
+    const tag = (html.match(/id="rpVerify"[^>]*>/) || [''])[0];
+    if (!tag) fails.push('#rpVerify is missing from the act screen');
+    else if (!/\bhidden\b/.test(tag)) fails.push('#rpVerify does not start hidden');
+  }
+  /* The sector is asked once, in the thread, before the search runs. An act
+     screen that asks it again is the page failing to remember an answer the
+     reader already gave, so nothing here may grow a sector question back. */
+  if (/rpSectorAsk|rp-saskb|rpSectorUnplaced/.test(html))
+    fails.push('the act screen asks for the sector again, which the thread already asked before the search ran');
+
+  /* The question and the closing rule speak to the whole pattern panel, so both
+     sit on its centre line. The two readings between them stay ranged left. */
+  {
+    const tw = (styleBlock.match(/#rpt \.rp-twoways \.rp-t\{[^}]*\}/) || [''])[0];
+    const lastR = (styleBlock.match(/#rpt \.rp-twoways \.rp-last\{[^}]*\}/) || [''])[0];
+    if (!/text-align:center/.test(tw)) fails.push('the pattern question is no longer centred');
+    if (!/text-align:center/.test(lastR)) fails.push('the pattern rule is no longer centred');
+    [['question', tw], ['rule', lastR]].forEach(([n, r]) => {
+      if (/max-width:/.test(r) && !/margin-inline:auto/.test(r))
+        fails.push('the pattern ' + n + ' is centred inside a capped box that is not itself centred, so it reads off centre');
+    });
+    const col = (styleBlock.match(/#rpt \.rp-twoways \.rp-x\{[^}]*\}/) || [''])[0];
+    if (/text-align:center/.test(col))
+      fails.push('the two readings got centred too, which is slower to read than ranged left');
+  }
+
   if (!/#rpt \.rp-twoways\{[^}]*max-width:none/.test(styleBlock))
     fails.push('the pattern note is capped narrower than the blocks above and below it');
   /* And the claim row stays a comparison. Stacked, it filled a third of a row
