@@ -148,12 +148,27 @@ await one('rpReport', 'back to the result before reading its order');
 const order = await p.evaluate(() => {
   const s = document.getElementById('rpReport');
   const y = sel => { const e = s.querySelector(sel); return e ? e.getBoundingClientRect().top + window.scrollY : null; };
-  return { gap: y('.rp-gapnote'), already: y('#rpAlready'), onward: y('#rpToFound') };
+  return { gap: y('.rp-gapnote'), onward: y('#rpToFound'), already: y('#rpAlready') };
 });
-if (order.gap === null || order.already === null || order.onward === null)
-  fail('the result screen is missing the gap note, the already-sent door or the way on');
-if (!(order.gap < order.already && order.already < order.onward))
+if (order.gap === null || order.onward === null)
+  fail('the result screen is missing the gap note or the way on');
+if (order.already !== null)
+  fail('the already-sent door is back on the result screen; it belongs at the top of what to do');
+if (!(order.gap < order.onward))
   fail('the result screen reads in the wrong order: ' + JSON.stringify(order));
+
+/* The already-sent door now opens the what-to-do screen, above its title. */
+await p.click('#rpToFound'); await p.waitForTimeout(400);
+await p.click('#rpToAct');   await p.waitForTimeout(500);
+const actOrder = await p.evaluate(() => {
+  const s = document.getElementById('rpAct');
+  const y = sel => { const e = s.querySelector(sel); return e ? e.getBoundingClientRect().top + window.scrollY : null; };
+  return { already: y('#rpAlready'), title: y('.rp-stitle') };
+});
+if (actOrder.already === null || actOrder.title === null)
+  fail('what to do is missing the already-sent door or its title');
+if (!(actOrder.already < actOrder.title))
+  fail('the already-sent door must sit above the what-to-do title: ' + JSON.stringify(actOrder));
 
 console.log('screens walked, two moves on the result, both pills on the rest, order held');
 if (errs.length) fail('page errors ' + errs.slice(0,2).join(' | '));

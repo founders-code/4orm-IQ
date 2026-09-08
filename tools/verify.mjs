@@ -717,11 +717,27 @@ if (undocumented.length) fails.push('board registers with no reference entry: ' 
    sentence is what a reader who has never opened a registry actually reads. The
    demo corpus is hand written, so nothing enforced it there and it silently had
    none at all: the whole plain language layer was invisible in the showroom. */
-const evCount = (script.match(/\{t:"[ABCD4]",src:"/g) || []).length;
+/* "you" joined A, B, C, D and 4orm when the consumer's own wire slip stopped
+   wearing a regulator's badge. It is an evidence record like any other and
+   still owes its reader a plain sentence. */
+const evCount = (script.match(/\{t:"(?:[ABCD4]|you)",src:"/g) || []).length;
 const plainCount = (script.match(/\n\s*plain:"/g) || []).length;
 if (evCount !== plainCount)
   fails.push(evCount + ' specimen evidence records but ' + plainCount + ' plain language sentences. ' +
     'The schema requires one on every record, and the demo corpus is hand written so nothing else enforces it.');
+
+/* --------------------- THE SHARED IDENTIFIER LIMIT, HELD AGAINST OURSELVES.
+   The sources page publishes our own limit on the 4orm corpus in as many words:
+   "Reports a shared identifier. Never a shared operator." Two specimen findings
+   used to end "Two brands, one operator", which is precisely the conclusion the
+   published limit says we do not draw. A page that states a limit and then
+   breaks it two screens later is worse than one that never stated it. */
+if (!/Reports a shared identifier\. Never a shared operator\./.test(html))
+  fails.push('the published limit on the 4orm corpus is gone from the sources page');
+const operatorClaims = [...html.matchAll(/[^<>"]{0,80}one operator[^<>"]{0,40}/g)].map(m => m[0].trim());
+if (operatorClaims.length)
+  fails.push('a finding asserts a shared operator, which the sources page says we never do: ' +
+    operatorClaims.slice(0, 2).join(' | '));
 
 /* the plain sentence is written for a reader, so it has to be a sentence */
 const shortPlain = [...script.matchAll(/plain:"((?:[^"\\]|\\.)*)"/g)]
@@ -1120,7 +1136,12 @@ const belongs_ = (needle, on, what) => {
   else if (where[0] !== on) fails.push(what + ' is on ' + where[0] + ', it belongs on ' + on);
 };
 belongs_('What we could not answer', 'rpReport', 'the gap note');
-belongs_('id="rpAlready"', 'rpReport', 'the door for somebody who has already paid');
+/* IT MOVED TO THE SCREEN THAT EXISTS TO BE ACTED ON.
+   On the result screen it sat between the verdict and the way on, which asked
+   everybody who had NOT sent anything to read past a red panel about money
+   already gone. Do this right now is where that reader is heading, and the
+   door is the first thing on it, above the title. */
+belongs_('id="rpAlready"', 'rpAct', 'the door for somebody who has already paid');
 belongs_('id="rpToFound"', 'rpReport', 'the way on to what we found');
 belongs_('id="rpFindsSec"', 'rpFound', 'the findings');
 /* The door to the whole console is the last thing on the last screen, after
@@ -1147,17 +1168,25 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
        the summary and the card
        what we could not answer, grey, because the hole belongs with the verdict
        what came back in their favour
-       the door for somebody who has already sent the money
        the way on to what we found, last, because nothing may sit below it
      The gap note used to sit fourth, which put the shape of what we do not
      know at the end of a page most people never reached. */
   const at = k => r.indexOf(k);
+  /* And the result screen no longer carries it at all. */
+  if (/id="rpAlready"/.test(r))
+    fails.push('the already-sent door is back on the result screen, between the verdict and the way on');
   if (at('What we could not answer') > at('id="rpGoodSec"'))
     fails.push('what we could not answer sits below the good news, and it belongs with the verdict');
-  if (at('What we could not answer') > at('id="rpAlready"'))
-    fails.push('what we could not answer sits below the already-sent door, it belongs above it');
-  if (at('id="rpAlready"') > at('id="rpToFound"'))
-    fails.push('the way on to what we found sits above the already-sent door');
+  if (at('What we could not answer') > at('id="rpToFound"'))
+    fails.push('what we could not answer sits below the way on, and it belongs with the verdict');
+  /* AND THE DOOR IS THE FIRST THING ON THE SCREEN IT MOVED TO.
+     Above the title, because the reader it is for has the shortest clock in
+     the product and the least attention to spend finding things. */
+  {
+    const a = sheets_.rpAct;
+    if (a.indexOf('id="rpAlready"') > a.indexOf('class="rp-stitle"'))
+      fails.push('the already-sent door is below the title on do this right now, and it belongs above it');
+  }
   /* Nothing below the way on but the small print. A reader who takes the next
      step never comes back up, so anything under that door is unread. */
   if (at('id="rpGoodSec"') > at('id="rpToFound"'))
