@@ -2795,7 +2795,13 @@ function opsPills(){
    behind it would be exactly the wrong way round. */
 function readerAck(n){
   var el = document.getElementById("reader"); if(!el) return;
-  document.getElementById("rdline").textContent = "All is good to go.";
+  /* THE COUNT GOES IN THE HEADLINE, AND THE HEADLINE STILL DOES NOT LIE.
+     "All is good to go" claimed more than the board could support: two control
+     documents are still down, they are just owned now. This says the machine is
+     running and carries the number on the fix list, which is the thing being
+     asked of the reader, and every fault is still named underneath. */
+  document.getElementById("rdline").textContent =
+    n === 1 ? "Running. One on the fix list." : "Running. " + n + " on the fix list.";
   var faults = opsFaults(), lines = [], i;
   lines.push(n === 1
     ? "One fault is on the fix list and somebody has it. Nothing new is waiting."
@@ -2901,15 +2907,28 @@ document.getElementById("newbtn").addEventListener("click", function(){ openFix(
    the drawing, the lamps and the dials have not moved a pixel. What changes
    is that the board can now tell a fault you have seen from one you have
    not, which is the only thing this panel was ever for. */
-document.getElementById("fixbtn").addEventListener("click", function(){
+/* TWO CONTROLS CARRIED THE WORDS FIX LIST AND ONLY ONE OF THEM MEANT IT.
+   The pill took the waiting rows on. The tab inside the panel, with the same
+   name on it, only changed which pile you were looking at, so anyone who
+   opened the panel on New and then pressed Fix list saw an empty list and a
+   board still saying two things need you. The board was right and the control
+   was lying. Both now do the same thing, because they say the same thing. */
+function opsTakeOn(){
   var sp = opsSplit(), i;
   for(i=0;i<sp.nw.length;i++) OPS.fix[sp.nw[i].k] = sp.nw[i].s;
   if(sp.nw.length) opsSave();
   opsPills();
+  return sp.nw.length;
+}
+document.getElementById("fixbtn").addEventListener("click", function(){
+  opsTakeOn();
   openFix(true,"fix");
 });
 document.getElementById("fxTabNew").addEventListener("click", function(){ fxTab("new"); });
-document.getElementById("fxTabFix").addEventListener("click", function(){ fxTab("fix"); });
+document.getElementById("fxTabFix").addEventListener("click", function(){
+  opsTakeOn();
+  fxTab("fix");
+});
 document.getElementById("fxClose").addEventListener("click", function(){ openFix(false); });
 document.getElementById("fxClear").addEventListener("click", function(){
   var sp = opsSplit(), rows = FXTAB === "fix" ? sp.fx : sp.nw, i;
@@ -3249,7 +3268,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260908.0805";
+var BUILD = "20260908.1704";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
