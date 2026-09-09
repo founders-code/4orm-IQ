@@ -97,10 +97,20 @@ const took = await st();
 say('taking one on moves it from new to the fix list',
   took.nw === before - 1 && took.fx === 1, 'new ' + before + ' -> ' + took.nw + ', fix ' + took.fx);
 await p.click('#fxTabFix'); await p.waitForTimeout(200);
-say('the fix list tab shows what was taken on', (await st()).rows === 1);
+/* The tab carries the same words as the pill, so it does the same thing: it
+   takes on whatever is still waiting and then shows the whole list. Taking on
+   one row at a time still works from the row itself. */
+{
+  const onTab = await st();
+  say('the fix list tab shows the list, having swept up whatever was still waiting',
+    onTab.rows === before && onTab.nw === 0 && onTab.fx === before,
+    onTab.rows + ' rows, new ' + onTab.nw + ', fix ' + onTab.fx);
+}
 await p.click('#fxBody [data-fx]'); await p.waitForTimeout(200);
 const cleared = await st();
-say('clearing takes it off the panel', cleared.fx === 0);
+/* The tab swept the whole pile on, so clearing one row leaves the rest held. */
+say('clearing takes that row off the panel', cleared.fx === before - 1,
+  'fix ' + cleared.fx + ' of ' + before);
 
 console.log('\nPRESSING FIX LIST TAKES EVERYTHING ON');
 /* One gesture: the pile nobody has looked at moves to the pile somebody has,
@@ -127,7 +137,13 @@ console.log('\nPRESSING FIX LIST TAKES EVERYTHING ON');
   }));
   say('everything waiting moves to the fix list in one press',
     after.nw === 0 && after.fx === before.nw, before.nw + ' new -> ' + after.fx + ' on the list');
-  say('and the summary says all is good to go', after.line === 'All is good to go.', after.line);
+  /* It used to read "All is good to go", which claimed more than the board can
+     support while two controls are down. It now says what is running and how
+     many are held, which is the thing the reader is being asked to act on. */
+  say('and the summary says what is running, and carries the count',
+    /^Running\./.test(after.line) && new RegExp('\\b' + after.fx + '\\b').test(after.line),
+    after.line);
+  say('and it never claims the machine is well', !/^All is good to go/.test(after.line), after.line);
   say('in green, and off alarm',
     after.ack === 'yes' && after.lampBg === 'rgb(51, 216, 155)' && after.lampAnim === 'none'
     && after.lineBg === 'rgb(51, 216, 155)', after.lampBg + ' / ' + after.lampAnim);
@@ -158,11 +174,32 @@ console.log('\nPRESSING FIX LIST TAKES EVERYTHING ON');
   await p.click('#fxBody [data-fx]'); await p.waitForTimeout(200);
 }
 
+/* The Fix list tab now drains the New pile, the same as the Fix list pill,
+   because both carry the same words. That can leave a tab with nothing on it,
+   and Clear is disabled on an empty tab, so a walk through both piles presses
+   Clear only where there is something to clear. */
+const clearTab = async tab => {
+  await p.click(tab); await p.waitForTimeout(200);
+  const on = await p.evaluate(() => {
+    const b = document.getElementById('fxClear');
+    return !!b && !b.disabled && b.offsetParent !== null;
+  });
+  if (on) { await p.click('#fxClear'); await p.waitForTimeout(200); }
+  return on;
+};
+
 console.log('\nAND CLEARING CHANGES NOTHING ELSE');
 say('the board is still red', cleared.board === 'bad');
-say('the operations summary lamp is still on alarm', cleared.anim === 'alarm', cleared.anim);
-await p.click('#fxTabNew'); await p.click('#fxClear'); await p.waitForTimeout(150);
-await p.click('#fxTabFix'); await p.click('#fxClear'); await p.waitForTimeout(250);
+/* THE LAMP MAY GO OFF ALARM. IT MAY NOT GO ALL CLEAR.
+   With rows still held, nothing is unattended, so the lamp is entitled to
+   leave alarm. What it may never do while the board is red is show the all
+   clear, because that lamp answers for the machine and the machine has not
+   moved. */
+say('the operations summary lamp does not show all clear while the board is red',
+  cleared.anim !== 'allclear' && cleared.clear === 'no', cleared.anim + ' / clear=' + cleared.clear);
+await clearTab('#fxTabNew');
+await clearTab('#fxTabFix');
+await p.waitForTimeout(150);
 const emptied = await st();
 say('with every row cleared the panel reads empty', emptied.nw === 0 && emptied.fx === 0);
 /* THE LINE SOMEBODY OPENS AN EMPTY LIST TO READ.
@@ -196,8 +233,9 @@ await p.evaluate(() => paint(normalise(window.__ONEBAD)));
 await p.waitForTimeout(250);
 say('a row going red raises it as new', (await st()).nw === 1);
 await p.click('#newbtn'); await p.waitForTimeout(200);
-await p.click('#fxClear'); await p.click('#fxTabFix'); await p.click('#fxClear');
-await p.waitForTimeout(200); await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+await clearTab('#fxTabNew');
+await clearTab('#fxTabFix');
+await p.keyboard.press('Escape'); await p.waitForTimeout(200);
 say('clearing it empties the panel', (await st()).nw === 0);
 await p.evaluate(() => paint(normalise(window.__ALLOK)));
 await p.waitForTimeout(250);
@@ -235,6 +273,41 @@ await p.evaluate(() => { BOARD_ROWS = {}; opsPills(); });
 await p.waitForTimeout(200);
 say('an empty board does not clear the fix list',
   await p.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('4ormiq.ops.v1')).fix).length === 1));
+
+/* BOTH CONTROLS THAT SAY FIX LIST HAVE TO MEAN IT.
+   The pill took the waiting rows on. The tab inside the panel, carrying the
+   same words, only changed which pile was on screen, so anyone who opened on
+   New and pressed Fix list got an empty list and a board still saying two
+   things needed them. The board was right and the control was lying. */
+await p.evaluate(() => { localStorage.removeItem('4ormiq.ops.v1'); });
+await p.reload({ waitUntil: 'domcontentloaded' });
+await p.waitForTimeout(1100);
+const preTab = await st();
+await p.click('#newbtn'); await p.waitForTimeout(300);
+await p.click('#fxTabFix'); await p.waitForTimeout(400);
+const afterTab = await st();
+say('the fix list tab takes the waiting rows on, like the pill does',
+  preTab.nw > 0 && afterTab.nw === 0 && afterTab.fx === preTab.nw,
+  'new ' + preTab.nw + ' -> ' + afterTab.nw + ', fix ' + afterTab.fx);
+
+/* AND THE BOARD SAYS SO, WITH THE COUNT WHERE THE READER IS BEING ASKED TO
+   ACT. Green here is about the list, never about the machine, so the line may
+   report what is running and how many are held, and may not claim they are
+   gone: every fault is still named underneath it. */
+{
+  const line = (await p.evaluate(() => document.getElementById('rdline').textContent)).trim();
+  const body = await p.evaluate(() => document.getElementById('rdbody').textContent);
+  if (/needs? you/.test(line))
+    fails.push('the board still says something needs you after everything was taken on: ' + line);
+  if (!new RegExp('\\b' + afterTab.fx + '\\b').test(line))
+    fails.push('the acknowledged line does not carry the count: ' + line);
+  if (/all (is|clear)|nothing is wrong|no faults/i.test(line))
+    fails.push('the acknowledged line claims the machine is well, not just attended: ' + line);
+  if (!/still down|fix list/i.test(body))
+    fails.push('the acknowledged board stopped naming the faults it is holding');
+  say('the acknowledged line reports running, carries the count, and still names the faults',
+    !/needs? you/.test(line), line);
+}
 
 say('no page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
 
