@@ -132,7 +132,22 @@ const SCENES = [
     reach: async p => { await p.fill('#kbInput','Meridian Yield Partners'); await p.click('#kbGo');
       await p.waitForTimeout(2200); await tap(p,'investment'); await p.waitForTimeout(1400);
       await tap(p,'already sent money');
-      for (let i=0;i<14;i++){ await p.waitForTimeout(1500);
+      /* THE RESULT NO LONGER OPENS ITSELF.
+         The waiting screen used to count down and open the report after three
+         seconds, so waiting was enough to reach it. The disclaimer is a real
+         gate now, and without pressing it this walk measured the dark waiting
+         overlay and called it the report, which is how forty five new contrast
+         failures appeared on a screen nobody had touched. */
+      for (let i=0;i<20;i++){
+        await p.waitForTimeout(1200);
+        const ready = await p.evaluate(() => {
+          const b = document.getElementById('waitOk');
+          return !!b && !b.disabled && /Show the result/i.test(b.textContent);
+        });
+        if (ready) { await p.click('#waitOk'); break; }
+        if (await p.evaluate(() => document.body.getAttribute('data-stage') === 'report')) break;
+      }
+      for (let i=0;i<10;i++){ await p.waitForTimeout(600);
         if (await p.evaluate(() => document.body.getAttribute('data-stage') === 'report')) break; }
       await p.waitForTimeout(1200); } },
   { key:'backoffice', page:'admin.html?demo=1', widths:[1440], reach: async p => { await p.waitForTimeout(900); } },

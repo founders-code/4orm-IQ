@@ -1,6 +1,6 @@
 {
   "note": "Recorded ceilings, not targets. A number may fall and may never rise. Raising one is a design decision with an owner, not a way past a red build.",
-  "recorded": "2026-09-08",
+  "recorded": "2026-09-09",
   "scenes": {
     "landing@1440": {
       "contrast": 5,
@@ -11,7 +11,7 @@
       "headings": 1,
       "stops": 5,
       "h1s": 1,
-      "textRuns": 40,
+      "textRuns": 39,
       "overflow": 0
     },
     "landing@390": {
@@ -23,7 +23,7 @@
       "headings": 1,
       "stops": 5,
       "h1s": 1,
-      "textRuns": 36,
+      "textRuns": 35,
       "overflow": 0
     },
     "landing@320": {
@@ -35,7 +35,7 @@
       "headings": 1,
       "stops": 5,
       "h1s": 1,
-      "textRuns": 36,
+      "textRuns": 35,
       "overflow": 0
     },
     "waiting@1440": {
@@ -45,9 +45,9 @@
       "phantom": 0,
       "noring": 0,
       "headings": 0,
-      "stops": 8,
+      "stops": 22,
       "h1s": 0,
-      "textRuns": 39,
+      "textRuns": 38,
       "overflow": 0
     },
     "waiting@390": {
@@ -57,45 +57,45 @@
       "phantom": 0,
       "noring": 0,
       "headings": 0,
-      "stops": 8,
+      "stops": 22,
       "h1s": 0,
-      "textRuns": 35,
+      "textRuns": 34,
       "overflow": 0
     },
     "report@1440": {
       "contrast": 3,
-      "targets": 20,
+      "targets": 17,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
       "headings": 1,
-      "stops": 7,
+      "stops": 6,
       "h1s": 1,
-      "textRuns": 208,
+      "textRuns": 205,
       "overflow": 0
     },
     "report@390": {
       "contrast": 3,
-      "targets": 20,
+      "targets": 17,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
       "headings": 1,
-      "stops": 7,
+      "stops": 6,
       "h1s": 1,
-      "textRuns": 81,
+      "textRuns": 78,
       "overflow": 0
     },
     "report@320": {
       "contrast": 3,
-      "targets": 20,
+      "targets": 17,
       "unnamed": 0,
       "phantom": 0,
       "noring": 0,
       "headings": 1,
-      "stops": 7,
+      "stops": 6,
       "h1s": 1,
-      "textRuns": 81,
+      "textRuns": 78,
       "overflow": 0
     },
     "backoffice@1440": {

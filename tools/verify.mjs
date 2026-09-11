@@ -783,17 +783,32 @@ else if (!/#E7F7EF/i.test(shPlainRule))
   fails.push('.sh-plain on the printed summary is no longer light green');
 
 /* ------------------- the wait screen must let go of the reader by itself.
-   It sat open after the sweep landed and waited to be dismissed, which reads
-   as a hung page. The countdown is the thing that fixes it, so the call from
-   waitFinish is checked rather than assumed. */
+   It used to count down and open the result on its own after three seconds,
+   which meant a reader could cross the disclaimer by doing nothing at all. The
+   disclaimer says what this product is and is not, and it is the one sentence
+   somebody has to have seen before a verdict about a named company appears. So
+   the countdown is gone by instruction, the button is the only way through,
+   and it has to ask for itself once the result is ready. */
 const wfStart = script.indexOf('function waitFinish');
 /* the body only, to the first close at column zero. The helpers that follow
-   share the name, and matching those would pass a build where the call is gone. */
+   share the name, and matching those would read the wrong body. */
 const waitFin = script.slice(wfStart, script.indexOf('\n}', wfStart));
-if (!/[^n]\s*waitAutoGo\s*\(/.test(waitFin))
-  fails.push('waitFinish no longer starts the countdown off the disclaimer, so the panel will sit open');
-if (!/function\s+waitAutoCancel/.test(script))
-  fails.push('the countdown can no longer be held, so a reader mid card gets cut off');
+if (/waitAutoGo\s*\(/.test(waitFin) || /function waitAutoGo/.test(script))
+  fails.push('the waiting screen can open the result by itself again, so the disclaimer can be crossed unread');
+if (!/gatecall/.test(waitFin))
+  fails.push('the gate does not call attention to itself when the result is ready, and it is now the only way off the screen');
+if (!/waitPoint/.test(waitFin))
+  fails.push('nothing points the reader at the gate');
+/* Escape may move focus to the gate. It may not press it. */
+{
+  const esc = script.slice(script.indexOf('if(e.key!=="Escape") return;'), script.indexOf('if(sumBox.classList.contains("on"))'));
+  if (/waitOk"\)\.click\(\)/.test(esc))
+    fails.push('escape presses the disclaimer gate for the reader');
+}
+/* The countdown is gone, and so is everything that existed to hold it back.
+   Nothing opens the result on its own any more, so there is nothing to cancel. */
+if (/waitAutoCancel|waitAutoT/.test(script))
+  fails.push('the countdown machinery is back on the waiting screen');
 
 /* ------------------------ the summary box is sized by the band, not by itself.
    The detail under the statement scrolls. If the verdict goes back into flow
@@ -1701,6 +1716,30 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
     fails.push('the two readings lost the mono label that marks them as our reading');
 
   /* ---------------------------------------------------------------- *
+   * NO TWO COMPONENTS MAY SHARE A CLASS NAME
+   *
+   * The red door's open state was called rp-open. So was an unrelated small
+   * mono uppercase pill, with its own background, border and 999px radius.
+   * Opening the door therefore painted the whole red panel in that pill's type
+   * and drew its grey rounded box behind it: one collision, three symptoms,
+   * and nothing in the code looked wrong at either end.
+   * ---------------------------------------------------------------- */
+  {
+    if (/classList\.(add|toggle|remove)\("rp-open"/.test(script))
+      fails.push('a component is toggling rp-open again, which is a different pill component and will repaint it');
+    /* Every state class the script toggles has to be one this stylesheet
+       actually defines for that component, not one it borrows by accident. */
+    const toggled = [...script.matchAll(/classList\.(?:add|toggle)\("(rp-[a-z-]+)"/g)].map(m => m[1]);
+    const shared = toggled.filter(c => {
+      const asState = new RegExp('\\\\.[a-z-]+\\\\.' + c + '\\\\b').test(styleBlock);
+      const asOwn = new RegExp('#rpt \\\\.' + c + '\\\\{').test(styleBlock);
+      return asState && asOwn;
+    });
+    [...new Set(shared)].forEach(c =>
+      fails.push('"' + c + '" is used both as a component of its own and as another component\'s state class, which is how the red door came to be drawn as a mono pill'));
+  }
+
+  /* ---------------------------------------------------------------- *
    * THE SCALE OF THE TWO ONWARD SCREENS
    *
    * Walking forward through the report used to make the type get bigger: a
@@ -1833,9 +1872,15 @@ if (!/<button class="navbtn green" type="button" id="navSources">/.test(html))
 if (!/<button class="navbtn green" type="button" id="waitSources">/.test(html))
   fails.push('the waiting screen has no sources and method pill');
 {
+  /* SOURCES AND METHOD ALONE ON THE WAITING SCREEN.
+     Find support sat here as well, which put a way off the screen beside the
+     one control that matters, on the screen where the disclaimer has to be
+     acknowledged before anything opens. It lives on the report now, at row 05
+     of the things to do, where somebody is actually deciding if they need it. */
   const a = html.indexOf('<span class="waitpills">');
   const wb = a < 0 ? '' : html.slice(a, html.indexOf('</span>\n  </div>', a));
-  if (!/Find support/.test(wb)) fails.push('the waiting screen has no find support pill');
+  if (/Find support/.test(wb))
+    fails.push('find support is back on the waiting screen, beside the disclaimer gate');
 }
 if (/rp-pill-blue/.test(html))
   fails.push('a report screen still carries the old blue sources pill');
@@ -1875,11 +1920,52 @@ if (!/return Object\.keys\(out\)\.filter\(function\(k\)\{\s*return rpPersonOutpu
     fails.push('the police pack no longer carries the province picker');
 }
 
+/* ---------------------------------------------------------------- *
+ * WHAT WE ASK THE MODEL FOR IS HELD TO THE SAME STANDARD AS WHAT WE WRITE
+ *
+ * Most of the words a reader sees on a live check are written on the far side
+ * of this prompt, not in this file. A house standard the page obeys and the
+ * prompt does not is a house standard that governs the demo and nothing else.
+ * ---------------------------------------------------------------- */
+{
+  const cue = fs.readFileSync(path.join(root, 'api', '_cue.js'), 'utf8');
+  const oi = cue.slice(cue.indexOf('export const OUTPUT_INSTRUCTION'));
+  [['em dash', /never an en dash/i, 'the dash rule'],
+   ['AI', /Never reference AI/i, 'the no-AI rule'],
+   ['praise', /NEVER PRAISE THIS PRODUCT/i, 'the no-self-praise rule'],
+   ['verdict', /NEVER PASS A VERDICT ON THE PARTY/i, 'the no-verdict rule'],
+   ['absence', /NEVER PRESENT ABSENCE AS CLEARANCE/i, 'the silence-is-not-clearance rule'],
+   ['complete', /COMPLETE THOUGHT/i, 'the complete-headline rule'],
+   ['banned', /straightforward/i, 'the banned word list'],
+   ['problem', /never the word\s*\n?\s*"problem"/i, 'the problem rule'],
+   ['status', /Community-reported/i, 'the evidence status vocabulary'],
+  ].forEach(([, re, what]) => {
+    if (!re.test(oi)) fails.push('the model prompt has lost ' + what + ', so a live check is not held to it');
+  });
+}
+
 /* ------------------------------------------------ THE ONE PAGE, TWO COPIES */
 if (!/id="sumDownloadPlain"/.test(html))
   fails.push('the one page summary offers only one copy');
-if (!/sh-h">Report card<\/div>/.test(html))
+/* The report card is still on the sheet, and it is LAST now. It used to sit
+   second, in front of somebody who opened the sheet to find out what the
+   registers said: a reference, a log entry, a record hash and a policy
+   version, none of which answers that question. It is our paperwork, so it
+   prints under everything that is theirs. */
+if (!/sh-h">Report card, for our records<\/div>/.test(html))
   fails.push('the printed sheet has lost the report card');
+{
+  const fn = (script.match(/function buildSummary\([\s\S]*?\n\}/) || [''])[0];
+  if (!/h\+=cardHtml;/.test(fn))
+    fails.push('the report card is built but never printed on the sheet');
+  const card = fn.indexOf('h+=cardHtml;');
+  const hits = fn.indexOf('The main hits');
+  const party = fn.indexOf('The party, and the dates');
+  if (card >= 0 && hits >= 0 && card < hits)
+    fails.push('the report card prints before the findings again, so our paperwork leads the sheet');
+  if (card >= 0 && party >= 0 && card < party)
+    fails.push('the report card prints before the facts about the party');
+}
 if (!/function buildSummary\(d, mode\)/.test(html))
   fails.push('the printed sheet no longer knows which copy it is building');
 
@@ -2267,12 +2353,29 @@ if (!/\.waitbox:not\(\.on\) \.waitpills \.navbtn\{pointer-events:none\}/.test(st
   const eduAt = script.indexOf('var EDU = [');
   const edu = script.slice(eduAt, script.indexOf('\n];', eduAt));
   const cards = (edu.match(/\{tone:/g) || []).length;
-  if (cards < 16) fails.push('the waiting deck is down to ' + cards + ' cards');
+  /* THE FLOOR IS ABOUT QUALITY, NOT COUNT.
+     It was sixteen because sixteen were written. Cut to thirteen in September
+     2026 on the instruction that fewer and better beats more: the American
+     totals were replaced with Canadian ones, and three cards that repeated
+     what their neighbours already said were merged away. Ten is the floor
+     because below that the deck starts repeating inside a two minute wait. */
+  if (cards < 10) fails.push('the waiting deck is down to ' + cards + ' cards');
   const srcs = (edu.match(/\n\s*src:"/g) || []).length;
   if (srcs !== cards) fails.push(cards + ' cards on the waiting deck and only ' + srcs + ' carry a source');
+  /* "Why we keep doing it" was merged into "Why this exists", which now carries
+     both halves: the gap official records leave, and the fact that what would
+     have stopped it was usually already on a record. The property worth
+     holding is that the deck still answers WHY, not that a particular eyebrow
+     survives. */
   for (const need of ['Why we built this', 'What it actually costs', 'What comes after',
-                      'What keeps people quiet', 'Why we keep doing it'])
+                      'What keeps people quiet', 'Why this exists'])
     if (!edu.includes(need)) fails.push('the waiting deck has lost the card "' + need + '"');
+  /* And the Canadian reader gets Canadian numbers where a Canadian source
+     exists. An American total on a Canadian check was the thing being fixed. */
+  if (!/Canadian Anti-Fraud Centre/.test(edu))
+    fails.push('the waiting deck no longer carries a Canadian loss figure');
+  if (/FBI IC3|Internet Crime Complaint/.test(edu))
+    fails.push('the waiting deck is back to leading a Canadian reader with an American total');
 }
 
 /* -------------------------------------- nothing may navigate on its own
@@ -2343,7 +2446,11 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
     'rp-already':      /#rpt \.rp-already\{[^}]*margin-top:(\d+)px\}/,
     'rp-accs':         /#rpt \.rp-accs\{[^}]*margin-top:(\d+)px;/,
     'rp-why':          /#rpt \.rp-why\{margin-top:(\d+)px;/,
-    'rp-clock':        /#rpt \.rp-clock\{[^}]*margin-top:(\d+)px;/,
+    /* .rp-clock is off the band deliberately. It is not a section on the page,
+       it is the inside of the door above it: it opens out of that control and
+       is drawn as one object with it, so any gap at all reads as the panel
+       having come loose. Zero is the only correct value, and it is checked
+       below rather than held to the 48 and 96 bands. */
     /* .rp-figs was the three big ratios beside the verdict. They came off
        the result screen: every one of them is already on the page in a
        sentence, and a reader deciding whether to send money was being
@@ -2352,6 +2459,14 @@ if (!/Log entry/.test(script)) fails.push('the report card no longer carries the
     'rp-foot':         /#rpt \.rp-foot\{[^}]*margin-top:(\d+)px;/,
     'rp-stitle':       /#rpt \.rp-stitle\{margin-top:(\d+)px;/,
   };
+  {
+    const m = styleBlock.match(/#rpt \.rp-clock\{[^}]*margin-top:(\d+)(?:px)?[;,}]/);
+    if (!m) fails.push('the clock panel no longer states its own margin, so it can drift off the door');
+    else if (m[1] !== '0')
+      fails.push('the clock panel sits ' + m[1] + 'px below the door it opens out of, so it reads as having come loose');
+    if (!/#rpt \.rp-clock\{[^}]*border-top:none/.test(styleBlock))
+      fails.push('the clock panel draws a top border across the join with the door');
+  }
   for (const [name, re] of Object.entries(bands)) {
     const m = styleBlock.match(re);
     if (!m) { fails.push('the band value for .' + name + ' cannot be read, so it cannot be held to the scale'); continue; }
