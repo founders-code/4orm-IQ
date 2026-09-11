@@ -1384,23 +1384,22 @@ body.wait-up .dirbox{z-index:501}
   padding:0 clamp(24px,4.4vw,72px);color:var(--tx-1)}
 .waitbox.on{opacity:1;pointer-events:auto}
 .waithd{display:flex;align-items:center;gap:16px;padding:22px 0 0;border-bottom:none;background:none}
-.waitq{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--tx-2);letter-spacing:.03em;
-  max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.waitpills{display:flex;align-items:center;gap:10px;flex:none}
+/* THE NAME IS THE SUBJECT OF THIS SCREEN.
+   It was 11px mono in the corner, smaller than the label beside it, on the one
+   screen where a reader wants to be sure we are checking the thing they typed. */
+.waitq{margin-left:auto;font-family:var(--mono);font-size:15px;font-weight:500;
+  color:var(--tx);letter-spacing:.01em;
+  max-width:54%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* pointer-events:auto on .navbtn is what lets the top nav's buttons be clicked
    through a nav that is itself pointer-events:none. Inherited into the waiting
    overlay, it made these two pills live while the overlay was closed and
    invisible, and because that overlay is fixed at inset:0 they sat on top of
    the landing and swallowed the clicks meant for the header. An invisible
-   element must not be clickable. */
-.waitbox:not(.on) .waitpills .navbtn{pointer-events:none}
-/* Not hidden. They were, and a phone is exactly where somebody has time to
+   element must not be clickable. *//* Not hidden. They were, and a phone is exactly where somebody has time to
    read sources and method while a check runs. Below 560 they drop to the
    row under the heading rather than off the page. */
-@media(max-width:820px){ .waitpills .navbtn{padding:11px 14px;font-size:9.5px;gap:7px} }
 @media(max-width:560px){ .waithd{flex-wrap:wrap}
-  .waitq{order:3;max-width:100%;flex:1 0 100%;margin-left:0}
-  .waitpills{margin-left:auto} }
+  .waitq{order:3;max-width:100%;flex:1 0 100%;margin-left:0} }
 .waitprog{padding:16px 0 0}
 .waitbar{height:3px;border-radius:3px;background:var(--border);overflow:hidden}
 .waitbar i{display:block;height:100%;width:0;border-radius:3px;
@@ -2617,7 +2616,21 @@ body[data-stage="report"] .foot{display:none}
 [inert]{pointer-events:none}
 
 /* The one field this whole product runs on had no focus ring at all. */
-#kbInput:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
+/* NO SECOND BOX INSIDE THE PILL.
+   The input sits inside a pill that already lights up when it holds focus, so
+   a focus ring on the field drew a box inside a box the moment somebody began
+   typing. The ring moves to the pill, which is the thing a keyboard user is
+   actually looking at, so focus is still visible and there is only ever one
+   outline on screen. */
+/* THE PILL LIGHTS UP. THE FIELD UNDERLINES. NEITHER DRAWS A BOX.
+   The field is transparent and inset 48px into the pill, so an outline on it
+   drew a hard rectangle floating inside the pill the moment somebody typed.
+   An outline cannot trace the pill from there, because outline-offset is
+   uniform and the inset is not. So the ring goes on the pill, which is the
+   shape a reader is looking at, and the field carries a two pixel underline
+   that says which control has focus without adding a second edge. */
+#kbInput:focus-visible{outline:none;box-shadow:0 2px 0 0 var(--blue)}
+#kbForm:focus-within{outline:2px solid var(--blue);outline-offset:3px}
 #rpt .rp-provb.rp-on{background:var(--blue);border-color:var(--blue);color:#fff}
 #rpt .rp-provout{margin-top:16px;padding:16px 18px;border-radius:var(--r-sm);
   background:var(--surface-2);border:1px solid var(--border)}
@@ -4469,17 +4482,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             New check
           </button>
         </div>
-        <div class="rp-idtray" id="rpIdTray"><div class="rp-idplate">
-          <div class="rp-cardhd">
-            <div class="rp-cardk">Report card</div>
-            <div class="rp-cardref" id="rpCardRef"></div>
-            <div class="rp-cardmeta" id="rpCardMeta"></div>
-          </div>
-          <!-- Both headings are written by rpIdent, because whether there is a
-               findings block above this one depends on what came back. -->
-          <div id="rpIdent"></div>
-          <p class="rp-cardfoot" id="rpCardFoot"></p>
-        </div></div>
         </div>
       </div>
       <!-- THE CUE THAT THERE IS MORE.
@@ -4539,6 +4541,40 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         </span>
         <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
+    </div>
+
+    <!-- OUR PAPERWORK, AT THE FOOT, CLOSED.
+         A reference, a log entry, a record hash and a policy version sat at the
+         top of the result, in front of somebody who came here to find out what
+         the registers said about a company. None of it answers that. It is how
+         we make this run findable again later, so it is ours, it is named as
+         ours, and it is shut until somebody asks for it. -->
+    <div class="rp-sec rp-tight">
+      <details class="rp-acc rp-acc-x" id="rpCardFold">
+        <summary class="rp-acch">
+          <span class="rp-accn" aria-hidden="true">&#43;</span>
+          <span class="rp-accb">
+            <span class="rp-acct">Report card, 4orm info</span>
+            <span class="rp-accx">The reference for this run, the day the records were read, and
+              the log entry that lets anyone check it again later.</span>
+          </span>
+          <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"
+            stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </summary>
+        <div class="rp-accbody">
+          <div class="rp-idtray" id="rpIdTray"><div class="rp-idplate">
+            <div class="rp-cardhd">
+              <div class="rp-cardk">Report card</div>
+              <div class="rp-cardref" id="rpCardRef"></div>
+              <div class="rp-cardmeta" id="rpCardMeta"></div>
+            </div>
+            <!-- Both headings are written by rpIdent, because whether there is a
+                 findings block above this one depends on what came back. -->
+            <div id="rpIdent"></div>
+            <p class="rp-cardfoot" id="rpCardFoot"></p>
+          </div></div>
+        </div>
+      </details>
     </div>
 
     <div class="rp-behind">
@@ -4864,20 +4900,14 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     </button>
     </div>
 
-    <div class="rp-sec rp-tight">
-      <div class="rp-kick">Where we looked</div>
-      <h2 class="rp-h2">Everywhere we looked, and what each one said back.</h2>
-      <p class="rp-sub">The ones that had something, the ones that had nothing, and the ones we
-        could not get into. All three are here. A register that came back empty is an answer, and
-        it is the answer most services leave out.</p>
-      <!-- THE DATA ROOM IS NOT ONE OF THE THINGS TO DO.
-           It was a full width door here, the same size as the red one, on a
-           page whose whole promise is that everything on it takes an hour and
-           needs no expertise. Almost nobody reading this page wants the board
-           of 121 registers and the audit trail; the few who do will find it,
-           so it is a small link in the footer with the other reference links. -->
-    </div>
-
+        <!-- "WHERE WE LOOKED" IS GONE FROM THIS PAGE.
+         It was a kicker, a headline and three lines promising every register
+         and what each one said back, above the data room door that actually
+         delivered them. The door moved to a footer link, which left a section
+         that promised a list and delivered nothing. The registers are still on
+         the findings screen and in the data room; what was here was an
+         advertisement for them on the page that is supposed to be only things
+         to do. -->
     <div class="rp-behind">
       <p class="rp-spec" id="rpSpecA"></p>
       <div class="rp-foot">
@@ -5522,16 +5552,12 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     <!-- The same two, in the same place, on the one screen a reader spends the
          longest looking at. Somebody waiting two minutes is exactly the person
          who wants to know how this is decided, or who to ring. -->
-    <!-- SOURCES AND METHOD ALONE.
-         Find support sat here too, which put a way off the screen beside the
-         one control that matters, on the screen where the reader has to
-         acknowledge the disclaimer before anything opens. It lives on the
-         report, at row 05 of the things to do, which is where somebody is
-         actually deciding whether they need it. -->
-    <span class="waitpills">
-      <button class="navbtn green" type="button" id="waitSources">
-        <span class="hi">&#9636;</span> Sources and method</button>
-    </span>
+    <!-- NO PILLS ON THIS SCREEN AT ALL.
+         Both of them were ways off a screen whose whole job is to hold
+         somebody for two minutes and then have them acknowledge a disclaimer
+         before a verdict about a named company appears. Sources and method and
+         Find support are both on the report, where a reader who wants either
+         one is in a position to use it. -->
   </div>
 
   <div class="waitprog">
@@ -11803,28 +11829,6 @@ function waitClose(){
    forward: the check was still running, the wait screen was gone, and nothing
    on screen said so. The sheet now opens OVER the waiting screen, which stays
    exactly where it was underneath, and the way back is back to the check. */
-id("waitSources").addEventListener("click",function(){
-  /* Held, so the countdown cannot yank them off the page they just opened. */
-  waitAck=true;
-  id("waitPhase").textContent="Still checking. The result will open by itself.";
-  RP_FROM="wait";
-  rpSourcesFill();
-  id("rpBackToReportT").textContent="Back to the check";
-  document.body.classList.add("over-wait");
-  /* THE WAITING SCREEN LOCKED THE PAGE AND THE SHEET INHERITED THE LOCK.
-     waitOpen sets body overflow hidden so nothing scrolls behind the scrim.
-     This sheet opens OVER that screen and is fifteen thousand pixels tall, and
-     the lock was never lifted, so on a phone Sources and Method could not be
-     scrolled by one pixel. A desktop hid it because a mouse wheel over the
-     sheet's own scroller still worked. Released here, restored on the way
-     back, because the wait screen underneath still wants it. */
-  document.body.style.overflow="";
-  for(var k in RP_SCREENS){ var el=id(RP_SCREENS[k]); if(el) el.hidden=(k!=="sources"); }
-  RP_AT="sources";
-  document.body.setAttribute("data-stage","report");
-  rpTop();
-  setTimeout(function(){ id("rpBackToReport").focus(); },60);
-});
 /* The arrows and the counter went with the rest of the chrome. The cards
    advance on their own; the dots below them are the only control. */
 /* Arrow keys move the cards while the wait screen has focus, which is the
@@ -11854,7 +11858,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260910.1914";
+var KBYS_BUILD = "20260911.0619";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
