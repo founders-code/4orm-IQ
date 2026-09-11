@@ -36,9 +36,23 @@ for (const vw of [1440, 1280]) {
     const r = document.querySelector('.waitprog').getBoundingClientRect();
     return { x: Math.round(r.x), w: Math.round(r.width) };
   });
-  /* From the waiting screen, which is the pill that sits over it. The top
-     nav's copy of it is behind the overlay and cannot be clicked. */
-  await p.click('#waitSources');
+  /* THE WAITING SCREEN CARRIES NO PILLS ANY MORE.
+     Both were ways off a screen whose job is to hold somebody for two minutes
+     and then have them acknowledge the disclaimer before a verdict about a
+     named company appears. So this walks the way a reader now does: wait for
+     the result, press the gate, then go to sources from the report. The
+     property being measured is unchanged, which is that the column the gutter
+     creates does not move between the two stages. */
+  for (let i = 0; i < 40; i++) {
+    const ready = await p.evaluate(() => {
+      const g = document.getElementById('waitOk');
+      return !!g && !g.disabled && /Show the result/i.test(g.textContent);
+    });
+    if (ready) { await p.click('#waitOk'); break; }
+    await p.waitForTimeout(500);
+  }
+  await p.waitForTimeout(800);
+  await p.click('#rpToSourcesR');
   await p.waitForTimeout(700);
   /* The wrap's CONTENT box, not the header. The header on sources and method is
      deliberately narrower than the sheet, because that page is one 900px column

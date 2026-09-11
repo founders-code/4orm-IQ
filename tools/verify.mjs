@@ -1302,14 +1302,21 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
     fails.push('the extra steps sit below the four menus, and they belong above them');
   if (/rp-accn">01<\/span>[\s\S]{0,200}rpStepsH/.test(a))
     fails.push('the extra steps have taken 01 back off the four menus');
-  /* The download is a thing to do, up with the other three, not a second door
-     buried under where we looked. */
-  const WHERE = '<div class="rp-kick">Where we looked</div>';
-  if (at(WHERE) < 0) fails.push('what to do has lost the where we looked heading');
-  if (at('id="rpDownloadSummary"') > at(WHERE))
-    fails.push('the one page summary is back under where we looked, where nobody heading for a bank finds it');
-  if (at('id="rpOpenRecord"') < at(WHERE))
-    fails.push('the data room sits above where we looked, and it belongs under it');
+  /* "WHERE WE LOOKED" IS NO LONGER ON THIS PAGE.
+     It was a kicker, a headline and three lines promising every register and
+     what each one said back, above the data room door that delivered them. The
+     door became a footer link, which left a section promising a list and
+     delivering nothing. The download is a thing to do and stays up with the
+     others, which is now simply a matter of it being inside the menu block. */
+  if (/<div class="rp-kick">Where we looked<\/div>/.test(a))
+    fails.push('the empty where we looked section is back on what to do');
+  if (at('id="rpDownloadSummary"') < 0)
+    fails.push('what to do has lost the one page summary');
+  /* The data room is a quiet footer link now, not a door on this page. */
+  if (!/class="rp-lk" id="rpOpenRecord">See the technical data room/.test(a))
+    fails.push('the data room is no longer a small link in the act screen footer');
+  if (/class="rp-behindbtn"|rp-behindin/.test(a))
+    fails.push('the data room is back as a full width door on what to do');
   /* Both ways back, as pills, in the row the reader already uses. */
   /* "Back to " sits in its own span so a phone can drop it and let the arrow
      carry the direction, so the label is matched in two pieces. */
@@ -1360,12 +1367,26 @@ for (const x of PILLED_) {
   /* The way to the rest of the small print has to survive the pills going. */
   if (!/id="rpToSourcesR"/.test(r))
     fails.push('the result screen has no route to how we decide at all now');
-  /* AND THE CONTROL SHARES A GRID CELL WITH THE CARD.
-     rp-heromain is a two column grid whose children are auto placed. Adding
-     the control as a third child put it in the right column and pushed the
-     card it belongs to into the left one, underneath the summary. */
-  if (!/<div class="rp-cardcol">[\s\S]{0,400}?class="rp-newrow"[\s\S]{0,400}?id="rpIdTray"/.test(r))
-    fails.push('new check and the report card are not in one grid cell, so the card will drop into the other column');
+  /* THE CARD IS NO LONGER IN THE HERO AT ALL.
+     A reference, a log entry, a record hash and a policy version sat at the top
+     of the result, in front of somebody who came to find out what the registers
+     said. It is our paperwork, so it is now shut, named as ours, and at the
+     foot. New check keeps the cell it shared with it. */
+  if (/class="rp-heromain"[\s\S]*?id="rpIdTray"[\s\S]*?<\/button>\s*<\/div>\s*<\/div>\s*<\/div>\s*<!-- THE CUE/.test(r))
+    fails.push('the report card is back at the top of the result screen');
+  {
+    const fold = (r.match(/<details[^>]*id="rpCardFold"[^>]*>/) || [''])[0];
+    if (!fold) fails.push('the report card fold is gone from the result screen');
+    else if (/\bopen\b/.test(fold)) fails.push('the report card fold ships open');
+    if (!/Report card, 4orm info/.test(r))
+      fails.push('the report card fold does not say whose information it is');
+    const foldAt = r.indexOf('id="rpCardFold"'), footAt = r.indexOf('class="rp-foot"');
+    const heroAt = r.indexOf('class="rp-heromain"');
+    if (foldAt < 0 || foldAt < heroAt)
+      fails.push('the report card is above the result it belongs under');
+    if (footAt >= 0 && foldAt > footAt)
+      fails.push('the report card fold sits below the page footer');
+  }
 }
 
 /* THE SCROLL CUE.
@@ -1768,7 +1789,7 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
     const nav = (html.match(/<nav class="rp-nav"[\s\S]*?<\/nav>[\s\S]*?id="rpActTitle"/) || [''])[0];
     if (nav && /Find support/.test(nav))
       fails.push('Find support is back in the act screen navigation');
-    const acc = (html.match(/<div class="rp-accs" id="rpStepsSec">[\s\S]*?<div class="rp-sec rp-tight">/) || [''])[0];
+    const acc = (html.match(/<div class="rp-accs" id="rpStepsSec">[\s\S]*?<div class="rp-behind">/) || [''])[0];
     const nums = [...acc.matchAll(/class="rp-accn"[^>]*>(\d\d)</g)].map(m => m[1]);
     if (nums.join(',') !== '01,02,03,04,05')
       fails.push('the things to do are numbered ' + (nums.join(',') || 'none') + ', expected 01,02,03,04,05');
@@ -1869,8 +1890,12 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
 /* THE PILL PAIR IS GREEN AND GOLD, AND THE WAITING SCREEN CARRIES IT TOO. */
 if (!/<button class="navbtn green" type="button" id="navSources">/.test(html))
   fails.push('sources and method is not the green pill on the landing');
-if (!/<button class="navbtn green" type="button" id="waitSources">/.test(html))
-  fails.push('the waiting screen has no sources and method pill');
+/* NO PILLS ON THE WAITING SCREEN AT ALL.
+   Both were ways off a screen whose job is to hold somebody for two minutes
+   and then have them acknowledge the disclaimer before a verdict about a named
+   company appears. Both live on the report instead. */
+if (/id="waitSources"|class="waitpills"/.test(html))
+  fails.push('a pill is back on the waiting screen, beside the disclaimer gate');
 {
   /* SOURCES AND METHOD ALONE ON THE WAITING SCREEN.
      Find support sat here as well, which put a way off the screen beside the
@@ -2342,8 +2367,13 @@ if (!/setAttribute\("data-chat","on"\)/.test(html) || !/removeAttribute\("data-c
    pointer-events:auto so it can be clicked through a nav that has none, and
    inherited into the closed waiting overlay it swallowed every click on the
    landing underneath. */
-if (!/\.waitbox:not\(\.on\) \.waitpills \.navbtn\{pointer-events:none\}/.test(styleBlock))
-  fails.push('the closed waiting overlay keeps live controls over the landing');
+/* The rule this replaced neutralised the waiting screen's pills while the
+   overlay was shut, so they could not swallow clicks meant for the landing
+   underneath. There are no pills on that screen any more, so the property to
+   hold is the general one: nothing inside the closed overlay is clickable.
+   smoke26 measures that directly on every control it finds. */
+if (/\.waitpills/.test(styleBlock))
+  fails.push('the waiting screen pill rules are back');
 
 /* WHAT WE PUT IN FRONT OF SOMEBODY WHILE THEY WAIT.
    Every card carries a source, including the ones that are our own testimony,
@@ -2832,9 +2862,18 @@ if (!/new MutationObserver/.test(html))
   fails.push('nothing watches the overlays, so one opened by a path nobody remembered is left reachable while shut');
 if (/parseFloat\(getComputedStyle\(el\)\.opacity\) > 0\.01/.test(html))
   fails.push('the shut test reads computed opacity, which a transition never re-fires, so a box read mid-fade stays reachable forever');
-/* The one field this product runs on had no focus ring at all. */
-if (!/#kbInput:focus-visible\{outline:2px solid/.test(html))
+/* The one field this product runs on had no focus ring at all. It now carries
+   it on the PILL rather than the input: a ring on the field drew a box inside
+   the box the moment somebody typed. One outline, on the thing a keyboard
+   reader is looking at. */
+if (!/#kbForm:focus-within\{outline:2px solid/.test(html))
   fails.push('the search box has no visible focus indicator, so a keyboard reader cannot see where they are');
+if (/#kbInput:focus-visible\{outline:2px solid/.test(html))
+  fails.push('the search field draws its own ring again, so there is a box inside the pill while typing');
+/* And it still carries an indicator of its own, because a keyboard reader has
+   to be told which control has focus, not which container. */
+if (!/#kbInput:focus-visible\{[^}]*box-shadow:/.test(html))
+  fails.push('the search field has no focus indicator of its own at all');
 
 /* --------------------------------------------------------------- the gate
    The review found six barriers on a page everybody had looked at many

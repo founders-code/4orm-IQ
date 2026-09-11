@@ -196,9 +196,14 @@ await pillPair('the act screen');
              order: (() => {
                const y = q => { const e = s.querySelector(q); return e
                  ? Math.round(e.getBoundingClientRect().top + window.scrollY) : null; };
+               /* "Where we looked" is gone from this page. It was a kicker,
+                  a headline and three lines promising every register and what
+                  each one said back, above the data room door that delivered
+                  them. The door is a footer link now, which left a section
+                  promising a list and delivering nothing. */
                return { title: y('.rp-stitle'), already: y('#rpAlready'),
                         menus: y('#rpStepsSec'), dl: y('#rpDownloadSummary'),
-                        where: y('.rp-kick'), room: y('#rpOpenRecord') };
+                        support: y('#rpFindSupport'), room: y('#rpOpenRecord') };
              })() };
   });
   const flat = n.pills.map(t => t.replace(/\s+/g, ' ').trim().toLowerCase());
@@ -208,8 +213,19 @@ await pillPair('the act screen');
   const o = n.order;
   for (const k of Object.keys(o)) if (o[k] === null) fail('what to do is missing ' + k);
   if (!(o.title < o.already && o.already < o.menus && o.menus < o.dl
-        && o.dl < o.where && o.where < o.room))
+        && o.dl < o.support && o.support < o.room))
     fail('what to do reads in the wrong order: ' + JSON.stringify(o));
+  /* And the data room is a quiet footer link, not a door the size of the red
+     one, on a page that promises everything takes an hour. */
+  {
+    const room = await p.evaluate(() => {
+      const e = document.getElementById('rpOpenRecord');
+      const r = e.getBoundingClientRect();
+      return { cls: e.className, w: Math.round(r.width), h: Math.round(r.height) };
+    });
+    if (!/rp-lk/.test(room.cls) || room.h > 40)
+      fail('the data room is back as a full width door on what to do: ' + JSON.stringify(room));
+  }
 }
 
 /* Back, one step at a time, to where the reader actually came from. */
