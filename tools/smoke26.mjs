@@ -62,8 +62,9 @@ await p.waitForTimeout(1000);
 await one('rpReport', 'a finished check');
 
 /* Sources and method is reachable from every screen. Find support is too, but
-   on the act screen it is row 05 of the things to do rather than a pill beside
-   the way back, because it is not navigation: it is the last thing on the list.
+   on the act screen it sits inside the reach-out row rather than as a pill
+   beside the way back, because it is not navigation: it is part of who to
+   send things to.
    So the assertion is that the reader can always reach support, not that it is
    always drawn the same way. */
 const pillPair = async where => {
@@ -73,15 +74,19 @@ const pillPair = async where => {
     return t;
   });
   if (!n.some(t => /Sources and method/.test(t))) fail(where + ' has no sources and method pill');
-  const support = await p.evaluate(() => {
+  /* On what to do, support sits inside the reach-out row, which is a closed
+     disclosure until the reader opens it, so it is present rather than drawn.
+     Everywhere else it has to be on the screen without opening anything. */
+  const act = /act screen|what to do/.test(where);
+  const support = await p.evaluate(shut => {
     const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
-    return [...s.querySelectorAll('[data-dir="open"]')]
-      .filter(e => e.checkVisibility && e.checkVisibility({checkVisibilityCSS:true, contentVisibilityAuto:true}))
-      .length;
-  });
+    const all = [...s.querySelectorAll('[data-dir="open"]')];
+    return shut ? all.length : all.filter(e => e.checkVisibility
+      && e.checkVisibility({checkVisibilityCSS:true, contentVisibilityAuto:true})).length;
+  }, act);
   if (!support) fail(where + ' offers no way to reach support at all');
-  if (where.indexOf('what to do') >= 0 && n.some(t => /Find support/.test(t)))
-    fail('find support is back in the act screen navigation, it belongs at row 05');
+  if (act && n.some(t => /Find support/.test(t)))
+    fail('find support is back in the act screen navigation, it belongs inside the reach out row');
 };
 /* THE RESULT SCREEN IS THE OTHER ONE WITHOUT THEM.
    A reader who has just been told something about their money has two moves
@@ -201,9 +206,25 @@ await pillPair('the act screen');
                   each one said back, above the data room door that delivered
                   them. The door is a footer link now, which left a section
                   promising a list and delivering nothing. */
-               return { title: y('.rp-stitle'), already: y('#rpAlready'),
-                        menus: y('#rpStepsSec'), dl: y('#rpDownloadSummary'),
-                        support: y('#rpFindSupport'), room: y('#rpOpenRecord') };
+               return { title: y('.rp-stitle'), menus: y('#rpStepsSec'),
+                        already: y('#rpAlready'), room: y('#rpOpenRecord') };
+             })(),
+             /* THE FORMS AND THE SUPPORT DIRECTORY LIVE INSIDE ROW 02.
+                They are part of who you send things to, so they are measured
+                by what contains them, not by where they land: a closed
+                disclosure reports a top that means nothing. */
+             inReach: (() => {
+               const row = s.querySelector('#rpPaks') &&
+                 s.querySelector('#rpPaks').closest('details, .rp-acc');
+               if (!row) return null;
+               return ['#rpDownloadSummary', '#rpFindSupport']
+                 .every(q => { const e = s.querySelector(q); return e && row.contains(e); });
+             })(),
+             /* And the red door is the first of the three, inside the list. */
+             doorFirst: (() => {
+               const list = s.querySelector('#rpStepsSec');
+               const door = s.querySelector('#rpAlready');
+               return !!(list && door && list.contains(door));
              })() };
   });
   const flat = n.pills.map(t => t.replace(/\s+/g, ' ').trim().toLowerCase());
@@ -212,9 +233,12 @@ await pillPair('the act screen');
   if (n.navb) fail('a way back on what to do is an underlined word again');
   const o = n.order;
   for (const k of Object.keys(o)) if (o[k] === null) fail('what to do is missing ' + k);
-  if (!(o.title < o.already && o.already < o.menus && o.menus < o.dl
-        && o.dl < o.support && o.support < o.room))
+  /* Title, then the three things, then the door to the whole record last. */
+  if (!(o.title < o.menus && o.menus <= o.already && o.already < o.room))
     fail('what to do reads in the wrong order: ' + JSON.stringify(o));
+  if (n.inReach === null) fail('what to do has lost the row that says who to reach out to');
+  else if (!n.inReach) fail('the summary and the support directory sit outside the reach out row');
+  if (!n.doorFirst) fail('the fraud door is outside the list of three again');
   /* And the data room is a quiet footer link, not a door the size of the red
      one, on a page that promises everything takes an hour. */
   {

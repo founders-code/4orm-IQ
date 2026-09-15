@@ -2924,6 +2924,26 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-retryb:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 #rpt .rp-retryx{font-size:13px;color:var(--tx-3)}
 @media(max-width:520px){#rpt .rp-retry{gap:10px}#rpt .rp-retryx{font-size:12px}}
+/* OUR ROWS, SHUT, AT THE FOOT OF THE CARD.
+   They used to head it: a reference, a date, a log entry, a hash and a policy
+   version above the identity the card is about. They are how we make the run
+   findable again, not an answer to anything the reader asked, so the summary
+   below is a quiet line and the rows only exist once it is opened. */
+#rpt .rp-cardfold{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+#rpt .rp-cardfold summary{list-style:none;display:flex;align-items:center;gap:10px;
+  cursor:pointer;font-family:var(--rmono);font-size:9.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);
+  transition:color .2s var(--ease)}
+#rpt .rp-cardfold summary::-webkit-details-marker{display:none}
+#rpt .rp-cardfold summary:hover{color:var(--tx-2)}
+#rpt .rp-cardfold summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
+#rpt .rp-cardfoldt{flex:1;min-width:0}
+#rpt .rp-cardfoldg{flex:none;display:inline-flex;transition:transform .35s var(--spring)}
+#rpt .rp-cardfoldg svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.4;fill:none}
+#rpt .rp-cardfold[open] .rp-cardfoldg{transform:rotate(180deg)}
+/* Open, the rows are the card's own rows, so the head rule that separated them
+   from the identity above is not wanted a second time. */
+#rpt .rp-cardfold .rp-cardhd{padding-bottom:0;border-bottom:none;margin-bottom:0;margin-top:14px}
 #rpt .rp-cardhd{padding-bottom:16px;border-bottom:1px solid var(--border-strong);margin-bottom:14px}
 #rpt .rp-cardk{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.18em;
   text-transform:uppercase;color:var(--acc-dp)}
@@ -3146,6 +3166,26 @@ body[data-stage="report"] .foot{display:none}
   #rpt .rp-find .rp-b{flex:1 1 100%}
   #rpt .rp-find .rp-n{padding-top:0}
   #rpt .rp-plate{padding:22px 20px 20px}#rpt .rp-clockin{padding:24px 20px 22px}}
+
+/* tips, the third of the three */
+#rpt .rp-tips{margin-top:8px;display:grid;gap:14px}
+#rpt .rp-tip{display:flex;gap:18px;align-items:flex-start;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh-sm)}
+#rpt .rp-tip .rp-n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--blue-50);
+  border:1px solid var(--blue-100);color:var(--blue-dp);font-family:var(--rmono);font-size:11px;
+  font-weight:800;display:flex;align-items:center;justify-content:center}
+#rpt .rp-tip .rp-b{flex:1;min-width:0;display:block}
+#rpt .rp-tip .rp-t{display:block;font-size:16px;font-weight:700;letter-spacing:-.02em;
+  line-height:1.3;color:var(--tx)}
+#rpt .rp-tip .rp-x{display:block;margin-top:7px;font-size:14.2px;line-height:1.6;color:var(--tx-2);
+  max-width:74ch}
+@media(max-width:560px){#rpt .rp-tip{padding:17px 16px;gap:13px}}
+/* the two doors that live inside the reach out menu */
+#rpt .rp-accdos{margin-top:22px;display:grid;gap:12px}
+#rpt .rp-accdo-in .rp-acch{padding:16px 18px}
+/* the red door is the first of the three, so it wears the list's number */
+#rpt .rp-accn-red{flex:none;align-self:flex-start;font-family:var(--rmono);font-size:11px;
+  font-weight:800;color:#A33A4C;letter-spacing:.06em;padding-top:4px}
 
 /* claims */
 #rpt .rp-claims{margin-top:30px;display:grid;gap:2px;background:var(--border);
@@ -3755,7 +3795,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-accdo:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 /* The unnumbered row keeps the numeral column so its title sits on the same
    left edge as the four below it. */
-#rpt .rp-acc-x .rp-accn{color:var(--tx-3);font-size:13px;letter-spacing:0}
 #rpt .rp-accb{flex:1;min-width:0}
 #rpt .rp-acct{display:block;font-size:clamp(15.5px,1.5vw,17px);font-weight:700;letter-spacing:-.022em;
   color:var(--tx);line-height:1.22}
@@ -4482,6 +4521,29 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             New check
           </button>
         </div>
+        <div class="rp-idtray" id="rpIdTray"><div class="rp-idplate">
+          <!-- WHAT THE READER CAME FOR IS THE CARD. WHAT WE NEED IS FOLDED.
+               The reference, the day the records were read, the log entry, the
+               record hash and the policy version all sat at the top of this
+               card, above the identity it is actually about. None of them
+               answers the reader's question; they are how we make this run
+               findable again later. So they stay on the card, where they
+               belong, and they sit shut at the foot of it. -->
+          <div id="rpIdent"></div>
+          <p class="rp-cardfoot" id="rpCardFoot"></p>
+          <details class="rp-cardfold" id="rpCardFold">
+            <summary>
+              <span class="rp-cardfoldt">Report card, 4orm info</span>
+              <span class="rp-cardfoldg" aria-hidden="true"><svg viewBox="0 0 24 24"><path
+                d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </summary>
+            <div class="rp-cardhd">
+              <div class="rp-cardk">Report card</div>
+              <div class="rp-cardref" id="rpCardRef"></div>
+              <div class="rp-cardmeta" id="rpCardMeta"></div>
+            </div>
+          </details>
+        </div></div>
         </div>
       </div>
       <!-- THE CUE THAT THERE IS MORE.
@@ -4541,40 +4603,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         </span>
         <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
-    </div>
-
-    <!-- OUR PAPERWORK, AT THE FOOT, CLOSED.
-         A reference, a log entry, a record hash and a policy version sat at the
-         top of the result, in front of somebody who came here to find out what
-         the registers said about a company. None of it answers that. It is how
-         we make this run findable again later, so it is ours, it is named as
-         ours, and it is shut until somebody asks for it. -->
-    <div class="rp-sec rp-tight">
-      <details class="rp-acc rp-acc-x" id="rpCardFold">
-        <summary class="rp-acch">
-          <span class="rp-accn" aria-hidden="true">&#43;</span>
-          <span class="rp-accb">
-            <span class="rp-acct">Report card, 4orm info</span>
-            <span class="rp-accx">The reference for this run, the day the records were read, and
-              the log entry that lets anyone check it again later.</span>
-          </span>
-          <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"
-            stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </summary>
-        <div class="rp-accbody">
-          <div class="rp-idtray" id="rpIdTray"><div class="rp-idplate">
-            <div class="rp-cardhd">
-              <div class="rp-cardk">Report card</div>
-              <div class="rp-cardref" id="rpCardRef"></div>
-              <div class="rp-cardmeta" id="rpCardMeta"></div>
-            </div>
-            <!-- Both headings are written by rpIdent, because whether there is a
-                 findings block above this one depends on what came back. -->
-            <div id="rpIdent"></div>
-            <p class="rp-cardfoot" id="rpCardFoot"></p>
-          </div></div>
-        </div>
-      </details>
     </div>
 
     <div class="rp-behind">
@@ -4674,11 +4702,21 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
     </div>
 
+    <!-- WHAT THEY SAID, AGAINST WHAT THE RECORD SAYS.
+         This was a menu on the page of things to do, which is the wrong place:
+         it is not an action, it is evidence about the party, and it belongs
+         with the rest of the evidence. -->
+    <div class="rp-sec" id="rpClaimsSec">
+      <div class="rp-kick">Their words</div>
+      <h2 class="rp-h2">What they told you, and what the records say.</h2>
+      <div class="rp-claims" id="rpClaims"></div>
+    </div>
+
     <div class="rp-onward">
       <button class="rp-onbtn" type="button" id="rpToAct">
         <span class="rp-b">
           <span class="rp-t">Do this right now</span>
-          <span class="rp-x">The order to do it in, what to have ready before you ring, who to tell, and their words set against the records.</span>
+          <span class="rp-x">Three things: what to do if money has gone, who to reach out to with a form already filled in for each, and the checks that catch most of it.</span>
         </span>
         <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
@@ -4741,6 +4779,27 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <p class="rp-verf" id="rpVerifyF"></p>
     </div>
 
+    <!-- FOUR TITLES, ALL VISIBLE AT ONCE.
+         Open, these four ran to eight screens, and somebody who came here to find
+         the phone number for their bank had to scroll past a table of fields to
+         reach it. Closed, the whole of what to do fits on one screen and they
+         open the one they need. Native details and summary, so it works with a
+         keyboard and with a screen reader without a line of script. -->
+    <!-- UNNUMBERED, AND ON ITS OWN ABOVE THE FOUR.
+         It is not one of the four things the reader came here for, so it does
+         not take 01 off them. It used to, and it also repeated the page title
+         back at them: "Do this right now" followed by "Do these three things
+         now" at 01. -->
+    <!-- THREE THINGS, AND THAT IS THE WHOLE PAGE.
+         It ran to six: an unnumbered block of extra steps, four numbered menus
+         and a support row, over a red door that already said the first of
+         them. A reader who has just been told something is wrong does not
+         triage a list of six. The red door is the first of the three rather
+         than a seventh thing repeating the first, everything that belongs to
+         the fraud path is inside it, and what was "their words against the
+         records" moved to what we found, where evidence about the party
+         belongs. -->
+    <div class="rp-accs" id="rpStepsSec">
     <!-- STRAIGHT UNDER THE TITLE, AND ABOVE EVERYTHING ELSE ON THE SCREEN.
          The reader who has already sent the money has the shortest clock in
          the product and the least attention to spend finding things. The title
@@ -4749,9 +4808,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
          money already gone in front of a page nobody had been introduced to
          yet, and before that it was on the result screen, where it asked
          everybody who had NOT sent anything to read past it. -->
-    <div class="rp-already" id="rpAlready">
+    <div class="rp-already rp-acc-first" id="rpAlready">
       <button class="rp-alreadybtn" type="button" id="rpAlreadyBtn" aria-expanded="false"
         aria-controls="rpClock">
+        <span class="rp-accn rp-accn-red">01</span>
         <span class="rp-b">
           <span class="rp-t" id="rpAlreadyT"></span>
           <span class="rp-x" id="rpAlreadyX"></span>
@@ -4773,134 +4833,92 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <div class="rp-shame" id="rpShame"></div>
         <div class="rp-win" id="rpWindows"></div>
         <div class="rp-tel" id="rpTels"></div>
+        <!-- THE ORDER, AND WHAT THE CALL WILL ASK FOR, BOTH BELONG IN HERE.
+             They were two separate menus outside this door, which meant the
+             instruction to ring the bank was behind one control and the list of
+             things the bank will ask for was behind another, three rows down.
+             In the first hour that is the difference between a short call and a
+             long one. -->
+        <div class="rp-clocksub">
+          <div class="rp-clockh2" id="rpStepsH"></div>
+          <div class="rp-steps" id="rpSteps"></div>
+        </div>
+        <div class="rp-clocksub">
+          <div class="rp-clockh2">What the call will ask you for</div>
+          <p class="rp-sub">Everything we already know is filled in. The rest only you can
+            answer, and writing it down before you ring turns a long call into a short one.</p>
+          <div class="rp-bundle" id="rpBundle"></div>
+        </div>
       </div>
     </div>
 
-    <!-- FOUR TITLES, ALL VISIBLE AT ONCE.
-         Open, these four ran to eight screens, and somebody who came here to find
-         the phone number for their bank had to scroll past a table of fields to
-         reach it. Closed, the whole of what to do fits on one screen and they
-         open the one they need. Native details and summary, so it works with a
-         keyboard and with a screen reader without a line of script. -->
-    <!-- UNNUMBERED, AND ON ITS OWN ABOVE THE FOUR.
-         It is not one of the four things the reader came here for, so it does
-         not take 01 off them. It used to, and it also repeated the page title
-         back at them: "Do this right now" followed by "Do these three things
-         now" at 01. -->
-    <div class="rp-accs" id="rpStepsSec">
-    <details class="rp-acc rp-acc-x">
-      <summary class="rp-acch">
-        <span class="rp-accn" aria-hidden="true">&#43;</span>
-        <span class="rp-accb">
-          <span class="rp-acct"><span id="rpStepsH"></span></span>
-          <span class="rp-accx">In this order. The first one is the only one with a clock on it.</span>
-        </span>
-        <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      </summary>
-      <div class="rp-accbody">
-        <div class="rp-steps" id="rpSteps"></div>
-      </div>
-    </details>
-
-    <details class="rp-acc">
-      <summary class="rp-acch">
-        <span class="rp-accn">01</span>
-        <span class="rp-accb">
-          <span class="rp-acct">What to have ready before the call</span>
-          <span class="rp-accx">Your bank and the fraud line will both ask for these. Everything we already know is filled in.</span>
-        </span>
-        <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      </summary>
-      <div class="rp-accbody">
-        <p class="rp-sub">The rest only you can answer, and writing it down before you
-          call turns a long call into a short one.</p>
-        <div class="rp-bundle" id="rpBundle"></div>
-      </div>
-    </details>
 
     <details class="rp-acc">
       <summary class="rp-acch">
         <span class="rp-accn">02</span>
         <span class="rp-accb">
-          <span class="rp-acct">Who to tell</span>
-          <span class="rp-accx">A complete evidence file for each one, already filled in from this
-            report.</span>
+          <span class="rp-acct">Who to reach out to, and what to send them</span>
+          <span class="rp-accx">Every body worth telling, each one with its own form already
+            filled in from this report, and the one page summary to hand over.</span>
         </span>
         <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </summary>
       <div class="rp-accbody">
-        <p class="rp-sub"><b>Each of these is a prepared evidence file, built for the one body it
-          is going to.</b> Every one asks for different things, and the fields we can answer from
-          the public record are answered already: the party, the website, the dates, the reference
-          for this report. What is left is the handful only you can supply, and each file says which
-          of the two every line is. Read the whole thing before you contact anybody, and take it
-          with you when you do.</p>
+        <p class="rp-sub"><b>Each of these is a prepared file, built for the one body it is
+          going to.</b> Every one asks for different things, and the fields we can answer from the
+          public record are answered already: the party, the website, the dates, the reference for
+          this report. What is left is the handful only you can supply, and each file says which of
+          the two every line is.</p>
         <div class="rp-pakgrid" id="rpPaks"></div>
         <p class="rp-pakfoot"><b>Only your bank or your card company can move money.</b> Only your
-          local police will investigate what happened to you. Everything else on this list is a
-          record, and records are how the next person gets warned. Ring the bank first, get the
-          police file number second, because every other body here will ask you for that number.</p>
+          local police will investigate what happened to you. Everything else on this list records
+          it, refers it, or acts on the advertising.</p>
+        <div class="rp-accdos">
+          <button class="rp-acc rp-accdo rp-accdo-in" type="button" id="rpDownloadSummary">
+            <span class="rp-acch">
+              <span class="rp-accb">
+                <span class="rp-acct">Download the one page summary</span>
+                <span class="rp-accx">Everything on this report, on one printable page, with the
+                  reference and the date on it. This is the page to hand to a bank.</span>
+              </span>
+              <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path
+                d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14" stroke-linecap="round"
+                stroke-linejoin="round"/></svg></span>
+            </span>
+          </button>
+          <button class="rp-acc rp-accdo rp-accdo-in" type="button" id="rpFindSupport" data-dir="open">
+            <span class="rp-acch">
+              <span class="rp-accb">
+                <span class="rp-acct">Find support near you</span>
+                <span class="rp-accx">Free, independent help. Nobody on this list charges to
+                  recover money, and no lawyer or recovery service is named.</span>
+              </span>
+              <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path
+                d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round"
+                stroke-linejoin="round"/></svg></span>
+            </span>
+          </button>
+        </div>
       </div>
     </details>
 
-    <div id="rpClaimsSec">
     <details class="rp-acc">
       <summary class="rp-acch">
         <span class="rp-accn">03</span>
         <span class="rp-accb">
-          <span class="rp-acct">Their words against the records</span>
-          <span class="rp-accx">What they told you, and what the records say.</span>
+          <span class="rp-acct">Tips and best practices</span>
+          <span class="rp-accx">What to do before you send anything to anyone, and the handful of
+            checks that catch most of it.</span>
         </span>
         <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </summary>
       <div class="rp-accbody">
-        <div class="rp-claims" id="rpClaims"></div>
+        <div class="rp-tips" id="rpTips"></div>
       </div>
     </details>
-
     </div>
 
-    <!-- THE FOURTH THING, AND IT IS AN ACTION RATHER THAN A DRAWER.
-         It sat at the foot of the page under Where we looked, which is where
-         somebody heading for their bank with a reference number would never
-         find it. It is the page they hand over, so it belongs with the other
-         three things to do. Not a details: there is nothing to disclose, so
-         pressing it does the thing. -->
-    <button class="rp-acc rp-accdo" type="button" id="rpDownloadSummary">
-      <span class="rp-acch">
-        <span class="rp-accn">04</span>
-        <span class="rp-accb">
-          <span class="rp-acct">Download the one page summary</span>
-          <span class="rp-accx">Everything on this report, on one printable page, with the
-            reference and the date on it. This is the page to hand to a bank.</span>
-        </span>
-        <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path
-          d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14" stroke-linecap="round"
-          stroke-linejoin="round"/></svg></span>
-      </span>
-    </button>
-
-    <!-- 05, AND IT IS A DOOR RATHER THAN A DRAWER.
-         Find support used to be a pill in the header, which put it beside the
-         navigation and made it look like another way around the report. It is
-         not navigation. It is the last thing on the list of things to do, so it
-         sits at the end of the list wearing the same shell as the other four. -->
-    <button class="rp-acc rp-accdo" type="button" id="rpFindSupport" data-dir="open">
-      <span class="rp-acch">
-        <span class="rp-accn">05</span>
-        <span class="rp-accb">
-          <span class="rp-acct">Find support</span>
-          <span class="rp-accx">Free, independent help near you. Nobody on this list charges to
-            recover money, and no lawyer or recovery service is named.</span>
-        </span>
-        <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path
-          d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round"
-          stroke-linejoin="round"/></svg></span>
-      </span>
-    </button>
-    </div>
-
-        <!-- "WHERE WE LOOKED" IS GONE FROM THIS PAGE.
+    <!-- "WHERE WE LOOKED" IS GONE FROM THIS PAGE.
          It was a kicker, a headline and three lines promising every register
          and what each one said back, above the data room door that actually
          delivered them. The door moved to a footer link, which left a section
@@ -11858,7 +11876,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260911.0619";
+var KBYS_BUILD = "20260915.1919";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -12616,6 +12634,35 @@ function rpClaims(d){
   }
   return out;
 }
+/* TIPS AND BEST PRACTICES, THE THIRD OF THE THREE.
+   Not a lecture and not a list of fears. Every one is a thing a person can do
+   in a couple of minutes, on their own, that settles something. They are
+   ordered by how often they turn out to matter, and the last one is the one
+   nobody says out loud. */
+var RP_TIPS = [
+  ["Pay in a way that can be undone",
+   "A credit card can be disputed and a bank transfer usually cannot. An e-Transfer, a wire, crypto or a gift card is gone the moment it lands. If somebody steers you away from the card, that is the tip on this list you needed."],
+  ["Look up the number yourself",
+   "Never ring a number from the message, the email or the website they sent you. Find the firm on a register or on its own published contact page and ring that. The same goes for a link: type the address yourself."],
+  ["Check the name on the account against the name on the contract",
+   "Money going to a personal name, a numbered company or a different country from the one you are dealing with is worth a question before it is worth a payment. Ask, in writing, why they do not match."],
+  ["Ask for the registration number and check it on the register",
+   "A real firm answers in one line and the register agrees with them. Take the number they give you, open the regulator's own site, and search it. Two minutes."],
+  ["Make the decision on a different day",
+   "Nothing legitimate needs your money tonight. A deadline that appears once you hesitate was put there for you. Sleeping on it costs nothing and it is the single most effective thing on this page."],
+  ["Say it out loud to one person first",
+   "Describe the offer to somebody who is not involved, in your own words. Most people hear the fault themselves halfway through the sentence. This is the step almost everybody skips, and it is free."]
+];
+function rpTips(){
+  var out="", i;
+  for(i=0;i<RP_TIPS.length;i++){
+    out+='<div class="rp-tip"><span class="rp-n">'+(i+1)+'</span><span class="rp-b">'
+      +'<span class="rp-t">'+rpEsc(RP_TIPS[i][0])+'</span>'
+      +'<span class="rp-x">'+rpEsc(RP_TIPS[i][1])+'</span></span></div>';
+  }
+  return out;
+}
+
 function rpSteps(d){
   var list=(d.bys||[]).slice(0,3);
   if(!list.length){
@@ -13860,9 +13907,10 @@ function renderReport(d){
   id("rpClaimsSec").style.display=cl?"":"none";
 
   id("rpSteps").innerHTML=rpSteps(d);
+  id("rpTips").innerHTML=rpTips();
   /* The page title already says do this right now. Saying it again at 01 told
      the reader nothing and pushed the four menus they came for down a rung. */
-  id("rpStepsH").textContent="Some extra steps";
+  id("rpStepsH").textContent="Do these, in this order";
   id("rpBundle").innerHTML=rpBundle(d);
   id("rpPaks").innerHTML=rpPaks();
 

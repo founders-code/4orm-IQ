@@ -1241,11 +1241,14 @@ belongs_('id="rpToAct"', 'rpFound', 'the way on to what to do');
 belongs_('id="rpStepsSec"', 'rpAct', 'the three things to do now');
 belongs_('id="rpBundle"', 'rpAct', 'what to have ready before the call');
 belongs_('id="rpPaks"', 'rpAct', 'who to tell');
-belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
+/* IT MOVED TO WHAT WE FOUND. What somebody said about themselves, set against
+   what the record says, is evidence about the party. It is not an action, and
+   on the page of things to do it read as a fifth errand. */
+belongs_('id="rpClaimsSec"', 'rpFound', 'their words against the records');
 {
   const a = sheets_.rpAct;
-  if (a.indexOf('id="rpOpenRecord"') < a.indexOf('id="rpClaimsSec"'))
-    fails.push('the door to the whole record sits above the four things to do, it belongs at the foot of the screen');
+  if (a.indexOf('id="rpOpenRecord"') < a.indexOf('id="rpStepsSec"'))
+    fails.push('the door to the whole record sits above the three things to do, it belongs at the foot of the screen');
 }
 
 /* The gap note reads as the last thing the result screen could not tell them,
@@ -1277,8 +1280,12 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
     const a = sheets_.rpAct;
     if (a.indexOf('id="rpAlready"') < a.indexOf('class="rp-stitle"'))
       fails.push('the already-sent door is above the title on do this right now; it belongs directly under it');
-    if (a.indexOf('id="rpAlready"') > a.indexOf('id="rpStepsSec"'))
-      fails.push('the already-sent door has fallen below the steps, and it belongs above every one of them');
+    /* It is the FIRST of the three now, inside the list, carrying 01. It used
+       to sit above the list as a separate panel, which meant the page had a red
+       door saying what to do if money has gone and then a menu saying the same
+       thing again three rows down. */
+    if (a.indexOf('id="rpAlready"') < a.indexOf('id="rpStepsSec"'))
+      fails.push('the fraud door is back outside the list of three');
   }
   /* --------------------- WHAT TO DO, IN THE ORDER IT WAS ASKED FOR.
    The title, then the one line, then the door for somebody who has already
@@ -1287,36 +1294,45 @@ belongs_('id="rpClaimsSec"', 'rpAct', 'their words against the records');
 {
   const a = sheets_.rpAct;
   const at = t => a.indexOf(t);
-  const want = ['What to have ready before the call', 'Who to tell',
-                'Their words against the records', 'Download the one page summary'];
-  want.forEach((t, i) => {
-    if (at(t) < 0) return fails.push('what to do has lost the menu: ' + t);
-    const n = a.slice(0, at(t)).lastIndexOf('class="rp-accn"');
-    const num = a.slice(n, n + 60).match(/>([^<]+)</);
-    const got = num ? num[1].trim() : '?';
-    if (got !== '0' + (i + 1))
-      fails.push('"' + t + '" is numbered ' + got + ' and should be 0' + (i + 1));
-  });
-  /* The extra steps sit above the four and take no number off them. */
-  if (at('id="rpStepsH"') > at('What to have ready before the call'))
-    fails.push('the extra steps sit below the four menus, and they belong above them');
-  if (/rp-accn">01<\/span>[\s\S]{0,200}rpStepsH/.test(a))
-    fails.push('the extra steps have taken 01 back off the four menus');
-  /* "WHERE WE LOOKED" IS NO LONGER ON THIS PAGE.
-     It was a kicker, a headline and three lines promising every register and
-     what each one said back, above the data room door that delivered them. The
-     door became a footer link, which left a section promising a list and
-     delivering nothing. The download is a thing to do and stays up with the
-     others, which is now simply a matter of it being inside the menu block. */
-  if (/<div class="rp-kick">Where we looked<\/div>/.test(a))
-    fails.push('the empty where we looked section is back on what to do');
-  if (at('id="rpDownloadSummary"') < 0)
-    fails.push('what to do has lost the one page summary');
-  /* The data room is a quiet footer link now, not a door on this page. */
-  if (!/class="rp-lk" id="rpOpenRecord">See the technical data room/.test(a))
-    fails.push('the data room is no longer a small link in the act screen footer');
-  if (/class="rp-behindbtn"|rp-behindin/.test(a))
-    fails.push('the data room is back as a full width door on what to do');
+  /* THREE THINGS, AND THAT IS THE WHOLE PAGE.
+     It ran to six: an unnumbered extra-steps block, four numbered menus and a
+     support row, over a red door that already said the first of them. A reader
+     who has just been told something is wrong does not triage six. The red
+     door is the FIRST of the three rather than a seventh thing repeating it,
+     everything belonging to the fraud path lives inside it, and what was
+     "their words against the records" moved to what we found, because it is
+     evidence about the party and not an action. */
+  {
+    const nums = [...a.matchAll(/class="rp-accn(?: rp-accn-red)?"[^>]*>(\d\d)</g)].map(m => m[1]);
+    if (nums.join(',') !== '01,02,03')
+      fails.push('the things to do are numbered ' + (nums.join(',') || 'none') + ', expected 01,02,03');
+    /* 01 is the red door itself, so it must be inside the list and carry the
+       number, not sit above it as a separate panel repeating row one. */
+    const accs = a.indexOf('id="rpStepsSec"');
+    const door = a.indexOf('id="rpAlready"');
+    if (door < 0) fails.push('the fraud door is gone from what to do');
+    else if (door < accs) fails.push('the fraud door sits outside the list of three again');
+    if (!/class="rp-accn rp-accn-red">01</.test(a))
+      fails.push('the fraud door is not numbered as the first of the three');
+    for (const t of ['Who to reach out to', 'Tips and best practices'])
+      if (at(t) < 0) fails.push('what to do has lost: ' + t);
+    /* The order, the forms and the summary all live inside the reach-out menu,
+       because what you send is part of who you send it to. */
+    const reach = at('Who to reach out to');
+    for (const id of ['id="rpPaks"', 'id="rpDownloadSummary"', 'id="rpFindSupport"'])
+      if (at(id) < reach) fails.push(id + ' is outside the reach out menu');
+    /* And the fraud path carries its own order and its own list of what the
+       call will ask for, inside the door, not three rows away from it. */
+    const clock = a.indexOf('id="rpClock"');
+    for (const id of ['id="rpSteps"', 'id="rpBundle"'])
+      if (a.indexOf(id) < clock)
+        fails.push(id + ' is no longer inside the door that tells the reader to ring');
+    /* Evidence about the party is not an action. */
+    if (/id="rpClaims"/.test(a))
+      fails.push('their words against the records is back on the page of things to do');
+    if (!/id="rpClaims"/.test(sheets_.rpFound || ''))
+      fails.push('their words against the records is not on what we found either');
+  }
   /* Both ways back, as pills, in the row the reader already uses. */
   /* "Back to " sits in its own span so a phone can drop it and let the arrow
      carry the direction, so the label is matched in two pieces. */
@@ -1678,10 +1694,12 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
 {
   const act = sheets_.rpAct || '';
   const opens = (act.match(/<details[^>]*>/g) || []);
-  if (opens.length !== 4)
-    fails.push('what to do has ' + opens.length + ' collapsible sections, it should have four');
+  /* Two <details> plus the fraud door, which is a button and a panel rather
+     than a details because its copy is written per sector. Three things. */
+  if (opens.length !== 2)
+    fails.push('what to do has ' + opens.length + ' collapsible sections, it should have two beside the fraud door');
   if (opens.some(t => /\bopen\b/.test(t)))
-    fails.push('a section on what to do starts open, so the four titles are not all visible at once');
+    fails.push('a section on what to do starts open, so the three titles are not all visible at once');
   if (!/#rpt \.rp-acch::-webkit-details-marker\{display:none\}/.test(styleBlock))
     fails.push('the browser disclosure triangle is still drawn beside our own chevron');
 }
@@ -1790,14 +1808,15 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
     if (nav && /Find support/.test(nav))
       fails.push('Find support is back in the act screen navigation');
     const acc = (html.match(/<div class="rp-accs" id="rpStepsSec">[\s\S]*?<div class="rp-behind">/) || [''])[0];
-    const nums = [...acc.matchAll(/class="rp-accn"[^>]*>(\d\d)</g)].map(m => m[1]);
-    if (nums.join(',') !== '01,02,03,04,05')
-      fails.push('the things to do are numbered ' + (nums.join(',') || 'none') + ', expected 01,02,03,04,05');
     if (!/id="rpFindSupport"[^>]*data-dir="open"/.test(acc))
-      fails.push('row 05 is not wired to open the support directory');
-    const order = ['Download the one page summary', 'Find support'].map(t => acc.indexOf(t));
-    if (order[0] < 0 || order[1] < 0 || order[0] > order[1])
-      fails.push('Find support no longer sits below the download');
+      fails.push('find support is not wired to open the support directory');
+    /* Both doors live inside the reach out menu, because what you send is part
+       of who you send it to. The numbering itself is checked where the three
+       things are checked. */
+    const order = ['Who to reach out to', 'Download the one page summary', 'Find support']
+      .map(t => acc.indexOf(t));
+    if (order.some(n => n < 0) || order[0] > order[1] || order[1] > order[2])
+      fails.push('the forms and the summary are no longer inside the reach out menu, in that order');
   }
 
   /* ---------------------------------------------------------------- *
@@ -2436,15 +2455,39 @@ if (!/\.waitscrim\.snap,\.waitbox\.snap\{transition:none!important\}/.test(style
 if (!/waitScrim\.classList\.add\("snap"\)/.test(script))
   fails.push('nothing turns off the transition when the waiting screen opens');
 
-/* THE REPORT CARD. Reference first, then what makes the run findable again. */
+/* THE REPORT CARD. The identity the reader came for, then OUR rows, folded.
+   The reference, the read date, the log entry, the hash and the policy version
+   used to head this card, above the identity it is about. None of them answers
+   the reader's question: they are how we make the run findable again later. So
+   they stay on the card, shut, at its foot. */
 {
   /* Matched on the class, not on the whole opening tag, so adding an attribute
      to the element does not silently empty this slice and pass every check
      inside it by finding nothing to check. */
   const trayAt = html.search(/<div class="rp-idtray"[^>]*>/);
   const plate = html.slice(trayAt, html.indexOf('</div></div>', trayAt));
-  if (plate.indexOf('id="rpCardRef"') > plate.indexOf('id="rpIdent"'))
-    fails.push('the report reference is below the record rows, it belongs at the top of the card');
+  if (plate.indexOf('id="rpIdent"') > plate.indexOf('id="rpCardRef"'))
+    fails.push('our own rows are back above the identity the card is about');
+  {
+    const fold = (plate.match(/<details[^>]*id="rpCardFold"[^>]*>/) || [''])[0];
+    if (!fold) fails.push('the report card no longer folds our rows away');
+    else if (/\bopen\b/.test(fold)) fails.push('the report card fold ships open');
+    if (plate.indexOf('id="rpCardFold"') < plate.indexOf('id="rpIdent"'))
+      fails.push('the fold sits above the identity rather than at the foot of the card');
+    for (const nested of ['id="rpCardRef"', 'id="rpCardMeta"'])
+      if (plate.indexOf(nested) < plate.indexOf('id="rpCardFold"'))
+        fails.push(nested + ' is outside the fold, so our paperwork is on show again');
+  }
+  /* And it stays ON the card, in the hero. It was moved to the foot of the
+     whole page once and that was wrong: it belongs to the card. */
+  {
+    const hero = html.indexOf('class="rp-heromain"');
+    const tray = html.indexOf('id="rpIdTray"');
+    if (tray < 0 || hero < 0 || tray < hero)
+      fails.push('the report card is no longer inside the hero');
+    if (html.indexOf('class="rp-foot"') > 0 && tray > html.indexOf('class="rp-foot"'))
+      fails.push('the report card drifted to the bottom of the page again');
+  }
   for (const x of ['rpCardRef', 'rpCardMeta', 'rpCardFoot'])
     if (!plate.includes('id="' + x + '"')) fails.push('the report card has lost ' + x);
 }
