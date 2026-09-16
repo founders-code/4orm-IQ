@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Know Before You Send &middot; 4orm Control Centre</title>
+<title>Know more. Decide better. &middot; 4ormIQ, 4orm Finance</title>
 <!-- THE TAB MARK. The 4 from assets/mark-4.png, the logo file itself, on
      nothing: the ground is fully transparent so the tab's own colour shows
      through and the mark reads in a light theme and a dark one. Rendered at
@@ -655,6 +655,11 @@ body[data-stage="landing"] .kbblocked{margin-left:auto;margin-right:auto;text-al
 }
 .gobtn:hover:not(:disabled){background:var(--blue-lt);transform:translateY(-1px)}
 .gobtn:disabled{opacity:.35;cursor:not-allowed}
+/* THE BUTTON SAYS THE PHRASE. It is "Check 4orm" because that is what we want
+   somebody to say out loud, and a button reading CHECK taught them nothing to
+   repeat. It is one label, not a long one and a short one: two labels put a
+   span inside the button, and the contrast gate reads a span against the page
+   rather than the button under it. */
 @media(max-width:560px){
   .searchbox{padding-left:18px}
   .searchbox input{padding:17px 0;font-size:16px}
@@ -784,6 +789,16 @@ body[data-stage="landing"] .noteg .upnote{
 /* Hidden with the pair, not on their own. The thread hides .upnote by element,
    which leaves two empty framed panels sitting under the conversation. */
 body[data-stage="landing"][data-chat="on"] .noteg{display:none}
+
+/* WHOSE CHECK THIS IS, UNDER THE PAIR.
+   It inherited nothing and sat hard against the bottom edge of the two panels,
+   reading as a third line of the right-hand one. The air above it is what tells
+   a reader it is a separate thought about a different subject. */
+.tielink{margin:30px auto 0;max-width:66ch;text-align:center;
+  font-size:13px;line-height:1.6;color:var(--tx-3)}
+.tielink b{color:var(--tx-2)}
+body[data-stage="landing"][data-chat="on"] .tielink{display:none}
+@media(max-width:760px){ .tielink{margin-top:22px;font-size:12.4px} }
 
 /* stat strip */
 .statstrip{
@@ -2389,9 +2404,18 @@ body[data-stage="console"] .verdictwrap.on{display:block}
    at the foot of the screen, not with the panels above them: a link row
    floating halfway between the two reads as a third statement. */
 .docrow{margin:66px auto 0;display:flex;justify-content:center;align-items:center;gap:11px}
-.docrow button{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--tx-4);background:none;border:0;cursor:pointer;padding:4px 2px}
-.docrow button:hover{color:var(--tx-2)}
+/* THE ROW GAINED A THIRD ENTRY AND THE GATE CAUGHT THE HEIGHT.
+   These sat at 23 points tall, one under the floor, and adding the site made
+   it three targets a thumb can miss instead of two. The padding takes them
+   over 24 without moving anything: the text size and the tracking are
+   unchanged, so the row reads exactly as it did.
+   The colour moved up with it. At tx-4 these read 3.94 against the page, under
+   the 4.5 floor, and adding the site would have made a third line nobody with
+   ordinary eyes can read comfortably. */
+.docrow button,.docrow a{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx-3);background:none;border:0;cursor:pointer;
+  padding:6px 2px;display:inline-flex;align-items:center;min-height:24px;text-decoration:none}
+.docrow button:hover,.docrow a:hover{color:var(--tx-2)}
 .docrow span{color:var(--tx-4);font-size:10px}
 .foot .docrow{justify-content:flex-start;margin:20px 0 0}
 
@@ -4159,8 +4183,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="cbmain">
         <div class="cbtitle">
           <div class="tlead">
-            <h1 class="cbh1"><span class="console-only">Check who you're dealing with <span class="dim">before the money leaves.</span></span><span class="landing-only">Before you send money, check 4orm</span></h1>
-            <p class="cbdeck landing-only"><span class="q">Not sure about a company, broker, website, auto dealer, bank, or crypto opportunity?</span><span>See what public sources can confirm, and what they cannot.</span></p>
+            <h1 class="cbh1"><span class="console-only">Check who you're dealing with <span class="dim">before the money leaves.</span></span><span class="landing-only">Before you send money, check 4orm.</span></h1>
+            <p class="cbdeck landing-only"><span class="q">Not sure about a company, broker, website, auto dealer, bank or crypto opportunity?</span><span>See what public sources confirm, and what they cannot.</span></p>
 
             <!-- The line above names the moments and the limit in one breath, so the
                  separate list of moments that used to sit here is gone: it said the
@@ -4184,7 +4208,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <form class="searchbox" id="kbForm" autocomplete="off">
           <span class="pfx">&gt;</span>
           <input id="kbInput" type="text" placeholder="Company, website, email or wallet" aria-label="Enter a company, a website, an email address or a wallet address">
-          <button class="gobtn" id="kbGo" type="submit" disabled>Check</button>
+          <button class="gobtn" id="kbGo" type="submit" disabled>Check 4orm</button>
         </form>
         <div class="kbblocked" id="kbBlocked" role="status" aria-live="polite" style="display:none"></div>
 
@@ -4340,7 +4364,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
              panels they separate, and the block gains air above and below
              rather than being made smaller. -->
         <div class="noteg landing-only">
-        <p class="upnote landing-only" style="color:var(--tx-3)">We check the registers, read the records, and publish every source we used and every one we could not reach. Nothing is invented, and green never means we guarantee anyone.</p>
+        <p class="upnote landing-only" style="color:var(--tx-3)"><b>Every check runs live.</b> The name you enter is swept against public records at that moment. Nothing comes from a stored list and nothing is invented. If a sweep cannot complete, the result says so.</p>
 
         <!-- ADVICE, AND THE ABSENCE OF IT.
              Its own paragraph, and not folded into the line above, because the
@@ -4348,8 +4372,15 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
              disclaimer that disappears the moment the product starts doing the
              thing it disclaims is not a disclaimer. This one is never rewritten
              by anything. -->
-        <p class="upnote upadv landing-only" style="color:var(--tx-3)"><b>This is not financial advice.</b> We do not advise, recommend or endorse anyone. We present third party evidence, name the source and the date beside every line, and leave the decision with you.</p>
+        <p class="upnote upadv landing-only" style="color:var(--tx-3)"><b>This is not financial advice.</b> We do not advise, recommend or endorse anyone. We show third party evidence, name the source and the date beside every line, and leave the decision with you.</p>
         </div>
+
+        <!-- WHAT THIS IS PART OF.
+             The page said what the check does and never said whose check it
+             was. One line, under the pair, because a reader who has just been
+             told what we will not do is the reader most likely to ask who we
+             are. -->
+        <p class="tielink landing-only"><b>4ormIQ is the trust layer of 4orm Finance.</b> Building trust between the consumer and the business before money is ever sent.</p>
 
         <!-- The way to the two standing documents from the first screen. The
              site footer carries them too, but it is hidden on the landing
@@ -4359,6 +4390,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <button type="button" data-doc="compliance">Compliance statement</button>
           <span aria-hidden="true">&middot;</span>
           <button type="button" data-doc="privacy">Privacy notice</button>
+          <span aria-hidden="true">&middot;</span>
+          <a href="https://4ormfinance.com" rel="noopener">4ormfinance.com</a>
         </p>
 
 
@@ -8848,6 +8881,8 @@ function assertActive(v){
       && USER_ASSERT_FOR === String(v || "").trim().toLowerCase();
 }
 function assertClear(){ USER_ASSERT=null; USER_ASSERT_FOR=""; }
+/* FREE FOR LIFE. Off until the commitment is made. One word to turn it on. */
+var FREE_FOR_LIFE = false;
 /* The one sentence that lists what the box takes, built from the list itself. */
 (function(){
   var el2=id("kbAccepts"); if(!el2) return;
@@ -8860,8 +8895,18 @@ function assertClear(){ USER_ASSERT=null; USER_ASSERT_FOR=""; }
      short one can never come to accept something the long one does not. The
      long one runs to three lines on a phone and repeats what the box under it
      is about to say; the short one is the scope and nothing else. */
-  el2.innerHTML='<span class="cbsubt">Check '+rpEsc(words.join(", "))+", or "+rpEsc(last)
-    +' by typing the name in the search bar.</span>'
+  /* FREE FOR LIFE IS A COMMITMENT, NOT A DESCRIPTION.
+     It is the one line on this page the product has to hold to afterwards, so
+     it sits behind a switch rather than in the copy, off until somebody who
+     can make that commitment turns it on. A promise nobody signed does not get
+     printed because it reads well. */
+  var free = FREE_FOR_LIFE ? "Free for life. " : "";
+  /* The helper no longer repeats the placeholder under the box. It says what
+     the box takes, once, in the order the box takes it. It never says "a name"
+     on its own: a bare name reads as a person, and a person is the one search
+     the product refuses. */
+  el2.innerHTML='<span class="cbsubt">'+rpEsc(free)+'Type '+rpEsc(words.join(", "))+" or "+rpEsc(last)
+    +'.</span>'
     +'<span class="cbsubs">'+rpEsc((words.join(", ")+" or "+last)
         .replace(/^a /,"A ").replace(/\ban? /g,""))+'.</span>';
 })();
@@ -11296,8 +11341,8 @@ if(LIVE){
   if(!(window.matchMedia && window.matchMedia("(max-width:560px)").matches))
     id("kbInput").placeholder="Any company, website, email or wallet";
   document.querySelector(".upnote").innerHTML=
-    "<b>Live checking is on.</b> Every identifier you type runs a real sweep against public records. "+
-    "Nothing is read from a stored corpus, and nothing is invented: if the sweep cannot complete, the console says so.";
+    "<b>Every check runs live.</b> The name you enter is swept against public records at that moment. "+
+    "Nothing comes from a stored list and nothing is invented. If a sweep cannot complete, the result says so.";
 }
 
 /* Debug hook. Off unless ?debug=1 is in the URL, so it is inert in normal use.
@@ -11876,7 +11921,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260915.1919";
+var KBYS_BUILD = "20260916.2246";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
