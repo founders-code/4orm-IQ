@@ -153,6 +153,29 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
       fails.push('the accepted-types sentence is typed again instead of generated from ID_TYPES');
     if (!/ID_TYPES\.map/.test(src))
       fails.push('the accepted-types sentence no longer reads ID_TYPES, so it can drift again');
+    /* THE HELPER DOES NOT REPEAT THE PLACEHOLDER UNDER IT.
+       It used to end "by typing the name in the search bar", which said the
+       same four words the box was already showing and spent a line doing it. */
+    if (/by typing the name in the search bar/.test(src))
+      fails.push('the helper line repeats the search placeholder again');
+    /* FREE FOR LIFE IS A COMMITMENT AND SITS BEHIND A SWITCH.
+       It may be turned on by somebody who can make it. It may not be typed
+       into the copy, where nothing records that it was ever a decision. */
+    if (!/var FREE_FOR_LIFE = (?:true|false);/.test(src))
+      fails.push('the free for life switch is gone, so the commitment is either unprintable or untracked');
+    {
+      const noswitch = src.replace(/FREE_FOR_LIFE \? "Free for life\. " : ""/g, '');
+      if (/Free for life\./.test(noswitch))
+        fails.push('free for life is typed into the page instead of standing behind its switch');
+    }
+    /* THE PHRASE IS ON THE BUTTON. It is the thing we want said out loud. */
+    if (!/id="kbGo"[\s\S]{0,200}Check 4orm/.test(src))
+      fails.push('the button no longer says Check 4orm');
+    /* AND THE PAGE SAYS WHOSE CHECK IT IS. */
+    if (!/4ormIQ is the trust layer of 4orm Finance/.test(src))
+      fails.push('nothing on the landing ties 4ormIQ to 4orm Finance');
+    if (!/<title>[^<]*Know more\. Decide better\./.test(src))
+      fails.push('the page title no longer carries the slogan');
     /* And "a name" on its own reads as a person's name, which is the one search
        the product refuses. */
     if (/>\s*A name is enough/i.test(src))
