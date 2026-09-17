@@ -72,7 +72,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260916.2246';
+const BUILD = '20260917.0640';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -794,6 +794,29 @@ export default async function handler(req, res) {
         const id = s.board || s.platform || s.host;
         if (!id) continue;
         recordSource(id, s.searched ? 'ok' : 'failed', null);
+      }
+    } catch {}
+
+    /* EVERY REGISTER THE RUN PUT A QUESTION TO, UNDER ITS CATALOGUE ID.
+       The health table above is written from the review ledger, which covers
+       the customer-review platforms and nothing else, and writes them under
+       their board names. The back office counts registers reached by looking
+       for catalogue source_ids in that same table, so it found none of the 121
+       and printed nought per cent on a finished run.
+
+       The board is the record of what this run reached: clear means a page
+       came back from that register, searched means it was asked and returned
+       nothing, which is reached without a match. Anything else was not asked.
+       Fire and forget, like the ledger above: a counter never holds up a
+       response. */
+    try {
+      for (const [name, state] of Object.entries(board || {})) {
+        const row = BY_NAME[name];
+        if (!row || !row.source_id) continue;
+        if (state === 'clear' || state === 'caution' || state === 'adverse')
+          recordSource(row.source_id, 'ok', null);
+        else if (state === 'searched')
+          recordSource(row.source_id, 'no_match', null);
       }
     } catch {}
 
