@@ -2448,6 +2448,52 @@ if (/\.waitpills/.test(styleBlock))
     fails.push('the waiting deck no longer carries a Canadian loss figure');
   if (/FBI IC3|Internet Crime Complaint/.test(edu))
     fails.push('the waiting deck is back to leading a Canadian reader with an American total');
+  /* THE CARDS ARE READ BY SOMEBODY WHO IS FRIGHTENED AND IN A HURRY.
+     Each one carries a number and the sentence that makes it mean something.
+     Past about forty words the card stops being read and becomes a wall, and
+     the reader arrives at the report having already spent their attention. */
+  {
+    const long = [...edu.matchAll(/x:"([^"]+)"/g)]
+      .map(m => [m[1], m[1].split(/\s+/).length])
+      .filter(([, w]) => w > 45);
+    for (const [t, w] of long)
+      fails.push('a waiting card runs to ' + w + ' words: ' + t.slice(0, 60));
+  }
+  /* AND THE BIGGEST FIGURE ON THE DECK CANNOT BE MISREAD AS A COUNT OF PEOPLE.
+     The value chip sits directly above the headline, so a headline opening
+     with "Canadians" reads, out loud, as 704 million Canadians. */
+  if (/t:"Canadians reported losing \$704/.test(edu))
+    fails.push('the loss card reads as a count of Canadians rather than a sum of money');
+}
+
+/* HOW LONG THE CHECK TAKES, IN WORDS, ON THE SCREEN THAT HOLDS THEM.
+   A bar and a falling estimate say a machine is busy. They do not tell a first
+   time reader that two minutes is the normal answer. */
+{
+  if (!/id="waitSay"/.test(html))
+    fails.push('the waiting screen no longer says how long a check takes');
+  const say = (html.match(/id="waitSay"[^>]*>([^<]*)</) || ['', ''])[1];
+  if (!/two minutes/.test(say))
+    fails.push('the waiting line does not name the time a check takes: ' + say.slice(0, 60));
+  if (!/waitSayT=setTimeout/.test(script))
+    fails.push('the waiting line never retires, so it sits there after the clock has taken over');
+}
+
+/* THE BACK OFFICE COUNTS REGISTERS REACHED BY CATALOGUE ID.
+   The per-register health table is read by admin-metrics looking for catalogue
+   source_ids in it. A run that writes only board display names into that table
+   leaves the coverage dial reading nought per cent on a finished check, which
+   is a number that is not true and cannot be acted on. */
+{
+  const api = fs.readFileSync(path.join(root, 'api/check.js'), 'utf8');
+  if (!/BY_NAME\[name\]/.test(api))
+    fails.push('nothing maps the board back to catalogue source_ids, so registers reached reads zero');
+  if (!/recordSource\(row\.source_id/.test(api))
+    fails.push('register health is not written under the catalogue source_id the back office counts');
+  /* A register that was asked and answered with nothing is reached, not
+     failed. Recording it as a failure makes the reliability dial lie. */
+  if (!/state === 'searched'[\s\S]{0,120}'no_match'/.test(api))
+    fails.push('a register that answered with nothing is recorded as something other than no_match');
 }
 
 /* -------------------------------------- nothing may navigate on its own
