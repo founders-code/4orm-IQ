@@ -53,10 +53,11 @@ await p.click('#rpBackToReport'); await p.waitForTimeout(400);
 if (await stage() !== 'landing') fail('back from sources did not return to the landing');
 
 await p.evaluate(() => window.__KBYS__.check('atlanticglobalwealth.com'));
+await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
 await p.waitForTimeout(3000);
 for (let i = 0; i < 6; i++) {
   if (!await p.evaluate(() => document.getElementById('waitBox').classList.contains('on'))) break;
-  await p.click('#waitOk'); await p.waitForTimeout(500);
+  await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(500);
 }
 await p.waitForTimeout(1000);
 await one('rpReport', 'a finished check');

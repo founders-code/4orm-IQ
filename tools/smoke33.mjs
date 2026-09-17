@@ -98,6 +98,7 @@ for (const name of PHONES) {
   });
   try {
     await p.tap('#kbGo');
+    await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
     await p.waitForTimeout(2200);
     const on = await p.evaluate(() => document.body.getAttribute('data-chat'));
     if (on !== 'on') fails.push(name + ': tapping check did not open the thread');

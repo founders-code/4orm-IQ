@@ -1506,14 +1506,20 @@ for (const x of ['rpAct', 'rpSources']) {
    comment claiming it lived in one place, and they drifted twice anyway. The
    shape is declared ONCE now and only the colour is declared per door, so a
    change to one is a change to all three by construction rather than by
-   discipline. The height went 110 (a note), 220 (a billboard), and is 147:
-   two thirds of double, and a door. */
+   discipline. The height is set by what is inside it rather than by a floor: it is the
+   first of three rows, so it reads a size above the two under it and no more.
+   A fixed floor is what made it fill the screen and turn the other two into
+   footnotes. */
 {
   const shape = (styleBlock.match(/#rpt \.rp-alreadybtn,#rpt \.rp-onbtn\{\n?[^}]*\}/) || [''])[0];
   if (!shape) fails.push('the three doors no longer share one shape rule, so they will drift apart again');
   else {
-    const h = (shape.match(/min-height:(\d+)px/) || [])[1];
-    if (h !== '147') fails.push('the doors are ' + h + 'px. 147 is two thirds of the doubled size and is what was asked for');
+    const h = (shape.match(/min-height:(\d+)(?:px)?/) || [])[1];
+    if (h !== '0') fails.push('the doors carry a height floor of ' + h + ' again, which is what made the first of the three fill the screen');
+    /* And its heading may not outgrow the row headings under it. */
+    const t0 = (styleBlock.match(/#rpt \.rp-alreadybtn \.rp-t,#rpt \.rp-onbtn \.rp-t\{[^}]*font-size:clamp\([^,]+,[^,]+,([\d.]+)px\)/) || [])[1];
+    if (t0 && Number(t0) > 20)
+      fails.push('the door heading is ' + t0 + 'px at its ceiling, louder than the rows it leads');
     for (const prop of ['padding', 'grid-template-columns', 'gap'])
       if (!new RegExp(prop + ':').test(shape))
         fails.push('the shared door rule no longer declares ' + prop + ', so each door sets its own');
@@ -1562,18 +1568,21 @@ for (const x of ['rpAct', 'rpSources']) {
     fails.push('the whole record sits above the one page summary, and the summary is the one most readers need');
 }
 
-/* "NOBODY IS NAMED ANYWHERE WE LOOKED" MUST NOT BE PRINTED WHEN SOMEBODY IS.
+/* THE CARD SAYS NOTHING ABOUT NAMES IT CANNOT STAND BEHIND.
    RP_PERSON_OUTPUT_SOURCES is empty by design: no source is cleared for person
-   level output until counsel signs it off. So the name scan returns nothing and
-   the card fell through to the "we found nothing" branch, on a page that prints
-   the regulator's own words naming a chief executive two paragraphs above.
-   We do not publish it is a different sentence from it does not exist, and
-   printing the second when the first is true is the exact class of small lie
-   this product exists not to tell. */
-if (!/function rpNamesWithheld/.test(script))
-  fails.push('nothing counts the names we found and did not publish, so the card cannot tell a withheld name from no name');
-if (!/We do not publish individuals/.test(script))
-  fails.push('the report card no longer says a name was found and withheld');
+   level output until counsel signs it off. So a card that reports on names at
+   all ends up printing "nobody is named anywhere we looked" on a page that
+   carries the regulator's own words naming a chief executive two paragraphs
+   above. We do not publish it is a different sentence from it does not exist,
+   and printing the second when the first is true is the exact class of small
+   lie this product exists not to tell. The card carries the names an official
+   record holds, under the agency that holds them, and makes no other claim. */
+if (/Nobody is named anywhere we looked/.test(script))
+  fails.push('the card claims nobody is named, which it cannot know while person output is off');
+if (/People named in these records/.test(script))
+  fails.push('the count of names is back on the report card');
+if (!/rpIdRow\(rpAgency\(off\[i\]\.src\)/.test(script))
+  fails.push('the names an official record holds are no longer printed under the agency that holds them');
 {
   /* And the gate itself is still shut. This is the line counsel has to move. */
   const gate = (script.match(/var RP_PERSON_OUTPUT_SOURCES\s*=\s*\{([^}]*)\}/) || [])[1];
@@ -2466,17 +2475,30 @@ if (/\.waitpills/.test(styleBlock))
     fails.push('the loss card reads as a count of Canadians rather than a sum of money');
 }
 
-/* HOW LONG THE CHECK TAKES, IN WORDS, ON THE SCREEN THAT HOLDS THEM.
+/* HOW LONG THE CHECK TAKES, SAID BEFORE IT STARTS.
    A bar and a falling estimate say a machine is busy. They do not tell a first
-   time reader that two minutes is the normal answer. */
+   time reader that two minutes is the normal answer, so the primer says it,
+   says what we are doing, and carries the disclaimer, which means the one
+   sentence that has to be read is read before the sweep rather than after it. */
 {
-  if (!/id="waitSay"/.test(html))
-    fails.push('the waiting screen no longer says how long a check takes');
-  const say = (html.match(/id="waitSay"[^>]*>([^<]*)</) || ['', ''])[1];
-  if (!/two minutes/.test(say))
-    fails.push('the waiting line does not name the time a check takes: ' + say.slice(0, 60));
-  if (!/waitSayT=setTimeout/.test(script))
-    fails.push('the waiting line never retires, so it sits there after the clock has taken over');
+  if (!/id="primBox"/.test(html))
+    fails.push('the primer before the waiting screen is gone');
+  const box = html.slice(html.indexOf('id="primBox"'), html.indexOf('</div>', html.indexOf('id="primOk"')));
+  if (!/two to three minutes/.test(box))
+    fails.push('the primer does not say how long a check takes');
+  if (!/id="primOk"/.test(box))
+    fails.push('the primer has no way forward');
+  /* The disclaimer is written in from the one constant, never typed twice. */
+  if (!/f\.innerHTML=WAIT_DISCLAIMER/.test(script))
+    fails.push('the primer carries its own copy of the disclaimer instead of the one the product holds');
+  /* And it opens with the waiting screen, not instead of it: the sweep runs
+     underneath, so reading the primer costs the reader nothing. */
+  if (!/primOpen\(\);/.test(script))
+    fails.push('nothing opens the primer when a check starts');
+  /* Pressing it is the acknowledgement, so nobody is asked to agree twice. */
+  const ph = script.slice(script.indexOf('id("primOk").addEventListener'), script.indexOf('id("waitOk").addEventListener'));
+  if (!/waitAck=true/.test(ph))
+    fails.push('the primer does not record the acknowledgement, so the reader is asked for it twice');
 }
 
 /* THE BACK OFFICE COUNTS REGISTERS REACHED BY CATALOGUE ID.
@@ -3676,3 +3698,42 @@ if (fails.length) {
   process.exit(1);
 }
 console.log('\nPASSED\n');
+
+/* A ROW THAT PRINTS THE SAME ANSWER ON EVERY REPORT IS NOT A ROW.
+   Every check runs live, so the read date on the card was always "Just now".
+   The date that means something is the one beside each record in the working. */
+if (/rpIdRow\("When we looked"/.test(script))
+  fails.push('the read date row is back on the card, where it always reads the same');
+
+/* THE NAME THEY SEARCHED FOR IS THE FIRST THING ON THE RESULT.
+   A reader arrives having typed a company, so the page opens with that company
+   and its address, and the headline finding sits under the name it is about.
+   A pill above the name reads as a finding with nothing attached to it. */
+{
+  const hero = html.slice(html.indexOf('<div class="rp-heromain">'),
+                          html.indexOf('id="rpTonight"'));
+  const at = t => hero.indexOf(t);
+  const order = ['id="rpWho"', 'id="rpDom"', 'id="rpEyebrow"', 'id="rpWhy"'];
+  for (let i = 1; i < order.length; i++)
+    if (at(order[i - 1]) > at(order[i]))
+      fails.push('the result opens with ' + order[i] + ' above ' + order[i - 1]
+        + ', and the name they searched for comes first');
+}
+
+/* THE WAY INTO THE WORKING IS ON EVERY REPORT SCREEN, AT THE FOOT.
+   It reads as small print because that is what it is: most readers never want
+   it, and the one who does should find it where they already look for the
+   compliance statement rather than walking to another screen for it. */
+{
+  for (const [x, id] of [['rpReport', 'rpOpenRecordR'], ['rpFound', 'rpOpenRecordF'],
+                         ['rpAct', 'rpOpenRecord'], ['rpSources', 'rpOpenRecordS']]) {
+    const sheet = sheets_[x] || '';
+    if (!sheet.includes('id="' + id + '"')) { fails.push(x + ' has no way into the data room'); continue; }
+    const foot = sheet.lastIndexOf('<div class="rp-foot">');
+    if (foot < 0 || sheet.indexOf('id="' + id + '"') < foot)
+      fails.push('the data room link on ' + x + ' is not in the foot with the rest of the small print');
+  }
+  /* And all of them go to the same place, wired in one list, not four times. */
+  if (!/\["rpOpenRecord","rpOpenRecordR","rpOpenRecordF","rpOpenRecordS"\]/.test(script))
+    fails.push('the data room links are wired one at a time, so one of them will be missed');
+}

@@ -83,6 +83,7 @@ for (const [w, h] of VIEWPORTS) {
 
   /* ---- a real run, sampled continuously from before the overlay opens ---- */
   await p.evaluate(() => window.__KBYS__.check('atlanticglobalwealth.com'));
+  await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
   for (let t = 0; t < 42; t++) {                     /* ~6.3s, past the finish */
     await p.waitForTimeout(150);
     const r = await p.evaluate(new Function('return ' + CENSUS));
@@ -97,6 +98,7 @@ for (const [w, h] of VIEWPORTS) {
 
   /* ---- and the whole deck, which a reader can walk at any moment ---- */
   await p.evaluate(() => window.__KBYS__.check('atlanticglobalwealth.com'));
+  await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
   await p.waitForTimeout(1200);
   const dots = await p.evaluate(() => document.querySelectorAll('#eduDots button').length);
   for (let i = 0; i < dots; i++) {

@@ -124,12 +124,20 @@ const PROBE = `(() => {
    by running a real check. */
 const SCENES = [
   { key:'landing', page:'index.html?demo=1', widths:[1440,390,320], reach: async () => {} },
+  /* THE WAITING SCREEN, MEASURED WHILE IT IS ACTUALLY WAITING.
+     It used to answer the two context questions on the way in. Answering one
+     starts the check again, which puts the primer back over the screen this
+     scene exists to measure, and pressing through that primer acknowledges the
+     disclaimer, which closes the wait and lands the walk on the report. So the
+     scene stops at the screen it is named after. */
   { key:'waiting', page:'index.html?demo=1', widths:[1440,390],
     reach: async p => { await p.fill('#kbInput','Meridian Yield Partners'); await p.click('#kbGo');
-      await p.waitForTimeout(2200); await tap(p,'investment'); await p.waitForTimeout(1400);
-      await tap(p,'already sent money'); await p.waitForTimeout(1400); } },
+      await p.waitForTimeout(250);
+      await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();});
+      await p.waitForTimeout(900); } },
   { key:'report',  page:'index.html?demo=1', widths:[1440,390,320],
     reach: async p => { await p.fill('#kbInput','Meridian Yield Partners'); await p.click('#kbGo');
+    await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
       await p.waitForTimeout(2200); await tap(p,'investment'); await p.waitForTimeout(1400);
       await tap(p,'already sent money');
       /* THE RESULT NO LONGER OPENS ITSELF.
@@ -144,7 +152,7 @@ const SCENES = [
           const b = document.getElementById('waitOk');
           return !!b && !b.disabled && /Show the result/i.test(b.textContent);
         });
-        if (ready) { await p.click('#waitOk'); break; }
+        if (ready) { await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); break; }
         if (await p.evaluate(() => document.body.getAttribute('data-stage') === 'report')) break;
       }
       for (let i=0;i<10;i++){ await p.waitForTimeout(600);

@@ -21,6 +21,7 @@ await p.waitForTimeout(250);
 /* Typing alone must not put a control on the page. */
 if (await p.$('#kbChat:not([hidden])')) fails.push('the thread opens while somebody is typing');
 await p.click('#kbGo');
+await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
 await p.waitForTimeout(2400);
 await p.locator('.pill', { hasText: 'A vehicle' }).first().click();
 await p.waitForTimeout(1500);

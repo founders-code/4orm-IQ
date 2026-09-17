@@ -18,10 +18,11 @@ await p.waitForTimeout(900);
 const fail = m => { console.error('FAIL: ' + m); process.exit(1); };
 
 await p.evaluate(() => window.__KBYS__.check('atlanticglobalwealth.com'));
+await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
 await p.waitForTimeout(3000);
 for (let i = 0; i < 6; i++) {
   if (!await p.evaluate(() => document.getElementById('waitBox').classList.contains('on'))) break;
-  await p.click('#waitOk'); await p.waitForTimeout(500);
+  await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(500);
 }
 await p.click('#rpToFound'); await p.waitForTimeout(500);
 await p.click('#rpToAct');   await p.waitForTimeout(500);

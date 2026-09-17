@@ -29,9 +29,10 @@ for (const [w,h] of [[1440,1000],[1080,900],[900,900],[820,900],[700,900],[640,9
   await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
   await p.waitForTimeout(700);
   await p.evaluate(()=>window.__KBYS__.check('atlanticglobalwealth.com'));
+  await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
   await p.waitForTimeout(2600);
   for(let i=0;i<6;i++){ if(!await p.evaluate(()=>document.getElementById('waitBox').classList.contains('on'))) break;
-    await p.click('#waitOk'); await p.waitForTimeout(400); }
+    await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(400); }
   await p.waitForTimeout(600);
   const r = await p.evaluate(()=>{
     const out={};
@@ -61,6 +62,7 @@ for (const [w,h] of [[390,844],[390,664],[414,716],[360,780],[360,640],[430,700]
   await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
   await p.waitForTimeout(700);
   await p.evaluate(()=>window.__KBYS__.check('atlanticglobalwealth.com'));
+  await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
   await p.waitForTimeout(1800);
   const r = await p.evaluate(()=>{
     const body=document.querySelector('.waitbody').getBoundingClientRect();
@@ -95,9 +97,10 @@ for (const w of [1440,640,560,480,390,360]) {
   await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
   await p.waitForTimeout(700);
   await p.evaluate(()=>window.__KBYS__.check('atlanticglobalwealth.com'));
+  await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
   await p.waitForTimeout(2600);
   for(let i=0;i<6;i++){ if(!await p.evaluate(()=>document.getElementById('waitBox').classList.contains('on'))) break;
-    await p.click('#waitOk'); await p.waitForTimeout(380); }
+    await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(380); }
   await p.waitForTimeout(500); await p.click('#rpToFound'); await p.waitForTimeout(500);
   const r = await p.evaluate(()=>{
     const b=document.querySelector('#rpFound .rp-find .rp-b');

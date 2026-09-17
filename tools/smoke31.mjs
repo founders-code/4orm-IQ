@@ -26,6 +26,7 @@ await p.evaluate(() => {
   requestAnimationFrame(tick);
 });
 await p.evaluate(() => window.__KBYS__.check('atlanticglobalwealth.com'));
+await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
 await p.waitForTimeout(9300);
 const w = (await p.evaluate(() => window.__W)).filter(x => x[2]);
 if (w.length < 30) fail('the waiting screen was never up long enough to measure');

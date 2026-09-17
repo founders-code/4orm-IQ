@@ -30,6 +30,7 @@ for (const q of ['Goliath Ventures', 'atlanticglobalwealth.com', 'investhelm.com
     await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
     await p.waitForTimeout(700);
     await p.evaluate(x => window.__KBYS__.check(x), q);
+    await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
     await p.waitForTimeout(2600);
     for (let i = 0; i < 10; i++) {
       if (!await p.evaluate(() => document.getElementById('waitBox').classList.contains('on'))) break;

@@ -38,6 +38,7 @@ await p.evaluate(() => {
   requestAnimationFrame(tick);
 });
 await p.evaluate(() => window.__KBYS__.check('atlanticglobalwealth.com'));
+await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
 await p.waitForTimeout(600);
 const seen = await p.evaluate(() => window.__seen);
 const worst = seen.length ? Math.min(...seen) : 1;

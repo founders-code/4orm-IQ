@@ -31,6 +31,7 @@ for (const vw of [1440, 1280]) {
 
   /* ---- the gutter, across the handover ---- */
   await p.evaluate(() => window.__KBYS__.check('investhelm.com'));
+  await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
   await p.waitForTimeout(900);
   const wait = await p.evaluate(() => {
     const r = document.querySelector('.waitprog').getBoundingClientRect();
@@ -48,7 +49,7 @@ for (const vw of [1440, 1280]) {
       const g = document.getElementById('waitOk');
       return !!g && !g.disabled && /Show the result/i.test(g.textContent);
     });
-    if (ready) { await p.click('#waitOk'); break; }
+    if (ready) { await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); break; }
     await p.waitForTimeout(500);
   }
   await p.waitForTimeout(800);
