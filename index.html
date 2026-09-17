@@ -793,6 +793,45 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
 body[data-stage="landing"][data-chat="on"] .tielink{display:none}
 @media(max-width:760px){ .tielink{margin-top:22px;font-size:12.4px} }
 
+/* THE TICKER.
+   Full width of the block, one line high, running right to left. It is a
+   marquee, which is a thing to be careful with: it moves slowly enough to read
+   at a glance, it stops the moment a pointer or a keyboard reaches it, and it
+   stops dead under reduced motion, where it becomes a line a reader scrolls
+   themselves. The rail is doubled so the loop has no seam. */
+.tick{margin:26px auto 0;max-width:1120px;padding:11px 0;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.tickmask{overflow:hidden;position:relative;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.tickrail{display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;
+  animation:tickrun var(--tickdur,70s) linear infinite}
+.tick:hover .tickrail,.tick:focus-within .tickrail{animation-play-state:paused}
+@keyframes tickrun{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}}
+.tickrun{display:inline-flex;align-items:center}
+.tickit{display:inline-flex;align-items:baseline;gap:10px;padding:0 26px;
+  border-right:1px solid var(--border)}
+.tickv{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--blue-lt);
+  letter-spacing:-.01em}
+.tickt{font-size:13.5px;font-weight:600;color:var(--tx-2)}
+/* THE SOURCE IS THE POINT OF THE LINE, SO IT IS READABLE.
+   At tx-4 it read at 3.9 to 1, under the floor, which puts the one part of a
+   statistic that makes it worth anything in the faintest ink on the page. */
+.ticks{font-size:11.5px;color:var(--tx-3)}
+@media(prefers-reduced-motion:reduce){
+  /* No movement at all. The line becomes something the reader scrolls. */
+  .tickrail{animation:none}
+  .tickmask{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
+}
+body[data-stage="landing"][data-chat="on"] .tick{display:none}
+@media(max-width:760px){
+  .tick{margin-top:20px;padding:9px 0}
+  .tickit{padding:0 18px;gap:8px}
+  .tickv{font-size:13.5px}.tickt{font-size:12.4px}.ticks{display:none}
+}
+
 /* stat strip */
 .statstrip{
   display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:14px;
@@ -1491,6 +1530,18 @@ body.wait-up .dirbox{z-index:501}
   font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;
   transition:background .25s var(--ease),transform .3s var(--pop)}
 .primok:hover{background:var(--blue);transform:translateY(-1px)}
+/* Two ways on rather than one, because being walked through a room is a thing
+   some people want and some people resent. Neither is the quiet option: they
+   are the same size and the same weight, and the tour is the one on the left
+   only because it is the one a first time reader is more likely to want. */
+.roombtns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.roombtns .primok{margin-top:0}
+.primalt{padding:16px 20px;border:1px solid rgba(255,255,255,.16);border-radius:999px;
+  background:none;color:var(--tx-2);cursor:pointer;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;
+  transition:border-color .25s var(--ease),color .25s var(--ease),transform .3s var(--pop)}
+.primalt:hover{border-color:rgba(255,255,255,.34);color:var(--tx);transform:translateY(-1px)}
+@media(max-width:560px){ .roombtns{grid-template-columns:1fr} }
 @media(max-width:560px){
   .primbox{padding:24px 20px 20px}
   .primt{font-size:24px}
@@ -4378,6 +4429,21 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
              are. -->
         <p class="tielink landing-only"><b>4ormIQ is the trust layer of 4orm Finance.</b> Building trust between the consumer and the business before money is ever sent.</p>
 
+        <!-- THE NUMBERS, MOVING, THE WAY A BUILDING CARRIES THEM.
+             A reader who has not lost anything has no reason to believe this
+             matters to them, and a block of statistics is a block nobody
+             reads. One line, moving, carries the scale past the eye instead of
+             asking for a decision to read it.
+
+             Every line on it is built from the waiting deck, which means every
+             line already carries a source and has already been through the
+             evidence gate. Nothing is typed in here: a statistic with nobody
+             behind it is the thing this product exists to warn people about. -->
+        <div class="tick landing-only" id="tickRow" role="region"
+             aria-label="Fraud in Canada, by the numbers">
+          <div class="tickmask"><div class="tickrail" id="tickRail"></div></div>
+        </div>
+
         <!-- The way to the two standing documents from the first screen. The
              site footer carries them too, but it is hidden on the landing
              stage, and somebody looking for a privacy notice is usually
@@ -5678,6 +5744,27 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
      sentence that has to be read before a verdict about a named company
      appears. The sweep is already running underneath it, so reading this
      costs nothing. -->
+<!-- WHAT THE ROOM IS, BEFORE SOMEBODY IS STANDING IN IT.
+     The data room is a wall of instruments. A reader who has just been told
+     something about their money and presses a link at the foot of a page lands
+     in it with no idea what they are looking at, and the walkthrough starts
+     pointing at dials they did not ask about. This says what the room is for
+     in three lines and lets them choose whether to be walked through it. -->
+<div class="primscrim" id="roomScrim"></div>
+<div class="primbox" id="roomBox" role="dialog" aria-modal="true" aria-labelledby="roomT">
+  <div class="primhd"><span class="led"><i></i><span class="lbl gold">The technical data room</span></span></div>
+  <h2 class="primt" id="roomT">This is the working, not the answer.</h2>
+  <ol class="primsteps">
+    <li><b>Everything on your report, and where it came from.</b> Every register we asked, what each one said back, and the ones we could not reach.</li>
+    <li><b>Nothing here changes the result.</b> It is a reference you can check against, so you do not have to take our word for any line of it.</li>
+    <li><b>It is built for somebody checking our work.</b> Your bank, your lawyer, a regulator, or you.</li>
+  </ol>
+  <div class="roombtns">
+    <button class="primok roomtour" type="button" id="roomTour" disabled>Show me around</button>
+    <button class="primalt" type="button" id="roomSelf" disabled>Let me look on my own</button>
+  </div>
+</div>
+
 <div class="primscrim" id="primScrim"></div>
 <div class="primbox" id="primBox" role="dialog" aria-modal="true" aria-labelledby="primT">
   <div class="primhd"><span class="led"><i></i><span class="lbl gold">Know before you send</span></span></div>
@@ -11429,54 +11516,54 @@ var EDU = [
 
   /* Our own testimony, sourced as our own. Somebody waiting on a check they
      are frightened about should know who is doing the checking. */
-  {tone:"act", k:"Why we built this", v:"Hundreds",
+  {tone:"act", k:"Why we built this", v:"Hundreds", tick:1,
    t:"We have sat with hundreds of people after the money went",
    x:"Since 2020, most of them to investment and trading scams. It is almost always the same story.",
    src:"4orm Finance"},
 
-  {tone:"loss", k:"What it cost Canadians", v:"$704M",
+  {tone:"loss", k:"What it cost Canadians", v:"$704M", tick:1,
    t:"Last year Canadians reported losing $704 million to fraud",
    x:"112,000 reports in 2025, the worst year on record. Reported counts only the people who filled in a form.",
    src:"Canadian Anti-Fraud Centre, 2025"},
 
-  {tone:"loss", k:"Where it went", v:"Half",
+  {tone:"loss", k:"Where it went", v:"Half", tick:1,
    t:"Nearly half of that went to investment offers",
    x:"$351 million of it, from 3,867 people. The largest single kind of fraud in the country.",
    src:"Canadian Anti-Fraud Centre, 2025"},
 
-  {tone:"scale", k:"The number behind every number", v:"5 to 10%",
+  {tone:"scale", k:"The number behind every number", v:"5 to 10%", tick:1,
    t:"Only 5 to 10 per cent of fraud in Canada is ever reported",
    x:"The Government of Canada's own estimate. Every total you have read is the small visible part.",
    src:"RCMP, November 2025, and Competition Bureau Canada, March 2026"},
 
-  {tone:"loss", k:"What it actually costs", v:"Everything",
+  {tone:"loss", k:"What it actually costs", v:"Everything", tick:1,
    t:"For almost everyone, it was never spare money",
    x:"The house deposit, the retirement, the money set aside for a child. The hardest part is telling the family.",
    src:"4orm Finance"},
 
-  {tone:"act", k:"The part nobody tells you", v:"Today",
+  {tone:"act", k:"The part nobody tells you", v:"Today", tick:1,
    t:"A payment can sometimes be pulled back, but only for a few hours",
    x:"The window is measured in hours, not days, and nobody tells you when it closes. If money has gone, ring your bank now. That call is the only thing here that can move money.",
    src:"Canadian Bankers Association guidance"},
 
-  {tone:"loss", k:"What comes after", v:"Months",
+  {tone:"loss", k:"What comes after", v:"Months", tick:1,
    t:"Reporting it takes months, and most people do it alone",
    x:"The same statements and receipts go to the bank, the police and the regulator, then get asked for again. Your report arrives already filled in for each of them.",
    src:"4orm Finance"},
 
-  {tone:"loss", k:"How it starts", v:"1 in 3",
+  {tone:"loss", k:"How it starts", v:"1 in 3", tick:1,
    t:"One report in three is somebody pretending to be a name you trust",
    x:"Usually your own bank, a company you deal with, or a government office. Counted in the United States, arriving here by text and phone every day.",
    src:"US Federal Trade Commission, June 2026"},
 
-  {tone:"loss", k:"What keeps people quiet", v:"Shame",
+  {tone:"loss", k:"What keeps people quiet", v:"Shame", tick:1,
    t:"Embarrassment is what closes the last door",
    x:"Almost everyone waited before telling anybody, and waiting is what ends the chance of getting money back. Nobody we sat with was foolish.",
    src:"4orm Finance"},
 
   /* THE CARD THIS PRODUCT EXISTS FOR. It says what the gap is, why the gap is
      nobody's fault, and that the reader is standing in it right now. */
-  {tone:"act", k:"Why this exists", v:"The gap",
+  {tone:"act", k:"Why this exists", v:"The gap", tick:1,
    t:"Almost everything official arrives after the money is gone",
    x:"A regulator has to prove its case before it can warn anyone, and that takes months. The gap in between is where you are standing when you are about to send.",
    src:"4orm Finance"},
@@ -11644,7 +11731,54 @@ function eduNavPaint(){
   }
 }
 
-var EDU_HOLD = 7000;
+/* THE TICKER IS BUILT FROM THE WAITING DECK AND FROM NOTHING ELSE.
+   Every line it shows is a card that already carries a source and has already
+   been through the evidence gate. Hand-typing a statistic here would put a
+   figure on the most looked at line of the product with nobody behind it,
+   which is the exact move this whole product exists to warn people about. */
+(function(){
+  var rail = id("tickRail"); if(!rail) return;
+  var items = [];
+  for(var i=0;i<EDU.length;i++){
+    var e = EDU[i];
+    /* A card earns a place on the ticker only if it carries a figure and a
+       source. The ones that carry a word rather than a number belong on the
+       deck, where there is room to say what the word means. */
+    /* A card earns a place only if it is marked for the line. The deck also
+       carries cards about how WE work, and a claim about our own product,
+       moving, on the busiest line of the page, is advertising. */
+    if(!e.tick || !e.v || !e.src) continue;
+    items.push(e);
+  }
+  if(!items.length){ var tr=id("tickRow"); if(tr) tr.hidden=true; return; }
+  function cell(e){
+    return '<span class="tickit"><span class="tickv">'+rpEsc(e.v)+'</span>'
+      +'<span class="tickt">'+rpEsc(e.t)+'</span>'
+      +'<span class="ticks">'+rpEsc(e.src)+'</span></span>';
+  }
+  var one = items.map(cell).join("");
+  /* Twice, so the loop closes on itself with no gap. The second copy is
+     decoration: a screen reader is given the list once. */
+  rail.innerHTML = '<span class="tickrun">'+one+'</span>'
+                 + '<span class="tickrun" aria-hidden="true">'+one+'</span>';
+  /* The speed is a constant, not a duration: a longer list takes longer to
+     pass rather than moving faster to fit the same clock. */
+  requestAnimationFrame(function(){
+    var w = rail.scrollWidth / 2;
+    /* Sixty points a second. Fast enough to read as a moving line rather than
+       a stuck one, slow enough that a sentence can be finished before it
+       leaves the screen. */
+    if(w > 0) rail.style.setProperty("--tickdur", Math.round(w / 60) + "s");
+  });
+})();
+
+/* FOURTEEN SECONDS A CARD, NOT SEVEN.
+   Seven was long enough to read a card that carried a paragraph and a reader
+   who wanted to finish it pressed the arrow. The cards are a figure and one
+   line now, and the complaint was the opposite: they went past before the
+   sentence had landed. A screen that holds somebody for two minutes can
+   afford to hold each card twice as long. */
+var EDU_HOLD = 14000;
 /* Which cards have been seen this run, however they were reached: on the
    timer, on the arrows, or on a dot. Once all of them have been, the reader
    has been through the whole disclaimer and can leave. */
@@ -12003,7 +12137,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260917.1120";
+var KBYS_BUILD = "20260917.1811";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -14378,11 +14512,45 @@ function rpConsole(){
   sweep(); observeAll();
   setTimeout(function(){ sweep(); top(); },40);
   setTimeout(function(){ top(); r.style.scrollBehavior=prev; },240);
-  /* Once, the first time somebody opens the room, and never again on its own.
-     After the board has filled, so the tour points at instruments that have
-     something on them. */
-  if(!WK_SEEN) setTimeout(function(){ if(!WK_SEEN) wkStart(); }, 620);
+  /* THE TOUR IS OFFERED, NOT STARTED.
+     It used to begin by itself the first time somebody opened the room, which
+     means a reader who came in to look at one thing was taken by the hand
+     without asking. The card at the door asks, once, and the answer decides.
+     After the board has filled either way, so whatever they choose points at
+     instruments that have something on them. */
+  if(!WK_SEEN && !ROOM_ASKED) setTimeout(roomOpen, 520);
 }
+
+/* THE DOOR TO THE ROOM.
+   Asked once per session. Somebody who has said how they want to look at it
+   is not asked again on their way back in. */
+var ROOM_ASKED = false;
+function roomOpen(){
+  var b=id("roomBox"), sc=id("roomScrim");
+  if(!b||!sc) return;
+  ROOM_ASKED = true;
+  id("roomTour").disabled=false; id("roomSelf").disabled=false;
+  sc.classList.add("on"); b.classList.add("on");
+  setTimeout(function(){ var k=id("roomTour"); if(k) k.focus(); }, 320);
+}
+function roomClose(){
+  var b=id("roomBox"), sc=id("roomScrim");
+  if(b) b.classList.remove("on");
+  if(sc) sc.classList.remove("on");
+  /* Out of the tab order with the rest of it, so nobody lands on a control
+     that is no longer on the screen. */
+  id("roomTour").disabled=true; id("roomSelf").disabled=true;
+}
+id("roomTour").addEventListener("click", function(){
+  roomClose();
+  setTimeout(function(){ if(!WK_ON) wkStart(); }, 240);
+});
+id("roomSelf").addEventListener("click", function(){
+  roomClose();
+  /* They have chosen to look on their own, so the tour does not start itself
+     later either. It is still one press away, in the header. */
+  WK_SEEN = true;
+});
 /* ------------------------------------------------------------------ *
  * THE WALKTHROUGH
  *
@@ -14809,7 +14977,7 @@ document.addEventListener("keydown", function(e){
    and marks the shut ones inert. Doing it here rather than at each call site
    means an overlay opened by a path nobody remembered is still covered. */
 (function(){
-  var SHEETS = ["sumBox","arBox","waitBox","primBox","regBox","dirBox","infoBox","rpPv","wkBal"];
+  var SHEETS = ["sumBox","arBox","waitBox","primBox","roomBox","regBox","dirBox","infoBox","rpPv","wkBal"];
   /* Open is the class these overlays are actually opened with, plus the
      hidden attribute for the one that uses it. Computed opacity is not
      usable here: a transition does not fire a mutation, so a box read
@@ -14838,7 +15006,7 @@ document.addEventListener("keydown", function(e){
      header underneath, which is off the screen behind the scrim. Marking the
      rest of the page inert for the duration is what aria-modal="true" is
      already promising. */
-  var MODAL = ["sumBox","arBox","waitBox","primBox","regBox","dirBox","infoBox","rpPv"];
+  var MODAL = ["sumBox","arBox","waitBox","primBox","roomBox","regBox","dirBox","infoBox","rpPv"];
   function trap(){
     var open = MODAL.some(function(k){ var e=document.getElementById(k);
       return e && !e.hasAttribute("inert"); });

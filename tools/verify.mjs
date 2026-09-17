@@ -70,7 +70,13 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   const seen = new Map();          /* "media||selector||prop" -> count */
   let media = '';
   let depth = 0;
-  const src = styleBlock;
+  /* KEYFRAME STOPS ARE NOT SELECTORS.
+     Two animations both moving something across the screen both end at 100%
+     with a transform, which is what an animation IS, and the scanner counted
+     the two stops as one selector declared twice. The bodies are cut out
+     before the scan rather than parsed, because a stop list can carry commas
+     and braces and there is nothing here worth checking inside one. */
+  const src = styleBlock.replace(/@keyframes[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '');
   let i = 0;
   while (i < src.length) {
     const at = src.indexOf('@media', i);
@@ -2340,8 +2346,28 @@ if (!/id="waitForming"/.test(html))
     fails.push('the walkthrough cannot be advanced or cancelled');
   if (!/id="navWalk"/.test(html))
     fails.push('there is no way to start the walkthrough again');
-  if (!/if\(!WK_SEEN\) setTimeout/.test(html))
-    fails.push('the walkthrough no longer runs itself once, or runs itself every time');
+  /* THE TOUR IS OFFERED, NOT STARTED.
+     It used to begin by itself the first time somebody opened the room, so a
+     reader who came in to look at one instrument was taken by the hand without
+     being asked. The card at the door asks once per session, and a reader who
+     says they would rather look on their own is not asked again. */
+  if (!/if\(!WK_SEEN && !ROOM_ASKED\) setTimeout\(roomOpen/.test(html))
+    fails.push('the walkthrough starts itself again instead of being offered at the door');
+  if (!/id="roomBox"/.test(html))
+    fails.push('the data room opens with no word about what it is');
+  {
+    const card = html.slice(html.indexOf('id="roomBox"'), html.indexOf('</div>', html.indexOf('id="roomSelf"')));
+    if (!/id="roomTour"/.test(card) || !/id="roomSelf"/.test(card))
+      fails.push('the door to the data room does not offer both ways in');
+    if ((card.match(/<li>/g) || []).length < 3)
+      fails.push('the door does not say what the room is for');
+    /* And it says the room changes nothing, because a reader who thinks the
+       working can move the answer will read it looking for a different one. */
+    if (!/Nothing here changes the result/.test(card))
+      fails.push('the door does not say the room is a reference rather than a second opinion');
+  }
+  if (!/ROOM_ASKED = true/.test(html))
+    fails.push('the door asks again every time the room is opened');
   /* The layer is fixed, so its children are placed against the viewport. Add
      the scroll offset and the balloon walks off the bottom of the page. */
   {
@@ -3784,4 +3810,49 @@ if (/rpIdRow\("When we looked"/.test(script))
     if (num && !/Canada|United States|British Columbia/.test(num[0]))
       fails.push('pack ' + p.n + ' prints a number without saying which country it rings: ' + num[0]);
   }
+}
+
+/* THE TICKER CARRIES NOTHING THAT IS NOT ALREADY SOURCED.
+   It is the most looked at line on the landing page. A statistic typed in
+   here with nobody behind it is the exact move this product exists to warn
+   people about, so the line is built from the waiting deck, where every card
+   already carries its source and has already been through the evidence gate. */
+{
+  if (!/id="tickRail"/.test(html))
+    fails.push('the ticker is gone from the landing');
+  const build = script.slice(script.indexOf('var rail = id("tickRail")'),
+                             script.indexOf('/* The one sentence that lists what the box takes'));
+  if (!build) fails.push('nothing fills the ticker');
+  else {
+    if (!/for\(var i=0;i<EDU\.length/.test(build))
+      fails.push('the ticker is no longer built from the waiting deck, so its figures carry no source');
+    if (!/e\.src/.test(build))
+      fails.push('the ticker does not require a source on the cards it shows');
+    if (/["'][^"']*\d[^"']*%[^"']*["']/.test(build.replace(/translateX\([^)]*\)/g, '')))
+      fails.push('a figure is typed into the ticker rather than read off a sourced card');
+  }
+  /* It sits under the line that says whose product this is, and the standing
+     documents sit under it, so a reader scrolls a little to reach them. */
+  const body = html.slice(html.indexOf('class="tielink'));
+  const at = t => body.indexOf(t);
+  if (at('id="tickRow"') < 0 || at('class="docrow') < 0)
+    fails.push('the ticker and the standing documents are not both on the landing');
+  else if (at('id="tickRow"') > at('class="docrow'))
+    fails.push('the standing documents sit above the ticker rather than under it');
+  /* And it stops for anybody who has asked for less movement. */
+  if (!/prefers-reduced-motion[\s\S]{0,240}\.tickrail\{animation:none\}/.test(styleBlock))
+    fails.push('the ticker keeps moving under reduced motion');
+  if (!/\.tick:hover \.tickrail[\s\S]{0,80}paused/.test(styleBlock))
+    fails.push('the ticker does not stop when somebody tries to read it');
+}
+
+/* THE WAITING CARDS HOLD LONG ENOUGH TO BE READ.
+   Seven seconds suited a card that carried a paragraph and was being skimmed.
+   The cards are a figure and one line now, and they were going past before the
+   sentence landed. */
+{
+  const hold = Number((script.match(/var EDU_HOLD = (\d+);/) || [])[1]);
+  if (!hold) fails.push('the waiting deck no longer declares how long a card is held');
+  else if (hold < 12000)
+    fails.push('a waiting card is held for ' + (hold / 1000) + 's, which is not long enough to read it');
 }

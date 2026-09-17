@@ -92,7 +92,12 @@ await p.click('#rpDownloadSummary'); await p.waitForTimeout(800);
 await shot('12-summary', true);
 await p.click('#sumClose'); await p.waitForTimeout(500);
 await p.click('#rpOpenRecord'); await p.waitForTimeout(1600);
-/* the room introduces itself the first time it is opened */
+/* THE ROOM SAYS WHAT IT IS BEFORE ANYBODY IS STANDING IN IT.
+   The card at the door offers the tour rather than starting it, so the sheet
+   captures the card, takes the tour, and then walks it. */
+await shot('13-roomdoor');
+await p.evaluate(()=>{ const b=document.getElementById('roomTour'); if(b && !b.disabled) b.click(); });
+await p.waitForTimeout(900);
 await shot('13a-walkthrough');
 for (let i=0;i<7;i++){
   if (await p.evaluate(()=>document.getElementById('wk').hidden)) break;
@@ -110,6 +115,17 @@ await p.click('#navBackReport'); await p.waitForTimeout(700);
 for (let i=0;i<4;i++){
   if (await p.evaluate(()=>!document.getElementById('rpReport').hidden)) break;
   const back = await p.$('#rpt .rp-sheet:not([hidden]) .rp-back');
+  if (!back) break;
+  await back.click(); await p.waitForTimeout(600);
+}
+/* The walk back out of the room lands on whichever report screen it was left
+   on, so the way back to the result is taken explicitly before the control
+   that only the result screen carries is pressed. */
+await p.evaluate(()=>{ const b=document.getElementById('navBackReport'); if(b && b.offsetParent) b.click(); });
+await p.waitForTimeout(700);
+for (let i=0;i<4;i++){
+  if (await p.evaluate(()=>!document.getElementById('rpReport').hidden)) break;
+  const back = await p.$('#rpt .rp-sheet:not([hidden]) .rp-back, #rpt .rp-sheet:not([hidden]) .rp-pill-back');
   if (!back) break;
   await back.click(); await p.waitForTimeout(600);
 }
