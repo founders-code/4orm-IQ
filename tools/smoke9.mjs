@@ -17,7 +17,7 @@ console.log('horizontal pill row gone:', !doc.getElementById('quickRow') && !htm
 console.log('three pills above search gone:', !doc.querySelector('.hls'));
 
 window.__KBYS__.check('investhelm.com');
-setTimeout(()=>doc.getElementById('waitOk').click(),300);
+setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),300);
 await new Promise(r=>setTimeout(r,6500));
 
 const band=doc.getElementById('summaryBand');

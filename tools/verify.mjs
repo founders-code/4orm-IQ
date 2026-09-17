@@ -805,23 +805,30 @@ if (!shPlainRule) fails.push('the printed summary has no plain language block');
 else if (!/#E7F7EF/i.test(shPlainRule))
   fails.push('.sh-plain on the printed summary is no longer light green');
 
-/* ------------------- the wait screen must let go of the reader by itself.
-   It used to count down and open the result on its own after three seconds,
-   which meant a reader could cross the disclaimer by doing nothing at all. The
-   disclaimer says what this product is and is not, and it is the one sentence
-   somebody has to have seen before a verdict about a named company appears. So
-   the countdown is gone by instruction, the button is the only way through,
-   and it has to ask for itself once the result is ready. */
+/* THE DISCLAIMER IS READ BEFORE THE SWEEP, NOT AFTER IT.
+   It used to sit under the waiting screen with a button beside it, which asked
+   somebody to agree to a sentence at the end of two minutes they had spent
+   watching registers go past. It is on the card that opens before the sweep
+   starts, and its button is the acknowledgement, so the waiting screen carries
+   no controls and closes itself when the answer lands. */
 const wfStart = script.indexOf('function waitFinish');
 /* the body only, to the first close at column zero. The helpers that follow
    share the name, and matching those would read the wrong body. */
 const waitFin = script.slice(wfStart, script.indexOf('\n}', wfStart));
 if (/waitAutoGo\s*\(/.test(waitFin) || /function waitAutoGo/.test(script))
-  fails.push('the waiting screen can open the result by itself again, so the disclaimer can be crossed unread');
-if (!/gatecall/.test(waitFin))
-  fails.push('the gate does not call attention to itself when the result is ready, and it is now the only way off the screen');
-if (!/waitPoint/.test(waitFin))
-  fails.push('nothing points the reader at the gate');
+  fails.push('the waiting screen counts down to the result again');
+if (!/waitClose\(\);/.test(waitFin))
+  fails.push('the waiting screen does not close itself when the answer lands, and there is no button left to close it');
+/* And nothing may be put back under the sweep. */
+for (const gone of ['id="waitOk"', 'id="waitFine"', 'id="waitLeft"', 'id="waitPoint"', 'class="waitfoot"'])
+  if (html.includes(gone))
+    fails.push('the waiting screen has a footer again: ' + gone);
+/* The one sentence still has to be somewhere a reader passes through. */
+{
+  const prim = html.slice(html.indexOf('id="primBox"'), html.indexOf('id="primOk"'));
+  if (!/id="primFine"/.test(prim))
+    fails.push('the disclaimer is on neither screen now');
+}
 /* Escape may move focus to the gate. It may not press it. */
 {
   const esc = script.slice(script.indexOf('if(e.key!=="Escape") return;'), script.indexOf('if(sumBox.classList.contains("on"))'));
@@ -1520,7 +1527,12 @@ for (const x of ['rpAct', 'rpSources']) {
     const t0 = (styleBlock.match(/#rpt \.rp-alreadybtn \.rp-t,#rpt \.rp-onbtn \.rp-t\{[^}]*font-size:clamp\([^,]+,[^,]+,([\d.]+)px\)/) || [])[1];
     if (t0 && Number(t0) > 20)
       fails.push('the door heading is ' + t0 + 'px at its ceiling, louder than the rows it leads');
-    for (const prop of ['padding', 'grid-template-columns', 'gap'])
+    /* The doors are a row of three: the number, the words, the arrow. It was a
+       two column grid, so the arrow wrapped under the number and the panel
+       grew an empty row of red to hold it. */
+    if (/grid-template-columns/.test(shape))
+      fails.push('the doors are back on a grid, which wraps the arrow under the number');
+    for (const prop of ['padding', 'display', 'gap'])
       if (!new RegExp(prop + ':').test(shape))
         fails.push('the shared door rule no longer declares ' + prop + ', so each door sets its own');
   }
@@ -1845,7 +1857,7 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
     /* Both doors live inside the reach out menu, because what you send is part
        of who you send it to. The numbering itself is checked where the three
        things are checked. */
-    const order = ['Who to reach out to', 'Download the one page summary', 'Find support']
+    const order = ['Who to reach out to', 'Download report card', 'Find support']
       .map(t => acc.indexOf(t));
     if (order.some(n => n < 0) || order[0] > order[1] || order[1] > order[2])
       fails.push('the forms and the summary are no longer inside the reach out menu, in that order');
@@ -3736,4 +3748,40 @@ if (/rpIdRow\("When we looked"/.test(script))
   /* And all of them go to the same place, wired in one list, not four times. */
   if (!/\["rpOpenRecord","rpOpenRecordR","rpOpenRecordF","rpOpenRecordS"\]/.test(script))
     fails.push('the data room links are wired one at a time, so one of them will be missed');
+}
+
+/* THE PACK IS A DOCUMENT THE READER CAN HAND OVER WITHOUT APOLOGISING FOR IT.
+   It goes to a fraud desk, a police officer and a regulator's inbox. Rules made
+   of hyphens and blanks made of underscores read as something a machine
+   produced, and they take the reader's word with them. */
+{
+  if (/function rpPackText/.test(script))
+    fails.push('the packs are plain text again');
+  if (!/function rpPackHTML/.test(script))
+    fails.push('nothing builds the pack as a document');
+  const fn = script.slice(script.indexOf('function rpPackHTML'),
+                          script.indexOf('function rpPackFile'));
+  /* THE MARK IS THE FILE. Never redrawn, never traced, never rebuilt. */
+  if (!/rpMark\(\)/.test(fn))
+    fails.push('the pack does not carry the mark');
+  if (!/document\.querySelector\("\.rp-hlogo img"\)/.test(script))
+    fails.push('the pack draws its own logo instead of reading the one the page carries');
+  /* Every pack ends with what ties it to one run. */
+  for (const need of ['Report reference', 'Records read', 'Produced by'])
+    if (!fn.includes(need))
+      fails.push('the pack foot does not carry: ' + need);
+  if (!/rpPackFile[\s\S]{0,120}\.html/.test(script))
+    fails.push('the pack still downloads as a text file');
+  /* AND IT SAYS WHOSE NUMBER IT IS AND WHO PICKS IT UP.
+     A bare number on a page beside a fraud warning is the shape of the thing
+     the product exists to warn people about. */
+  const packs = JSON.parse(script.match(/var RP_PACKS = (\[[\s\S]*?\]);/)[1]);
+  for (const p of packs) {
+    const keys = p.route.map(r => r[0]).join(' | ');
+    if (!/Who answers/.test(keys))
+      fails.push('pack ' + p.n + ' does not say who picks up: ' + keys);
+    const num = p.route.find(r => /^\+?[\d][\d\- ]{6,}$/.test(String(r[1]).trim()));
+    if (num && !/Canada|United States|British Columbia/.test(num[0]))
+      fails.push('pack ' + p.n + ' prints a number without saying which country it rings: ' + num[0]);
+  }
 }

@@ -63,19 +63,19 @@ window.__KBYS__.check('investhelm.com');
 await new Promise(r=>setTimeout(r,320));
 console.log('\nWAIT SCREEN');
 say('the second way off the screen is gone', !doc.getElementById('waitBrowse'));
-const ok=doc.getElementById('waitOk');
+const ok=doc.getElementById('primOk');
 say('the acknowledgement is there and live', !!ok && !ok.disabled);
-say('and it says what pressing it does',
-  (doc.getElementById('waitHint')||{textContent:''}).textContent.trim().length > 10);
+say('and it carries the sentence it is acknowledging',
+  /not advice/i.test((doc.getElementById('primFine')||{textContent:''}).textContent));
 const total=doc.querySelectorAll('#eduDots button').length;
 for(let i=0;i<total;i++){ doc.querySelectorAll('#eduDots button')[i].click(); await new Promise(r=>setTimeout(r,15)); }
 say('reading every card still does not open a second exit', !doc.getElementById('waitBrowse'));
 ok.click(); await new Promise(r=>setTimeout(r,120));
 say('acknowledging leaves the panel up while the sweep runs',
   doc.getElementById('waitBox').classList.contains('on'));
-say('and the hint stops once it has been pressed',
-  (doc.getElementById('waitHint')||{hidden:true}).hidden === true);
-console.log('  and says the check is still running:', doc.getElementById('waitFine').textContent);
+say('and the card goes once it has been pressed',
+  !doc.getElementById('primBox').classList.contains('on'));
+console.log('  and says the check is still running:', doc.getElementById('waitPhase').textContent);
 await new Promise(r=>setTimeout(r,6500));
 console.log('  the result still arrived:', !!window.__KBYS__.current(), '|', doc.getElementById('modeLbl').textContent);
 

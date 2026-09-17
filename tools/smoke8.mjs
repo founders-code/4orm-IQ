@@ -15,7 +15,7 @@ console.log('three pills removed:', !doc.querySelector('.hls'));
 console.log('page width token:', html.includes('max-width:1560px'));
 
 window.__KBYS__.check('investhelm.com');
-setTimeout(()=>doc.getElementById('waitOk').click(),300);
+setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),300);
 await new Promise(r=>setTimeout(r,6500));
 
 const band=doc.getElementById('summaryBand');

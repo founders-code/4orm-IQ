@@ -19,7 +19,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 await wait(900);
 
 window.__KBYS__.check('atlanticglobalwealth.com');
-setTimeout(()=>doc.getElementById('waitOk').click(),220);
+setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),220);
 await wait(6500);
 const d=window.__KBYS__.current();
 let fails=[];

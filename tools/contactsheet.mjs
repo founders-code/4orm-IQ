@@ -57,7 +57,7 @@ await shot('06-wait');
    reader does anyway. The button is disabled until the assessment is ready. */
 for (let i=0;i<40;i++){
   if(!await p.evaluate(()=>document.getElementById('waitBox').classList.contains('on'))) break;
-  await p.evaluate(()=>{ const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click(); });
+  await p.evaluate(()=>{ const b=document.getElementById('primOk'); if(b && !b.disabled) b.click(); });
   await p.waitForTimeout(400);
 }
 await p.waitForTimeout(1200);

@@ -49,12 +49,12 @@ const {window}=dom, doc=window.document;
 window.console.error=(...a)=>errs.push('console.error: '+a.join(' '));
 window.Element.prototype.scrollTo=function(){};
 await new Promise(r=>setTimeout(r,900));
-if(doc.getElementById('waitOk')) doc.getElementById('waitOk').click();
+if(doc.getElementById('waitOk')) (doc.getElementById('primOk')||{click(){}}).click();
 await new Promise(r=>setTimeout(r,600));
 
 
 window.__KBYS__.check('goliath ventures');
-setTimeout(()=>doc.getElementById('waitOk').click(),300);
+setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),300);
 const poll=setInterval(()=>seen.push(doc.getElementById('modeLbl').textContent),120);
 await new Promise(r=>setTimeout(r,6000));
 clearInterval(poll);

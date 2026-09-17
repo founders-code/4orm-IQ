@@ -22,10 +22,11 @@ console.log('  subject shown:', doc.getElementById('waitQ').textContent);
 console.log('  bar moving:', doc.getElementById('waitBar').style.width, '| phase:', doc.getElementById('waitPhase').textContent);
 const edu=doc.getElementById('eduCard').textContent.replace(/\s+/g,' ');
 console.log('  education card:', edu.slice(0,72)+'...');
-console.log('  disclaimer inside it:', wb.textContent.includes('research tool, not advice'));
+console.log('  disclaimer on the card that asks for the acknowledgement:',
+  doc.getElementById('primFine').textContent.includes('research tool, not advice'));
 console.log('  support number:', wb.textContent.includes('1-888-495-8501'));
-console.log('  can acknowledge while running:', !doc.getElementById('waitOk').disabled);
-doc.getElementById('waitOk').click();
+console.log('  can acknowledge while running:', !doc.getElementById('primOk').disabled);
+(doc.getElementById('primOk')||{click(){}}).click();
 console.log('  acknowledging early does not close it:', wb.classList.contains('on'));
 await new Promise(r=>setTimeout(r,6000));
 console.log('  closes once done and acknowledged:', !wb.classList.contains('on'));

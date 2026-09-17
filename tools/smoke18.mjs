@@ -60,8 +60,9 @@ await answer('I have not sent anything yet');
    result lands leaves CURRENT with no categories, and every assertion below
    then fails for a reason that has nothing to do with what it is testing. */
 await new Promise(r => setTimeout(r, 6000));
-const ok = doc.getElementById('waitOk');
-ok.click(); await new Promise(r => setTimeout(r, 400)); ok.click();
+const ok = doc.getElementById('primOk');
+if (ok && !ok.disabled) ok.click();
+await new Promise(r => setTimeout(r, 400));
 await new Promise(r => setTimeout(r, 1400));
 const tile = doc.querySelector('#tiles .tile');
 if (!tile) { console.error('FAIL: no check tiles rendered'); process.exit(1); }

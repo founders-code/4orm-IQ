@@ -28,7 +28,7 @@ console.log('  links out:', body.includes('fincen.gov'));
 doc.getElementById('infoClose').click();
 
 // run a seeded check, then open a category tile
-window.__KBYS__.check('investhelm.com'); setTimeout(()=>doc.getElementById('waitOk').click(),200); setTimeout(()=>doc.getElementById('waitOk').click(),4200);
+window.__KBYS__.check('investhelm.com'); setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),200); setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),4200);
 await new Promise(r=>setTimeout(r,6000));
 console.log('\nverdict shown after a check:', doc.getElementById('verdictWrap').classList.contains('on'), '| in the band:', !!doc.querySelector('.sbleft #verdictWrap'));
 console.log('verdict text:', doc.getElementById('kbBadgeT').textContent);

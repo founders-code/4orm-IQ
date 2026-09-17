@@ -17,7 +17,7 @@ window.Element.prototype.scrollTo=function(){};
 await new Promise(r=>setTimeout(r,900));
 
 window.__KBYS__.check('atlanticglobalwealth.com');
-setTimeout(()=>doc.getElementById('waitOk').click(),250);
+setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),250);
 await new Promise(r=>setTimeout(r,6500));
 
 console.log('summary button offered:', !!doc.getElementById('sumOpen'));

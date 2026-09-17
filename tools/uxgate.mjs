@@ -149,10 +149,10 @@ const SCENES = [
       for (let i=0;i<20;i++){
         await p.waitForTimeout(1200);
         const ready = await p.evaluate(() => {
-          const b = document.getElementById('waitOk');
+          const b = document.getElementById('primOk');
           return !!b && !b.disabled && /Show the result/i.test(b.textContent);
         });
-        if (ready) { await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); break; }
+        if (ready) { await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();}); break; }
         if (await p.evaluate(() => document.body.getAttribute('data-stage') === 'report')) break;
       }
       for (let i=0;i<10;i++){ await p.waitForTimeout(600);

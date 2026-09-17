@@ -11,7 +11,7 @@ window.console.error=(...a)=>errs.push('console.error: '+a.join(' '));
 await new Promise(r=>setTimeout(r,900));
 
 // demo mode: seeded corpus entity, no ledger / retrieved / pipeline
-window.__KBYS__.check('investhelm.com'); setTimeout(()=>window.document.getElementById('waitOk').click(),200); setTimeout(()=>window.document.getElementById('waitOk').click(),4200);
+window.__KBYS__.check('investhelm.com'); setTimeout(()=>(window.document.getElementById('primOk')||{click(){}}).click(),200); setTimeout(()=>(window.document.getElementById('primOk')||{click(){}}).click(),4200);
 await new Promise(r=>setTimeout(r,5200));
 const cur=window.__KBYS__.current();
 console.log('demo verdict:', cur && cur.verdict, '| has ledger:', !!(cur&&cur.ledger), '| has pipeline:', !!(cur&&cur.pipeline));
@@ -19,7 +19,7 @@ try { window.__KBYS__.buildAudit(cur); console.log('demo buildAudit ok,', window
 catch(e){ errs.push('demo buildAudit threw: '+e.stack); }
 console.log('board:', window.document.getElementById('boardC').textContent);
 console.log('specimen path:'); 
-window.__KBYS__.check('atlanticglobalwealth.com'); setTimeout(()=>window.document.getElementById('waitOk').click(),200); setTimeout(()=>window.document.getElementById('waitOk').click(),4200);
+window.__KBYS__.check('atlanticglobalwealth.com'); setTimeout(()=>(window.document.getElementById('primOk')||{click(){}}).click(),200); setTimeout(()=>(window.document.getElementById('primOk')||{click(){}}).click(),4200);
 await new Promise(r=>setTimeout(r,5200));
 try { window.__KBYS__.buildAudit(window.__KBYS__.current()); console.log('  specimen buildAudit ok'); }
 catch(e){ errs.push('specimen threw: '+e.stack); }

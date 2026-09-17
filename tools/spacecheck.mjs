@@ -46,10 +46,10 @@ for (const vw of [1440, 1280]) {
      creates does not move between the two stages. */
   for (let i = 0; i < 40; i++) {
     const ready = await p.evaluate(() => {
-      const g = document.getElementById('waitOk');
+      const g = document.getElementById('primOk');
       return !!g && !g.disabled && /Show the result/i.test(g.textContent);
     });
-    if (ready) { await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); break; }
+    if (ready) { await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();}); break; }
     await p.waitForTimeout(500);
   }
   await p.waitForTimeout(800);

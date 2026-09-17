@@ -34,7 +34,7 @@ console.log('progress bar has aria:', doc.getElementById('waitBarWrap')?.getAttr
    lunch. Left as written, restoring the old broken bar would have made it pass. */
 say('the bar is not confined to steps of ten',
   !/^(0|10|20|30|40|50|60|70|80|90|100)%$/.test(doc.getElementById('waitPct').textContent));
-console.log('focus moved into the dialog:', doc.activeElement && doc.activeElement.id==='waitOk');
+console.log('focus moved into the dialog:', doc.activeElement && doc.activeElement.id==='primOk');
 say('the two US numbers are present', html.includes('1-877-382-4357') && html.includes('1-800-225-5324'));
 /* The copy moved. What has to survive is that the reader is sent to the FRAUD
    line rather than the general line, because the general line closes at five
@@ -43,14 +43,14 @@ say('the reader is sent to the fraud line, not the general line',
   /fraud line/.test(html) && /not the general line/.test(html));
 const edu=doc.getElementById('eduCard');
 console.log('education card is toned:', !!edu.getAttribute('data-tone'), '| cites a source:', !!edu.querySelector('.esrc'));
-doc.getElementById('waitOk').click();
-/* The "done" styling came off deliberately: adding a tick and a weight change
-   to this line rewrapped the row under it and moved the whole screen mid-run.
-   What matters is that the sentence is still there afterwards. */
-say('the disclaimer survives being acknowledged',
-  /not advice/i.test(doc.getElementById('waitFine').textContent));
-say('and acknowledging it does not restyle the line, which used to move the screen',
-  !doc.getElementById('waitFine').classList.contains('done'));
+(doc.getElementById('primOk')||{click(){}}).click();
+/* THE DISCLAIMER IS ON THE CARD THAT OPENS BEFORE THE SWEEP.
+   It is read and agreed to there, which is why the waiting screen behind it
+   carries no controls and no small print at all. */
+say('the disclaimer is on the card that asks for the acknowledgement',
+  /not advice/i.test(doc.getElementById('primFine').textContent));
+say('and the waiting screen carries no footer of its own',
+  !doc.querySelector('.waitfoot') && !doc.getElementById('waitOk'));
 await new Promise(r=>setTimeout(r,6200));
 
 const b=window.__KBYS__.current ? null : null;

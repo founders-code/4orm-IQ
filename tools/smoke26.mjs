@@ -57,7 +57,7 @@ await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementBy
 await p.waitForTimeout(3000);
 for (let i = 0; i < 6; i++) {
   if (!await p.evaluate(() => document.getElementById('waitBox').classList.contains('on'))) break;
-  await p.evaluate(()=>{const b=document.getElementById('waitOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(500);
+  await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(500);
 }
 await p.waitForTimeout(1000);
 await one('rpReport', 'a finished check');

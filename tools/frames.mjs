@@ -34,7 +34,7 @@ for (const q of ['Goliath Ventures', 'atlanticglobalwealth.com', 'investhelm.com
     await p.waitForTimeout(2600);
     for (let i = 0; i < 10; i++) {
       if (!await p.evaluate(() => document.getElementById('waitBox').classList.contains('on'))) break;
-      await p.evaluate(() => { const x = document.getElementById('waitOk'); if (x && !x.disabled) x.click(); });
+      await p.evaluate(() => { const x = document.getElementById('primOk'); if (x && !x.disabled) x.click(); });
       await p.waitForTimeout(400);
     }
     await p.waitForTimeout(700);

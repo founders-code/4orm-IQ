@@ -3,7 +3,7 @@
   "recorded": "2026-09-17",
   "scenes": {
     "landing@1440": {
-      "contrast": 1,
+      "contrast": 0,
       "targets": 1,
       "unnamed": 0,
       "phantom": 0,
@@ -11,11 +11,11 @@
       "headings": 2,
       "stops": 6,
       "h1s": 1,
-      "textRuns": 51,
+      "textRuns": 48,
       "overflow": 0
     },
     "landing@390": {
-      "contrast": 1,
+      "contrast": 0,
       "targets": 1,
       "unnamed": 0,
       "phantom": 0,
@@ -23,11 +23,11 @@
       "headings": 2,
       "stops": 6,
       "h1s": 1,
-      "textRuns": 47,
+      "textRuns": 43,
       "overflow": 0
     },
     "landing@320": {
-      "contrast": 1,
+      "contrast": 0,
       "targets": 1,
       "unnamed": 0,
       "phantom": 0,
@@ -35,11 +35,11 @@
       "headings": 2,
       "stops": 6,
       "h1s": 1,
-      "textRuns": 47,
+      "textRuns": 43,
       "overflow": 0
     },
     "waiting@1440": {
-      "contrast": 2,
+      "contrast": 1,
       "targets": 1,
       "unnamed": 0,
       "phantom": 0,
@@ -47,11 +47,11 @@
       "headings": 1,
       "stops": 10,
       "h1s": 0,
-      "textRuns": 42,
+      "textRuns": 39,
       "overflow": 0
     },
     "waiting@390": {
-      "contrast": 2,
+      "contrast": 1,
       "targets": 1,
       "unnamed": 0,
       "phantom": 0,
@@ -59,11 +59,11 @@
       "headings": 1,
       "stops": 10,
       "h1s": 0,
-      "textRuns": 38,
+      "textRuns": 34,
       "overflow": 0
     },
     "report@1440": {
-      "contrast": 2,
+      "contrast": 1,
       "targets": 14,
       "unnamed": 0,
       "phantom": 0,
@@ -71,11 +71,11 @@
       "headings": 2,
       "stops": 1,
       "h1s": 1,
-      "textRuns": 212,
+      "textRuns": 208,
       "overflow": 0
     },
     "report@390": {
-      "contrast": 2,
+      "contrast": 1,
       "targets": 14,
       "unnamed": 0,
       "phantom": 0,
@@ -83,11 +83,11 @@
       "headings": 2,
       "stops": 1,
       "h1s": 1,
-      "textRuns": 85,
+      "textRuns": 80,
       "overflow": 0
     },
     "report@320": {
-      "contrast": 2,
+      "contrast": 1,
       "targets": 14,
       "unnamed": 0,
       "phantom": 0,
@@ -95,7 +95,7 @@
       "headings": 2,
       "stops": 1,
       "h1s": 1,
-      "textRuns": 85,
+      "textRuns": 80,
       "overflow": 0
     },
     "backoffice@1440": {

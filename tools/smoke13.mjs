@@ -94,11 +94,14 @@ if (doc.querySelector('#waitBox .wdhgrid'))
   fails.push('the helpline grid is back on the waiting screen');
 if (doc.querySelector('#waitBox .waitdisc'))
   fails.push('the disclaimer wall is back on the waiting screen');
-/* One line of it has to survive somewhere, because it is the sentence this
-   product cannot stop saying. */
-const fine = doc.getElementById('waitFine');
+/* It has to survive somewhere, because it is the sentence this product cannot
+   stop saying. It is on the card that opens before the sweep, where it is read
+   and agreed to rather than skipped past at the end of two minutes. */
+const fine = doc.getElementById('primFine');
 if (!fine || !/not advice/i.test(fine.textContent))
-  fails.push('the "research tool, not advice" line is gone from the waiting screen entirely');
+  fails.push('the "research tool, not advice" line is on neither screen now');
+if (doc.querySelector('#waitBox .waitfoot'))
+  fails.push('the waiting screen has a footer again');
 
 /* Every class the new markup emits must resolve to a rule. */
 /* netname, not nlab. The network's label class was renamed off .nlab because

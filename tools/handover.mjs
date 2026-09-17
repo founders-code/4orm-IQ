@@ -28,7 +28,7 @@ await p.evaluate(()=>{
    lands on the document underneath it. */
 for(let i=0;i<40;i++){
   if(!await p.evaluate(()=>document.getElementById('waitBox').classList.contains('on'))) break;
-  await p.evaluate(()=>{ const x=document.getElementById('waitOk'); if(x && !x.disabled) x.click(); });
+  await p.evaluate(()=>{ const x=document.getElementById('primOk'); if(x && !x.disabled) x.click(); });
   await p.waitForTimeout(400);
 }
 await p.waitForTimeout(3000);

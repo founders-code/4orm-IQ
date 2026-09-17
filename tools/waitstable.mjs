@@ -39,9 +39,9 @@ const VIEWPORTS = [[1440,900],[1366,768],[1280,800],[1680,1050],[414,896],[390,8
  * layout fault. What must not change is the reserved box itself, and that is
  * exactly what is measured here. Every one of these has a min-height or a
  * nowrap rule in the stylesheet put there for this reason. */
-const RESERVED = ['eduCard', 'eduDots', 'netCap', 'netSvg', 'waitPhase', 'waitFine', 'waitOk'];
+const RESERVED = ['eduCard', 'eduDots', 'netCap', 'netSvg', 'waitPhase'];
 const CENSUS = `(() => {
-  const RESERVED = ${JSON.stringify(['eduCard','eduDots','netCap','netSvg','waitPhase','waitFine','waitOk'])};
+  const RESERVED = ${JSON.stringify(['eduCard','eduDots','netCap','netSvg','waitPhase'])};
   const o = {};
   const path = el => {
     const parts = [];

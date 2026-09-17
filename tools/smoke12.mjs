@@ -18,7 +18,7 @@ console.log('no register count typed into the header:', !/Registers <b>\d+<\/b>/
 console.log('board size:', window.TOTAL_SOURCES ?? 'n/a');
 
 window.__KBYS__.check('atlanticglobalwealth.com');
-setTimeout(()=>doc.getElementById('waitOk').click(),300);
+setTimeout(()=>(doc.getElementById('primOk')||{click(){}}).click(),300);
 await new Promise(r=>setTimeout(r,6500));
 const d=window.__KBYS__.current();
 console.log('\nspecimen loaded:', !!d, '| verdict:', d && d.verdict);

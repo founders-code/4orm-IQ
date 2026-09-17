@@ -53,14 +53,22 @@ if (read.focused !== 'primOk') fail('focus is on ' + read.focused + ', not on th
    they did not ask to read. */
 if (!read.running) fail('the check waits for the primer instead of running behind it');
 
-/* Nothing on the waiting screen may be reachable while the primer is up. */
+/* THE WAITING SCREEN CARRIES NO CONTROLS AT ALL.
+   Its disclaimer, its read counter and its acknowledgement all moved onto this
+   card, which is where the sentence gets read rather than skipped past at the
+   end of two minutes. */
 {
-  const reach = await p.evaluate(() => {
-    const k = document.getElementById('waitOk'); const r = k.getBoundingClientRect();
-    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    return !!(hit && (hit === k || k.contains(hit)));
-  });
-  if (reach) fail('the gate under the primer can be pressed through it');
+  const left = await p.evaluate(() => ({
+    footer: !!document.querySelector('#waitBox .waitfoot'),
+    gate: !!document.getElementById('waitOk'),
+    /* The deck dots are the exception: they are how a reader walks the cards. */
+    other: [...document.querySelectorAll('#waitBox button')]
+      .filter(b => !b.closest('#eduDots')).map(b => b.id || b.className)
+  }));
+  if (left.footer) fail('the waiting screen has a footer again');
+  if (left.gate) fail('the waiting screen has a gate again');
+  if (left.other.length)
+    fail('the waiting screen has controls on it again: ' + left.other.join(', '));
 }
 
 await p.evaluate(() => document.getElementById('primOk').click());
@@ -68,18 +76,17 @@ await p.waitForTimeout(600);
 
 const after = await p.evaluate(() => ({
   up: document.getElementById('primBox').classList.contains('on'),
-  gate: (document.getElementById('waitOk') || {}).textContent,
-  gateOff: !!(document.getElementById('waitOk') || {}).disabled,
+  off: !!document.getElementById('primOk').disabled,
   phase: (document.getElementById('waitPhase') || { textContent: '' }).textContent
 }));
 if (after.up) fail('the primer stays up after it has been acknowledged');
-/* Acknowledged once. The reader is not asked to agree to the same sentence at
-   the other end of the wait. */
-if (!after.gateOff) fail('the gate still asks for an acknowledgement that has already been given');
-if (!/Understood/i.test(after.gate)) fail('the gate reads: ' + after.gate);
+/* And it leaves the tab order with the rest of itself, so a keyboard reader
+   cannot land on a control nobody can see. */
+if (!after.off) fail('the primer button is still focusable after the card has gone');
 
 if (errs.length) { console.error(errs.join('\n')); fail(errs.length + ' page errors'); }
 console.log('primer: two to three minutes, ' + read.steps.length
-  + ' steps, disclaimer carried, acknowledged once, sweep running underneath');
+  + ' steps, disclaimer carried, acknowledged once, sweep running underneath, '
+  + 'waiting screen carries nothing to press');
 console.log('\nPASSED');
 await b.close();
