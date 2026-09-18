@@ -762,7 +762,9 @@ if (undocumented.length) fails.push('board registers with no reference entry: ' 
 /* "you" joined A, B, C, D and 4orm when the consumer's own wire slip stopped
    wearing a regulator's badge. It is an evidence record like any other and
    still owes its reader a plain sentence. */
-const evCount = (script.match(/\{t:"(?:[ABCD4]|you)",src:"/g) || []).length;
+/* Every specimen record now states which party it is about and how it ties to
+   them, exactly as a live one does, so the counter reads past that. */
+const evCount = (script.match(/\{t:"(?:[ABCD4]|you)",(?: match:"\w+",)?src:"/g) || []).length;
 const plainCount = (script.match(/\n\s*plain:"/g) || []).length;
 if (evCount !== plainCount)
   fails.push(evCount + ' specimen evidence records but ' + plainCount + ' plain language sentences. ' +
@@ -786,8 +788,11 @@ if (operatorClaims.length)
    whole shape of the result. Everything underneath is one press away. Fully
    open, the four ran past the fold and the fourth was never reached. */
 {
+  /* The whole function, not the first three thousand characters of it. A fixed
+     window silently stopped covering the tail the moment the emitter grew, and
+     the guard then failed for the wrong reason. */
   const fn = script.slice(script.indexOf('function rpFinds('),
-                          script.indexOf('function rpFinds(') + 3000);
+                          script.indexOf('\nfunction ', script.indexOf('function rpFinds(') + 10));
   if (!/<details class="rp-fd"/.test(fn))
     fails.push('the findings are not collapsed; each one should be a line that opens');
   if (/<details class="rp-fd"[^>]* open/.test(fn))
@@ -1392,6 +1397,179 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
   if (!/box\.hidden=true; return;/.test(script))
     fails.push('a result with nothing to act on still gets a block of instructions');
 }
+/* ============================== A PERSON'S NAME NEVER REACHES ANY RENDER PATH
+   The privacy notice says a name found in a company record is refused at the
+   point of writing, not hidden at the point of showing. The scrubber ran on one
+   field out of dozens, and a director's name reached a live report card, the
+   findings and all nine packs. The fix is at the boundary rather than at the
+   call sites, because the call sites are where it went wrong: there are dozens
+   and a new one is one line away. */
+{
+  if (!/function rpScrubPayload\(d\)/.test(script))
+    fails.push('nothing scrubs the payload as a whole, so a name reaches the page through any field nobody remembered');
+  /* And it is the FIRST thing both entry points do. A scrub that runs after a
+     field has been read is not a scrub. */
+  for (const [fn, why] of [['renderReport', 'the report'], ['toResult', 'the console']]) {
+    const at = script.indexOf('function ' + fn + '(');
+    if (at < 0) { fails.push('the entry point ' + fn + ' is gone'); continue; }
+    const head = script.slice(at, at + 700);
+    if (!/d = rpAttachGuard\(rpScrubPayload\(d\)\);/.test(head))
+      fails.push(why + ' reads the payload before it is scrubbed and checked against the party');
+  }
+  /* The skip list is what the scrubber must not touch, and it must not grow to
+     cover prose. A field carrying sentences is a field a name can hide in. */
+  const m = /var RP_SCRUB_SKIP = \{([\s\S]*?)\};/.exec(script);
+  if (!m) fails.push('the scrubber no longer says which fields it leaves alone');
+  else {
+    /* A KEY NAME IS NOT A TYPE, AND THIS LIST LEARNED THAT THE HARD WAY.
+       It held "t" for the tier letter on evidence. "t" is also the TITLE of a
+       material issue, so a person's name sat in a finding heading on a live
+       page having passed straight through. The list is now the short set of
+       fields that are identifiers rather than prose, and nothing may be added
+       to it that a sentence could ever land in. */
+    const allowed = ['url', 'href', 'id', 'ref', 'domain', 'name', 'host'];
+    const keys = [...m[1].matchAll(/(\w+)\s*:\s*1/g)].map(x => x[1]);
+    for (const k of keys)
+      if (!allowed.includes(k))
+        fails.push('the scrubber skips ' + k + ', and a field that is not an identifier can hold a name');
+    for (const k of ['t', 'x', 'find', 'plain', 'sum', 'quote', 'statement', 'explanation', 'note'])
+      if (keys.includes(k))
+        fails.push('the scrubber skips ' + k + ', which carries prose, so a name can travel in it');
+  }
+  /* A redaction is dropped only where the sentence goes on to say what the
+     subject IS. That is the sentence that turns an institution into a person,
+     and it is the only one worth losing a true fact over. */
+  if (!/var IS_A = \//.test(script))
+    fails.push('the scrubber drops any sentence it redacts at the head, which loses true facts for no reason');
+  if (!/head\.test\(one\) && IS_A\.test\(one\)/.test(script))
+    fails.push('a redaction at the head of a sentence can still change what the sentence is about');
+  if (!/named a person, so /.test(script))
+    fails.push('a withheld sentence is dropped silently');
+  /* And the role vocabulary covers the words that put a name on a live page. */
+  for (const w of ['executive', 'listed as', 'manager', 'chair'])
+    if (!new RegExp('RP_ROLE = [^;]*' + w).test(script))
+      fails.push('the role vocabulary does not know the word "' + w + '", and that is how a name gets out');
+  /* The held names are computed once, against the original payload. Recomputing
+     per field means a name replaced in one field stops being findable in the
+     next. */
+  if (!/var held = rpHeldNames\(d\);/.test(script))
+    fails.push('the scrubber recomputes the held names per field, so a name survives in a later one');
+  if (!/function rpScrubPeople\(txt, d, heldIn\)/.test(script))
+    fails.push('the scrubber cannot be given a precomputed list of names');
+}
+/* ================ VOLUME IS READ AGAINST THE SIZE OF THE THING COMPLAINED OF
+   A count of one-star reviews with no denominator is a number, not a finding.
+   A provincial bank of 88 years, whose deposits a government guarantees, had a
+   handful of them promoted into a reason its customers should not send it
+   money. Scale never excuses a record: a regulator acting is a regulator acting
+   at any size. It stops a spread of service grievances becoming a verdict. */
+{
+  const sch = fs.readFileSync(new URL('../api/_schema.js', import.meta.url), 'utf8');
+  const chk = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  if (!/scale: \{/.test(sch))
+    fails.push('the payload carries no scale, so complaint volume has no denominator');
+  if (!/enum: \['major', 'established', 'small', 'new', null\]/.test(sch))
+    fails.push('the scale band is gone, so nothing can tell a bank from a three week old shell');
+  if (!/guarantee:/.test(sch))
+    fails.push('a statutory or state deposit guarantee cannot be recorded');
+  if (!/Never estimate/.test(sch))
+    fails.push('the scale fields no longer forbid estimating a figure into them');
+  if (!/scale,/.test(chk))
+    fails.push('scale is not carried through to the page');
+  if (!/function rpAtScale\(d\)/.test(script))
+    fails.push('the page has no test for whether the party is big enough that complaints are the base rate');
+  if (!/if\(rpAtScale\(d\)\) return "NOISE";/.test(script))
+    fails.push('a spread of complaints still escalates on an institution at scale');
+  if (!/exact && atScale && !hard/.test(script))
+    fails.push('consumer reports alone can still hold a category RED on an institution at scale');
+  /* And scale must never silence a real record. */
+  if (!/if\(ev\[i\]\.t==="A"\|\|ev\[i\]\.t==="B"\) hard=true;/.test(script))
+    fails.push('the scale rule does not except a regulator record, so size would excuse a finding');
+  if (!/rpHasOfficial\(d\)\) return "OFFICIAL";/.test(script))
+    fails.push('an official record no longer outranks everything, which is what scale must never touch');
+}
+
+/* The page applies the rule too, because a payload also arrives from the held
+   report, from a stored run, and from a build of the API older than the rule. */
+{
+  if (!/function rpAttachGuard\(d\)/.test(script))
+    fails.push('the page takes a RED verdict on trust, whoever the record was about');
+  if (!/d\.verdict==="RED" && !stillRed/.test(script))
+    fails.push('the page keeps a RED verdict after the category it rested on came down');
+  if (!/demoted\.push\(\{cat:k, from:"RED", to:next\}\)/.test(script))
+    fails.push('the page corrects the verdict without recording that it did');
+}
+
+/* ---------------------------------- AND THE SERVER APPLIES IT BEFORE THE PAGE
+   Telling the model a rule is not enforcing it. The model had written the doubt
+   into its own findings and the verdict took no notice, so the rule is applied
+   in code between the model and the payload as well as on the page. */
+{
+  const chk = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  const sch = fs.readFileSync(new URL('../api/_schema.js', import.meta.url), 'utf8');
+  const cue = fs.readFileSync(new URL('../api/_cue.js', import.meta.url), 'utf8');
+  /* The payload has to be able to SAY who a record is about. Without the two
+     fields nothing downstream can tell a warning about this firm from a warning
+     about a different one. */
+  if (!/about:\s*\{ type: 'string'/.test(sch))
+    fails.push('evidence carries no record of who it is about');
+  if (!/enum: \['exact', 'probable', 'unconnected'\]/.test(sch))
+    fails.push('evidence carries no attachment state');
+  if (!/'about', 'match'/.test(sch))
+    fails.push('who a record is about is optional, so it will be missing when it matters');
+  /* The cue states the rule, and states the thing that went wrong. */
+  for (const [t, why] of [
+    ['The attachment rule', 'the attachment rule is gone from the cue'],
+    ['A shared substring, a shared subdomain label', 'the cue no longer says a shared substring is never a link'],
+    ['registrable', 'the cue no longer distinguishes a registrable domain from a subdomain label'],
+    ['never takes a RED from review volume alone', 'the cue no longer reads complaint volume against size']])
+    if (!cue.includes(t)) fails.push(why);
+  /* And check.js demotes rather than trusting the answer. */
+  if (!/state === 'RED' && !ev\.some\(e => e\.match === 'exact'\)/.test(chk))
+    fails.push('a RED category with no record naming the party still ships as RED');
+  if (!/verdict === 'RED' && !stillRed/.test(chk))
+    fails.push('the verdict stays RED after the category it rested on came down');
+  if (!/attachment: demoted/.test(chk))
+    fails.push('the correction is not written into the payload, so nobody can count how often it fires');
+  /* A missing match is read as probable on the server, which cannot hold a RED.
+     Never as exact: a field we did not get is not a check we passed. */
+  if (!/ATTACH\.has\(e\.match\) \? e\.match : 'probable'/.test(chk))
+    fails.push('an evidence item with no attachment state is being trusted');
+}
+
+/* ====================== A RECORD ABOUT SOMEBODY ELSE IS NOT A RECORD ABOUT THEM
+   A UK regulator warning about a domain whose only relation to the party was
+   three letters in somebody else's subdomain reached a reader as "the Financial
+   Conduct Authority has published a warning about this firm", about a
+   provincial Crown corporation. Both halves of the product apply the rule now:
+   the server before the payload is built, the page before it speaks. */
+{
+  if (!/function rpAttached\(e\)\{ return !!e && e\.match === "exact"; \}/.test(script))
+    fails.push('the page has no test for whether a record names the party it is about to accuse');
+  /* The two functions that put the page into the imperative both gate on it. */
+  const evFn = script.slice(script.indexOf('function rpOfficialEv('),
+                            script.indexOf('function rpOfficialBody('));
+  if (!/rpAttached\(ev\[i\]\)/.test(evFn))
+    fails.push('the record behind the imperative is not checked against the party');
+  const hasFn = script.slice(script.indexOf('function rpHasOfficial('),
+                             script.indexOf('function rpLookalikes('));
+  if (!/ev\[i\]\.t==="A" && rpAttached\(ev\[i\]\)/.test(hasFn))
+    fails.push('a tier A record about anybody still puts the page into the imperative');
+  /* An older payload with no match field is read as unattached: a check we
+     cannot make is not a check we passed. */
+  if (!/function rpUnattached\(e\)\{ return !!e && e\.match !== "exact"; \}/.test(script))
+    fails.push('a payload with no attachment field is being treated as attached');
+  /* And the reader is told about the look-alike rather than left to assume. */
+  if (!/function rpLookalikes\(d\)/.test(script))
+    fails.push('a record that turned out to be somebody else is silently dropped');
+  if (!/class="rp-look"/.test(script))
+    fails.push('the look-alike record is not shown to the reader at all');
+  if (!/class="rp-loose"/.test(script))
+    fails.push('a finding resting on a record that does not name the party does not say so');
+  if (!/#rpt \.rp-look\{[^}]*background:#F1F2F4/.test(styleBlock))
+    fails.push('the look-alike block wears a state colour, and it is neither a finding nor good news');
+}
+
 /* ------------------------------------ BEHIND THE DOOR: FOUR BLOCKS, NOT A WALL
    What was behind it ran to two thousand pixels of unbroken reading with two
    unlabelled lists inside it. A frightened person cannot triage that. Each

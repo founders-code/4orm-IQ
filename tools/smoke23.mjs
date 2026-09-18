@@ -68,7 +68,10 @@ if ('channel' in window.__KBYS__.ctxPayload())
 window.__KBYS__.ctx().sector = 'AUTO';
 
 /* ------------------------------------------------- the escalation ladder */
-const ev = (t, reg) => ({ t, reg, src: reg });
+/* Each of these stands for a record that NAMES the party. Since the attachment
+   rule that is a thing a fixture has to say, because a record that does not say
+   it is read as being about somebody else, which is the whole point of it. */
+const ev = (t, reg) => ({ t, reg, src: reg, match: 'exact', about: 'the party' });
 const mk = cats => ({ verdict: 'YELLOW', cats });
 const official = mk({ a: { state: 'RED', ev: [ev('A', 'Ontario Securities Commission')] } });
 const twoBoards = mk({ a: { state: 'YELLOW', ev: [ev('C', 'trustpilot'), ev('C', 'bbb')] } });
