@@ -3912,6 +3912,24 @@ if (!/reach: reach/.test(metrics))
 if (!/asked:\s+enabled\.filter/.test(metrics))
   fails.push('registers reached is not counted once per register');
 
+/* --------------------------------------------- THE SECOND ATTEMPT
+
+   Where nothing could be attached to a party, the page says so and then asks
+   the one question that unblocks it. Both halves have to be there: the test
+   that decides when to ask, and the block that does the asking. A page that
+   keeps the test and loses the block is a dead end again, silently. */
+{
+  if (!/function rpUnresolved\(/.test(html))
+    fails.push('nothing decides when an identifier failed to resolve, so the question can never be asked');
+  if (!/id="rpAsk"/.test(html) || !/id="rpAskForm"/.test(html) || !/id="rpAskIn"/.test(html))
+    fails.push('the second attempt block is gone: an unresolved identifier is a dead end again');
+  if (!/rpAskPaint\(d\)/.test(html))
+    fails.push('the second attempt block is never painted, so it can never appear');
+  /* And the front door says it before the run, not only after it. */
+  if (!/Initials and short names match several organisations at once/.test(html))
+    fails.push('the search box no longer says a short name will not resolve');
+}
+
 /* The two lamps that watch the panel are not steps in the process. */
 if (!/class="panellamps" id="house"/.test(admin))
   fails.push('the two panel lamps are not in the masthead');

@@ -3525,6 +3525,31 @@ body.rp-fvup{overflow:hidden}
 #rpt .rp-gapnote .rp-x{margin-top:10px;font-size:14.5px;line-height:1.6;color:var(--tx-2);max-width:74ch}
 #rpt .rp-gapnote .rp-x+.rp-x{margin-top:11px}
 
+/* The ask box wears the pale blue of a way forward rather than the grey of an
+   absence, because it is the one thing on this page the reader can act on. */
+/* The section it sits in already carries the standing 96px above it, and a
+   further 30 opened a hole between the words and the one control that answers
+   them. The question belongs under the sentence that raises it. */
+#rpt #rpAsk{padding-top:44px}
+#rpt .rp-askbox{margin-top:0;max-width:var(--rp-half);background:#F6F9FF;
+  border:1px solid #CFE0FD;border-top:2px solid var(--blue-dp);
+  border-radius:0 0 var(--r-lg) var(--r-lg);padding:25px 28px}
+#rpt .rp-askbox .rp-t{font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
+#rpt .rp-askbox .rp-x{margin-top:10px;font-size:14.5px;line-height:1.6;color:var(--tx-2);max-width:74ch}
+#rpt .rp-askrow{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+#rpt .rp-askrow input{flex:1 1 240px;min-width:0;min-height:48px;padding:12px 15px;
+  font:inherit;font-size:15px;color:var(--tx-1);background:#fff;
+  border:1px solid #B9CFF7;border-radius:var(--r-md)}
+#rpt .rp-askrow input:focus-visible{outline:none;border-color:var(--blue-dp);
+  box-shadow:0 0 0 3px rgba(46,107,242,.28)}
+#rpt .rp-askgo{flex:none;min-height:48px;padding:12px 24px;font:inherit;font-size:15px;
+  font-weight:600;color:#fff;background:var(--blue-dp);border:1px solid var(--blue-dp);
+  border-radius:var(--r-md);cursor:pointer}
+#rpt .rp-askgo:hover{background:var(--blue-deep);border-color:var(--blue-deep)}
+#rpt .rp-askgo:focus-visible{outline:2px solid var(--blue-deep);outline-offset:2px}
+#rpt .rp-asknote{margin-top:11px;font-size:13.5px;line-height:1.55;color:#8A5A05;min-height:0}
+#rpt .rp-asknote:empty{display:none}
+
 /* THE SCROLL CUE. Fixed to the foot of the window rather than to the page,
    because it has to be visible from wherever the reader is when the report
    lands, and gone the moment they have understood it. */
@@ -4951,6 +4976,26 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
          does the job it exists for: the reader has just been through what we
          did find, and this is the honest edge of it. Grey, because an absence
          takes no state colour: it is neither a finding nor a warning. -->
+    <!-- THE SECOND ATTEMPT.
+         Shown only where nothing could be attached to a party: the identifier
+         matched several organisations and the page has just said it could not
+         tell which one. Until now that was the end of the road, which is a
+         result that tells a reader they are on their own at the exact moment
+         they asked for help. One question, one box, and the check runs again. -->
+    <div class="rp-sec rp-tight" id="rpAsk" hidden>
+      <form class="rp-askbox" id="rpAskForm" autocomplete="off">
+        <div class="rp-t" id="rpAskT">Which one is it?</div>
+        <p class="rp-x" id="rpAskX"></p>
+        <div class="rp-askrow">
+          <input id="rpAskIn" type="text"
+                 placeholder="Full legal name, website, email or wallet"
+                 aria-label="The full legal name, website, email address or wallet address of the party you are checking">
+          <button class="rp-askgo" id="rpAskGo" type="submit">Check again</button>
+        </div>
+        <p class="rp-asknote" id="rpAskNote" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
     <div class="rp-sec rp-tight">
       <div class="rp-gapnote">
         <div class="rp-t">What we could not answer</div>
@@ -9362,10 +9407,19 @@ var FREE_FOR_LIFE = false;
      the box takes, once, in the order the box takes it. It never says "a name"
      on its own: a bare name reads as a person, and a person is the one search
      the product refuses. */
+  /* A SHORT NAME IS NOT AN IDENTIFIER, AND THE BOX HAS TO SAY SO BEFORE THE RUN.
+     Four letters typed on their own match several unrelated organisations, so
+     nothing can be attached to any one of them and the honest answer at the end
+     is that we could not tell which one you meant. That is a wasted run and a
+     reader left with nothing. It costs one sentence here to avoid it. The full
+     legal name does resolve: it is initials and short forms that do not. */
+  var RESOLVE_LONG  = "Initials and short names match several organisations at once. "
+    + "Use the full legal name, or the website, email or wallet, so we know which one you mean.";
+  var RESOLVE_SHORT = "Full legal name, not initials.";
   el2.innerHTML='<span class="cbsubt">'+rpEsc(free)+'Type '+rpEsc(words.join(", "))+" or "+rpEsc(last)
-    +'.</span>'
+    +'. '+rpEsc(RESOLVE_LONG)+'</span>'
     +'<span class="cbsubs">'+rpEsc((words.join(", ")+" or "+last)
-        .replace(/^a /,"A ").replace(/\ban? /g,""))+'.</span>';
+        .replace(/^a /,"A ").replace(/\ban? /g,""))+'. '+rpEsc(RESOLVE_SHORT)+'</span>';
 })();
 
 var input=id("kbInput"), go=id("kbGo");
@@ -12555,7 +12609,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260918.1754";
+var KBYS_BUILD = "20260918.2008";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -14406,6 +14460,28 @@ function rpBodyPlain(nm){
    The server applies the same rule before this ever runs. Both apply it,
    because this is the sentence with the least room for error on the product. */
 function rpAttached(e){ return !!e && e.match === "exact"; }
+/* NOTHING COULD BE ATTACHED TO A PARTY.
+   True where the page has no identified website and not one piece of evidence
+   that names the party it was asked about. That is not a quiet result, it is
+   the product saying it could not tell which organisation the reader meant,
+   and it is the only state where asking them a question is the right answer
+   rather than an interruption. A run that found nothing at all is NOT this:
+   there, we know who they are and the registers were empty, which is a
+   finding about the record and not about the question. */
+function rpUnresolved(d){
+  if(!d) return false;
+  if(String(d.domain||"").trim()) return false;
+  var anyEv=false, anyAttached=false;
+  for(var k in (d.cats||{})){
+    var ev=(d.cats[k]||{}).ev||[];
+    for(var i=0;i<ev.length;i++){
+      anyEv=true;
+      if(rpAttached(ev[i])) anyAttached=true;
+    }
+  }
+  (d.issues||[]).forEach(function(i){ anyEv=true; if(rpAttached(i)) anyAttached=true; });
+  return anyEv && !anyAttached;
+}
 /* An older payload, stored before the field existed, carries no match at all.
    It is read as unattached rather than as attached: a check we cannot make is
    not a check we passed. */
@@ -14484,6 +14560,18 @@ function rpConsumerHosts(d){
     for(var i=0;i<ev.length;i++){
       var e=ev[i];
       if(e.t!=="C"&&e.t!=="D") continue;
+      /* THE ATTACHMENT RULE REACHES HERE TOO, AND IT DID NOT BEFORE.
+         This count is what turns several complaint sites into PATTERN, and
+         PATTERN is what puts "Do not send anything tonight" at the top of the
+         page in the imperative. Counting unattached chatter meant an ambiguous
+         identifier, one short token matching six unrelated organisations, could
+         gather six strangers' complaints into a pattern and speak to a reader
+         as though it were about the party they asked about. The verdict was
+         demoted correctly and the instruction above it was not, which is the
+         worst of both: a page that says it could not check, and tells you not
+         to send money, in the same column. Only a complaint that names the
+         party counts. */
+      if(!rpAttached(e)) continue;
       var h=String(e.reg||e.src||e.host||"").trim().toLowerCase();
       if(h) hosts[h]=1;
     }
@@ -14510,6 +14598,13 @@ function rpAtScale(d){ return rpBand(d)==="major" || rpGuaranteed(d); }
 
 function rpEscalation(d){
   if(rpHasOfficial(d)) return "OFFICIAL";
+  /* AN UNCHECKED RESULT CANNOT CARRY AN INSTRUCTION.
+     Second line of defence, deliberately after the official test and before
+     everything else. If nothing official names the party and the page is
+     already telling the reader it could not check enough to answer, then there
+     is no record behind an imperative, and the page must not issue one. The
+     line above still fires on a real attached finding, whatever the verdict. */
+  if(d && d.verdict==="GREY") return "NOISE";
   if(d && d.verdict==="RED") return "OFFICIAL";   /* the record contradicts them */
   /* At scale, complaints across several platforms are what several platforms
      look like for an institution with hundreds of thousands of customers. They
@@ -14882,6 +14977,49 @@ function rpRelatedRegistered(d){
   return "";
 }
 
+/* The block itself. It carries the count of how many organisations the
+   identifier matched where we have it, because "several" is a word and a
+   number is a reason. */
+function rpAskPaint(d){
+  var box=id("rpAsk"); if(!box) return;
+  var show=rpUnresolved(d);
+  box.hidden=!show;
+  if(!show){ var n0=id("rpAskNote"); if(n0) n0.textContent=""; return; }
+  var others=rpLookalikes(d).length;
+  id("rpAskX").textContent=
+    (others>1 ? "What you typed matches "+rpWord(others)+" different organisations, "
+              : "What you typed matches more than one organisation, ")
+    +"so we will not pin any of their records to you. Give us the full legal name, the "
+    +"website, the email address it came from, or the wallet you were asked to pay, and "
+    +"we will run it again.";
+  var inp=id("rpAskIn"); if(inp) inp.value="";
+}
+(function(){
+  var f=id("rpAskForm"); if(!f) return;
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    var inp=id("rpAskIn"), note=id("rpAskNote");
+    var v=String((inp&&inp.value)||"").trim();
+    /* THE SAME REFUSAL AS THE FRONT DOOR, FOR THE SAME REASON.
+       A reader who typed four letters and was told four letters is not enough
+       will sometimes type five. This says so before spending a run on it,
+       and it is the one place the rule is worth repeating. */
+    if(!v){
+      if(note) note.textContent="Type the full legal name, the website, the email or the wallet.";
+      if(inp) inp.focus();
+      return;
+    }
+    if(!/[.@]/.test(v) && v.replace(/[^A-Za-z]/g,"").length < 8 && v.split(/\s+/).length < 2){
+      if(note) note.textContent="That is still too short to tell one organisation from another. "
+        +"The full legal name, a website, an email address or a wallet will do it.";
+      if(inp) inp.focus();
+      return;
+    }
+    if(note) note.textContent="";
+    check(v);
+  });
+})();
+
 function renderReport(d){
   /* THE FIRST THING THAT HAPPENS TO A PAYLOAD, BEFORE ANY FIELD IS READ.
      Every render path on this product reads from here down, so scrubbing here
@@ -15162,6 +15300,7 @@ function renderReport(d){
       : "We reached every register that could have held a record on them.")
     +(c.unsettled?" "+rpCap(rpWord(c.unsettled))+" check"+(c.unsettled===1?"":"s")
       +" came back with too little to call either way." : "");
+  rpAskPaint(d);
   id("rpGap2").textContent="An empty register is not a clean record. It only means that register "
     +"had nothing on them on the day we looked"+(d.asOf?", which was "+d.asOf:"")
     +". A new fraud is not on any register yet.";

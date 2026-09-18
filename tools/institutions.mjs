@@ -96,6 +96,39 @@ const CASES = [
                      find: 'An alert names a differently constituted entity sharing one word.' }] }
       }
     }
+  },
+  {
+    /* THE AMBIGUOUS IDENTIFIER. A reader typed four letters and nothing else.
+       Those four letters match several unrelated organisations, so nothing can
+       be attached to any one of them, and the page correctly said it could not
+       check enough to answer. It then printed "Do not send anything tonight,
+       something came back against this party" directly underneath, because the
+       pattern count that drives that instruction was reading complaints about
+       six strangers. A page that says it could not check and issues an order in
+       the same column has told the reader two opposite things and the louder
+       one wins. */
+    who: 'four letters that match six unrelated organisations',
+    d: {
+      name: 'ACET (AMBIGUOUS IDENTIFIER)', domain: '',
+      verdict: 'GREY',
+      cats: {
+        C7: { state: 'RED', sum: 'Reports across platforms',
+              ev: [
+                { t: 'C', src: 'Trustpilot', when: '18 Sep 2026', match: 'unconnected',
+                  about: 'an engineering firm of the same initials',
+                  find: 'One-star reviews describe a late delivery.' },
+                { t: 'D', src: 'Reddit', when: '18 Sep 2026', match: 'unconnected',
+                  about: 'a college association of the same initials',
+                  find: 'Threads describe a membership dispute.' },
+                { t: 'C', src: 'Sitejabber', when: '18 Sep 2026', match: 'unconnected',
+                  about: 'a shopfront of the same initials',
+                  find: 'Reviews describe a refund refused.' },
+                { t: 'D', src: 'Forex Peace Army', when: '18 Sep 2026', match: 'unconnected',
+                  about: 'a broker of the same initials',
+                  find: 'Posts describe a withdrawal not paid.' }]
+        }
+      }
+    }
   }
 ];
 
