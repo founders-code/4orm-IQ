@@ -1,0 +1,205 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ, full audit, AUD-001</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#F1F2F3;--surface:#FFFFFF;--sunk:#E7E9EA;--ink:#15181B;--ink-2:#3D4348;--ink-3:#6C7378;
+ --rule:#D3D7D9;--rule-soft:#E2E5E6;--p0:#9E3618;--p1:#8A6414;--p2:#3F6A6E;--ok:#3F6A6E;
+ --p0w:#F7EAE6;--p1w:#F7F1E0;--p2w:#E8F0F0;--okw:#E8F0F0}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;--ink-3:#8B9296;
+ --rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+ --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122;--okw:#14201E}}
+:root[data-theme="dark"]{--paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;
+ --ink-3:#8B9296;--rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+ --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122;--okw:#14201E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+ font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;font-size:16px;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 28px 80px}
+.mast{border-bottom:2px solid var(--ink);padding-bottom:20px}
+.kick{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+ color:var(--ink-3);display:flex;gap:18px;flex-wrap:wrap}
+h1{font-family:'Spectral',Georgia,serif;font-weight:600;font-size:38px;line-height:1.1;margin:16px 0 0;letter-spacing:-.01em}
+.dek{margin:10px 0 0;max-width:64ch;color:var(--ink-2);font-size:16.5px}
+.heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--rule);
+ border:1px solid var(--rule);margin:30px 0 0}
+.hcell{background:var(--surface);padding:18px 18px 20px}
+.hlab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.htitle{font-family:'Spectral',serif;font-weight:600;font-size:18px;margin:8px 0 6px;line-height:1.2}
+.hcell p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.5}
+.sechead{display:flex;align-items:baseline;gap:14px;margin:52px 0 16px;break-after:avoid}
+.secn{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-3)}
+h2{font-family:'Spectral',serif;font-weight:600;font-size:25px;margin:0;line-height:1.15}
+h3{font-family:'Spectral',serif;font-weight:600;font-size:18px;margin:26px 0 8px}
+p{margin:0 0 14px;max-width:74ch}
+.tablewrap{border:1px solid var(--rule);background:var(--surface);overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13.5px}
+th{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+ text-align:left;color:var(--ink-3);padding:11px 14px;border-bottom:1px solid var(--rule)}
+td{padding:11px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+td:first-child{color:var(--ink);font-weight:500}
+tr:last-child td{border-bottom:none}
+.num{font-family:'IBM Plex Mono',monospace;text-align:right;font-variant-numeric:tabular-nums}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+ padding:3px 8px;border-radius:2px;white-space:nowrap;display:inline-block}
+.c0{background:var(--p0w);color:var(--p0)} .c1{background:var(--p1w);color:var(--p1)}
+.c2{background:var(--p2w);color:var(--p2)} .cok{background:var(--okw);color:var(--ok)}
+.find{border-left:3px solid var(--p1);background:var(--surface);padding:18px 20px;margin:0 0 16px}
+.find.maj{border-left-color:var(--p0)}
+.find.min{border-left-color:var(--p2)}
+.find h3{margin:0 0 6px;font-size:18px}
+.meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-3);margin:10px 0 0;
+ letter-spacing:.04em;border-top:1px solid var(--rule-soft);padding-top:10px}
+.fix{border-left:3px solid var(--ok);background:var(--surface);padding:16px 20px;margin:12px 0 0}
+.fix .lab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+ color:var(--ok);display:block;margin-bottom:6px}
+.fix p{margin:0;font-size:14.5px}
+ol.rec{counter-reset:r;list-style:none;padding:0;margin:0}
+ol.rec li{counter-increment:r;border-top:1px solid var(--rule);padding:16px 0 4px}
+ol.rec li::before{content:counter(r,decimal-leading-zero);font-family:'IBM Plex Mono',monospace;
+ font-size:11px;color:var(--ink-3);display:block;margin-bottom:4px}
+ol.rec b{font-size:16.5px;color:var(--ink)}
+.foot{margin-top:60px;padding-top:16px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;
+ gap:18px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-3);letter-spacing:.05em}
+@media(max-width:620px){.wrap{padding:24px 16px 56px}h1{font-size:28px}h2{font-size:21px}}
+</style></head><body><div class="wrap">
+
+<header class="mast">
+  <div class="kick"><span>4orm IQ</span><span>Audit output</span><span>AUD-001 v1.0</span><span>Build 20260917.1811</span><span>17 September 2026</span></div>
+  <h1>Nothing in the build is broken. The route through it is.</h1>
+  <p class="dek">Every automated check passes and no screen throws. What the walk found is a navigation problem: on a phone, a reader who has just been told not to send money is four screenfuls away from the only screen that tells them what to do.</p>
+</header>
+
+<div class="heads">
+  <div class="hcell"><div class="hlab">Worst exposure</div>
+    <div class="htitle">The action is behind the evidence</div>
+    <p>Two presses from the verdict to what to do, and the first of them sits 3.96 screens down a 4.66 screen page on a phone.</p></div>
+  <div class="hcell"><div class="hlab">Worst outcome</div>
+    <div class="htitle">A reader acts too late, or not at all</div>
+    <p>The one call that can pull a payment back is measured in hours. The route to it is the slowest thing on the product.</p></div>
+  <div class="hcell"><div class="hlab">Most underrated</div>
+    <div class="htitle">One destination, three names</div>
+    <p>How we decide, Sources and method, and a header pill all open the same screen. Recognition is being paid for three times.</p></div>
+  <div class="hcell"><div class="hlab">Gate</div>
+    <div class="htitle">Unverified, not blocked</div>
+    <p>49 checks, the UX gate and the production verify all pass. No participant has used this without a tour, so comprehension is untested.</p></div>
+</div>
+
+<div class="sechead"><span class="secn">01</span><h2>What was measured, and what was not</h2></div>
+<p>An automated pass is not a conformance review, a heuristic walk is not a participant study, and a design review is not implementation. This document carries the first two. Nobody outside the build has used the product without being shown around, so no claim is made about whether a first time reader understands it.</p>
+<div class="tablewrap"><table>
+  <colgroup><col style="width:30%"><col style="width:16%"><col style="width:54%"></colgroup>
+  <thead><tr><th>Check</th><th>Result</th><th>What it proves</th></tr></thead>
+  <tbody>
+  <tr><td>tools/verify.mjs</td><td><span class="chip cok">Pass</span></td><td>758 build assertions over the markup, the stylesheet, the script and the API</td></tr>
+  <tr><td>49 behaviour checks</td><td><span class="chip cok">Pass</span></td><td>Every screen driven in a real browser, every control pressed</td></tr>
+  <tr><td>tools/uxgate.mjs</td><td><span class="chip cok">Pass</span></td><td>Contrast, target size, control names, focus rings, tab order and overflow at 1440, 390 and 320</td></tr>
+  <tr><td>Production verify</td><td><span class="chip cok">Pass</span></td><td>The stamped build matches what ships</td></tr>
+  <tr><td>Page and console errors</td><td><span class="chip cok">Zero</span></td><td>Eight screens walked, desktop and phone. Only file protocol fetch noise, which does not occur on the deployment</td></tr>
+  <tr><td>Typed input</td><td><span class="chip cok">Escaped</span></td><td>A script tag typed into the search box is painted as text. No injection, no execution</td></tr>
+  <tr><td>Real content lengths</td><td><span class="chip cok">Holds</span></td><td>A 101 character company name causes no horizontal overflow at either width</td></tr>
+  <tr><td>Reduced motion</td><td><span class="chip cok">Holds</span></td><td>Both cards render, the result is reachable, the ticker stops</td></tr>
+  <tr><td>External links</td><td><span class="chip cok">Clean</span></td><td>Every outbound link carries rel noopener</td></tr>
+  <tr><td>Dead code</td><td><span class="chip cok">Zero</span></td><td>No unreachable function, no unstyled class, no styled class nothing wears</td></tr>
+  <tr><td>Participant comprehension</td><td><span class="chip c1">Not run</span></td><td>Nothing here says a first time reader understands the result</td></tr>
+  </tbody></table></div>
+
+<div class="sechead"><span class="secn">02</span><h2>What the walk cost a reader, screen by screen</h2></div>
+<p>Each screen was reached the way a person reaches it, by running a real check, then measured: how much there is to read, how many things can be pressed, how many stops the keyboard takes, and how many screenfuls tall it is.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Screen</th><th class="num">Words</th><th class="num">Controls</th><th class="num">Tab stops</th><th class="num">Headings</th><th class="num">Screens tall</th></tr></thead>
+  <tbody>
+  <tr><td>Landing, 1440</td><td class="num">686</td><td class="num">14</td><td class="num">6</td><td class="num">3</td><td class="num">1.0</td></tr>
+  <tr><td>Landing, 390</td><td class="num">589</td><td class="num">14</td><td class="num">6</td><td class="num">3</td><td class="num">1.1</td></tr>
+  <tr><td>Waiting</td><td class="num">1578</td><td class="num">43</td><td class="num">13</td><td class="num">3</td><td class="num">2.7</td></tr>
+  <tr><td>Result, 1440</td><td class="num">1203</td><td class="num">30</td><td class="num">10</td><td class="num">4</td><td class="num">2.3</td></tr>
+  <tr><td>Result, 390</td><td class="num">918</td><td class="num">30</td><td class="num">10</td><td class="num">4</td><td class="num">4.7</td></tr>
+  <tr><td>What we found</td><td class="num">930</td><td class="num">31</td><td class="num">10</td><td class="num">5</td><td class="num">2.4</td></tr>
+  <tr><td>Do this right now</td><td class="num">784</td><td class="num">42</td><td class="num">10</td><td class="num">3</td><td class="num">1.1</td></tr>
+  <tr><td>Sources and method</td><td class="num">1207</td><td class="num">39</td><td class="num">18</td><td class="num">10</td><td class="num">3.1</td></tr>
+  </tbody></table></div>
+<p style="margin-top:12px;font-size:13.5px;color:var(--ink-3)">The act screen is the shortest and the densest: 784 words and 42 controls on one screenful, because the three rows hold everything inside them. That is the right shape. The result screen is the opposite: it is where the reader lands and it is the one they have to scroll.</p>
+
+<div class="sechead"><span class="secn">03</span><h2>Findings</h2></div>
+
+<div class="find maj">
+  <span class="chip c0">Major</span>
+  <h3>The action sits behind the evidence, and on a phone it sits four screens down</h3>
+  <p>The result screen offers one way forward: What we found. From there, a second press reaches Do this right now. There is no route from the verdict to the action. A reader who has just read <em>Do not send anything tonight</em> is two presses and a screen of evidence away from the only page that tells them to ring their bank.</p>
+  <p>On a phone it is worse than two presses. The way on sits at 3.96 screenfuls down a page that runs 4.66 screenfuls. On desktop it sits at 1.82, still below the fold.</p>
+  <div class="meta">Measured: rpToFound top offset / viewport height, 390x844 and 1440x1000, finished report, build 20260917.1811</div>
+  <div class="fix"><span class="lab">The fix</span><p>Put the action on the result screen. Where the verdict is adverse, or the reader has said money has gone, the result screen offers Do this right now beside What we found, and it sits with the verdict rather than at the foot. One press from what happened to what to do.</p></div>
+</div>
+
+<div class="find maj">
+  <span class="chip c0">Major</span>
+  <h3>Sources and method is a dead end</h3>
+  <p>The screen that explains how a record is found and read has exactly one way off it, and it points backwards. A reader arrives there to satisfy themselves the work is sound, which is the moment they are most ready to act, and the product offers them nothing but the way they came.</p>
+  <div class="meta">Measured: every visible control on rpSources. One exit, rpBackToReport</div>
+  <div class="fix"><span class="lab">The fix</span><p>A way on, not only a way back. Sources carries the same forward control the other screens carry, so a convinced reader goes to what to do rather than retracing.</p></div>
+</div>
+
+<div class="find">
+  <span class="chip c1">Minor, but it compounds</span>
+  <h3>One destination, three labels</h3>
+  <p>How we decide sits in the foot of three screens. Sources and method sits in the header pill of the act screen. Both open the same page, and its own sections are titled a third way. A reader pays the recognition cost three times and cannot tell whether they have already been there.</p>
+  <div class="meta">Measured: control labels on rpReport, rpFound, rpAct, rpSources</div>
+  <div class="fix"><span class="lab">The fix</span><p>One name for one destination, everywhere it appears: How we decide.</p></div>
+</div>
+
+<div class="find">
+  <span class="chip c1">Minor</span>
+  <h3>Check another name exists on one screen out of four</h3>
+  <p>New check is on the result screen only. It is the most repeated action in the product, and from what we found, what to do or sources there is no way to start another one without walking back.</p>
+  <div class="meta">Measured: rpNewCheck present on rpReport, absent on rpFound, rpAct, rpSources</div>
+  <div class="fix"><span class="lab">The fix</span><p>New check in the foot of every report screen, in the small print row that already carries the standing documents.</p></div>
+</div>
+
+<div class="find min">
+  <span class="chip c2">Minor</span>
+  <h3>The waiting screen keeps announcing a result that has already been shown</h3>
+  <p>waitPhase is an aria live region. After the sweep finishes and the screen closes, it is left holding <em>Assessment ready in 3s</em>. A screen reader announces a status about a screen nobody is on. The house standard says a live region is cleared when it stops being true.</p>
+  <div class="meta">Measured: aria-live content after waitClose, build 20260917.1811</div>
+  <div class="fix"><span class="lab">The fix</span><p>Empty it in waitClose.</p></div>
+</div>
+
+<div class="find min">
+  <span class="chip c2">Minor</span>
+  <h3>The things a reader acts on cannot be addressed</h3>
+  <p>Rows 02 and 03 on the act screen, and all four findings on what we found, carry no id. They cannot be linked to, opened from another screen, or measured individually. Every navigation improvement above needs at least one of them to be addressable.</p>
+  <div class="meta">Measured: visible controls with no id, rpFound and rpAct</div>
+  <div class="fix"><span class="lab">The fix</span><p>An id on each, named for what it is rather than where it sits.</p></div>
+</div>
+
+<div class="find min">
+  <span class="chip c2">Minor</span>
+  <h3>Five ways off a screen that offers three things to do</h3>
+  <p>The act screen carries back to what we found, back to the result and sources and method in its header, and how we decide and the data room in its foot. The three things it exists for compete with five ways to leave.</p>
+  <div class="meta">Measured: visible controls on rpAct outside the three rows</div>
+  <div class="fix"><span class="lab">The fix</span><p>One way back, one way on, and the standing links in the foot where they already live.</p></div>
+</div>
+
+<div class="sechead"><span class="secn">04</span><h2>What to change, in the order it pays</h2></div>
+<ol class="rec">
+  <li><b>Put Do this right now on the result screen.</b> Beside the verdict, not at the foot, and only where the verdict is adverse or the reader has said money has gone. This is the whole finding above, and it is one change.</li>
+  <li><b>Pin the next action on a phone.</b> Once the reader passes the first screenful of the result, a single bar follows them carrying the one thing to do next. Nothing else in it.</li>
+  <li><b>Give sources a way on.</b> The same forward control the other screens carry.</li>
+  <li><b>One label for one destination.</b> How we decide, in every place that opens it.</li>
+  <li><b>New check in the foot of every report screen.</b></li>
+  <li><b>Clear the live region when the waiting screen closes.</b></li>
+  <li><b>Id every row and every finding</b>, which is what makes one, two and three buildable and measurable.</li>
+  <li><b>Thin the act header to one way back.</b></li>
+</ol>
+
+<div class="sechead"><span class="secn">05</span><h2>What could not be confirmed</h2></div>
+<p>Three things, named rather than left silent.</p>
+<p><b>Live retrieval was not exercised.</b> Every measurement here ran against the seeded specimen. The live path shares the same rendering code, and the register health writing was corrected this week, but no live run was measured for this document.</p>
+<p><b>Nobody outside the build has used it.</b> Every number here is a machine measurement or my own reading. That is a heuristic walk, and a heuristic walk is not a participant study. Until somebody who has not seen it before runs a check without being shown around, comprehension is unverified.</p>
+<p><b>Two control documents still disagree with the board.</b> SEC-001 and VEND-001 carry NO-GO on their own covers while the release board records them amber. The build names it on every run. It is a decision for the owner, not a defect this audit can close.</p>
+
+<div class="foot">
+  <span>4orm Finance &nbsp;·&nbsp; Control Standard &nbsp;·&nbsp; Internal</span>
+  <span>AUD-001 &nbsp;·&nbsp; 17 September 2026 &nbsp;·&nbsp; Build 20260917.1811</span>
+</div>
+</div></body></html>
