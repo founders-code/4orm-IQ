@@ -104,7 +104,7 @@ if (empty.length) fails.push('these open onto nothing: '+empty.join(', '));
 console.log('nodes opening onto nothing:', empty.length);
 
 /* EVERY REGISTER OPENS, IN BOTH SIZES.
-   All 121, walked. A name and a colour raise two questions and this is where
+   All 133, walked. A name and a colour raise two questions and this is where
    they are answered: what the thing is, and what an empty answer from it
    would mean. */
 {
@@ -131,7 +131,7 @@ console.log('nodes opening onto nothing:', empty.length);
     }
   }
   console.log('registers opened', opened, '| computed here, no outside link', noLink);
-  if (opened !== 121) fails.push('only ' + opened + ' of 121 registers open');
+  if (opened !== 133) fails.push('only ' + opened + ' of 133 registers open');
   if (silent.length) fails.push(silent.length + ' register card(s) are wrong: ' + silent.slice(0,4).join(' | '));
   /* The ones with no link are the ones we compute. If every register had a
      link, one of them would be borrowing somebody else's name. */

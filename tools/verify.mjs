@@ -1457,6 +1457,165 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
   if (!/function rpScrubPeople\(txt, d, heldIn\)/.test(script))
     fails.push('the scrubber cannot be given a precomputed list of names');
 }
+/* =================== A FINDING THAT IS NOT ABOUT THEM IS NOT A FINDING ON THEM
+   The attachment rule reached the verdict and stopped. Three of four findings on
+   a live run about a provincial bank were about somebody else: a lookalike the
+   regulator warned about, fraudsters running fake phone lines in the bank's
+   name, and a second lookalike on an alert list. All true, all rendered against
+   the bank at HIGH. Being impersonated is something that happens TO a firm. */
+{
+  const sch = fs.readFileSync(new URL('../api/_schema.js', import.meta.url), 'utf8');
+  const chk = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  const cue = fs.readFileSync(new URL('../api/_cue.js', import.meta.url), 'utf8');
+  const mi = sch.slice(sch.indexOf('material_issues: {'),
+                       sch.indexOf('before_you_send:', sch.indexOf('material_issues: {')));
+  for (const [t, why] of [["'about', 'match'", 'a finding need not say who it is about'],
+                          ['coverage_gap', 'a record we did not read can still be filed as a finding']])
+    if (!mi.includes(t)) fails.push(why);
+  if (!/never about the party/.test(mi))
+    fails.push('the schema no longer says that being impersonated is not a finding against the party');
+  if (!/i\.kind !== 'coverage_gap'/.test(chk))
+    fails.push('a gap in our own reading still ships as a finding at a severity');
+  if (!/about: i\.about \|\| '', match: ATTACH\.has\(i\.match\)/.test(chk))
+    fails.push('findings are carried to the page without saying who they are about');
+  if (!/it\.match === "unconnected"/.test(script))
+    fails.push('the page still lists a finding about somebody else against the party');
+  if (!/out\.elsewhere = elsewhere;/.test(script))
+    fails.push('a finding about somebody else is dropped rather than reported as theirs');
+  if (!/fromIssue/.test(script))
+    fails.push('a finding about somebody else never reaches the reader at all');
+  if (!cue.includes('Somebody impersonating the party is a finding about the impersonator'))
+    fails.push('the cue no longer says an impersonator is the subject of their own finding');
+}
+/* ---------------------------------------------- AND THE NAME ON IT IS A NAME
+   A run on atb.com put "Atb" at the top of the report in forty point type. */
+{
+  const chk = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  if (!/display = legal;/.test(chk))
+    fails.push('the report can be headed with the domain label title cased instead of the company name');
+}
+/* -------------------------------- AND AN ABSENCE STILL TAKES NO STATE COLOUR
+   "We could not confirm this party on a register" was set on a green ground,
+   which reads as good news to anybody scanning, and it is the opposite. */
+{
+  const m = /t:"We could not confirm this party on a register\."/.exec(script);
+  if (!m) fails.push('the unregistered sentence is gone');
+  else {
+    const before = script.slice(Math.max(0, m.index - 220), m.index);
+    if (/c:"calm"/.test(before))
+      fails.push('an absence is dressed as good news again');
+    if (!/c:"none"/.test(before))
+      fails.push('the unregistered sentence carries a state colour');
+  }
+  if (!/function rpRelatedRegistered\(d\)/.test(script))
+    fails.push('a registration for a related company sits beside the words could not confirm, unexplained');
+}
+
+/* ------------------------------------------ AND THE HOST MAP IS NOT TYPED TWICE
+   The catalogue carries every register's host. The map was hand written beside
+   it, the two drifted, and ten enabled registers ended up listed in one and
+   absent from the other, permanently dark. The catalogue is the source of that
+   fact now and the hand written table is what it was always meant to be: the
+   aliases, for a host that serves a register under another domain. */
+{
+  const reg = fs.readFileSync(new URL('../api/_registers.js', import.meta.url), 'utf8');
+  const cat = fs.readFileSync(new URL('../api/_catalogue.js', import.meta.url), 'utf8');
+  if (!/import \{ CATALOGUE \} from '\.\/_catalogue\.js';/.test(reg))
+    fails.push('the register map no longer reads the catalogue, so the two can drift again');
+  if (!/const CATALOGUE_HOSTS = \(\) =>|const CATALOGUE_HOSTS = \(\(\) =>/.test(reg))
+    fails.push('a register is no longer reachable by its own catalogue host');
+  if (!/const HOST_MAP_HAND = \{/.test(reg))
+    fails.push('the hand written aliases are gone, so a host serving two registers lights one');
+  if (!/export function unreachableRegisters\(\)/.test(reg))
+    fails.push('nothing can say which registers we publish and cannot ask');
+  /* WHAT WE ASK AND WHAT WE COMPUTE ARE COUNTED APART.
+     Fourteen catalogue rows are connectors, run over what the sweep already
+     holds rather than asked. They sat in the coverage denominator, so a run
+     that reached every register on earth still read eighty-seven per cent and
+     the missing thirteen points looked like a hole rather than a category
+     error. The transport field already said which was which. */
+  if (!/export const ASKABLE  = CATALOGUE\.filter\(s => s\.enabled && s\.transport !== 'connector'\);/.test(cat))
+    fails.push('the catalogue no longer separates the registers we ask from the checks we compute');
+  if (!/export const TOTAL_ASKABLE = ASKABLE\.length;/.test(cat))
+    fails.push('there is no denominator that excludes the things that cannot be asked');
+  if (!/s\.transport !== 'connector'\n *&& !served\.has/.test(reg)
+      && !/s\.transport !== 'connector'[\s\S]{0,60}!served\.has/.test(reg))
+    fails.push('a connector can still be reported as an unreachable register');
+  if (!/unmapped:'/.test(cat))
+    fails.push('a register we publish and cannot ask is not declared as such with a reason');
+  const met2 = fs.readFileSync(new URL('../api/admin-metrics.js', import.meta.url), 'utf8');
+  if (!/x\.enabled && x\.transport !== 'connector'/.test(met2))
+    fails.push('the board still divides coverage by things it was never going to ask');
+  if (!/reach\.computed = \{/.test(met2))
+    fails.push('the checks we compute are not counted at all, so nobody can tell whether they ran');
+}
+
+/* ================ EVERY REGISTER THAT COULD HAVE HELD A RECORD LEAVES A ROW
+   The back office read nought of a hundred and twenty one registers reached on
+   a finished run, beside a fifty nine per cent answering rate, and the two
+   numbers were reading different tables. Only the registers the board had lit
+   were ever written, so a register that applied and was never asked, and a
+   register routing had ruled out, both left no row, and a missing row was read
+   as "not called" for both. Four outcomes, one row each, every run. */
+{
+  const chk = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  const met = fs.readFileSync(new URL('../api/admin-metrics.js', import.meta.url), 'utf8');
+  for (const [t, why] of [
+    ["recordSource(row.source_id, 'ok', null)", 'a register that answered is not recorded'],
+    ["recordSource(row.source_id, 'no_match', null)", 'a register that was asked and had nothing is not recorded'],
+    ["recordSource(id, 'failed', null)", 'a register that applied and was never reached leaves no row, so it reads as one that does not apply'],
+    ["recordSource(id, 'out_of_scope', null)", 'a register routing ruled out leaves no row, so it reads as one we failed to reach']])
+    if (!chk.includes(t)) fails.push(why);
+  if (!/const applicableIds = new Set\(app\.applicable\.map/.test(chk))
+    fails.push('the run no longer writes down the registers routing said could apply');
+  /* One row per register per run, never four. */
+  if (!/const done = new Set\(\);/.test(chk))
+    fails.push('a register can be recorded more than once in a run, which inflates every rate on the board');
+  /* The board reads the whole row, not two columns of it. */
+  for (const c of ['no_match', 'failed', 'out_of_scope'])
+    if (!new RegExp('sum\\(' + c + '\\),0\\)::int as ' + c + '[\\s\\S]{0,200}group by source_id').test(met))
+      fails.push('the board cannot see ' + c + ' per register, so it cannot tell a hole from a register that does not apply');
+  /* AND A NOUGHT THAT MEANS A BROKEN TABLE IS NOT PRINTED AS A MEASUREMENT.
+     A finished run always asks something, so runs with no register recorded is
+     an impossible pair rather than a low number. */
+  if (!/reach\.unwritten = \(r\.attempted \|\| 0\) > 0 && reach\.asked === 0;/.test(met))
+    fails.push('the board cannot tell a sweep that asked nothing from a health table that is not being written');
+  const adm = fs.readFileSync(new URL('../admin.html', import.meta.url), 'utf8');
+  if (!/rch\.unwritten/.test(adm))
+    fails.push('the gauge still prints the nought as though it were a measurement');
+  if (!/not one register "[\s\S]{0,40}was recorded against the catalogue/.test(adm))
+    fails.push('the board does not lead with the fact that its own register readings are measuring nothing');
+  if (!/came back empty and/.test(adm))
+    fails.push('the gauge no longer separates asked-and-empty from applied-and-never-reached');
+}
+
+/* ============================ THE BEAT MEANS ONE THING, SO IT MEANS ONE THING
+   Movement on a page somebody is reading in a panic is a claim. It is made only
+   where an authority has published something about this party BY NAME under the
+   attachment rule: never on an amber, never on a look-alike, never on a pattern
+   of complaints. A beat for everything would mean nothing and the reader would
+   learn to ignore the one time it mattered. */
+{
+  if (!/@keyframes rpBeat\{/.test(styleBlock))
+    fails.push('the urgent control no longer beats at all');
+  if (!/#rpt \.rp-actb\.rp-beat\{animation:rpBeat/.test(styleBlock))
+    fails.push('the beat is not wired to the control');
+  if (!/var beat_ = rpHasOfficial\(d\) \? " rp-beat" : "";/.test(script))
+    fails.push('the beat is not gated on an authority naming this party');
+  if (/rp-beat[^"]*"[\s\S]{0,200}verdict==="AMBER"/.test(script))
+    fails.push('an amber result is being made to beat, and amber is not a fault');
+  /* It stops under the pointer, and it never runs for a reader who asked for
+     less movement. */
+  if (!/#rpt \.rp-actb\.rp-beat:hover,#rpt \.rp-actb\.rp-beat:focus-visible\{animation:none/.test(styleBlock))
+    fails.push('the control keeps moving under the pointer, which makes it harder to press');
+  if (!/prefers-reduced-motion:reduce\)\{[\s\S]{0,260}#rpt \.rp-actb\.rp-beat\{animation:none/.test(styleBlock))
+    fails.push('the beat runs for a reader who has asked for less movement');
+  /* And the reduced-motion case still marks the control, rather than silently
+     dropping the one signal on the page. */
+  if (!/#rpt \.rp-actb\.rp-beat\{animation:none;box-shadow:0 0 0 3px/.test(styleBlock))
+    fails.push('with motion off the urgent control is no longer marked at all');
+}
+
 /* ================ VOLUME IS READ AGAINST THE SIZE OF THE THING COMPLAINED OF
    A count of one-star reviews with no denominator is a number, not a finding.
    A provincial bank of 88 years, whose deposits a government guarantees, had a
@@ -1498,6 +1657,10 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     fails.push('the page keeps a RED verdict after the category it rested on came down');
   if (!/demoted\.push\(\{cat:k, from:"RED", to:next\}\)/.test(script))
     fails.push('the page corrects the verdict without recording that it did');
+  /* A red with nothing red underneath it is a stray field, not a judgement,
+     and on this product it is the most consequential stray field there is. */
+  if (!/d\.verdict==="RED" && !anyRed && !demoted\.length/.test(script))
+    fails.push('a RED verdict with every category green is printed as a verdict');
 }
 
 /* ---------------------------------- AND THE SERVER APPLIES IT BEFORE THE PAGE
@@ -3757,7 +3920,7 @@ if (!/class="panellamps" id="house"/.test(admin))
 
    A name and a colour tell an operator that something is amber without saying
    what the thing is or what an empty answer from it would mean, and those are
-   the two questions a register raises. Every one of the 121 now opens. */
+   the two questions a register raises. Every one of the 133 now opens. */
 {
   const info = [...admin.matchAll(/^  "((?:[^"\\]|\\.)*)": \{ k:/gm)].map(m => m[1].replace(/\\"/g, '"'));
   if (!/var REGINFO = \{/.test(admin))
@@ -3774,8 +3937,8 @@ if (!/class="panellamps" id="house"/.test(admin))
     fails.push(noInfo.length + ' register(s) on the board have no readout: ' + noInfo.slice(0,4).join(', '));
   if (orphan.length)
     fails.push(orphan.length + ' readout(s) name a register the board does not carry: ' + orphan.slice(0,4).join(', '));
-  if (info.length !== 121)
-    fails.push('the readouts cover ' + info.length + ' registers, the catalogue has 121');
+  if (info.length !== 133)
+    fails.push('the readouts cover ' + info.length + ' registers, the catalogue has 133');
   /* Every readout says what an empty answer means, because that is the
      sentence that stops a silence being read as clearance, and it has to be
      different per register: absent from FINTRAC means something, absent from
@@ -3784,7 +3947,7 @@ if (!/class="panellamps" id="house"/.test(admin))
   if (empties.length !== info.length)
     fails.push('a register readout has no sentence for what an empty answer means');
   if (new Set(empties).size < 40)
-    fails.push('only ' + new Set(empties).size + ' distinct empty-answer sentences across 121 registers. '
+    fails.push('only ' + new Set(empties).size + ' distinct empty-answer sentences across 133 registers. '
       + 'One sentence copied everywhere is the same as not having one.');
   /* A link may only ever be the domain retrieval is already pinned to. */
   if (!/u:null/.test(admin))

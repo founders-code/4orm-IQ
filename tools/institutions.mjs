@@ -61,6 +61,29 @@ const CASES = [
     }
   },
   {
+    who: 'a bank whose name is being used by fraudsters',
+    d: {
+      name: 'A NAMED BANK', domain: 'example-named.com',
+      scale: { basis: 'annual report', customers: 800000, assets_usd: 46000000000,
+               since: 1938, guarantee: 'Government of Alberta', band: 'major' },
+      cats: {
+        C1: { state: 'GREEN', sum: 'Established',
+              ev: [{ t: 'A', src: 'Companies register', when: '25 Aug 2026', match: 'exact',
+                     about: 'example-named.com', find: 'Registered and active.' }] }
+      },
+      /* Being impersonated is something that happens TO a firm. Every one of
+         these is true and not one of them is a mark against them. */
+      issues: [
+        { t: 'Fake phone lines and text messages use this bank\'s name to target customers.',
+          x: 'Reviewers describe calls and texts purporting to be from the bank.',
+          sev: 'high', tier: 'C', match: 'unconnected', about: 'whoever is running them' },
+        { t: 'A regulator has warned about a lookalike domain that is not this bank\'s site.',
+          x: 'The warning names a different registrable domain.',
+          sev: 'high', tier: 'A', match: 'unconnected', about: 'named-bank.example-scam.pro' }
+      ]
+    }
+  },
+  {
     who: 'a long-established insurer sharing a word with an unrelated entity',
     d: {
       name: 'AN ESTABLISHED INSURER', domain: 'example-insure.com',
@@ -113,10 +136,12 @@ const read = async d => {
   return p.evaluate(() => {
     const t = q => { const e = document.querySelector(q); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; };
     const d = window.__KBYS__.lastReport() || {};
+    /* Only what is ON THE SCREEN. A hidden block keeps its last text, and
+       reading it anyway makes the check fail for a sentence nobody can see. */
+    const nowUp = !document.getElementById('rpNow').hidden;
     return { verdict: d.verdict, eyebrow: t('#rpEyebrowT'), why: t('#rpWhy'),
              tonight: t('#rpTonightT'), say: t('#rpSay'),
-             now: !document.getElementById('rpNow').hidden,
-             nowH: t('#rpNowH') };
+             now: nowUp, nowH: nowUp ? t('#rpNowH') : '' };
   });
 };
 
@@ -130,6 +155,19 @@ for (const c of CASES) {
   if (/published a warning about this firm|already flagged|says do not send money/i.test(loud))
     bad.push('the page says an authority acted against them');
   if (n.now && /send nothing|ring your bank/i.test(n.nowH)) bad.push('the page hands them an emergency');
+  /* And nothing about somebody else is listed as a finding against them. */
+  const shown = await p.evaluate(() => {
+    document.getElementById('rpToFound').click();
+    return new Promise(r => setTimeout(() => r({
+      finds: [...document.querySelectorAll('#rpFoundBox .rp-find .rp-t')].map(e => e.textContent.trim()),
+      look: !!document.querySelector('#rpFoundBox .rp-look')
+    }), 500));
+  });
+  for (const f of shown.finds)
+    if (/fake phone|lookalike|impersonat|not this bank|is not ATB/i.test(f))
+      bad.push('a finding about somebody else is listed against them: ' + f.slice(0, 60));
+  await p.evaluate(() => { const b = document.getElementById('rpFoundBack'); if (b) b.click(); });
+  await p.waitForTimeout(300);
   console.log('  ' + (bad.length ? 'FAIL  ' : 'ok    ') + c.who + '   -> ' + n.verdict);
   if (bad.length) {
     fails.push(c.who + ': ' + bad.join(', '));

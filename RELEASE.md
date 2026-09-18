@@ -123,6 +123,7 @@ to `/api/check` instead.
     node tools/verify.mjs          the build check, exits non zero on a failure
     node tools/smoke.mjs           and smoke2 through smoke41
     node tools/institutions.mjs    the bystander test, run this one first
+    node tools/reachcheck.mjs      every register is askable or says why not
     node tools/graph-tests.mjs     operator graph scoring and routing
 
 `tools/institutions.mjs` is the one to run before the others, because it asks the
@@ -134,6 +135,25 @@ Financial Conduct Authority has published a warning about this firm" and told th
 reader not to send anything tonight. The regulator had published nothing about
 them. It had listed a domain that shared three letters with theirs inside
 somebody else's subdomain.
+
+`tools/reachcheck.mjs` answers a question the board could not: can we actually
+ask the registers we publish. The back office read nought of a hundred and
+twenty one reached on a finished run. Half of that was a counter that only wrote
+the registers it had already lit, so a register that applied and was never asked
+and a register routing had ruled out both left no row and read as the same
+thing. The other half was drift: the host map was hand written beside a
+catalogue that already carried every register's host, and ten enabled registers,
+among them ACRA, both MAS registers, the Hong Kong and New Zealand company
+offices, NMLS, RECO, FSRA and the Quebec registraire, appeared in one and not
+the other. A page from any of them came back and lit nothing.
+
+The map is derived from the catalogue now, with hand written aliases layered on
+top for a host that serves a register under another domain. Every enabled
+register must be reachable, marked derived if it is computed rather than
+fetched, or declared unmapped with the reason written beside it. The ceiling
+this check prints is the real one: **the most the product can report reached
+today is 87 per cent**, because eleven registers are computed and five are one
+row standing for a class of regulators with no single host.
 
 The rule that came out of it is the attachment rule, and it is applied in three
 places because one was not enough: the cue states it, `api/check.js` enforces it

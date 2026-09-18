@@ -3972,6 +3972,31 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
   text-transform:uppercase;transition:background .22s var(--ease),color .22s var(--ease)}
 #rpt .rp-actb:hover{background:var(--bad);color:#fff;border-color:var(--bad)}
 #rpt .rp-actb:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* ================================== IT BEATS WHERE A REGULATOR HAS NAMED THEM
+   The hover state is the right red, so the pulse is the hover state arriving on
+   its own. It is not decoration and it is not applied to every result: movement
+   on a page somebody is reading in a panic has to mean one thing, so it means
+   the one thing, and it is set only where an authority has published something
+   about this party by name. An amber result never beats. A look-alike never
+   beats. If it beat for everything it would mean nothing, and the reader would
+   learn to ignore the one time it mattered.
+   Slow, because a fast flash reads as an error rather than as urgency: one and
+   a half seconds, ease in and out, no hard edges.
+   It stops on hover and on focus, because a control that moves under the
+   pointer is a control that is harder to press, and it never runs at all for a
+   reader who has asked for less movement. */
+@keyframes rpBeat{
+  0%,100%{background:#fff;color:var(--tx);border-color:#fff;
+    box-shadow:0 0 0 0 rgba(214,51,78,0)}
+  50%{background:var(--bad);color:#fff;border-color:var(--bad);
+    box-shadow:0 0 0 7px rgba(214,51,78,.16)}}
+#rpt .rp-actb.rp-beat{animation:rpBeat 1.5s var(--ease) infinite}
+#rpt .rp-actb.rp-beat:hover,#rpt .rp-actb.rp-beat:focus-visible{animation:none;
+  background:var(--bad);color:#fff;border-color:var(--bad)}
+@media(prefers-reduced-motion:reduce){
+  /* Not a quieter beat: none. The state is carried by the ring, which is
+     static, so the control still reads as the urgent one on the page. */
+  #rpt .rp-actb.rp-beat{animation:none;box-shadow:0 0 0 3px rgba(214,51,78,.22)}}
 @media print{#rpt .rp-acta{display:none!important}}
 
 /* THE TWO PILLS
@@ -6800,10 +6825,10 @@ var GREY = {
 /* GENERATED:SOURCES - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
 var SOURCES = [
  {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones"]},
- {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]},
- {c:"03 Enforcement", w:3, items:["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]},
+ {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]},
+ {c:"03 Enforcement", w:3, items:["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau Canada","Federal Trade Commission","Consumer Financial Protection Bureau","Internet Crime Complaint Center","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]},
  {c:"04 People", w:1, items:["Corporations Canada, Individuals with Significant Control","ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]},
- {c:"05 Legal", w:2, items:["CanLII","Supreme Court of Canada and Federal Court","Provincial courts and tribunals","Securities tribunals and the Competition Tribunal","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims","SEDAR+"]},
+ {c:"05 Legal", w:2, items:["CanLII","Supreme Court of Canada and Federal Court","Provincial court decisions","Capital Markets Tribunal","Competition Tribunal","Securities tribunals outside Ontario","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims","SEDAR+"]},
  {c:"06 Web", w:3, items:["ICANN RDAP","Certificate Log","Google Web Risk","VirusTotal","urlscan.io","Mail Config"]},
  {c:"07 Reviews", w:1, items:["Trustpilot","Sitejabber","BBB Scam Tracker","Forex Peace Army","Reddit","Glassdoor"]},
  {c:"08 Payment", w:2, items:["Beneficiary Match","IBAN and SWIFT","Chainabuse","Chain Analytics","Etherscan","Solscan","Tronscan","Bitcoin Explorer"]},
@@ -6853,12 +6878,22 @@ var REGINFO = {
 "ESMA MiCA CASP":["EU","A","The European authorisation record for crypto asset service providers under the Markets in Crypto Assets regulation. Names the legal entity, the member state that authorised it and which crypto services it may provide.","https://www.esma.europa.eu/"],
 "RECO real estate register":["CA-ON","A","The Real Estate Council of Ontario's register. Says whether a brokerage is registered to trade in real estate in Ontario.","https://www.reco.on.ca/"],
 "FSRA Ontario, mortgage and insurance licences":["CA-ON","A","The Financial Services Regulatory Authority of Ontario. Licenses mortgage brokerages, insurance agencies, credit unions and loan companies in Ontario.","https://www.fsrao.ca/"],
-"BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators":["CA","A","The provincial bodies that license real estate, mortgage and insurance outside Ontario: the BC Financial Services Authority, the Real Estate Council of Alberta, the Autorite des marches financiers, the Financial and Consumer Affairs Authority of Saskatchewan, and their Manitoba and Atlantic counterparts.","https://www.bcfsa.ca/"],
+"BC Financial Services Authority":["CA-BC","A","The British Columbia regulator of mortgage brokers, real estate services, credit unions and insurance.","https://www.bcfsa.ca/"],
+"Real Estate Council of Alberta":["CA-AB","A","The Alberta regulator that licenses real estate, mortgage and property management brokerages and holds their conduct record.","https://www.reca.ca/"],
+"Autorite des marches financiers":["CA-QC","A","Quebec's single financial regulator, covering securities, insurance, deposit institutions and mortgage brokerage.","https://lautorite.qc.ca/"],
+"Financial and Consumer Affairs Authority of Saskatchewan":["CA-SK","A","The Saskatchewan regulator of securities, mortgage brokers, payday lenders and consumer credit.","https://fcaa.gov.sk.ca/"],
+"Manitoba Securities Commission":["CA-MB","A","The Manitoba securities and real estate regulator, holding registrations, orders and investor warnings.","https://www.mbsecurities.ca/"],
+"Financial and Consumer Services Commission of New Brunswick":["CA-NB","A","The New Brunswick regulator across securities, insurance, mortgage brokers, real estate, payday lending and consumer credit.","https://fcnb.ca/"],
+"Nova Scotia Securities Commission":["CA-NS","A","The Nova Scotia securities regulator, holding registrations, orders and investor warnings.","https://nssc.novascotia.ca/"],
+"Prince Edward Island and Newfoundland and Labrador regulators":["CA","A","The two Atlantic regulators whose registers we have not yet pinned to a host, kept on the board so the gap has a name.","https://www.bcfsa.ca/"],
 "NMLS Consumer Access":["US","A","The United States national register of mortgage and consumer lending licences, for companies and individuals.","https://www.nmlsconsumeraccess.org/"],
 "MAS Financial Institutions Directory":["SG","A","The Monetary Authority of Singapore's directory of the institutions it regulates.","https://eservices.mas.gov.sg/fid"],
 "IOSCO I-SCAN":["GLOBAL","A","The investor alerts portal carrying warnings from more than ninety national authorities in one place.","https://www.iosco.org/i-scan/"],
 "Canadian Consolidated Autonomous Sanctions List":["CA","A","Canada's own sanctions list, held by Global Affairs Canada. Names the people and entities Canadians are prohibited from dealing with.","https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/consolidated-consolide.aspx"],
-"Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts":["INTL","A","The public warnings issued by the consumer and competition authorities of Canada and the United States, and by the FBI's internet crime centre.","https://competition-bureau.canada.ca/"],
+"Competition Bureau Canada":["CA","A","Canada's competition law enforcer, publishing deceptive marketing cases and fraud warnings.","https://competition-bureau.canada.ca/"],
+"Federal Trade Commission":["US","A","The United States consumer protection agency, publishing cases, refund programmes and consumer alerts.","https://www.ftc.gov/"],
+"Consumer Financial Protection Bureau":["US","A","The United States regulator for consumer lending, payments and credit reporting, publishing enforcement and complaint records.","https://www.consumerfinance.gov/"],
+"Internet Crime Complaint Center":["US","A","The FBI's reporting hub for internet crime, publishing alerts on active fraud patterns.","https://www.ic3.gov/"],
 "MAS Investor Alert List":["SG","A","The Monetary Authority of Singapore's list of unregulated persons who may have been wrongly perceived as licensed.","https://www.mas.gov.sg/investor-alert-list"],
 "BCSC Caution List":["CA-BC","A","British Columbia's Investment Caution List.","https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list"],
 "ASC Caution List":["CA-AB","A","Alberta's Investment Caution List.","https://www.asc.ca/en/enforcement/investment-caution-list"],
@@ -6886,8 +6921,10 @@ var REGINFO = {
 "SEDI Insider Reports":["CA","A","Canada's System for Electronic Disclosure by Insiders. Directors, officers and significant shareholders must report what they hold and every trade they make.","https://www.sedi.ca/"],
 "CanLII":["CA","A","Canadian court and tribunal decisions.","https://www.canlii.org/"],
 "Supreme Court of Canada and Federal Court":["CA","A","The decisions of Canada's highest court and of the Federal Court.","https://decisions.fct-cf.gc.ca/"],
-"Provincial courts and tribunals":["CA","A","The published decisions of the provincial superior and small claims courts and of the provincial tribunals.","https://www.canlii.org/"],
-"Securities tribunals and the Competition Tribunal":["CA","A","The tribunals that decide securities enforcement in each province, and the federal Competition Tribunal.","https://www.canlii.org/"],
+"Provincial court decisions":["CA","A","The published decisions of the provincial superior and small claims courts, served through CanLII.","https://www.canlii.org/"],
+"Capital Markets Tribunal":["CA-ON","A","Ontario's securities tribunal, which hears enforcement proceedings under the Securities Act and publishes its decisions.","https://www.capitalmarketstribunal.ca/"],
+"Competition Tribunal":["CA","A","The federal tribunal that hears competition matters, including deceptive marketing.","https://www.ct-tc.gc.ca/"],
+"Securities tribunals outside Ontario":["CA","A","The securities tribunals of the other provinces, each publishing from its own commission site. No host is pinned for these yet, so the row is kept on the board to give the gap a name.","https://www.canlii.org/"],
 "OSB Bankruptcy":["CA","A","The Office of the Superintendent of Bankruptcy insolvency records.","https://www.ic.gc.ca/app/scr/bsf-osb/ins/login.html"],
 "CourtListener":["US","B","A free archive of United States court opinions and dockets.","https://www.courtlistener.com/"],
 "UK Insolvency":["UK","A","The Insolvency Service register.","https://www.gov.uk/search-bankruptcy-insolvency-register"],
@@ -7100,9 +7137,30 @@ var REGREAD = {
 "FSRA Ontario, mortgage and insurance licences":["The firm holds an Ontario licence for what it is doing, or it appears in FSRA's enforcement record.",
   "No Ontario licence found for that activity. A firm arranging mortgages or selling insurance in Ontario needs one.",
   "Match the licence to the activity. A licence to sell insurance is not a licence to arrange a mortgage, and a firm holding one while doing the other is the thing to notice."],
-"BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators":["The firm holds a licence in that province for what it is doing, or it appears in that regulator's enforcement record.",
-  "No licence found in that province. A licence in one province is not a licence in another.",
-  "Check the province the money is going to, not only the province you are in. These regulators do not share one register, and each one only answers for its own."],
+"BC Financial Services Authority":["The firm holds a British Columbia licence for what it is doing, or it appears in BCFSA's enforcement record.",
+  "No British Columbia licence found for that activity. A licence in another province does not cover work done here.",
+  "Match the licence to the activity and to the province the money is going to, not the province you are in."],
+"Real Estate Council of Alberta":["The brokerage is licensed in Alberta, or it appears in RECA's conduct and discipline record.",
+  "No Alberta brokerage licence found. Arranging a mortgage or a property deal in Alberta needs one.",
+  "The licence is held by the brokerage. An individual agent working outside a licensed brokerage is the thing to notice."],
+"Autorite des marches financiers":["The firm is authorised in Quebec, or it appears in the AMF's warning and enforcement record.",
+  "No Quebec authorisation found. Quebec licenses separately from the rest of Canada and a firm can be registered elsewhere and not here.",
+  "Whether the authorisation covers the product being sold. The AMF registers by discipline, and the discipline is the point."],
+"Financial and Consumer Affairs Authority of Saskatchewan":["The firm is registered in Saskatchewan, or it appears in the authority's orders.",
+  "No Saskatchewan registration found for that activity.",
+  "Which division registered it. This one body covers several very different markets and a registration in one says nothing about another."],
+"Manitoba Securities Commission":["The firm or person is registered in Manitoba, or an order names them.",
+  "No Manitoba registration found. The register is smaller than the larger provinces and an absence is common for an out of province firm.",
+  "Whether the firm relies on an exemption rather than a registration, and whether that exemption fits what it is actually selling."],
+"Financial and Consumer Services Commission of New Brunswick":["The firm holds a New Brunswick licence, or it appears in the commission's warnings and orders.",
+  "No New Brunswick licence found across any of those sectors.",
+  "This one commission covers many markets, so read which licence was found before reading it as cover for the deal in front of you."],
+"Nova Scotia Securities Commission":["The firm or person is registered in Nova Scotia, or an order or warning names them.",
+  "No Nova Scotia securities registration found.",
+  "Whether anything found is a registration or an order. They sit on the same site and they mean opposite things."],
+"Prince Edward Island and Newfoundland and Labrador regulators":["Not asked yet. Nothing can be found here until a host is pinned for each of these two registers.",
+  "We do not ask these, so an empty answer is our gap and not the regulator's. Check them yourself if the money is going to either province.",
+  "That this row is a declared gap, not a clean result. Nothing here is evidence either way."],
 "NMLS Consumer Access":["The firm holds a state lending licence, with the states it covers listed.",
   "No NMLS record. A firm arranging a mortgage or a consumer loan in the United States needs one in every state it operates in.",
   "The states listed on the licence. A licence in one state is not a licence to lend in yours."],
@@ -7115,9 +7173,18 @@ var REGREAD = {
 "Canadian Consolidated Autonomous Sanctions List":["A name on this list is a legal prohibition, not a warning. Do not send anything and speak to your bank.",
   "Not on Canada's sanctions list. That is the floor, not a clearance.",
   "Match the full legal name and any listed alias. Sanctions lists carry aliases precisely because names get changed."],
-"Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts":["A consumer authority has published something naming this party or this scheme.",
-  "No consumer alert found. These bodies publish selectively, so silence here is very weak evidence.",
-  "Whether the alert names this party or names a pattern the approach you received matches. Both are worth knowing, and they are not the same thing."],
+"Competition Bureau Canada":["The Bureau has published something naming this party, or a warning describing this approach.",
+  "No Canadian competition action found. The Bureau publishes only what it has acted on, so silence is weak evidence.",
+  "Whether the item names the party or describes a pattern. Both are worth knowing and they are not the same thing."],
+"Federal Trade Commission":["The FTC has sued, settled with, or published an alert naming this party.",
+  "No federal consumer case found. The FTC brings a small number of cases against a very large market.",
+  "Whether a refund programme exists. If the party has been sued and money was returned, there may be a claim you can still make."],
+"Consumer Financial Protection Bureau":["The Bureau has an enforcement action or a body of complaints naming this party.",
+  "No CFPB record found. A firm outside consumer lending and payments is expected to be absent.",
+  "Complaint volume is not a finding. Read the enforcement record separately from the complaint database."],
+"Internet Crime Complaint Center":["An IC3 alert describes the pattern the approach you received matches.",
+  "No matching alert found. IC3 publishes patterns and rarely names a firm, so silence here says almost nothing about one business.",
+  "This is where a loss is reported in the United States. Whatever it says about the party, the reporting route is the useful part."],
 "MAS Investor Alert List":["MAS has published this name as one that may be mistaken for a regulated firm.",
   "Not on the MAS list. The list only covers what has been reported to MAS.",
   "The exact entity name and the website beside it. These entries usually name the site as well as the brand."],
@@ -7169,7 +7236,7 @@ var REGREAD = {
 "ASIC Investor Alerts":["An Australian regulator has published a warning naming this party or its website. Read the exact wording: it says what the concern is.",
   "Not on the list. It carries what ASIC has published, which is a fraction of what exists.",
   "The website and the aliases. The same operation appears on these lists repeatedly under new names."],
-"SFC Alert List":["The SFC has classified this party or its website. The classification itself is the finding: impersonation of a licensed firm is a different matter from operating unlicensed.",
+"SFC Alert List":["The SFC has classified this party or its website. The classification itself is the finding: impersonation of a licensed firm is a different fault from operating unlicensed.",
   "Not listed.",
   "The classification the SFC used, and whether the entry names a firm being impersonated. If it does, the real firm is not the one you are dealing with."],
 "Corporations Canada, Individuals with Significant Control":["The people with real control over the company are on the record.",
@@ -7199,12 +7266,18 @@ var REGREAD = {
 "Supreme Court of Canada and Federal Court":["The party has been before one of these courts. Read what the case was about before drawing anything from it.",
   "Nothing at this level. Most disputes never reach these courts, so this proves very little on its own.",
   "What the party was doing in the case. Being sued, suing somebody, and being prosecuted are three different facts."],
-"Provincial courts and tribunals":["A decision names the party. Most commercial disputes end up here rather than in a federal court.",
+"Provincial court decisions":["A decision names the party. Most commercial disputes end up here rather than in a federal court.",
   "No published decision found. Many proceedings are settled or never published, so an absence is not a clean record.",
   "The date and the outcome. An old settled dispute and a current unsatisfied judgment are not the same thing at all."],
-"Securities tribunals and the Competition Tribunal":["A tribunal has made a finding about this party. This is the record behind most regulator caution list entries.",
-  "No tribunal decision found. A regulator can warn about a party long before any tribunal has heard it.",
-  "Whether the decision is a finding, an order, or a settlement, and what the party agreed to. A settlement without an admission is still a fact, and it is not a finding of wrongdoing."],
+"Capital Markets Tribunal":["The tribunal has made a finding, an order or approved a settlement naming this party.",
+  "Nothing heard in Ontario. A matter can be under investigation for years and never reach a hearing.",
+  "Whether it is a finding, an order or a settlement, and what the party agreed to. A settlement without an admission is still a fact and it is not a finding of wrongdoing."],
+"Competition Tribunal":["The Tribunal has decided a matter naming this party.",
+  "No Tribunal decision found. Very few matters reach it, so absence is the normal state for almost every business.",
+  "The remedy, not only the finding. What the party was ordered to stop doing tells you what it was doing."],
+"Securities tribunals outside Ontario":["Not asked yet. Nothing can be found here until a host is pinned for each province.",
+  "We do not ask these, so an empty answer is our gap and not the tribunal's. A provincial regulator can have decided something we did not see.",
+  "That this row is a declared gap, not a clean result. Check the commission for the province the money is going to."],
 "OSB Bankruptcy":["A Canadian insolvency record.",
   "No record.",
   "Whether it is closed or ongoing."],
@@ -7227,7 +7300,7 @@ var REGREAD = {
   "No SEDAR+ filings located. For a party describing itself as a Canadian public company or reporting issuer, that is a contradiction to resolve before anything else.",
   "The earliest filing date, and how the business described itself in each year. A company that told a regulator it was pre revenue in 2024 and tells you it has been trading profitably since 2022 has given two different accounts and you are entitled to ask which is correct."],
 "ICANN RDAP":["The registry record for the domain: registrar, nameservers, status and creation date.",
-  "The registry did not answer. It almost always does, so a failure here usually means a temporary outage rather than a missing domain.",
+  "The registry did not answer. It almost always does, so a failure here usually means a temporary fault rather than a missing domain.",
   "The creation date. Everything else on this page can be argued about. That date cannot."],
 "Certificate Log":["Every certificate ever issued for this host, with dates.",
   "No certificates found.",
@@ -7306,13 +7379,13 @@ var REGREAD = {
   "Whether the neighbours are on a mass market provider. Thousands of unrelated sites share a Cloudflare nameserver and that connects nobody to anybody."],
 "Host and Certificate Graph":["The host and certificate relationships are on record, which extends the certificate check in category 06 into a map rather than a single date.",
   "No scan data retrieved. Often a missing key, and it is published as a gap.",
-  "Certificates covering several unrelated brand names at once. One certificate issued for four brands puts those four brands on one certificate."],
+  "Certificates covering several unrelated brand names at once. One certificate naming four brands is a question about who runs them, and it is a question rather than an answer."],
 "Wallet Reuse":["This payment address has appeared in a previous check under a different name. Of everything on this board, this is the hardest to explain innocently.",
   "This address has not appeared in our records before. On a young corpus that mostly means we have not seen it, not that it is new.",
   "The other name it appeared under, and the date. Both are shown."],
 "Beneficiary Reuse":["The receiving party on this payment instruction has received money on behalf of a different named company before. The name on the account is the thing to look at, not the company on the invoice.",
   "This beneficiary has not appeared in our records before.",
-  "Whether the account name matches the company you are being asked to pay. A mismatch between what a party says and what a register holds is the signal that most often turns out to matter."],
+  "Whether the account name matches the company you are being asked to pay. A mismatch is the single most reliable signal on this entire board."],
 "People Cluster":["A person connected to this party appears in our records against another entity. The connection is shown with the record that established it, in both directions.",
   "No person connected to this party appears elsewhere in our records.",
   "Whether the earlier entity attracted a regulator warning. That is the connection worth the most, and it is stated separately when it exists."],
@@ -7384,7 +7457,7 @@ var REGREAD = {
 
 /* THE GENERATED CATALOGUE METADATA IS GONE, AND THIS NOTE IS WHY.
    tools/sync-catalogue.mjs wrote sixteen kilobytes of per-source metadata into
-   this file for all 121 registers, and nothing in the page ever read one field
+   this file for all 133 registers, and nothing in the page ever read one field
    of it. The board draws from SOURCES and REGINFO; the register drawer draws
    from SR001. If a screen ever needs the transport, tier or vertical of a named
    source, regenerate it with that tool rather than hand-writing a copy. */
@@ -12482,7 +12555,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260918.0742";
+var KBYS_BUILD = "20260918.1754";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -12742,12 +12815,23 @@ function rpBarred(ev){
   return null;
 }
 function rpSieve(list){
-  var out=[], dropped=[];
+  var out=[], dropped=[], elsewhere=[];
   for(var i=0;i<(list||[]).length;i++){
-    var why=rpBarred(list[i]);
-    if(why) dropped.push({ev:list[i], why:why}); else out.push(list[i]);
+    var it=list[i];
+    /* A FINDING THAT IS NOT ABOUT THEM IS NOT A FINDING AGAINST THEM.
+       Three of the four findings on a live run about a provincial bank were
+       about somebody else: a lookalike domain a regulator had warned about,
+       fraudsters running fake phone lines in the bank's name, and a second
+       lookalike on an alert list. Each was true, each was rendered against the
+       bank at HIGH, and each belongs under the heading that says it is not
+       them. Somebody using a name to defraud people is a finding about the
+       impersonator. It is not a mark against the name they borrowed. */
+    if(it && it.match === "unconnected"){ elsewhere.push(it); continue; }
+    var why=rpBarred(it);
+    if(why) dropped.push({ev:it, why:why}); else out.push(it);
   }
   out.dropped = dropped;
+  out.elsewhere = elsewhere;
   return out;
 }
 
@@ -12863,6 +12947,16 @@ function rpAttachGuard(d){
     demoted.push({cat:k, from:"RED", to:next});
     c.state = next;
   }
+  /* A VERDICT HAS TO STAND ON SOMETHING.
+     A payload arrived with every category green and the verdict set to RED, and
+     the page printed it, because the guard only looked at verdicts whose
+     category it had just demoted. A red with nothing red underneath it is not a
+     judgement, it is a stray field, and on this product it is the single most
+     consequential stray field there is. */
+  var anyRed=false;
+  for(k in (d.cats||{})) if(d.cats[k].state==="RED") anyRed=true;
+  if(d.verdict==="RED" && !anyRed && !demoted.length)
+    demoted.push({cat:"", from:"RED", to:"", why:"the verdict rested on no category at all"});
   if(demoted.length){
     var stillRed=false;
     for(k in (d.cats||{})) if(d.cats[k].state==="RED") stillRed=true;
@@ -13334,12 +13428,13 @@ function rpGoodsHtml(d){
   }
   return out;
 }
-var RP_LAST_DROPPED = [];
+var RP_LAST_DROPPED = [], RP_LAST_ELSEWHERE = [];
 function rpFinds(d){
   /* The sieve runs before anything is chosen, not after, so a barred item can
      never be the reason a finding was ranked into the top four and then vanish
      from underneath it. */
   var sieved=rpSieve(d.issues||[]);
+  RP_LAST_ELSEWHERE = sieved.elsewhere||[];
   /* ALL OF THEM, HIGHEST IMPACT FIRST.
      It used to stop at four. Four was right when every finding opened to half
      a screen of detail; now each one is a single line until it is asked for,
@@ -13405,20 +13500,32 @@ function rpFinds(d){
      its own heading, saying whose record it actually is. It carries no severity
      and it is not one of the findings above it. */
   var look=rpLookalikes(d);
+  /* Findings that turned out to be about somebody else join the records that
+     did, under one heading, so a reader meets the whole "not them" story in one
+     place rather than in two. */
+  var elsew=RP_LAST_ELSEWHERE||[];
+  for(var E=0;E<elsew.length;E++)
+    look.push({src:elsew[E].t||"A finding", about:elsew[E].about||"", url:"", fromIssue:true});
   if(look.length){
-    out+='<div class="rp-look"><div class="rp-lookh">A similar name on a list, and it is not them</div>';
+    out+='<div class="rp-look"><div class="rp-lookh">Things that carry this name, and are not them</div>';
     for(var L=0;L<look.length;L++){
       var e=look[L];
-      out+='<div class="rp-lookr"><span class="rp-lkw">'+rpEsc(e.src||"A list")+'</span>'
-        +'<span class="rp-lka">names '+rpEsc(e.about||"a different identifier")+'</span>'
-        +(e.url?'<span class="rp-lku">'+rpOut(e.url,"Open the record")+'</span>':"")
+      out+='<div class="rp-lookr">'
+        +(e.fromIssue
+          ? '<span class="rp-lka">'+rpEsc(e.src||"")
+            +(e.about?' This is about '+rpEsc(e.about)+'.':'')+'</span>'
+          : '<span class="rp-lkw">'+rpEsc(e.src||"A list")+'</span>'
+            +'<span class="rp-lka">names '+rpEsc(e.about||"a different identifier")+'</span>'
+            +(e.url?'<span class="rp-lku">'+rpOut(e.url,"Open the record")+'</span>':""))
         +'</div>';
     }
     out+='<p class="rp-lookx">We checked, and nothing in what we read ties '
-      +(d.name?rpEsc(d.name):"this party")+' to the entr'+(look.length===1?'y':'ies')
-      +' above. A shared word or a shared run of letters is not a link, so '
-      +(look.length===1?'it is':'they are')+' reported here and '
-      +(look.length===1?'counts':'count')+' for nothing in the result.</p></div>';
+      +(d.name?rpEsc(d.name):"this party")+' to '+(look.length===1?'it':'them')
+      +'. A shared word or a shared run of letters is not a link, and somebody '
+      +'using a name to defraud people is a finding about them rather than a '
+      +'mark against the name they borrowed. '+(look.length===1?'It is':'They are')
+      +' reported here and '+(look.length===1?'counts':'count')
+      +' for nothing in the result.</p></div>';
   }
   return out;
 }
@@ -14734,11 +14841,45 @@ function rpDelivery(d){
       t:"Do not send anything tonight.",
       x:"Something came back against this party and it is set out below with the source "
        +"beside it. Waiting until the morning costs you nothing." };
-  return { c:"calm", act:null,
+  /* NOT GREEN. AN ABSENCE TAKES NO STATE COLOUR.
+     "We could not confirm this party on a register" set on a green ground reads
+     as good news to somebody scanning, and it is the opposite: it is the page
+     saying it has less to go on than usual. Grey is the house answer for an
+     absence, the same grey the gap note wears, and it is used here for the same
+     reason.
+     It also has to be told apart from the case where a register DID answer
+     about a related company, because a reader looking at a registration for an
+     affiliate one column over and this sentence beside it is reading a
+     contradiction we put there. */
+  var rel_ = rpRelatedRegistered(d);
+  if(rel_) return { c:"none", act:null,
+    t:"We found a registration for a related company, not for this one.",
+    x:"A register answered about "+rel_+", which is not the party you asked about. "
+     +"Two companies can share a name and a parent and still be different firms with "
+     +"different permissions. Ask them, in writing, which entity you are dealing with." };
+  return { c:"none", act:null,
     t:"We could not confirm this party on a register.",
     x:"That is not a finding against them. It means the registers we could reach had no "
      +"entry, so there is less to go on here than there would be for a registered firm. "
      +"What we did reach is listed below." };
+}
+
+/* The name a register DID answer about, where it was not the party we checked.
+   Reported rather than swallowed: a registration for an affiliate sitting on the
+   page beside the words "could not confirm this party" is a contradiction, and
+   the reader is the one left to resolve it. */
+function rpRelatedRegistered(d){
+  for(var k in (d.cats||{})){
+    var ev=(d.cats[k]||{}).ev||[];
+    for(var i=0;i<ev.length;i++){
+      var e=ev[i];
+      if(e.match!=="probable") continue;
+      if(e.t!=="A"&&e.t!=="B") continue;
+      if(!/register|registered|licen[cs]ed|authoris|authoriz|dealer|member/i.test(String(e.find||""))) continue;
+      if(e.about) return String(e.about);
+    }
+  }
+  return "";
 }
 
 function renderReport(d){
@@ -14795,8 +14936,12 @@ function renderReport(d){
      than as instruction. */
   var actBox = id("rpTonightA");
   if(actBox){
+    /* The beat is earned by one thing only: an authority has published
+       something about THIS party, by name, under the attachment rule. Not an
+       amber, not a look-alike, not a pattern of complaints. */
+    var beat_ = rpHasOfficial(d) ? " rp-beat" : "";
     if(dl.act){
-      actBox.innerHTML = '<button class="rp-actb" type="button" data-pak="'+rpEsc(dl.act)+'">'
+      actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-pak="'+rpEsc(dl.act)+'">'
         + 'Open what to tell your bank</button>';
       actBox.hidden = false;
     } else if(d.verdict==="RED" || ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT"){
@@ -14808,7 +14953,7 @@ function renderReport(d){
          offered at the moment the verdict lands.
          Amber is not a fault, so an amber result never gets this. A reader who
          is only weighing something up is left to read. */
-      actBox.innerHTML = '<button class="rp-actb" type="button" data-act="1">'
+      actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-act="1">'
         + 'Do this right now</button>';
       actBox.hidden = false;
     } else {

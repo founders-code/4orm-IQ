@@ -286,7 +286,7 @@ var NODES=[
   {id:"route",  x:840, y:44,  w:182,h:84, k:"Scope",         t:"Routing",
    s:"which registers apply"},
   /* the evidence */
-  {id:"regs",   x:288, y:196, w:734,h:158,k:"Retrieval",     t:"121 registers, in ten checks",
+  {id:"regs",   x:288, y:196, w:734,h:158,k:"Retrieval",     t:"133 registers, in ten checks",
    s:"asked together, every answer kept with the page it came from", wide:1},
   {id:"pages",  x:1054,y:196, w:226,h:112,k:"Supply",        t:"Where the pages come from",
    s:"search, direct feeds, objectives"},
@@ -347,7 +347,7 @@ var INFO={
          +"somebody's character."},
 
   route:{k:"Scope", t:"Routing",
-    body:["The sector and the jurisdiction decide which of the 121 registers could hold a "
+    body:["The sector and the jurisdiction decide which of the 133 registers could hold a "
          +"record for this particular party. An Australian licence register does not lower "
          +"coverage on a Canadian issuer with no Australian activity, because it could never "
          +"have held a record in the first place.",
@@ -356,7 +356,7 @@ var INFO={
     rail:["The applicable set for this party","The rulebook version in force at that moment"],
     never:""},
 
-  regs:{k:"Retrieval", t:"121 registers, asked together",
+  regs:{k:"Retrieval", t:"133 registers, asked together",
     body:["Company registries, licence registers, enforcement and caution lists, court and "
          +"insolvency records, domain and certificate records, payment and chain records, and "
          +"the dates a party claims about itself.",
@@ -551,7 +551,7 @@ var WALK=[
            +"thing that actually needs checking is clear."],
   ["gate","The ask is tested. A person's name would be refused here. A company, a website, "
          +"an email or a wallet is allowed through."],
-  ["route","Sector and jurisdiction decide which of the 121 registers could hold a record "
+  ["route","Sector and jurisdiction decide which of the 133 registers could hold a record "
           +"for this party. That set is what coverage will be measured against."],
   ["pages","Direct feeds where one exists, a pinned search where one does not, an objective "
           +"where the answer spans pages."],

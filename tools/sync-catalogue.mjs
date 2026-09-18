@@ -68,11 +68,18 @@ const meta =
     ',transport:' + q(s.transport) + '}'
   ).join(',\n') + '\n  }\n};';
 
+/* CATALOGUE_META is built above and deliberately not written into the page.
+   The console reads the board, the reference and the counts; routing and
+   coverage are worked out in api/check.js against the catalogue itself, so a
+   second copy of the routing table in the page would be a copy nothing reads
+   and everything could drift from. It is kept here because the moment the page
+   needs it, this is where it comes from. */
+void meta;
+
 const blocks = {
   SOURCES: sources,
   REGINFO: reginfo,
-  REGREAD: regread,
-  CATALOGUE_META: meta
+  REGREAD: regread
 };
 
 let html = fs.readFileSync(target, 'utf8');
