@@ -1392,6 +1392,85 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
   if (!/box\.hidden=true; return;/.test(script))
     fails.push('a result with nothing to act on still gets a block of instructions');
 }
+/* ------------------------------------ BEHIND THE DOOR: FOUR BLOCKS, NOT A WALL
+   What was behind it ran to two thousand pixels of unbroken reading with two
+   unlabelled lists inside it. A frightened person cannot triage that. Each
+   block is now a letter, a short title and one line, and the shape is declared
+   once so a reader learns it on the first block and not four times. */
+{
+  const a = sheets_.rpAct || '';
+  const blocks = (a.match(/class="rp-cbk"/g) || []).length;
+  if (blocks < 4) fails.push('what is behind the door is down to ' + blocks + ' blocks');
+  const heads = [...a.matchAll(/<div class="rp-cbh">([\s\S]*?)<\/div>/g)]
+    .map(m => m[1].replace(/<[^>]*>/g, '').trim());
+  if (heads.length !== blocks)
+    fails.push('a block behind the door has no title of its own');
+  for (const h of heads) {
+    const words = h.split(/\s+/).filter(Boolean).length;
+    if (words > 6) fails.push('a title behind the door runs to ' + words + ' words: ' + h);
+  }
+  /* And every block's summary is one line, not a paragraph. */
+  for (const m of a.matchAll(/class="rp-cbs"[^>]*>([\s\S]*?)<\/p>/g)) {
+    const t = m[1].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    const w = t.split(/\s+/).filter(Boolean).length;
+    if (w > 24) fails.push('a summary behind the door runs to ' + w + ' words: ' + t.slice(0, 60));
+  }
+  if (/id="rpClockC"/.test(a))
+    fails.push('the door opens with a pill and a headline saying the same thing again');
+  if (/class="rp-clockh2"/.test(a))
+    fails.push('a list behind the door is back under an unstyled heading');
+  /* The summary lines the run writes are held to the same length. */
+  for (const k of ['clockX', 'shame']) {
+    for (const m of script.matchAll(new RegExp(k + ':"([^"]*(?:"\\s*\\+\\s*"[^"]*)*)"', 'g'))) {
+      const t = m[1].replace(/"\s*\+\s*"/g, '').replace(/\s+/g, ' ').trim();
+      const w = t.split(/\s+/).filter(Boolean).length;
+      if (w > 34) fails.push('the ' + k + ' line behind the door runs to ' + w + ' words: ' + t.slice(0, 60));
+    }
+  }
+  /* WHOSE HALF IS WHOSE, VISIBLE WITHOUT READING A WORD OF IT.
+     One column header labelled both halves of an eighteen row table and
+     therefore labelled neither, and every row in the lower half carried the
+     same sentence twice. */
+  if (!/class="rp-bband"/.test(script))
+    fails.push('the record table no longer says where our half stops and theirs starts');
+  if (!/class="rp-bband rp-byou"/.test(script))
+    fails.push('the reader\'s half of the record table is unlabelled');
+  {
+    const m = /var yours=\[([^\]]*)\]/.exec(script);
+    const n = m ? (m[1].match(/"/g) || []).length / 2 : 0;
+    if (n !== 4) fails.push('the reader is asked for ' + n + ' things, and it should be four');
+  }
+  if (/>Only you can answer this</.test(script))
+    fails.push('the record table says the same thing twice on every row of the reader\'s half');
+}
+/* ------------------------------------------- TIPS ARE LINES, NOT PARAGRAPHS
+   A reader reaches this list having already read a verdict and a page of what
+   to do. A tip that takes a paragraph to land is a tip that is not read. */
+{
+  const m = /var RP_TIPS = \[([\s\S]*?)\n\];/.exec(script);
+  if (!m) fails.push('the tips are gone');
+  else {
+    const pairs = [...m[1].matchAll(/\["([^"]+)",\s*\n?\s*"([^"]+)"\]/g)];
+    if (pairs.length < 5) fails.push('there are only ' + pairs.length + ' tips');
+    for (const [, t, x] of pairs) {
+      const tw = t.split(/\s+/).length, xw = x.split(/\s+/).length;
+      if (tw > 7) fails.push('a tip title runs to ' + tw + ' words: ' + t);
+      if (xw > 26) fails.push('a tip runs to ' + xw + ' words: ' + x.slice(0, 60));
+    }
+  }
+}
+/* And the paragraph over who to reach out to is one sentence, not four. */
+{
+  const a = sheets_.rpAct || '';
+  const m = /<p class="rp-sub">Each one is a report card([\s\S]{0,400}?)<\/p>/.exec(a);
+  if (!m) fails.push('the line over who to reach out to is gone or back to its old length');
+  else {
+    const w = ('Each one is a report card' + m[1]).replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ').trim().split(/\s+/).length;
+    if (w > 32) fails.push('the line over who to reach out to runs to ' + w + ' words');
+  }
+}
+
 /* --------------------------------------------- EVERY NUMBER NAMES WHO ANSWERS
    This row used to read "Canada 1-888-495-8501", which tells a frightened
    person to ring a country, and "Your bank: the number on your card", which a

@@ -168,6 +168,71 @@ await p.waitForTimeout(400);
   console.log('the file matches the preview');
 }
 
+/* ----------------------------------- behind the door, as four short blocks */
+{
+  await stage('SENT');
+  await act();
+  await p.evaluate(() => {
+    const c = document.getElementById('rpClock');
+    if (c && c.hidden) document.getElementById('rpAlreadyBtn').click();
+  });
+  await p.waitForTimeout(700);
+  const n = await p.evaluate(() => {
+    const c = document.getElementById('rpClock');
+    const blocks = [...c.querySelectorAll('.rp-cbk')].filter(e => !e.hidden);
+    return {
+      h: Math.round(c.getBoundingClientRect().height),
+      titles: blocks.map(e => e.querySelector('.rp-cbh').textContent.replace(/\s+/g, ' ').trim()),
+      sums: blocks.map(e => { const s = e.querySelector('.rp-cbs');
+        return s ? s.textContent.replace(/\s+/g, ' ').trim() : ''; }),
+      bands: [...c.querySelectorAll('.rp-bband')].map(e => e.textContent.trim()),
+      yours: c.querySelectorAll('.rp-bv.rp-you').length,
+      dupe: /Only you can answer this/.test(c.textContent)
+    };
+  });
+  if (n.titles.length < 4) await fail('the door holds ' + n.titles.length + ' blocks');
+  for (const t of n.titles) {
+    const w = t.replace(/^[A-D]\s*/, '').split(/\s+/).filter(Boolean).length;
+    if (w > 6) await fail('a title behind the door runs to ' + w + ' words: ' + t);
+  }
+  for (const x of n.sums) {
+    const w = x.split(/\s+/).filter(Boolean).length;
+    if (w > 24) await fail('a summary behind the door runs to ' + w + ' words: ' + x.slice(0, 50));
+  }
+  if (n.bands.length !== 2)
+    await fail('the record table does not say where our half stops and theirs starts');
+  if (n.yours !== 4) await fail('the reader is asked for ' + n.yours + ' things, and it should be four');
+  if (n.dupe) await fail('the record table still says the same thing twice on every row');
+  if (n.h > 2300) await fail('what is behind the door is ' + n.h + 'px, which is still a wall');
+  console.log('behind the door: ' + n.titles.length + ' blocks, ' + n.h + 'px, '
+    + n.yours + ' lines for the reader');
+}
+
+/* ------------------------------------------ tips are lines, not paragraphs */
+{
+  const t = await p.evaluate(() => [...document.querySelectorAll('#rpTips .rp-tip')]
+    .map(e => ({ t: e.querySelector('.rp-t').textContent.trim(),
+                 x: e.querySelector('.rp-x').textContent.trim() })));
+  if (t.length < 5) await fail('there are only ' + t.length + ' tips');
+  for (const r of t) {
+    if (r.t.split(/\s+/).length > 7) await fail('a tip title is too long: ' + r.t);
+    if (r.x.split(/\s+/).length > 26) await fail('a tip is still a paragraph: ' + r.x.slice(0, 50));
+  }
+  console.log('tips: ' + t.length + ', every one a title and a line');
+}
+
+/* -------------------------------- and the line over who to reach out to */
+{
+  const w = await p.evaluate(() => {
+    const e = [...document.querySelectorAll('#rpAct .rp-sub')]
+      .find(x => /report card/i.test(x.textContent));
+    return e ? e.textContent.replace(/\s+/g, ' ').trim().split(/\s+/).length : null;
+  });
+  if (w === null) await fail('the line over who to reach out to is gone');
+  if (w > 32) await fail('the line over who to reach out to runs to ' + w + ' words');
+  console.log('who to reach out to: ' + w + ' words over the list');
+}
+
 /* Every number on the screen names who answers. */
 {
   const tels = await p.evaluate(() =>
