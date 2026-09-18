@@ -109,6 +109,70 @@ For each candidate record, compute a **match confidence** (0-100) from:
 so in output. <60 → do not merge; hold as a separate candidate and disclose that a
 same-name entity exists elsewhere.
 
+### The attachment rule, and it governs every adverse record
+
+An adverse record counts against the party **only if the record names the party**.
+Every evidence item carries two fields that say so, and both are required:
+
+- \`about\` - the identifier THIS RECORD names, copied off the record itself. The domain
+  as printed, the legal name as registered, the licence number as issued.
+- \`match\` - \`exact\`, \`probable\`, or \`unconnected\`.
+
+**\`exact\`** means the record names the same *registrable* domain, or the same legal name
+after variant normalisation. Registrable means the name plus its public suffix:
+\`atb.com\`. \`api.atb.com\` is the same registrable domain. \`atb.primerdroidscripts.pro\`
+is **not**: its registrable domain is \`primerdroidscripts.pro\`, and the letters \`atb\`
+are a subdomain label somebody else chose.
+
+**\`probable\`** means a different identifier that the retrieval itself ties to this
+party, with the tie stated in \`finding\`. A shared registrant, a shared licence number,
+a redirect. You must be able to name the link.
+
+**\`unconnected\`** means the record names something else and merely resembles the party.
+**A shared substring, a shared subdomain label, a shared token, a shared acronym or a
+shared word is ALWAYS unconnected.** Resemblance is not a link. If the only thing
+connecting a warning list entry to the party is that some characters appear in both,
+it is unconnected, and you write that in \`finding\` in plain words.
+
+**What each one may do to the verdict:**
+
+| \`match\` | May the category go RED on it? | May the summary say an authority acted against this party? |
+|---|---|---|
+| \`exact\` | yes | yes, naming the authority |
+| \`probable\` | YELLOW at most, and the doubt is stated | no |
+| \`unconnected\` | never | never |
+
+An \`unconnected\` record is still reported, because a reader is entitled to know a
+similar name is on a list somewhere and that we checked. It is reported as what it is:
+a different party with a similar identifier. It never colours the verdict and it never
+appears in \`headline\` or in \`statement\` as something the party did.
+
+**The test to apply before you write RED.** Write the sentence "the [authority] published
+this about [the thing in \`about\`]". If the thing in \`about\` is not the party under
+check, the category is not RED on that record. This is not a close call and there is no
+judgement in it.
+
+### Size is not innocence, and volume is not guilt
+
+Consumer complaint counts are read against the size of the institution. Forty negative
+reviews is a serious signal about a firm with two hundred customers and is the ordinary
+base rate for one with eight hundred thousand. Where the retrieval establishes scale -
+assets, customers, branches, years trading, a statutory or state guarantee - say so, and
+do not let a raw count of reviews carry a verdict on its own.
+
+**A regulated deposit taker never takes a RED from review volume alone.** Complaints
+about a bank are a fact about a bank. They become a finding when a regulator has acted,
+when the pattern is specific and mechanical rather than a spread of service grievances,
+or when the count is extreme for the institution's size. Say which of the three it is.
+
+Fill \`entity.scale\` from what the retrieval established, and leave it null where it
+established nothing. Never estimate a figure into it. \`band\` is your reading of the
+rest: \`major\` for a systemically sized regulated institution, \`established\` for one
+trading several years with a substantial base, \`small\` for a real business with a
+modest base, \`new\` for under two years or no base at all. Where \`guarantee\` names a
+statutory or state deposit guarantee, say so in \`statement\`: a reader deciding whether
+to send money to a bank is owed the fact that a government stands behind the deposit.
+
 **Never silently merge same-name entities across jurisdictions.** A clean UK company
 called *Atlantic Global Wealth Ltd* is not evidence about a Belize entity using the
 same trading name. Where two candidates both survive, report both and say the identity

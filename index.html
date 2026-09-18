@@ -4174,6 +4174,24 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
    This is the page telling the reader that a rule we set ourselves cost them
    something. It is the most important paragraph in the report and it had no
    rule of its own, so it read as an afterthought in body copy. */
+/* A LIST ENTRY THAT TURNED OUT TO BE SOMEBODY ELSE.
+   Grey and quiet, because it is neither a finding nor good news: it is the
+   record of a check we ran and a link we did not find. It must never be able
+   to read as a severity, so it wears no state colour at all. */
+#rpt .rp-look{margin-top:26px;padding:20px 22px;border-radius:var(--r);
+  background:#F1F2F4;border:1px solid #DCDFE4}
+#rpt .rp-lookh{font-size:15px;font-weight:700;letter-spacing:-.016em;color:var(--tx)}
+#rpt .rp-lookr{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-top:12px;
+  padding-top:12px;border-top:1px solid #DCDFE4}
+#rpt .rp-lookr:first-of-type{border-top:none}
+#rpt .rp-lkw{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-lka{font-size:14px;line-height:1.5;color:var(--tx);overflow-wrap:anywhere}
+#rpt .rp-lku{font-size:13px}
+#rpt .rp-lookx{margin:14px 0 0;font-size:13.6px;line-height:1.6;color:var(--tx-2);max-width:68ch}
+/* Said on the finding itself, so nobody has to find the note to know. */
+#rpt .rp-loose{display:block;margin-top:10px;padding:9px 12px;border-radius:var(--r-sm);
+  background:#F1F2F4;border:1px solid #DCDFE4;font-size:13px;line-height:1.55;color:var(--tx-2)}
 #rpt .rp-held{margin-top:20px;padding:15px 18px;border-left:3px solid var(--acc-dp);
   border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--acc-50,#FBF6EA);
   font-size:14px;line-height:1.6;color:#5C4712;max-width:68ch}
@@ -6371,68 +6389,68 @@ var CORPUS = {
   barFoot:"Fourteen sources returned a definitive result. Seven are authoritative: two regulator listings, four registry records and one statement from a central bank. Nine sources that should have been reached were not, and every one of them is named further down this page.",
   cats:{
     C1:{state:"RED",sum:"No legal entity is named anywhere. There is nothing to look up.",
-      ev:[{t:"B",src:"investhelm.com, the site's own published claims",when:"25 Aug 2026",
+      ev:[{t:"B", match:"exact",src:"investhelm.com, the site's own published claims",when:"25 Aug 2026",
         find:"No legal entity, registration number, registered office, phone or email is published anywhere on the site.",
         plain:"The site tells you nothing you could look up. Before you send anything, ask for the legal company name and its registration number in writing, then check that number in the register yourself.",
         quote:"operates under full regulatory oversight; 85% Accuracy; Bank-Level Security; Major credit cards, bank transfers, and PayPal; (c) 2026 Investhelm",url:"https://investhelm.com"}]},
     C2:{state:"RED",sum:"Claims regulatory oversight. Names no regulator, gives no licence number. Not registered.",
-      ev:[{t:"A",src:"BC Securities Commission, Investment Caution List",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"BC Securities Commission, Investment Caution List",when:"25 Aug 2026",
         find:"Listed on the Investment Caution List, added 14 July 2026.",
         plain:"A securities regulator has publicly warned people about this name. That warning is on the record right now, and it is the strongest single reason on this page to stop.",
         quote:"This company is not registered with the BC Securities Commission.",url:"https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list/2026/investhelm"}]},
     C3:{state:"RED",sum:"On a Canadian securities regulator's caution list, and carried nationally.",
-      ev:[{t:"A",src:"BC Securities Commission, Investment Caution List",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"BC Securities Commission, Investment Caution List",when:"25 Aug 2026",
         find:"Added to the Investment Caution List on 14 July 2026.",
         plain:"The regulator that polices investment selling in British Columbia has put this name on a public caution list. Being on that list means they are not registered to take your money.",
         quote:"This company is not registered with the BC Securities Commission. If you have been approached by, or referred to, this entity, you should proceed with extreme caution and be aware of the risk before handing over any money.",url:"https://www.bcsc.bc.ca/enforcement/early-intervention/investment-caution-list/2026/investhelm"},
-       {t:"A",src:"Canadian Securities Administrators, Investor Alerts",when:"25 Aug 2026",
+       {t:"A", match:"exact",src:"Canadian Securities Administrators, Investor Alerts",when:"25 Aug 2026",
         find:"National investor alert published 15 July 2026. Issuing regulator: BCSC.",
         plain:"The warning did not stay local. It was republished nationally, so every Canadian regulator can see it. That is an escalation, not a repeat of the same thing.",
         quote:"Investhelm - https://investhelm.com - British Columbia Securities Commission - July 15, 2026",url:"https://www.autorites-valeurs-mobilieres.ca/investor-alerts/investhelm/"}]},
     C4:{state:"RED",sum:"No director, officer or founder is named. The only people attached to it are impersonated.",
-      ev:[{t:"A",src:"Bank of Canada, media relations",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"Bank of Canada, media relations",when:"25 Aug 2026",
         find:"The Bank of Canada states the investment video featuring its Governor is fake.",
         plain:"The Governor of Canada's central bank has said publicly that the video promoting this platform is fake. Nobody at the Bank of Canada endorsed anything here.",
         quote:"This video is fake. To help Canadians avoid these kinds of scams, we encourage people to check the Bank's official channels on social media as well as our website for genuine information from the Bank.",url:"https://www.thecanadianpressnews.ca/fact_checking/ad-for-investment-platform-featuring-bank-of-canada-governor-tiff-macklem-is-fake/article_7ef558ec-3a69-5494-8528-dba3f6102b5a.html"}]},
     C5:{state:"GREY",sum:"Not assessable. Court and insolvency registers key on a legal entity name, and none exists.",ev:[]},
     C6:{state:"RED",sum:"Domain 184 days old. 13 of 29 security sources report warnings. Randomised nameservers.",
-      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
         find:"Domain created 22 February 2026. 184 days old at the time of this check.",
         plain:"The website is under six months old. That alone is not fraud, but it means there is almost no history behind anything the site claims about itself.",
         quote:"registration 2026-02-22T18:15:58Z; last changed 2026-04-04T08:07:34Z; expiration 2027-02-22T18:15:58Z; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; client transfer prohibited",url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"},
-       {t:"B",src:"Threat aggregation across 29 security sources",when:"25 Aug 2026",
+       {t:"B", match:"exact",src:"Threat aggregation across 29 security sources",when:"25 Aug 2026",
         find:"13 of 29 sources report a warning. Phishing signals present. Certificate valid for a 90 day window.",
         plain:"Close to half the security services that scan websites flag this one. Do not enter a password or a card number on it.",
         quote:"Trust score 1/100; 13 blacklist detections and phishing-related signals; hosting Private Layer INC, Bellinzona, Switzerland; IP 179.43.182.250; SSL valid June 4 to September 2, 2026; Do not enter passwords or payment data",url:"https://gridinsoft.com/online-virus-scanner/url/investhelm-com"}]},
     C7:{state:"RED",sum:"The favourable review material is manufactured, and the same template runs under four brand names.",
-      ev:[{t:"D",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
+      ev:[{t:"D", match:"exact",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
         find:"An identical review template promotes Investhelm, Nexlares, Bay Assetholm and Cedar Assetgrove. Community intelligence, not verified fact. Promoted to a red result only because official registry records corroborate the cluster.",
         plain:"The favourable reviews you would find by searching are not reviews. The same text promotes four different brand names, which means somebody wrote it to be found.",
         quote:"Tiff Macklem Investhelm Review, Scam or Legit? | Tiff Macklem Bay Assetholm Review, Scam or Legit? | Tiff Macklem Nexlares Review, Scam or Legit? | Tiff Macklem Cedar Assetgrove Review, Scam or Legit?",url:""},
-       {t:"D",src:"Promotional review page",when:"25 Aug 2026",
+       {t:"D", match:"exact",src:"Promotional review page",when:"25 Aug 2026",
         find:"The source of the impossible operating history claims and the fabricated endorsement narrative.",
         plain:"This is the page the impossible history claims come from. It is marketing written to look like an independent review.",
         quote:"$350 to get started; average investor takes home between $2,800 and $4,500 per month; users collectively earned over $1.35 billion; 400,000 Canadians are already using; the platform is legal, it operates in Canada",url:""}]},
     C8:{state:"GREY",sum:"Not run. No payment instructions were supplied.",ev:[]},
     C9:{state:"RED",sum:"Shares all three nameservers and the registrar with a second brand making the same claims.",
-      ev:[{t:"B",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+      ev:[{t:"B", match:"exact",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
         find:"nexlares.com shares all three nameservers and the registrar with investhelm.com. Two brands on one set of infrastructure.",
         plain:"This website and another one are run on the same machinery. Two brand names, one setup behind them.",
         quote:"creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM",url:"https://rdap.verisign.com/com/v1/domain/nexlares.com"},
-       {t:"B",src:"nexlares.com, the sibling brand's published claims",when:"25 Aug 2026",
+       {t:"B", match:"exact",src:"nexlares.com, the sibling brand's published claims",when:"25 Aug 2026",
         find:"The sibling brand repeats the same unfalsifiable registration claim, with no number and no regulator named.",
         plain:"The sibling brand makes the same registration claim in the same unprovable way. Ask either of them for the number, and check it yourself rather than following a link they send.",
         quote:"Nexlares is an officially registered company in Canada; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",url:"https://nexlares.com"}]},
     C10:{state:"RED",sum:"The site claims results for 2025 on a domain that did not exist until February 2026.",
-      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
         find:"The domain investhelm.com was created on 22 February 2026. Nothing on it can be older than that date.",
         plain:"The website did not exist before this date. Any claim about trading earlier needs a different company name to carry it, and they can settle it by giving you that name.",
         quote:"registration 2026-02-22T09:14:07Z",url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"},
-       {t:"B",src:"investhelm.com, the party's own promotional material",when:"25 Aug 2026",
+       {t:"B", match:"exact",src:"investhelm.com, the party's own promotional material",when:"25 Aug 2026",
         find:"The site states a 2025 earnings figure and a user count accumulated over a period that predates the domain by a full year.",
         plain:"They claim results from a year in which their own website did not exist. Ask them which company earned it, then look that name up in the register.",
         quote:"$1.35 billion earned by our members in 2025; 400,000 Canadians already using the platform",url:"https://investhelm.com"},
-       {t:"B",src:"Internet Archive Wayback Machine",when:"25 Aug 2026",
+       {t:"B", match:"exact",src:"Internet Archive Wayback Machine",when:"25 Aug 2026",
         find:"No capture of this host exists before 2026. There is no archived version of the site in the period the claim covers.",
         plain:"The internet's own archive holds no copy of this site from the period they say they were operating. A site that was there would normally have been captured.",
         quote:"No results for investhelm.com prior to 2026",url:"https://web.archive.org/web/*/investhelm.com"}]}
@@ -6498,35 +6516,35 @@ var CORPUS = {
   barFoot:"Seven sources returned a definitive result. The decisive one is a registry record: all three nameservers and the registrar match a brand already on the BC Securities Commission caution list. Nine sources that should have been reached were not.",
   cats:{
     C1:{state:"RED",sum:"Claims to be a registered company in Canada. Gives no name, no number, no address.",
-      ev:[{t:"B",src:"nexlares.com, the site's own published claims",when:"25 Aug 2026",
+      ev:[{t:"B", match:"exact",src:"nexlares.com, the site's own published claims",when:"25 Aug 2026",
         find:"Claims Canadian registration without a legal entity name, a registration number, a regulator or a physical address.",
         plain:"Registered in Canada, with nothing supplied that you could use to confirm it. A real registration always comes with a name and a number you can look up.",
         quote:"Nexlares is an officially registered company in Canada; Over 1090 Daily; Limited spots available; Trading in financial instruments is not regulated in the United States",url:"https://nexlares.com"}]},
     C2:{state:"RED",sum:"An unfalsifiable registration claim: no registry named, no number given.",
-      ev:[{t:"B",src:"nexlares.com, the site's own published claims",when:"25 Aug 2026",
+      ev:[{t:"B", match:"exact",src:"nexlares.com, the site's own published claims",when:"25 Aug 2026",
         find:"An officially registered company in Canada, with nothing supplied that any register could confirm or refute.",
         plain:"They say they are an officially registered company but give nothing any register could match. Ask for the exact legal name and number, in writing.",
         quote:"Nexlares is an officially registered company in Canada",url:"https://nexlares.com"}]},
     C3:{state:"GREY",sum:"No caution listing found under this name. Most warning lists were not reached this run.",ev:[]},
     C4:{state:"RED",sum:"Nobody named. Promoted using the same fabricated Bank of Canada endorsement.",
-      ev:[{t:"A",src:"Bank of Canada, media relations",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"Bank of Canada, media relations",when:"25 Aug 2026",
         find:"The Bank of Canada states the investment video featuring its Governor is fake. The same template promotes this brand.",
         plain:"The same fake central bank video is used to promote this brand. The endorsement it implies never happened.",
         quote:"This video is fake. To help Canadians avoid these kinds of scams, we encourage people to check the Bank's official channels on social media as well as our website for genuine information from the Bank.",url:"https://www.thecanadianpressnews.ca/fact_checking/ad-for-investment-platform-featuring-bank-of-canada-governor-tiff-macklem-is-fake/article_7ef558ec-3a69-5494-8528-dba3f6102b5a.html"}]},
     C5:{state:"GREY",sum:"Not assessable. No legal entity name to query with.",ev:[]},
     C6:{state:"RED",sum:"Domain 218 days old, on randomised nameservers shared with a caution-listed brand.",
-      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
         find:"Domain created 19 January 2026, on the same three nameservers and the same registrar as investhelm.com.",
         plain:"This site was set up on the same machinery as the other brand, a month earlier. That is a fact about the setup. It is not a statement about who runs them.",
         quote:"creation 2026-01-19; registrar NETIM SAS (IANA 1519); NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; client transfer prohibited",url:"https://rdap.verisign.com/com/v1/domain/nexlares.com"}]},
     C7:{state:"YELLOW",sum:"Promoted by the same manufactured review template as three other brands.",
-      ev:[{t:"D",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
+      ev:[{t:"D", match:"exact",src:"Open web sweep, promotional template reuse",when:"25 Aug 2026",
         find:"The identical review template promotes this brand alongside Investhelm, Bay Assetholm and Cedar Assetgrove. Community intelligence, not verified fact.",
         plain:"The same promotional text promotes this brand and three others. Reviews that appear under four names at once are advertising.",
         quote:"Tiff Macklem Nexlares Review, Scam or Legit? | Tiff Macklem Investhelm Review, Scam or Legit?",url:""}]},
     C8:{state:"GREY",sum:"Not run. No payment instructions were supplied.",ev:[]},
     C9:{state:"RED",sum:"Infrastructure cluster with investhelm.com, which is already on the BCSC caution list.",
-      ev:[{t:"A",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"ICANN RDAP, via the Verisign registry",when:"25 Aug 2026",
         find:"All three nameservers and the registrar match investhelm.com, added to the BC Securities Commission Investment Caution List on 14 July 2026.",
         plain:"This site shares its whole setup with a name a securities regulator has publicly cautioned people about. The shared setup is a fact. What it means is a question to put to them.",
         quote:"NS1.RT9UE7.COM, NS2.QJ5TK1.COM, NS3.DE34U7.COM; registrar NETIM SAS (IANA 1519)",url:"https://rdap.verisign.com/com/v1/domain/investhelm.com"}]}
@@ -6658,45 +6676,45 @@ var SPECIMEN = {
   barFoot:"Seventy-three sources returned a definitive result across eleven jurisdictions. The decisive combination is a licensing mismatch, a domain younger than the claimed operating history, money going to a name that is not the company we checked, and forty-three independent accounts describing the same withdrawal mechanic.",
   cats:{
     C1:{state:"GREEN",sum:"Company record found, and the legal entity matches the register.",
-      ev:[{t:"A",src:"UK Companies House, company register",when:"26 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"UK Companies House, company register",when:"26 Aug 2026",
         find:"Atlantic Global Wealth Ltd is registered and active. Incorporated 11 June 2026.",
         plain:"The company does exist and is active on the UK register. That settles who they are. It settles nothing about whether they are allowed to sell you an investment.",
         quote:"Company number 15482207. Incorporated on 11 June 2026. Company type: Private limited company. Company status: Active.",url:""}]},
     C2:{state:"RED",sum:"The UK authorisation this firm claims is not on the register.",
-      ev:[{t:"A",src:"FCA Financial Services Register",when:"26 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"FCA Financial Services Register",when:"26 Aug 2026",
         find:"Reference 827381 does not correspond to Atlantic Global Wealth Ltd. It returns a different firm in a different category.",
         plain:"The licence number on their website belongs to a different firm. This is the most common tell there is, and checking it takes about a minute.",
         quote:"No results found for Atlantic Global Wealth Ltd. Firm reference number 827381 is held by an unrelated firm.",url:""},
-       {t:"A",src:"CSA National Registration Search",when:"26 Aug 2026",
+       {t:"A", match:"exact",src:"CSA National Registration Search",when:"26 Aug 2026",
         find:"Not registered in any Canadian jurisdiction, while accepting Canadian clients.",
         plain:"They are taking Canadian clients without being registered to do that in any Canadian province. Registration is the permission to ask you for money.",
         quote:"No registrant found matching Atlantic Global Wealth.",url:""}]},
     C3:{state:"GREEN",sum:"No matching enforcement action or public warning found in the lists checked.",
-      ev:[{t:"A",src:"IOSCO I-SCAN, 90+ contributing authorities",when:"26 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"IOSCO I-SCAN, 90+ contributing authorities",when:"26 Aug 2026",
         find:"No matching alert in any contributing jurisdiction. Absence here is expected on a firm this new, and is not a clearance.",
         plain:"No regulator anywhere has warned about them yet. On a company this new that is exactly what you would expect, and it is not a clean bill of health.",
         quote:"0 results for Atlantic Global Wealth.",url:""}]},
     C4:{state:"YELLOW",sum:"Two directors identified. One marketed executive appears in no register we reached.",
-      ev:[{t:"A",src:"UK Companies House, persons with significant control",when:"26 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"UK Companies House, persons with significant control",when:"26 Aug 2026",
         find:"Two officers filed. Neither is the person the website names as Chief Executive.",
         plain:"The person the website presents as Chief Executive is not one of the two officers on file. Ask who is actually responsible for the company, and get the answer in writing.",
         quote:"Officers: 2 active. No appointment recorded in the name John Smith.",url:""}]},
     C5:{state:"GREEN",sum:"No insolvency, judgment or public order identified.",
-      ev:[{t:"A",src:"UK Insolvency Service and Companies House insolvency",when:"26 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"UK Insolvency Service and Companies House insolvency",when:"26 Aug 2026",
         find:"No insolvency proceedings recorded against the entity or its two filed officers.",
         plain:"Nothing on the insolvency record. That means the company was not in a failure process on the day we looked, and nothing more than that.",
         quote:"No matching records.",url:""}]},
     C6:{state:"RED",sum:"Domain registered 43 days ago against a claimed twelve year operating history.",
-      ev:[{t:"A",src:"ICANN RDAP, registry record",when:"26 Aug 2026",
+      ev:[{t:"A", match:"exact",src:"ICANN RDAP, registry record",when:"26 Aug 2026",
         find:"Domain created 14 July 2026. 43 days old. The site claims twelve years of trading.",
         plain:"The website is six weeks old and they claim twelve years of trading. Ask which company did the other eleven years, and look that name up.",
         quote:"registration 2026-07-14T09:22:07Z; registrar privacy service; nameservers on a shared bulletproof range",url:""},
-       {t:"B",src:"Certificate transparency log",when:"26 Aug 2026",
+       {t:"B", match:"exact",src:"Certificate transparency log",when:"26 Aug 2026",
         find:"First certificate issued 16 July 2026, two days after registration. No earlier certificate exists for this name.",
         plain:"The first security certificate for this name was issued two days after the domain itself. There is no earlier version of this site anywhere.",
         quote:"Earliest entry 2026-07-16. Validity 90 days.",url:""}]},
     C7:{state:"RED",sum:"Forty-three independent accounts across five platforms describing the same withdrawal mechanic.",
-      ev:[{t:"C",src:"Cross-platform negative review sweep",when:"26 Aug 2026",
+      ev:[{t:"C", match:"exact",src:"Cross-platform negative review sweep",when:"26 Aug 2026",
         find:"Five platforms carry the same mechanic in different people's words over five months. Community intelligence, promoted to red only because official records corroborate.",
         plain:"Different people, on five separate platforms, over five months, describe the same thing happening to them. One complaint is noise. This is a pattern.",
         quote:"Depositing took four seconds. I have been waiting nine weeks for a withdrawal and every time I ask it goes back to processing.",url:""}]},
@@ -9741,6 +9759,10 @@ function fillBoard(d){
 }
 
 function toResult(d,label){
+  /* The console reads the same payload and draws the board, the graph and the
+     shareable summary from it, so it is scrubbed on the way in here too. The
+     call is idempotent: whichever of the two runs first does the work. */
+  d = rpAttachGuard(rpScrubPayload(d));
   MODE="result"; CURRENT=d;
   document.body.setAttribute("data-stage","console");
   /* Only a live run has a duration worth reporting. Timing the demo's scan
@@ -11732,6 +11754,12 @@ if(/[?&]debug=1\b/.test(window.location.search)){
                     applySector:function(d,c){ return rpApplySector(d||RP_LAST_D,
                                                  arguments.length>1?c:RP_LAST_CLEAN); },
                     lastReport:function(){ return RP_LAST_D; },
+                    /* The person scrubber, driveable. The property worth
+                       testing is that a redaction never changes what a sentence
+                       is about, and that is only measurable by feeding it
+                       sentences and reading what comes back. */
+                    scrub:function(txt,d){ return rpScrubPeople(txt,d); },
+                    scrubPayload:function(d){ return rpScrubPayload(d); },
                     /* Redraw the report from the payload already held. The act
                        screen changes shape with the run's stage, and a check
                        that wants to look at the money-has-gone screen needs a
@@ -12454,7 +12482,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260918.0644";
+var KBYS_BUILD = "20260918.0742";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -12653,7 +12681,13 @@ function rpIsName(s){
    officer, principal, named. Without that cue a capitalised pair of words is
    just as likely to be a company, and "Cedar Assetgrove" printed as a director
    on a page somebody hands to their bank is worse than printing nothing. */
-var RP_ROLE = /\b(director|officer|appointed|principal|promoter|adviser|advisor|president|chief|founder|owner|shareholder|controlled by|acting for|signatory|named as|named in|beneficial)\b/i;
+/* WIDENED, BECAUSE THE GAP IN IT PUT A NAME ON A LIVE PAGE.
+   "Ursula Holmsten is listed as an executive at ATB Wealth" carried none of the
+   words below as they stood: not executive, not listed as, not manager, not
+   chair. So the name was never recognised as a person, never held, and never
+   scrubbed, and it reached a report card, the findings and nine packs. A role
+   vocabulary that misses a word is not a near miss, it is a name in public. */
+var RP_ROLE = /\b(director|officer|appointed|principal|promoter|adviser|advisor|president|chief|founder|owner|shareholder|controlled by|acting for|signatory|named as|named in|beneficial|executive|executives|chair|chairman|chairwoman|chairperson|manager|managing|partner|trustee|board member|spokesperson|spokesman|spokeswoman|listed as|serves as|served as|works at|works for|employed|employee|joined|resigned|stepped down|CEO|CFO|COO|CTO|CIO|CRO)\b/i;
 
 /* ---------------------------------------------------- the Quebec subject rule
    Blocking Quebec users is a rule about who is reading. It says nothing about
@@ -12767,10 +12801,129 @@ function rpNamesWithheld(d){ return rpHeldNames(d).length; }
    publish people, and a paragraph is not an exception to that. */
 var RP_HELD_PHRASE = "an individual named in the records";
 function rpEscRe(t){ return String(t).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
-function rpScrubPeople(txt, d){
+/* ================================ NO PERSON'S NAME LEAVES THIS PAYLOAD, ANYWHERE
+   The privacy notice says a person's name found in a company record is refused
+   at the point of writing and not hidden at the point of showing. The scrubber
+   ran on exactly one field, the summary paragraph, and a director's name
+   reached a live report card, the findings and all nine packs because every
+   other render path read the payload raw.
+   Patching the call sites is how it happened: there are dozens of them and a
+   new one is one line of somebody else's work away. So it is done once, at the
+   boundary, on the whole payload, before a single field is read. A render path
+   added tomorrow is covered because there is nothing left to cover.
+   What it must not touch: a URL, a reference, a date, a company name. Those are
+   either not prose or are the subject of the report. */
+/* SKIP ONLY WHAT MUST BE SKIPPED, AND SKIP IT BY NAME, NOT BY GUESS.
+   The first version of this list held "t", meaning the tier letter on a piece
+   of evidence. "t" is also the TITLE of a material issue, and the skip took
+   both, so a person's name sat in a finding heading on the page having passed
+   straight through the scrubber. A key name is not a type.
+   What is left is the short list of fields that are identifiers rather than
+   prose: a link, a reference, the party's own name and domain. Everything else
+   is walked, including every field that could hold a sentence, because a field
+   that can hold a sentence can hold a name. Scrubbing a tier letter or a date
+   costs nothing and changes nothing: there is no name in "A" or in
+   "26 Aug 2026". */
+var RP_SCRUB_SKIP = {url:1, href:1, id:1, ref:1, domain:1, name:1, host:1};
+/* ====================== THE ATTACHMENT RULE, APPLIED AGAIN ON THE WAY IN
+   The server applies this before it builds the payload. The page applies it
+   again here, because a payload can also arrive from the held report, from a
+   stored run, or from a build of the API older than the rule. A record about
+   somebody else must not colour the verdict on any of those paths either.
+   It is the same rule in both places on purpose. The cost of running it twice
+   is nothing. The cost of missing it once is a provincial Crown corporation
+   reading "do not send anything tonight" over a warning about a domain that
+   shares three letters with it. */
+function rpAttachGuard(d){
+  if(!d || d.__attached) return d;
+  var demoted = [], k, i;
+  var atScale = rpAtScale(d);
+  for(k in (d.cats||{})){
+    var c=d.cats[k], ev=c.ev||[];
+    if(c.state!=="RED") continue;
+    var exact=false, probable=false, hard=false;
+    for(i=0;i<ev.length;i++){
+      if(ev[i].match==="exact") exact=true;
+      else if(ev[i].match==="probable") probable=true;
+      if(ev[i].t==="A"||ev[i].t==="B") hard=true;
+    }
+    /* AND VOLUME ALONE DOES NOT HOLD A RED ON AN INSTITUTION AT SCALE.
+       A regulator acting is a regulator acting at any size, so a tier A or B
+       record holds. What comes down is a category resting only on what
+       customers said, about a party big enough that customers say things every
+       day. The reports stay on the page with their source. They stop being a
+       verdict. */
+    if(exact && atScale && !hard){
+      demoted.push({cat:k, from:"RED", to:"YELLOW", why:"consumer reports only, at scale"});
+      c.state = "YELLOW";
+      continue;
+    }
+    if(exact) continue;
+    var next = probable ? "YELLOW" : "GREY";
+    demoted.push({cat:k, from:"RED", to:next});
+    c.state = next;
+  }
+  if(demoted.length){
+    var stillRed=false;
+    for(k in (d.cats||{})) if(d.cats[k].state==="RED") stillRed=true;
+    if(d.verdict==="RED" && !stillRed){
+      var anyY=false;
+      for(k in (d.cats||{})) if(d.cats[k].state==="YELLOW") anyY=true;
+      d.verdict = anyY ? "YELLOW" : "GREY";
+      d.headline = anyY ? "Something is unresolved, and no record names this party"
+                        : "No record we reached names this party";
+      /* The issues rested on the evidence, and the evidence is not about this
+         party, so they come down with it. An issue is a reading of a record. */
+      if(d.issues && d.issues.length){
+        var keep=[];
+        for(i=0;i<d.issues.length;i++)
+          if(d.issues[i].sev!=="critical") keep.push(d.issues[i]);
+        d.issues = keep;
+      }
+    }
+    d.attachment = (d.attachment||[]).concat(demoted);
+  }
+  try{ Object.defineProperty(d, "__attached", {value:true, enumerable:false}); }
+  catch(e){ d.__attached = true; }
+  return d;
+}
+
+function rpScrubPayload(d){
+  if(!d || d.__scrubbed) return d;
+  /* The held names are computed once against the ORIGINAL payload. Computing
+     them per field would mean a name already replaced in one field stops being
+     findable in the next. */
+  var held = rpHeldNames(d);
+  function walk(v, key, depth){
+    if(depth > 8) return v;
+    if(typeof v === "string"){
+      if(RP_SCRUB_SKIP[key]) return v;
+      if(/^https?:\/\//i.test(v)) return v;
+      return rpScrubPeople(v, d, held);
+    }
+    if(Array.isArray(v)){
+      for(var i=0;i<v.length;i++) v[i]=walk(v[i], key, depth+1);
+      return v;
+    }
+    if(v && typeof v === "object"){
+      for(var k in v) if(Object.prototype.hasOwnProperty.call(v,k))
+        v[k]=walk(v[k], k, depth+1);
+      return v;
+    }
+    return v;
+  }
+  walk(d, "", 0);
+  /* Marked so a second render of the same payload does not scrub a scrubbed
+     string, which is harmless but wasteful on a long report. */
+  try{ Object.defineProperty(d, "__scrubbed", {value:true, enumerable:false}); }
+  catch(e){ d.__scrubbed = true; }
+  return d;
+}
+
+function rpScrubPeople(txt, d, heldIn){
   var t=String(txt||"");
   if(!t) return t;
-  var held = d ? rpHeldNames(d) : [];
+  var held = heldIn || (d ? rpHeldNames(d) : []);
   var i;
   for(i=0;i<held.length;i++){
     var re=new RegExp("\\b"+rpEscRe(held[i])+"(?:'s|\u2019s)?\\b","g");
@@ -12779,14 +12932,55 @@ function rpScrubPeople(txt, d){
   /* A name the record never carried but the summary invented a role for is
      caught by shape: two or three capitalised words sitting against a role
      word. Company names are not touched, because they do not read this way. */
-  t=t.replace(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z'.-]+){1,2})(,?\s+(?:the\s+)?(?:sole\s+)?(?:director|directors|officer|officers|founder|co-founder|owner|principal|president|chair|chairman|chairwoman|chief executive|CEO|CFO|COO|manager|partner|shareholder|beneficial owner))\b/g,
-    function(m,nm,tail){ return rpIsName(nm) ? (RP_HELD_PHRASE+tail) : m; });
-  t=t.replace(/\b((?:director|officer|founder|owner|principal|president|chair|chief executive|CEO|CFO|COO|manager|partner|shareholder)\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z'.-]+){1,2})\b/g,
-    function(m,head,nm){ return rpIsName(nm) ? (head+RP_HELD_PHRASE) : m; });
-  /* A redaction that lands at the head of a sentence still has to read like
-     one. */
-  t=t.replace(new RegExp("(^|[.!?]\\s+)"+rpEscRe(RP_HELD_PHRASE),"g"),
-    function(m,pre){ return pre+"An individual named in the records"; });
+  /* The connector between a name and its role is not always a comma. "Ursula
+     Holmsten is listed as an executive" put four words between the two, and the
+     old shape required them to be adjacent, so it matched nothing. */
+  var CONN = "(,?\\s+(?:is|was|are|were)?\\s*(?:listed|named|shown|recorded|registered|appointed)?\\s*(?:as|at|of|for)?\\s*(?:the\\s+|an?\\s+)?(?:sole\\s+|former\\s+|current\\s+|acting\\s+)?)";
+  var ROLEW = "(director|directors|officer|officers|founder|co-founder|owner|principal|president|chair|chairman|chairwoman|chairperson|chief executive|executive|CEO|CFO|COO|CTO|manager|managing director|partner|shareholder|trustee|board member|beneficial owner)";
+  var NAMEW = "([A-Z][a-z]+(?:\\s+[A-Z][a-z'.-]+){1,2})";
+  t=t.replace(new RegExp("\\b"+NAMEW+CONN+ROLEW+"\\b","g"),
+    function(m,nm,conn,role){ return rpIsName(nm) ? (RP_HELD_PHRASE+conn+role) : m; });
+  t=t.replace(new RegExp("\\b"+ROLEW+"(\\s+(?:is\\s+)?(?:named\\s+)?)"+NAMEW+"\\b","g"),
+    function(m,role,mid,nm){ return rpIsName(nm) ? (role+mid+RP_HELD_PHRASE) : m; });
+  /* ====================== A REDACTION MUST NOT CHANGE WHAT A SENTENCE IS ABOUT
+     This used to capitalise the replacement and stop there, which reads fine
+     and can be false. A name at the head of a sentence became "An individual
+     named in the records", and the rest of that sentence went on to say the
+     subject was established by statute as a Crown corporation. The result, on a
+     live page, about an 88 year old provincial bank, was a sentence asserting
+     that an institution is a person. Nothing in it was true.
+     A redaction is only safe where it stands in for a person and the sentence
+     still says what it said. Where the redacted phrase would become the subject
+     of the sentence, we cannot know that, because the subject is the one thing
+     the sentence is making a claim about. So that sentence is not repaired and
+     not published. It is withheld, and the withholding is declared: a sentence
+     we could not print is honest, and a sentence we mangled into a falsehood
+     about a real company is not. */
+  /* The danger is precise, so the test is precise. A redaction at the head of a
+     sentence is only unsafe where the rest of that sentence goes on to say what
+     the subject IS: incorporated, established by statute, a Crown corporation,
+     a bank. That is the sentence that turns an institution into a person. A
+     redaction at the head of a sentence that merely says what somebody DID is
+     fine, and dropping it would lose a true fact for no reason. */
+  var IS_A = /\b(is|was|are|were)\b[^.!?]*\b(established|incorporated|registered|constituted|created|owned|governed|regulated|licensed|authorised|authorized|a crown corporation|a corporation|a company|a bank|a credit union|a subsidiary|a division|statute|act)\b/i;
+  var head = new RegExp("^\\s*"+rpEscRe(RP_HELD_PHRASE)+"\\b", "i");
+  var sent = t.split(/(?<=[.!?])\s+/);
+  var kept = [], dropped = 0;
+  for(i=0;i<sent.length;i++){
+    var one = sent[i];
+    if(!one.trim()) continue;
+    if(head.test(one) && IS_A.test(one)){ dropped++; continue; }
+    /* Otherwise it stays, and it reads like a sentence. */
+    kept.push(one.replace(head, function(m){ return rpCap(m.replace(/^\s+/,"")); }));
+  }
+  t = kept.join(" ").trim();
+  if(dropped){
+    t += (t ? " " : "")
+      + (dropped===1 ? "One sentence" : rpCap(rpWord(dropped))+" sentences")
+      + " here named a person, so "
+      + (dropped===1 ? "it is" : "they are")
+      + " not printed. Nothing about the company has been left out.";
+  }
   return t;
 }
 function rpNames(d){
@@ -13163,6 +13357,9 @@ function rpFinds(d){
     /* Who says it, and what that carries, sits on the finding itself. Nobody
        reads a key beside a page; they read the line in front of them. */
     var tier=x.tier||(ev&&ev.t)||"D", src=rpSrcOf(tier);
+    /* Where the record behind a finding does not name the party, the finding
+       says so on its own face rather than in a footnote somewhere else. */
+    var loose=rpUnattached(ev);
     /* ONE LINE EACH, CLOSED. The heading of a finding is a complete thought on
        its own, so a reader running down the page gets the whole shape of the
        result in four lines. Everything that supports it, the detail, the plain
@@ -13183,6 +13380,10 @@ function rpFinds(d){
       +(plain?'<span class="rp-plain"><i></i><span>'+rpEsc(plain)+'</span></span>':'')
       +'<span class="rp-from rp-'+src[2]+'"><span class="w">'+rpEsc(src[0])+'</span>'
       +'<span class="c">'+rpEsc(src[1])+'</span></span>'
+      +(loose?'<span class="rp-loose">This record names '
+        +rpEsc((ev&&ev.about)||"a different identifier")
+        +'. We could not tie it to this party, so it counts for nothing in the '
+        +'result.</span>':"")
       +(url?'<span class="rp-lk">'+rpOut(url,lab)+'</span>':'')
       +'</div></details></div></div>';
   }
@@ -13197,6 +13398,27 @@ function rpFinds(d){
       +(RP_LAST_DROPPED.length===1?' was':'s were')+' found and not reported.</b> '
       +rpEsc(whys.join("; "))+'. This is a rule we apply to ourselves, and it '
       +'applies whether the item would have helped this firm or hurt it.</div>';
+  }
+  /* A SIMILAR NAME ON A LIST IS NOT THIS PARTY ON A LIST.
+     The reader is entitled to know we found it, and entitled not to have it
+     counted against the company they asked about. So it is reported here, under
+     its own heading, saying whose record it actually is. It carries no severity
+     and it is not one of the findings above it. */
+  var look=rpLookalikes(d);
+  if(look.length){
+    out+='<div class="rp-look"><div class="rp-lookh">A similar name on a list, and it is not them</div>';
+    for(var L=0;L<look.length;L++){
+      var e=look[L];
+      out+='<div class="rp-lookr"><span class="rp-lkw">'+rpEsc(e.src||"A list")+'</span>'
+        +'<span class="rp-lka">names '+rpEsc(e.about||"a different identifier")+'</span>'
+        +(e.url?'<span class="rp-lku">'+rpOut(e.url,"Open the record")+'</span>':"")
+        +'</div>';
+    }
+    out+='<p class="rp-lookx">We checked, and nothing in what we read ties '
+      +(d.name?rpEsc(d.name):"this party")+' to the entr'+(look.length===1?'y':'ies')
+      +' above. A shared word or a shared run of letters is not a link, so '
+      +(look.length===1?'it is':'they are')+' reported here and '
+      +(look.length===1?'counts':'count')+' for nothing in the result.</p></div>';
   }
   return out;
 }
@@ -13975,9 +14197,29 @@ function rpHasOfficial(d){
   for(var k in (d.cats||{})){
     var c=d.cats[k], ev=c.ev||[];
     if(c.state!=="RED") continue;
-    for(var i=0;i<ev.length;i++) if(ev[i].t==="A") return true;
+    /* A tier A record is not enough. It has to be a tier A record ABOUT THEM.
+       This function decides whether the page speaks in the imperative, so it is
+       the last place a resemblance may be read as a finding. */
+    for(var i=0;i<ev.length;i++) if(ev[i].t==="A" && rpAttached(ev[i])) return true;
   }
   return false;
+}
+/* A record that turned out to be about somebody else. The reader is told, in
+   plain words, rather than left to assume the entry on the list is theirs. */
+function rpLookalikes(d){
+  var out=[], seen={};
+  for(var k in (d.cats||{})){
+    var ev=(d.cats[k].ev)||[];
+    for(var i=0;i<ev.length;i++){
+      var e=ev[i];
+      if(e.match!=="unconnected") continue;
+      var key=(e.src||"")+"|"+(e.about||"");
+      if(seen[key]) continue;
+      seen[key]=1;
+      out.push(e);
+    }
+  }
+  return out;
 }
 /* The imperative is the sentence the product exists to deliver, and it is also
    the sentence that most looks like advice about an investment. So it is not
@@ -14047,12 +14289,28 @@ function rpBodyPlain(nm){
      rather than guessing at words it never used. */
   return s;
 }
+/* ================================= DOES THIS RECORD NAME THE PARTY WE CHECKED?
+   The one question that has to be asked before the page says an authority acted
+   against somebody. A regulator warning about atb.primerdroidscripts.pro is not
+   a warning about atb.com, and the difference between those two sentences is
+   the difference between a product and a libel. The payload now carries, on
+   every record, the identifier the record itself names and how that ties to the
+   party. Anything that is not an exact tie cannot speak in the imperative here.
+   The server applies the same rule before this ever runs. Both apply it,
+   because this is the sentence with the least room for error on the product. */
+function rpAttached(e){ return !!e && e.match === "exact"; }
+/* An older payload, stored before the field existed, carries no match at all.
+   It is read as unattached rather than as attached: a check we cannot make is
+   not a check we passed. */
+function rpUnattached(e){ return !!e && e.match !== "exact"; }
+
 function rpOfficialEv(d){
   for(var k in (d.cats||{})){
     var c=d.cats[k], ev=c.ev||[];
     if(c.state!=="RED") continue;
     for(var i=0;i<ev.length;i++){
       if(ev[i].t!=="A") continue;
+      if(!rpAttached(ev[i])) continue;
       if(String(ev[i].reg||ev[i].src||"").trim()) return ev[i];
     }
   }
@@ -14125,9 +14383,31 @@ function rpConsumerHosts(d){
   }
   return Object.keys(hosts);
 }
+/* ====================== VOLUME IS READ AGAINST THE SIZE OF THE THING COMPLAINED OF
+   A count of one-star reviews with no denominator is not a finding, it is a
+   number. Forty is a serious signal about a firm with two hundred customers and
+   is the ordinary base rate for one with eight hundred thousand, and until the
+   payload carried scale this product read the two the same way. It told the
+   customers of an 88 year old provincial bank, whose deposits a government
+   guarantees, not to send it money.
+   Scale never excuses a record. A regulator acting is a regulator acting at any
+   size. What scale does is stop a spread of service grievances being promoted
+   into a verdict on an institution big enough to generate them every day. */
+function rpScale(d){ return (d && d.scale) || null; }
+function rpBand(d){ var s=rpScale(d); return (s && s.band) || ""; }
+function rpGuaranteed(d){ var s=rpScale(d); return !!(s && s.guarantee); }
+/* Big enough that a spread of complaints is the base rate rather than a signal.
+   Either the retrieval placed it in the top band, or it named a statutory or
+   state guarantee standing behind the deposits, which no small unknown has. */
+function rpAtScale(d){ return rpBand(d)==="major" || rpGuaranteed(d); }
+
 function rpEscalation(d){
   if(rpHasOfficial(d)) return "OFFICIAL";
   if(d && d.verdict==="RED") return "OFFICIAL";   /* the record contradicts them */
+  /* At scale, complaints across several platforms are what several platforms
+     look like for an institution with hundreds of thousands of customers. They
+     are still shown, on the record, with their source. They do not escalate. */
+  if(rpAtScale(d)) return "NOISE";
   return rpConsumerHosts(d).length >= RP_PATTERN_PLATFORMS ? "PATTERN" : "NOISE";
 }
 
@@ -14462,6 +14742,10 @@ function rpDelivery(d){
 }
 
 function renderReport(d){
+  /* THE FIRST THING THAT HAPPENS TO A PAYLOAD, BEFORE ANY FIELD IS READ.
+     Every render path on this product reads from here down, so scrubbing here
+     covers all of them, including the ones written after this line. */
+  d = rpAttachGuard(rpScrubPayload(d));
   RP=d;
   var c=rpCounts(d);
   /* No stamp. The reference and the date the records were read are the first

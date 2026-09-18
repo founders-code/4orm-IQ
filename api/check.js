@@ -72,7 +72,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260918.0644';
+const BUILD = '20260918.0742';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -180,25 +180,82 @@ function toRenderShape(a, meta) {
      where routing produced nothing. */
   const universe = (meta.counts && meta.counts.applicable) || (checked + missed);
 
+  /* ================================= THE ATTACHMENT RULE, ENFORCED ON THE WAY OUT
+     The cue tells the model that an adverse record counts against the party only
+     where the record names the party, and that a shared substring is never a
+     link. Telling is not enforcing. A UK regulator warning about a domain whose
+     only relation to atb.com was the three letters "atb" in somebody else's
+     subdomain reached a reader as "the Financial Conduct Authority has published
+     a warning about this firm", about an 88 year old provincial Crown
+     corporation. The model had even written the doubt into its own findings and
+     the verdict took no notice.
+     So the rule is applied here, in code, after the model and before the page:
+     an item marked unconnected cannot hold a category at RED, and where a RED
+     category has no record that actually names the party, it comes down. The
+     model is still asked to get this right. It is no longer trusted to. */
+  const ATTACH = new Set(['exact', 'probable', 'unconnected']);
+  const matchOf = e => ATTACH.has(e.match) ? e.match : 'probable';
+  const demoted = [];
   const cats = {};
   (a.categories || []).forEach(c => {
-    cats[c.id] = {
-      state: c.state, sum: c.summary,
-      ev: (c.evidence || []).map(e => ({
-        t: e.tier, src: e.source, when: e.retrieved,
-        find: e.finding, plain: e.plain || '', quote: e.quote || '', url: e.url || ''
-      }))
-    };
+    const ev = (c.evidence || []).map(e => ({
+      t: e.tier, src: e.source, when: e.retrieved,
+      find: e.finding, plain: e.plain || '', quote: e.quote || '', url: e.url || '',
+      /* Carried to the page so the reader can be told which party a record is
+         about, rather than being left to assume it is theirs. */
+      about: e.about || '', match: matchOf(e)
+    }));
+    let state = c.state;
+    if (state === 'RED' && !ev.some(e => e.match === 'exact')) {
+      /* Probable keeps the doubt visible at YELLOW. Nothing but unconnected
+         records means the category never had a record about this party at all. */
+      const next = ev.some(e => e.match === 'probable') ? 'YELLOW' : 'GREY';
+      demoted.push({ cat: c.id, from: 'RED', to: next,
+                     why: ev.length ? 'no record naming this party' : 'no evidence' });
+      state = next;
+    }
+    cats[c.id] = { state, sum: c.summary, ev };
   });
 
   const issues = a.material_issues || [];
   const claims = a.claims || [];
 
+  /* AND THE VERDICT COMES DOWN WITH THE CATEGORY IT RESTED ON.
+     Demoting a category and leaving the page headed RED would be the same bug
+     with an extra step: the loudest line on the screen is the verdict, and a
+     reader takes it as the summary of everything below it. If nothing is RED
+     any more, the page is not RED. The issues that rested on the demoted
+     categories come down with it, because a material issue is a reading of the
+     evidence and the evidence is no longer there. */
+  let verdict  = a.verdict?.state || 'GREY';
+  let headline = a.verdict?.headline || 'Insufficient information';
+  let statement = a.verdict?.statement || '';
+  const stillRed = Object.values(cats).some(c => c.state === 'RED');
+  if (verdict === 'RED' && !stillRed) {
+    const anyYellow = Object.values(cats).some(c => c.state === 'YELLOW');
+    verdict  = anyYellow ? 'YELLOW' : 'GREY';
+    headline = anyYellow
+      ? 'Something is unresolved, and no record names this party'
+      : 'No record we reached names this party';
+    statement = 'A record with a similar identifier appears on a list, and nothing in '
+      + 'what we read ties it to this party. It is set out below as what it is. '
+      + 'Nothing here is a finding about them, in either direction.'
+      + (statement ? ' ' + statement : '');
+  }
+
+  /* Carried to the page so complaint volume can be read against the size of the
+     thing being complained about, rather than counted in a vacuum. */
+  const scale = a.entity?.scale || null;
+
   return {
     name: a.entity?.display_name || '', domain: a.entity?.domain || '',
-    verdict: a.verdict?.state || 'GREY',
-    headline: a.verdict?.headline || 'Insufficient information',
-    statement: a.verdict?.statement || '',
+    scale,
+    verdict,
+    headline,
+    statement,
+    /* Written into the payload so the audit trail carries the correction rather
+       than only its result, and the back office can count how often it fires. */
+    attachment: demoted,
     idc: s.identity_confidence || 0, cov: s.evidence_coverage || 0,
 
     reads: [

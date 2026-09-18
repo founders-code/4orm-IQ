@@ -23,7 +23,27 @@ export const PAYLOAD_SCHEMA = {
       properties: {
         display_name: { type: 'string', description: 'Uppercase trading name as a consumer would recognise it.' },
         domain:       { type: 'string', description: 'Primary domain, or the raw identifier if none.' },
-        legal_entity: { type: ['string', 'null'], description: 'Legal entity name if one was established. Null if none was found.' }
+        legal_entity: { type: ['string', 'null'], description: 'Legal entity name if one was established. Null if none was found.' },
+        /* HOW BIG IS IT, AND IS SOMEBODY STANDING BEHIND IT.
+           Forty negative reviews is a serious signal about a firm with two
+           hundred customers and the ordinary base rate for one with eight
+           hundred thousand. Without scale in the payload the two are read the
+           same way, and a provincial bank of 88 years was told its customers
+           should not send it money on the strength of a handful of one-star
+           reviews. Read off the record or left null. Never estimated. */
+        scale: {
+          type: ['object', 'null'],
+          description: 'What the retrieval established about the size and standing of the party. Null where nothing was established. Never estimate any of it.',
+          properties: {
+            basis:     { type: 'string', description: 'Where these figures came from, named. Empty if none.' },
+            customers: { type: ['integer', 'null'], description: 'Customers or members, as the record states.' },
+            assets_usd:{ type: ['number', 'null'],  description: 'Total assets in USD, as the record states.' },
+            since:     { type: ['integer', 'null'], description: 'Year first established, as the record states.' },
+            guarantee: { type: ['string', 'null'],  description: 'A statutory or state deposit guarantee named in the record, e.g. "Government of Alberta", "CDIC", "FDIC". Null if none was established.' },
+            band:      { type: ['string', 'null'], enum: ['major', 'established', 'small', 'new', null],
+              description: 'major: a systemically sized regulated institution. established: trading several years with a substantial base. small: a real business with a modest base. new: under two years or no base established. Null where nothing was established.' }
+          }
+        }
       }
     },
 
@@ -74,10 +94,21 @@ export const PAYLOAD_SCHEMA = {
             description: 'Empty only when the category was unreachable or does not apply.',
             items: {
               type: 'object',
-              required: ['tier', 'source', 'retrieved', 'finding', 'plain'],
+              required: ['tier', 'source', 'retrieved', 'finding', 'plain', 'about', 'match'],
               properties: {
                 tier:      TIER,
                 source:    { type: 'string', description: 'The organisation and the specific register or page.' },
+                /* WHO THE RECORD IS ABOUT, AND HOW THAT TIES TO THE PARTY.
+                   Without these two fields the payload cannot express the
+                   difference between a regulator warning about this firm and a
+                   regulator warning about a different firm whose domain shares
+                   three letters with it, and nothing downstream can tell them
+                   apart. A warning list entry for atb.primerdroidscripts.pro
+                   is not a record about atb.com. */
+                about:     { type: 'string', description:
+                  'The identifier THIS RECORD names, copied from the record itself: the domain as printed, the legal name as registered, the licence number as issued. Never the party you were asked about, unless the record names them.' },
+                match:     { type: 'string', enum: ['exact', 'probable', 'unconnected'], description:
+                  'How `about` ties to the party under check. exact: the record names the same registrable domain or the same legal name. probable: a different identifier that the retrieval itself links to this party, with the link stated in `finding`. unconnected: the record names something else and only resembles the party. A shared substring, a shared subdomain label or a shared token is ALWAYS unconnected, never probable.' },
                 plain:     { type: 'string', description:
                   'One sentence in plain words telling the reader what THIS record means for them and what to do about it. Not a restatement of the finding. Where the record is ambiguous, say what it does not establish. Write it for somebody who has never seen a corporate registry.' },
                 retrieved: { type: 'string', description: 'Date the record was read, e.g. 26 Aug 2026.' },

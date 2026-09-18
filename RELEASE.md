@@ -121,8 +121,27 @@ to `/api/check` instead.
 ## Checking a build
 
     node tools/verify.mjs          the build check, exits non zero on a failure
-    node tools/smoke.mjs           and smoke2 through smoke17
+    node tools/smoke.mjs           and smoke2 through smoke41
+    node tools/institutions.mjs    the bystander test, run this one first
     node tools/graph-tests.mjs     operator graph scoring and routing
+
+`tools/institutions.mjs` is the one to run before the others, because it asks the
+question that ends a company rather than the question that makes one. Every other
+check asks whether we catch the bad ones. This one asks whether we accuse a real
+one. It exists because we did: a live result for a provincial Crown corporation
+of 88 years, whose deposits a government guarantees, carried the line "the UK
+Financial Conduct Authority has published a warning about this firm" and told the
+reader not to send anything tonight. The regulator had published nothing about
+them. It had listed a domain that shared three letters with theirs inside
+somebody else's subdomain.
+
+The rule that came out of it is the attachment rule, and it is applied in three
+places because one was not enough: the cue states it, `api/check.js` enforces it
+before the payload is built, and the page enforces it again before it speaks. An
+adverse record counts against a party only where the record names the party. A
+shared substring, a shared subdomain label or a shared word is never a link, and
+a record that turns out to be about somebody else is reported to the reader as
+exactly that, counting for nothing in the result.
 
 `tools/verify.mjs` guards the things that have broken before: duplicate ids,
 duplicate CSS layout properties, a script reference to an element that no longer
