@@ -829,7 +829,12 @@ body[data-stage="landing"][data-chat="on"] .tick{display:none}
 @media(max-width:760px){
   .tick{margin-top:20px;padding:9px 0}
   .tickit{padding:0 18px;gap:8px}
-  .tickv{font-size:13.5px}.tickt{font-size:12.4px}.ticks{display:none}
+  /* THE SOURCE TRAVELS WITH THE FIGURE ON A PHONE TOO.
+     It used to be dropped at this width. A statistic with its source taken off
+     is a statistic somebody has to take our word for, and this line exists
+     precisely because nobody should have to. The line scrolls, so there is
+     room for it. */
+  .tickv{font-size:13.5px}.tickt{font-size:12.4px}.ticks{font-size:10.5px}
 }
 
 /* stat strip */
@@ -1590,15 +1595,26 @@ body.wait-up .dirbox{z-index:501}
   .edu .ex{font-size:12.5px;line-height:1.48}
   .edu .eduv{font-size:28px;margin-top:9px}
 }
-/* Reserved at one row. Sixteen dots wrap to two rows on a narrow window, and a
-   second row appearing takes its height straight out of the network. */
-.edudots{flex:none;display:flex;gap:6px;justify-content:flex-start;flex-wrap:wrap;margin:10px 0 0;
-  padding-left:22px;min-height:20px}
-.edudots button{width:8px;height:8px;padding:0;border-radius:50%;border:none;
-  background:var(--border-lit);transition:all .3s var(--ease);cursor:pointer}
-.edudots button:hover{background:var(--tx-4);transform:scale(1.3)}
-.edudots button.on{background:var(--acc);width:20px;border-radius:4px}
-.edudots button:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+/* THE DOTS ARE THE ONLY WAY THROUGH THE DECK, SO THEY ARE REAL TARGETS.
+   There are no arrows beside them: pressing a dot is the only way to go back
+   to a card that has passed. A control that is the only way to do something
+   cannot be an eight pixel mark. Each one is 24 by 24 now, which is the floor,
+   and the mark inside it stays eight pixels so the row still reads as a row of
+   dots rather than a row of buttons. The gap went to nothing because the hit
+   areas themselves are the spacing, and two of them must never overlap.
+   Reserved at the height it will actually take, one row wide and two rows on a
+   phone, so a second row appearing never takes its height out of the network
+   mid-run. */
+.edudots{flex:none;display:flex;gap:0;justify-content:flex-start;flex-wrap:wrap;margin:4px 0 0;
+  padding-left:14px;min-height:24px}
+.edudots button{width:24px;height:24px;padding:0;border:none;background:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer}
+.edudots button::before{content:"";display:block;width:8px;height:8px;border-radius:50%;
+  background:var(--border-lit);transition:all .3s var(--ease)}
+.edudots button:hover::before{background:var(--tx-4);transform:scale(1.3)}
+.edudots button.on::before{background:var(--acc);width:20px;border-radius:4px}
+.edudots button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:6px}
+@media(max-width:760px){.edudots{min-height:48px}}
 /* ------------------------------------------------------------------ *
  * THE NETWORK
  * ------------------------------------------------------------------ */
@@ -3376,7 +3392,41 @@ body[data-stage="report"] .foot{display:none}
 }
 
 /* the control */
+/* THE RECORDS, OPENED IN PLACE. They take the page's own width and rhythm,
+   because they are part of the result rather than a panel inside it. */
+#rpt .rp-inline{position:relative;z-index:2}
+#rpt .rp-inline[hidden]{display:none}
+/* Once it is open the control has done its job, so it stops asking. */
+#rpt .rp-onbtn.rp-onopen{background:var(--surface-2);border-color:var(--border)}
+#rpt .rp-onbtn.rp-onopen .rp-go{transform:rotate(180deg)}
 #rpt .rp-behind{position:relative;z-index:2;margin:96px 0 0}
+/* Pinned next action. Hidden outright above 820px, where the door on the page
+   is already within reach. z-index sits under the pack preview (120) so a
+   modal is never straddled by a bar. */
+#rpt .rp-pin{display:none}
+@media(max-width:820px){
+  #rpt .rp-pin{display:block;position:fixed;left:0;right:0;bottom:0;z-index:60;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+    background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    transform:translateY(112%);transition:transform .38s var(--ease)}
+  #rpt .rp-pin.rp-on{transform:none}
+  #rpt .rp-pin[hidden]{display:none}
+  #rpt .rp-pinb{font-family:inherit;display:flex;align-items:center;gap:14px;width:100%;
+    text-align:left;min-height:56px;padding:11px 16px;border:1px solid var(--blue-dp);
+    border-radius:var(--r);background:var(--blue-dp);color:#fff;cursor:pointer}
+  #rpt .rp-pinb:focus-visible{outline:2px solid var(--tx);outline-offset:3px}
+  #rpt .rp-pinb .rp-pb{flex:1;min-width:0;display:block}
+  #rpt .rp-pinb .rp-pt{display:block;font-size:16px;font-weight:800;letter-spacing:-.015em}
+  #rpt .rp-pinb .rp-px{display:block;margin-top:2px;font-size:12.6px;line-height:1.35;
+    color:rgba(255,255,255,.88)}
+  #rpt .rp-pinb .rp-go{flex:none;display:flex;align-items:center;justify-content:center;
+    width:30px;height:30px}
+  #rpt .rp-pinb .rp-go svg{width:18px;height:18px;fill:none;stroke:currentColor;
+    stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  /* The bar never covers the last line of the page. */
+  body.rp-pinon #rpReport .rp-behind{padding-bottom:88px}}
+@media(prefers-reduced-motion:reduce){#rpt .rp-pin{transition:none}}
 /* The one page summary used to sit here as a second door above the record, and
    it is now the fourth thing to do, up with the other three. Only the data room
    is left under Where we looked, which is the one thing that belongs there. */
@@ -4203,7 +4253,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
          from two ends, so they sit together, and they sit together in the same
          place on every screen of the report as well. -->
     <button class="navbtn green" type="button" id="navSources">
-      <span class="hi">&#9636;</span> Sources and method</button>
+      <span class="hi">&#9636;</span> How we decide</button>
     <button class="navbtn gold" type="button" data-dir="open">
       <span class="hi">&#9873;</span> Find support</button>
   </div>
@@ -4691,58 +4741,23 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
          already gone. It is the first thing on the screen that exists to be
          acted on, which is where a person who has already paid is heading
          anyway, and it is the top of that screen so they meet it first. -->
+    <!-- WHAT WE FOUND OPENS HERE, NOT SOMEWHERE ELSE.
+         It was a screen of its own, which made the evidence a journey: the
+         reader pressed a control, lost the verdict, read the records, and was
+         then two presses from the only page that tells them what to do. The
+         records belong to the result they explain, so the control opens them
+         underneath it and the page carries both. -->
     <div class="rp-onward">
-      <button class="rp-onbtn" type="button" id="rpToFound">
+      <button class="rp-onbtn" type="button" id="rpToFound" aria-expanded="false" aria-controls="rpFoundIn">
         <span class="rp-b">
-          <span class="rp-t">What we found</span>
-          <!-- ONE SENTENCE, AND IT NAMES THE FOUR THINGS BEHIND THE DOOR:
-               the records, who published each one, the date it carries, and
-               the registers we asked. It used to run to two clauses and a
-               subordinate one, which is a paragraph pretending to be a label
-               on the only control at the foot of the page. -->
+          <span class="rp-t" id="rpToFoundT">What we found</span>
           <span class="rp-x">Every record we found, who published it, the date on it, and every register we asked.</span>
         </span>
-        <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
     </div>
 
-    <div class="rp-behind">
-      <p class="rp-spec" id="rpSpec"></p>
-      <div class="rp-foot">
-        <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
-        <span><button type="button" class="rp-lk" id="rpToSourcesR">How we decide</button>
-          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecordR">See the technical data room</button>
-          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
-          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
-          &nbsp;&middot;&nbsp; 4ormiq.com</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<div class="rp-sheet" id="rpFound" hidden>
-  <div class="rp-wash"></div>
-  <div class="rp-wrap">
-
-    <div class="rp-head">
-      <div class="rp-hlogo"><img src="data:image/png;base64,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" alt="4orm Finance"></div>
-      <div class="rp-navmid"></div>
-      <!-- THE WAY BACK IS A PILL, ON THE RIGHT, WITH THE OTHER CONTROLS.
-           It used to be an underlined word in the middle of the header, which
-           is the one place on this page nobody looks for a control. -->
-      <nav class="rp-nav" aria-label="Around this report">
-        <button class="rp-pill rp-pill-back" type="button" id="rpFoundBack">
-          <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="rp-pw">Back to </span>The result
-        </button>
-      </nav>
-    </div>
-
-    <h1 class="rp-stitle" id="rpFoundTitle">What we found.</h1>
-    <p class="rp-slead">Every line below came off a record you can open yourself. Nothing on this
-      screen is our opinion of this party. It is what the register said, and the date it said it.</p>
-
+    <div class="rp-inline" id="rpFoundIn" hidden>
     <div class="rp-sec rp-tight" id="rpFindsSec">
       <h2 class="rp-h2" id="rpFindsH"></h2>
       <p class="rp-sub">Under each one we say who says it, and how much weight that carries.</p>
@@ -4814,7 +4829,13 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <div class="rp-claims" id="rpClaims"></div>
     </div>
 
-    <div class="rp-onward">
+    </div>
+
+    <!-- THE WAY ON IS THE ACTION, AND IT IS ON THE RESULT PAGE.
+         A reader who has just been told not to send anything tonight had to
+         pass through a screen of evidence to reach the one page that tells
+         them to ring their bank. That call is measured in hours. -->
+    <div class="rp-onward" id="rpActWay">
       <button class="rp-onbtn" type="button" id="rpToAct">
         <span class="rp-b">
           <span class="rp-t">Do this right now</span>
@@ -4825,15 +4846,34 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     </div>
 
     <div class="rp-behind">
-      <p class="rp-spec" id="rpSpecF"></p>
+      <p class="rp-spec" id="rpSpec"></p>
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
-        <span><button type="button" class="rp-lk" id="rpToSourcesF">How we decide</button>
-          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecordF">See the technical data room</button>
+        <span><button type="button" class="rp-lk" id="rpAgainR">Check another name</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpToSourcesR">How we decide</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecordR">See the technical data room</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
+    </div>
+
+    <!-- THE NEXT THING TO DO, PINNED, ON A PHONE.
+         The result runs to several screenfuls on a handset. A reader who is
+         frightened does not scroll to the bottom to look for the door; they
+         stop reading somewhere in the middle and put the phone down. So once
+         they have passed the first screenful the next action rides with them,
+         and it steps out of the way whenever the real door is on screen, so
+         the same thing is never offered twice at once. It is a phone rule
+         only: on a laptop the door is already in view. -->
+    <div class="rp-pin" id="rpPin" hidden>
+      <button class="rp-pinb" type="button" id="rpPinGo">
+        <span class="rp-pb">
+          <span class="rp-pt">Do this right now</span>
+          <span class="rp-px">What to do, and who to reach out to</span>
+        </span>
+        <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </button>
     </div>
 
   </div>
@@ -4851,18 +4891,19 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
            that needs two: one step back to the findings, and one all the way
            to the verdict. They sit left of the two standing controls, because
            back reads leftward. -->
+      <!-- ONE WAY BACK, AND IT GOES WHERE THEY CAME FROM.
+           There were two, because what we found used to be a screen in between.
+           The records are on the result now, so there is one place to go back
+           to, and a screen offering three things to do does not also offer
+           three ways to leave. -->
       <nav class="rp-nav" aria-label="Around this report">
         <button class="rp-pill rp-pill-back" type="button" id="rpActBack">
-          <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="rp-pw">Back to </span>What we found
-        </button>
-        <button class="rp-pill rp-pill-back" type="button" id="rpActBackResult">
           <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span class="rp-pw">Back to </span>The result
         </button>
         <button class="rp-pill rp-pill-green" type="button" id="rpToSources_act">
           <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v18H6.5A2.5 2.5 0 014 18.5zM20 5.5A2.5 2.5 0 0017.5 3H12v18h5.5a2.5 2.5 0 002.5-2.5z" stroke-linejoin="round"/></svg>
-          Sources and method
+          How we decide
         </button>
       </nav>
     </div>
@@ -5033,7 +5074,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <p class="rp-spec" id="rpSpecA"></p>
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
-        <span><button type="button" class="rp-lk" id="rpToSourcesA">How we decide</button>
+        <span><button type="button" class="rp-lk" id="rpAgainA">Check another name</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpToSourcesA">How we decide</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecord">See the technical data room</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
@@ -5059,7 +5101,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <nav class="rp-nav" aria-label="Around this report">
         <span class="rp-pill rp-pill-green rp-on" aria-current="page">
           <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v18H6.5A2.5 2.5 0 014 18.5zM20 5.5A2.5 2.5 0 0017.5 3H12v18h5.5a2.5 2.5 0 002.5-2.5z" stroke-linejoin="round"/></svg>
-          Sources and method
+          How we decide
         </span>
         <button class="rp-pill rp-pill-gold" type="button" data-dir="open">
           <span class="rp-flag" aria-hidden="true">&#9873;</span>
@@ -5103,7 +5145,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         the whole time, free, in a place nobody thinks to look and nobody would know how to read.</p>
       <p class="rp-x">That is the whole reason this product exists, and it is why it is built the way it
         is. <b>We would rather tell you we do not know than tell you something comfortable.</b> A
-        person deciding whether to send their savings deserves the truth about what the record says,
+        consumer deciding whether to send their savings deserves the truth about what the record says,
         what it does not say, and which of the two we are giving them.</p>
     </div>
     </div>
@@ -5246,9 +5288,27 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <p class="rp-spec">The full catalogue, and which of its sources applied to any given party, is
         published inside every result. Coverage is always measured against the sources that could
         have held a record for that party, never against the whole catalogue.</p>
+
+      <!-- A WAY ON, NOT ONLY A WAY BACK.
+           A reader reaches the foot of this page because they wanted to satisfy
+           themselves the work is sound, which is the moment they are most ready
+           to act. The only control here pointed backwards. It is hidden until
+           there is a report to act on, because from the landing page there is
+           nothing behind it. -->
+      <div class="rp-onward" id="rpSrcWay" hidden>
+        <button class="rp-onbtn" type="button" id="rpSrcToAct">
+          <span class="rp-b">
+            <span class="rp-t">Do this right now</span>
+            <span class="rp-x">Three things: what to do if money has gone, who to reach out to with a form already filled in for each, and the checks that catch most of it.</span>
+          </span>
+          <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+      </div>
+
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
-        <span><button type="button" class="rp-lk" id="rpOpenRecordS">See the technical data room</button>
+        <span><button type="button" class="rp-lk" id="rpAgainS">Check another name</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecordS">See the technical data room</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
@@ -5386,7 +5446,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
       <nav class="rp-docnav" aria-label="Other documents">
         <button type="button" data-doc="privacy">Privacy notice</button>
-        <button type="button" data-doc="sources">Sources and method</button>
+        <button type="button" data-doc="sources">How we decide</button>
       </nav>
 
       <div class="rp-foot">
@@ -5587,7 +5647,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
       <nav class="rp-docnav" aria-label="Other documents">
         <button type="button" data-doc="compliance">Compliance statement</button>
-        <button type="button" data-doc="sources">Sources and method</button>
+        <button type="button" data-doc="sources">How we decide</button>
       </nav>
 
       <div class="rp-foot">
@@ -5841,7 +5901,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <span aria-hidden="true">&middot;</span>
       <button type="button" data-doc="privacy">Privacy notice</button>
       <span aria-hidden="true">&middot;</span>
-      <button type="button" data-doc="sources">Sources and method</button>
+      <button type="button" data-doc="sources">How we decide</button>
     </p>
     <p class="note">4orm reports what public records show. A red result means the records checked contradict each other, or contradict what the party says about itself. It is not a legal finding, an accusation, or a determination of wrongdoing by any person.</p>
   </div>
@@ -11516,54 +11576,80 @@ var EDU = [
 
   /* Our own testimony, sourced as our own. Somebody waiting on a check they
      are frightened about should know who is doing the checking. */
-  {tone:"act", k:"Why we built this", v:"Hundreds", tick:1,
-   t:"We have sat with hundreds of people after the money went",
-   x:"Since 2020, most of them to investment and trading scams. It is almost always the same story.",
-   src:"4orm Finance"},
+  {tone:"scale", k:"How common it is", v:"1 in 6", tick:1,
+   t:"One Canadian in six has been defrauded in the last five years",
+   x:"Seventeen per cent of everyone asked. Not a rare thing that happens to other people.",
+   src:"Statistics Canada, Self-reported fraud in Canada"},
+
+  {tone:"scale", k:"In a single year", v:"2.5 million", tick:1,
+   t:"2.5 million Canadians were defrauded in one year",
+   x:"7.8 per cent of everybody over fifteen, in the twelve months before they were asked.",
+   src:"Statistics Canada, Self-reported fraud in Canada"},
 
   {tone:"loss", k:"What it cost Canadians", v:"$704M", tick:1,
    t:"Last year Canadians reported losing $704 million to fraud",
-   x:"112,000 reports in 2025, the worst year on record. Reported counts only the people who filled in a form.",
+   x:"112,000 reports, the worst year on record. Reported counts only the people who filled in a form.",
    src:"Canadian Anti-Fraud Centre, 2025"},
 
-  {tone:"loss", k:"Where it went", v:"Half", tick:1,
-   t:"Nearly half of that went to investment offers",
-   x:"$351 million of it, from 3,867 people. The largest single kind of fraud in the country.",
+  {tone:"loss", k:"Since 2022", v:"$2.4B", tick:1,
+   t:"Reported losses since 2022 have passed $2.4 billion",
+   x:"That is the reported figure alone, and the government says the true impact is likely far higher.",
+   src:"Department of Finance Canada, 2026"},
+
+  {tone:"loss", k:"Where it went", v:"$351M", tick:1,
+   t:"Nearly half of last year's losses went to investment offers",
+   x:"$351 million of it, from 3,867 people. The largest single kind of fraud in the country by money lost.",
    src:"Canadian Anti-Fraud Centre, 2025"},
 
   {tone:"scale", k:"The number behind every number", v:"5 to 10%", tick:1,
    t:"Only 5 to 10 per cent of fraud in Canada is ever reported",
    x:"The Government of Canada's own estimate. Every total you have read is the small visible part.",
-   src:"RCMP, November 2025, and Competition Bureau Canada, March 2026"},
+   src:"Department of Finance Canada, 2026, and Competition Bureau Canada, March 2026"},
 
-  {tone:"loss", k:"What it actually costs", v:"Everything", tick:1,
+  {tone:"scale", k:"Who ever hears about it", v:"11%", tick:1,
+   t:"Only 11 per cent of victims told the police",
+   x:"Seven per cent told the Anti-Fraud Centre. Almost every case anybody knows about is one of the few that got written down.",
+   src:"Statistics Canada, Self-reported fraud in Canada"},
+
+  {tone:"loss", k:"What keeps people quiet", v:"Shame", tick:1,
+   t:"Many victims feel embarrassed or ashamed and never report it",
+   x:"The Anti-Fraud Centre's own words, and it says that silence is what lets the same people keep going.",
+   src:"Canadian Anti-Fraud Centre"},
+
+  {tone:"loss", k:"How it reaches you", v:"1 in 3", tick:1,
+   t:"Nearly one fraud report in three is somebody pretending to be a name you trust",
+   x:"Counted in the United States, where bank impersonators took the most of anyone. It arrives here by text and phone every day.",
+   src:"US Federal Trade Commission, June 2026"},
+
+  /* THE CARD THIS PRODUCT EXISTS FOR. It says what the gap is, why the gap is
+     nobody's fault, and that the reader is standing in it right now. */
+  {tone:"act", k:"What to do first", v:"Your bank", tick:1,
+   t:"Two victims in three told their bank, and the bank is the only one who can move money",
+   x:"Sixty-five per cent went to their bank. The Canadian Bankers Association says to contact your bank immediately if you think you have been defrauded.",
+   src:"Statistics Canada and the Canadian Bankers Association"},
+
+  /* OUR OWN TESTIMONY, ON THE DECK, NOT ON THE LINE.
+     Somebody held for two minutes should know who is doing the checking, and
+     the deck is where there is room to say it. The line is a different thing:
+     it is the public record of how common this is and how much it takes, and
+     every figure on it is somebody else's published number. Our own experience
+     is true and it is not a source, so it stays off the line. */
+  {tone:"act", k:"Why we built this", v:"Hundreds",
+   t:"We have sat with hundreds of people after the money went",
+   x:"Since 2020, most of them to investment and trading scams. It is almost always the same story.",
+   src:"4orm Finance"},
+
+  {tone:"loss", k:"What it actually costs", v:"Everything",
    t:"For almost everyone, it was never spare money",
    x:"The house deposit, the retirement, the money set aside for a child. The hardest part is telling the family.",
    src:"4orm Finance"},
 
-  {tone:"act", k:"The part nobody tells you", v:"Today", tick:1,
-   t:"A payment can sometimes be pulled back, but only for a few hours",
-   x:"The window is measured in hours, not days, and nobody tells you when it closes. If money has gone, ring your bank now. That call is the only thing here that can move money.",
-   src:"Canadian Bankers Association guidance"},
-
-  {tone:"loss", k:"What comes after", v:"Months", tick:1,
+  {tone:"loss", k:"What comes after", v:"Months",
    t:"Reporting it takes months, and most people do it alone",
    x:"The same statements and receipts go to the bank, the police and the regulator, then get asked for again. Your report arrives already filled in for each of them.",
    src:"4orm Finance"},
 
-  {tone:"loss", k:"How it starts", v:"1 in 3", tick:1,
-   t:"One report in three is somebody pretending to be a name you trust",
-   x:"Usually your own bank, a company you deal with, or a government office. Counted in the United States, arriving here by text and phone every day.",
-   src:"US Federal Trade Commission, June 2026"},
-
-  {tone:"loss", k:"What keeps people quiet", v:"Shame", tick:1,
-   t:"Embarrassment is what closes the last door",
-   x:"Almost everyone waited before telling anybody, and waiting is what ends the chance of getting money back. Nobody we sat with was foolish.",
-   src:"4orm Finance"},
-
-  /* THE CARD THIS PRODUCT EXISTS FOR. It says what the gap is, why the gap is
-     nobody's fault, and that the reader is standing in it right now. */
-  {tone:"act", k:"Why this exists", v:"The gap", tick:1,
+  {tone:"act", k:"Why this exists", v:"The gap",
    t:"Almost everything official arrives after the money is gone",
    x:"A regulator has to prove its case before it can warn anyone, and that takes months. The gap in between is where you are standing when you are about to send.",
    src:"4orm Finance"},
@@ -12062,6 +12148,11 @@ function waitFinish(render){
 function waitClose(){
   clearInterval(eduT); clearInterval(waitStepT);
   netStop();
+  /* A live region is cleared when it stops being true. The phase line is a
+     running commentary on a sweep that is now over, so leaving the last words
+     in the region means a screen reader can read out "Assessment ready in 41s"
+     long after the reader has moved on to the result. */
+  var wph=id("waitPhase"); if(wph) wph.textContent="";
   /* Only stop the clock when the run itself is finished. Dismissing the panel
      early must not stamp a partial duration on a check that is still going. */
   if(waitDone) runClockStop();
@@ -12137,7 +12228,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260917.1811";
+var KBYS_BUILD = "20260917.2306";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -12840,8 +12931,10 @@ function rpFinds(d){
        sentence, who says it and the record itself, is one press away. Four
        findings fully open ran to a wall of text nobody read to the bottom of,
        and the fourth one was never reached at all. */
-    out+='<div class="rp-tray"><div class="rp-plate">'
-      +'<details class="rp-fd"><summary class="rp-find">'
+    /* Same reason as the rows on what to do: a finding that cannot be named
+       cannot be quoted, linked to, or pointed at. */
+    out+='<div class="rp-tray" id="rpFind-'+(i+1)+'"><div class="rp-plate">'
+      +'<details class="rp-fd" id="rpFindD-'+(i+1)+'"><summary class="rp-find">'
       +'<span class="rp-n">'+(i+1)+'</span><span class="rp-b">'
       +'<span class="rp-t">'+rpEsc(x.t)+'</span></span>'
       +'<span class="rp-sev" data-s="'+sev+'"><i></i>'+sev+'</span>'
@@ -12923,7 +13016,10 @@ function rpSteps(d){
   }
   var out="";
   for(var i=0;i<list.length;i++){
-    out+='<div class="rp-step"><span class="rp-n">'+(i+1)+'</span>'
+    /* Every row is addressable. A reader on the phone to their bank says "step
+       two", a fraud desk quotes it back, and a check can point at it. A row
+       with no name of its own cannot be referred to by anybody. */
+    out+='<div class="rp-step" id="rpStep-'+(i+1)+'"><span class="rp-n">'+(i+1)+'</span>'
       +'<span class="rp-x">'+rpEsc(list[i])+'</span></div>';
   }
   return out;
@@ -14093,6 +14189,18 @@ function renderReport(d){
       actBox.innerHTML = '<button class="rp-actb" type="button" data-pak="'+rpEsc(dl.act)+'">'
         + 'Open what to tell your bank</button>';
       actBox.hidden = false;
+    } else if(d.verdict==="RED" || ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT"){
+      /* THE OTHER TWO CASES THAT EARN A CONTROL BESIDE THE VERDICT.
+         The records contradict each other or contradict the firm, or the money
+         has already gone. Either way the reader has something to do tonight and
+         should not have to scroll past the whole record to find out what. The
+         door further down the page stays where it is: this is the same door,
+         offered at the moment the verdict lands.
+         Amber is not a fault, so an amber result never gets this. A reader who
+         is only weighing something up is left to read. */
+      actBox.innerHTML = '<button class="rp-actb" type="button" data-act="1">'
+        + 'Do this right now</button>';
+      actBox.hidden = false;
     } else {
       actBox.innerHTML = "";
       actBox.hidden = true;
@@ -14252,7 +14360,7 @@ function renderReport(d){
       +(d.asOf?" on "+rpEsc(d.asOf):"")+" and have not been re-read since. Open any source and "
       +"check it against the register yourself before you rely on it."
     : "";
-  ["rpSpec","rpSpecF","rpSpecA"].forEach(function(x){
+  ["rpSpec","rpSpecA"].forEach(function(x){
     var sp=id(x); if(!sp) return;
     sp.innerHTML=specHtml; sp.style.display = specHtml ? "" : "none";
   });
@@ -14333,7 +14441,10 @@ function rpTop(){
      act     what to do, what to have ready, who to tell, and their words set
              against the records
      sources how we decide, and what we will not say                       */
-var RP_SCREENS = { result:"rpReport", found:"rpFound", act:"rpAct", sources:"rpSources",
+/* WHAT WE FOUND IS NO LONGER A SCREEN.
+   The records explain the result, so they open underneath it on the same page
+   rather than taking the reader somewhere and leaving the verdict behind. */
+var RP_SCREENS = { result:"rpReport", act:"rpAct", sources:"rpSources",
                    compliance:"rpCompliance", privacy:"rpPrivacy" };
 /* The three that are reachable from ANYWHERE, including from the landing page
    where there is no result to go back to. Everything else in RP_SCREENS is part
@@ -14352,6 +14463,7 @@ function rpShow(which){
   }
   document.body.setAttribute("data-stage","report");
   rpTop();
+  if(window.rpPinPlace) window.rpPinPlace();
 }
 /* THE LAST REPORT IS HELD.
    A check costs two minutes. A stray tap should not cost two minutes, so the
@@ -14421,12 +14533,15 @@ function rpDoc(which){
   /* Named for its destination in every case. A bare "Back" was what this said
      when a document was opened from the landing page, and a control that does
      not say where it goes is a control people stop pressing. */
-  var RP_BACKNAME = { result:"Back to the report", found:"Back to what we found",
+  var RP_BACKNAME = { result:"Back to the report",
                       act:"Back to what to do", console:"Back to the data room",
                       landing:"Back to the search", wait:"Back to your check" };
   var label = RP_BACKNAME[RP_FROM] || (RP ? "Back to the report" : "Back to the search");
   var btn = RP_DOCBACK[which];
   id(btn+"T").textContent = label;
+  /* The way on is only offered where there is a report behind it. From the
+     landing page it would point at nothing. */
+  var w=id("rpSrcWay"); if(w) w.hidden = !(which==="sources" && RP);
   rpShow(which);
   setTimeout(function(){ var e=id(btn); if(e) e.focus(); },60);
 }
@@ -14477,7 +14592,23 @@ function rpSourcesBack(){
   rpShow(RP_FROM);
 }
 function rpBackToReport(){ rpShow("result"); }
-function rpFound(){ rpShow("found"); }
+/* Opens the records in place, and says so on the control. It never closes
+   again from here: a reader who opened the evidence and then lost it on a tap
+   has to find it a second time. */
+function rpFound(){
+  var box=id("rpFoundIn"), btn=id("rpToFound"), lab=id("rpToFoundT");
+  if(!box) return;
+  if(box.hidden){
+    box.hidden=false;
+    btn.setAttribute("aria-expanded","true");
+    btn.classList.add("rp-onopen");
+    if(lab) lab.textContent="What we found";
+    if(box.scrollIntoView) setTimeout(function(){
+      box.scrollIntoView({behavior:reduceMotion()?"auto":"smooth", block:"start"}); },60);
+  } else if(box.scrollIntoView){
+    box.scrollIntoView({behavior:reduceMotion()?"auto":"smooth", block:"start"});
+  }
+}
 function rpAct(){ rpShow("act"); }
 function rpConsole(){
   rpPvHide();
@@ -14760,7 +14891,7 @@ function rpBackFromConsole(){
   /* Back to the screen they left, not to the top of the report. The console is
      opened from "Where we looked", which lives on the findings screen, and
      landing back on the first screen loses their place. */
-  rpShow(RP_AT==="sources" ? "found" : RP_AT);
+  rpShow(RP_AT==="sources" ? "result" : RP_AT);
 }
 
 id("rpAlreadyBtn").addEventListener("click", function(){
@@ -14771,8 +14902,8 @@ id("rpAlreadyBtn").addEventListener("click", function(){
   if(open && c.scrollIntoView) setTimeout(function(){
     c.scrollIntoView({behavior:"smooth", block:"start"}); },60);
 });
-["rpToSources_report","rpToSources_found","rpToSources_act",
- "rpToSourcesR","rpToSourcesF","rpToSourcesA"].forEach(function(x){
+["rpToSources_report","rpToSources_act",
+ "rpToSourcesR","rpToSourcesA"].forEach(function(x){
   var b=id(x); if(b) b.addEventListener("click", rpSources);
 });
 /* Delegated on the sheet, so it survives anything rewritten inside it. */
@@ -14888,14 +15019,49 @@ id("rpToFound").addEventListener("click", rpFound);
   };
 })();
 id("rpToAct").addEventListener("click", rpAct);
-id("rpFoundBack").addEventListener("click", rpBackToReport);
-id("rpActBack").addEventListener("click", rpFound);
-id("rpActBackResult").addEventListener("click", rpBackToReport);
+/* The pinned next action. Shown only on the result, only on a narrow screen,
+   only once the reader has passed the first screenful, and never while the
+   door on the page itself is in view. */
+(function(){
+  var pin=id("rpPin"), btn=id("rpPinGo"); if(!pin||!btn) return;
+  btn.addEventListener("click", rpAct);
+  function place(){
+    var on = document.body.getAttribute("data-stage")==="report"
+          && RP_AT==="result" && !!RP
+          && window.innerWidth<=820
+          && window.scrollY > window.innerHeight*0.9;
+    if(on){
+      /* The real door on screen wins. Two of the same thing at once is one
+         too many, and the one under the reader's thumb is the copy. */
+      var d=id("rpToAct");
+      if(d){
+        var r=d.getBoundingClientRect();
+        if(r.top < window.innerHeight-40 && r.bottom > 0) on=false;
+      }
+    }
+    if(on){
+      pin.hidden=false;
+      document.body.classList.add("rp-pinon");
+      requestAnimationFrame(function(){ pin.classList.add("rp-on"); });
+    }else{
+      pin.classList.remove("rp-on");
+      document.body.classList.remove("rp-pinon");
+      if(!pin.hidden) setTimeout(function(){
+        if(!pin.classList.contains("rp-on")) pin.hidden=true; }, 420);
+    }
+  }
+  window.rpPinPlace = place;
+  window.addEventListener("scroll", place, {passive:true});
+  window.addEventListener("resize", place);
+})();
+/* Back from what to do goes to the result, because the result is where the
+   records now live. */
+id("rpActBack").addEventListener("click", rpBackToReport);
 /* THE DATA ROOM IS AT THE FOOT OF EVERY REPORT SCREEN.
    A reader who wants to see the working should not have to walk to the page of
    things to do to find the way in. It stays where it was, in the small print
    at the foot, and it is now in that small print on all four screens. */
-["rpOpenRecord","rpOpenRecordR","rpOpenRecordF","rpOpenRecordS"].forEach(function(n){
+["rpOpenRecord","rpOpenRecordR","rpOpenRecordS"].forEach(function(n){
   var b=id(n); if(b) b.addEventListener("click", rpConsole);
 });
 /* One page, printable, with the reference on it. The reader who has to hand
@@ -14924,8 +15090,11 @@ id("rpPvBody").addEventListener("click", function(e){
 });
 id("rpTonightA").addEventListener("click", function(e){
   var t=e.target;
-  while(t && t!==this && !(t.getAttribute && t.getAttribute("data-pak"))) t=t.parentNode;
-  if(t && t!==this && t.getAttribute) rpPvShow(t.getAttribute("data-pak"), t);
+  while(t && t!==this && !(t.getAttribute
+        && (t.getAttribute("data-pak") || t.getAttribute("data-act")))) t=t.parentNode;
+  if(!t || t===this || !t.getAttribute) return;
+  if(t.getAttribute("data-act")) rpAct();
+  else rpPvShow(t.getAttribute("data-pak"), t);
 });
 id("navBackReport").addEventListener("click", rpBackFromConsole);
 /* The retry runs the same identifier again from the top. It is wired to the
@@ -14961,7 +15130,13 @@ function rpNewCheck(){
   setTimeout(function(){ var i=id("kbInput"); if(i){ i.value=""; i.focus(); } },80);
 }
 id("navNewCheck").addEventListener("click", rpNewCheck);
-id("rpNewCheck").addEventListener("click", rpNewCheck);
+/* CHECKING ANOTHER NAME IS THE MOST REPEATED THING ANYBODY DOES HERE.
+   It used to be on the result screen alone, so from what to do or how we
+   decide a reader had to walk back before they could start again. */
+id("rpSrcToAct").addEventListener("click", rpAct);
+["rpNewCheck","rpAgainR","rpAgainA","rpAgainS"].forEach(function(n){
+  var b=id(n); if(b) b.addEventListener("click", rpNewCheck);
+});
 id("lastOpen").addEventListener("click", rpResume);
 document.addEventListener("keydown", function(e){
   if(e.key!=="Escape") return;
