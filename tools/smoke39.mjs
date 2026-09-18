@@ -23,40 +23,44 @@ await p.waitForTimeout(5400);
   console.log('live region: cleared on close');
 }
 
-/* --------------------------------------- what we found opens where it is */
+/* --------------------------------------- what we found opens over the page */
 {
   const before = await p.evaluate(() => ({
     screens: ['rpReport', 'rpAct', 'rpSources'].map(i => !!document.getElementById(i)),
-    gone: !document.getElementById('rpFound'),
-    shut: document.getElementById('rpFoundIn').hidden,
+    inline: !!document.querySelector('#rpReport #rpFoundIn'),
+    shut: document.getElementById('rpFoundBox').hidden,
     exp: document.getElementById('rpToFound').getAttribute('aria-expanded'),
-    ctl: document.getElementById('rpToFound').getAttribute('aria-controls')
+    pop: document.getElementById('rpToFound').getAttribute('aria-haspopup')
   }));
   if (!before.screens.every(Boolean)) await fail('a report screen is missing');
-  if (!before.gone) await fail('what we found is still a screen of its own');
-  if (!before.shut) await fail('what we found is already open, so the result loads as a wall');
-  if (before.exp !== 'false') await fail('the door does not say it is shut');
-  if (before.ctl !== 'rpFoundIn') await fail('the door does not name what it opens');
+  if (before.inline) await fail('the records are still inside the result page');
+  if (!before.shut) await fail('the records sheet is open before anybody asked');
+  if (before.exp !== 'false') await fail('the control does not say it is shut');
+  if (before.pop !== 'dialog') await fail('the control does not say it opens a dialog');
 
   await p.evaluate(() => document.getElementById('rpToFound').click());
-  await p.waitForTimeout(500);
+  await p.waitForTimeout(700);
   const after = await p.evaluate(() => ({
-    open: !document.getElementById('rpFoundIn').hidden,
+    open: !document.getElementById('rpFoundBox').hidden,
     exp: document.getElementById('rpToFound').getAttribute('aria-expanded'),
     still: document.body.getAttribute('data-stage') === 'report'
         && !document.getElementById('rpReport').hidden,
-    finds: [...document.querySelectorAll('#rpFoundIn .rp-tray')].map(e => e.id),
-    inside: !!document.querySelector('#rpFoundIn #rpFindsSec')
-         && !!document.querySelector('#rpFoundIn #rpClaimsSec')
+    finds: [...document.querySelectorAll('#rpFoundBox .rp-tray')].map(e => e.id),
+    inside: !!document.querySelector('#rpFoundBox #rpFindsSec')
+         && !!document.querySelector('#rpFoundBox #rpClaimsSec'),
+    eb: (document.getElementById('rpFoundEb') || {}).textContent || ''
   }));
   if (!after.open) await fail('what we found did not open');
-  if (after.exp !== 'true') await fail('the door does not say it is open');
+  if (after.exp !== 'true') await fail('the control does not say it is open');
   if (!after.still) await fail('opening what we found took the reader off the result');
   if (!after.inside) await fail('the records and their words did not come with it');
   if (!after.finds.length) await fail('no findings rendered');
   if (!after.finds.every((v, i) => v === 'rpFind-' + (i + 1)))
     await fail('a finding carries no id: ' + JSON.stringify(after.finds));
-  console.log('what we found: opens in place, ' + after.finds.length + ' findings, all named');
+  if (!/\w/.test(after.eb)) await fail('the sheet does not say whose records these are');
+  await p.evaluate(() => document.getElementById('rpFoundBack').click());
+  await p.waitForTimeout(700);
+  console.log('what we found: opens over the result, ' + after.finds.length + ' findings, all named');
 }
 
 /* ------------------------------------------------- every act row is named */

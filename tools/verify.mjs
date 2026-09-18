@@ -174,9 +174,22 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
       if (/Free for life\./.test(noswitch))
         fails.push('free for life is typed into the page instead of standing behind its switch');
     }
-    /* THE PHRASE IS ON THE BUTTON. It is the thing we want said out loud. */
-    if (!/id="kbGo"[\s\S]{0,200}Check 4orm/.test(src))
-      fails.push('the button no longer says Check 4orm');
+    /* THE PHRASE IS ON THE BUTTON, AND ITS 4 IS THE MARK.
+       It is the thing we want said out loud, so it is written the way the
+       company writes it: "Check", then the file, then "orm" in type sized off
+       the file. A typed 4 would be a redrawn logo by another name. The
+       accessible name still reads "Check 4orm" because the mark carries
+       alt="4". */
+    if (!/id="kbGo"[\s\S]{0,400}>Check\s*<span class="fourming"><img class="fourm4"/.test(src))
+      fails.push('the button no longer says Check, then the 4 mark');
+    if (!/id="kbGo"[\s\S]{0,12000}alt="4"><span class="fourmw">orm<\/span>/.test(src))
+      fails.push('the button lost the orm that follows the mark');
+    if (/id="kbGo"[^>]*>Check 4orm</.test(src))
+      fails.push('the 4 on the button is typed again rather than the mark');
+    /* AND THE GROUND UNDER IT IS LIGHT, BECAUSE THE MARK IS BLUE.
+       Recolouring the mark to survive a blue button is not on the table. */
+    if (/\.gobtn\{[^}]*background:var\(--blue/.test(styleBlock))
+      fails.push('the button is blue again, which hides the blue 4 on it');
     /* AND THE PAGE SAYS WHOSE CHECK IT IS. */
     if (!/4ormIQ is the trust layer of 4orm Finance/.test(src))
       fails.push('nothing on the landing ties 4ormIQ to 4orm Finance');
@@ -1289,10 +1302,18 @@ const sheet_ = id => {
   const b = rest.indexOf('<div class="rp-sheet" id="');
   return b < 0 ? html.slice(a) : html.slice(a, a + 10 + b);
 };
-/* WHAT WE FOUND IS NOT A SHEET ANY MORE.
-   The records explain the result, so they open underneath it on the same page.
-   Three screens: the result and its evidence, what to do, and how we decide. */
+/* WHAT WE FOUND IS NOT A SHEET AND NOT A PANEL. IT IS A SHEET OVER THE PAGE.
+   The records explain the result, so they open on top of it and close back to
+   the sentence the reader was on. Three screens stay: the result, what to do,
+   and how we decide. The records live in a dialog beside the pack preview, so
+   they are read out of the document rather than out of a screen. */
 const SHEETS_ = ['rpReport', 'rpAct', 'rpSources'];
+const found_ = (() => {
+  const a = html.indexOf('<section class="rp-fv" id="rpFoundBox"');
+  if (a < 0) return '';
+  return html.slice(a, html.indexOf('</section>', a));
+})();
+if (!found_) fails.push('what we found has no sheet of its own');
 const sheets_ = {};
 for (const x of SHEETS_) {
   sheets_[x] = sheet_(x);
@@ -1306,8 +1327,12 @@ for (const x of SHEETS_.slice(1))
 if (/id="rpReport" hidden/.test(html))
   fails.push('the result screen starts hidden, so a finished check lands on nothing');
 
+/* The records dialog belongs to the result, so anything inside it counts as
+   being on the result: that is where the reader opens it from and where they
+   are returned to. */
 const belongs_ = (needle, on, what) => {
-  const where = SHEETS_.filter(x => sheets_[x].includes(needle));
+  const where = SHEETS_.filter(x => sheets_[x].includes(needle)
+    || (x === 'rpReport' && found_.includes(needle)));
   if (!where.length) fails.push(what + ' is not on any report screen');
   else if (where.length > 1) fails.push(what + ' is on more than one report screen: ' + where.join(', '));
   else if (where[0] !== on) fails.push(what + ' is on ' + where[0] + ', it belongs on ' + on);
@@ -1339,6 +1364,79 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     fails.push('the door to the whole record sits above the three things to do, it belongs at the foot of the screen');
 }
 
+/* ------------------------------------------- WHAT TO DO, BEFORE THE READING
+   A page headed "Do this right now" that opens with a title, a lead, a door, a
+   kicker, a headline, a paragraph and three cards before it says what to do
+   has not told anybody to do anything. The three things go first. */
+{
+  const a = sheets_.rpAct || '';
+  if (!/id="rpNow"/.test(a))
+    fails.push('what to do has no block of instructions at the top');
+  if (a.indexOf('id="rpNow"') > a.indexOf('id="rpStepsSec"'))
+    fails.push('the instructions sit below the menus they are meant to come before');
+  if (a.indexOf('id="rpNow"') > a.indexOf('id="rpAlready"'))
+    fails.push('the instructions sit below the door for somebody who has already paid');
+  if (!/id="rpNow" hidden/.test(a))
+    fails.push('the instructions are written before the run decides whether there are any');
+  /* AND A READER WHO HAS SENT NOTHING IS NEVER HANDED AN EMERGENCY.
+     Three states, decided by the run, not by the page: money gone, adverse
+     with nothing sent, and everything else, which gets nothing at all. */
+  if (!/stage_==="SENT"/.test(script))
+    fails.push('the instructions no longer depend on whether money has gone');
+  if (!/Ring your bank now\./.test(script))
+    fails.push('the money-gone instruction no longer leads with the bank');
+  if (!/back of your bank card/.test(script))
+    fails.push('the reader is not told where to find their bank\'s number');
+  if (!/Never read your card number out/.test(script))
+    fails.push('the card number warning is gone, and that is the line a reader misread');
+  if (!/box\.hidden=true; return;/.test(script))
+    fails.push('a result with nothing to act on still gets a block of instructions');
+}
+/* --------------------------------------------- EVERY NUMBER NAMES WHO ANSWERS
+   This row used to read "Canada 1-888-495-8501", which tells a frightened
+   person to ring a country, and "Your bank: the number on your card", which a
+   reader took as a request for their card number. */
+{
+  const m = /var RP_TELS = \[([\s\S]*?)\];/.exec(script);
+  if (!m) fails.push('the numbers on what to do are gone');
+  else {
+    const t = m[1];
+    if (/\["Canada"/.test(t) || /\["United States"/.test(t))
+      fails.push('a number is labelled with a country and not with the body that answers');
+    if (!/Canadian Anti-Fraud Centre, Canada/.test(t))
+      fails.push('the Canadian number does not name the Anti-Fraud Centre');
+    if (!/Federal Trade Commission, United States/.test(t))
+      fails.push('the United States number does not name the Federal Trade Commission');
+    if (/"The number on your card"/.test(t))
+      fails.push('the bank line still reads as a request for a card number');
+    if (!/back of your bank card/.test(t))
+      fails.push('the bank line does not say where to look for the number');
+  }
+}
+/* ------------------------------------------- THE PACK CARRIES OUR RECORD ONLY
+   It used to open with nine blank lines for the reader's own name, amounts and
+   account details. A page that asks a frightened person to fill in what they
+   already know, on a file we handed them, is asking them to do our work. */
+{
+  if (/class="rp-pva"|class="rp-ln"/.test(script))
+    fails.push('the pack preview still carries the blank form');
+  if (/pk-ask|pk-line|What only you can answer/.test(script))
+    fails.push('the downloadable pack still carries the blank form');
+  if (!/function rpPackRecord\(d\)/.test(script))
+    fails.push('nothing builds the record the pack is supposed to carry');
+  for (const [k, why] of [['What the records say about this name', 'the records'],
+                          ['What the record holds', 'what the record holds'],
+                          ['What to put in the message', 'the note on what to say']])
+    if (!script.includes(k))
+      fails.push('the pack no longer carries ' + why);
+  /* Against and in favour are told apart by more than colour: the file gets
+     printed, faxed and photocopied before anybody reads it. */
+  if (!/\.pk-r\[data-k='against'\]\{border-left-color/.test(script))
+    fails.push('the printed pack tells findings apart by colour alone');
+  if (!/#rpt \.rp-pvrec\[data-k="against"\]\{border-left:3px solid/.test(styleBlock))
+    fails.push('the pack preview tells findings apart by colour alone');
+}
+
 /* The gap note reads as the last thing the result screen could not tell them,
    which is exactly the thought that should precede the door for somebody who
    has already sent the money. Order, not presence. */
@@ -1355,10 +1453,14 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
   /* And the result screen no longer carries it at all. */
   if (/id="rpAlready"/.test(r))
     fails.push('the already-sent door is back on the result screen, between the verdict and the way on');
-  if (at('What we could not answer') > at('id="rpGoodSec"'))
-    fails.push('what we could not answer sits below the good news, and it belongs with the verdict');
-  if (at('What we could not answer') > at('id="rpToFound"'))
-    fails.push('what we could not answer sits below the way on, and it belongs with the verdict');
+  /* WHAT WE COULD NOT ANSWER READS AFTER THE RECORDS AND BEFORE THE ACTION.
+     Beside the verdict it put the size of the hole in front of a reader who
+     had not seen a single record yet. Here it is the honest edge of what they
+     have just read, and the last thing before they are asked to act. */
+  if (at('What we could not answer') < at('id="rpGoodSec"'))
+    fails.push('what we could not answer sits above the records it qualifies');
+  if (at('What we could not answer') > at('id="rpActWay"'))
+    fails.push('what we could not answer sits below the way on to what to do');
   /* AND ON THE SCREEN IT MOVED TO IT SITS DIRECTLY UNDER THE TITLE.
      The title and its one line say where the reader is; the door is the next
      thing they meet, ahead of every step, every menu and the way out. Above
@@ -1418,7 +1520,7 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     /* Evidence about the party is not an action. */
     if (/id="rpClaims"/.test(a))
       fails.push('their words against the records is back on the page of things to do');
-    if (!/id="rpClaims"/.test(sheets_.rpReport || ''))
+    if (!/id="rpClaims"/.test(found_))
       fails.push('their words against the records is not with the rest of the evidence either');
   }
   /* One way back, as a pill, in the row the reader already uses. What we found
@@ -1435,10 +1537,13 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
   {
     const a = sheets_.rpAct;
   }
-  /* Nothing below the way on but the small print. A reader who takes the next
-     step never comes back up, so anything under that door is unread. */
-  if (at('id="rpGoodSec"') > at('id="rpToFound"'))
-    fails.push('what came back in their favour sits below the way on, where nobody will read it');
+  /* THE WAY IN TO THE RECORDS SITS UNDER THE VERDICT, ABOVE EVERYTHING ELSE.
+     It is the question a reader asks the moment they are told not to send
+     money, so it is answered first and it is answered without moving them. */
+  if (at('id="rpToFound"') > at('id="rpGoodSec"'))
+    fails.push('the way in to the records sits below the records it opens');
+  if (at('id="rpTonight"') > at('id="rpToFound"'))
+    fails.push('the way in to the records sits above the verdict it explains');
   /* A TRUE GREY, not the page's cool wash. --bg-3 is #EFF3F9, which is a pale
      blue, and beside a blue accent it read as another note we were adding
      rather than as the shape of what is missing. */
@@ -1532,20 +1637,37 @@ for (const x of PILLED_) {
    from the verdict and left the action two presses further on. */
 {
   const r = sheets_.rpReport;
-  if (!/id="rpFoundIn"/.test(r))
-    fails.push('the records have no place on the result page');
+  if (/id="rpFoundIn"/.test(r))
+    fails.push('the records are back inside the result page instead of opening over it');
+  if (!/id="rpFoundIn"/.test(found_))
+    fails.push('the records have no body inside their sheet');
   const btn = (r.match(/<button[^>]*id="rpToFound"[^>]*>/) || [''])[0];
+  if (!/aria-haspopup="dialog"/.test(btn))
+    fails.push('the control that opens the records does not say it opens a dialog');
   if (!/aria-expanded="false"/.test(btn))
-    fails.push('the control that opens the records does not say it is a disclosure');
-  if (!/aria-controls="rpFoundIn"/.test(btn))
-    fails.push('the control that opens the records is not tied to what it opens');
-  if (!/id="rpFoundIn" hidden/.test(r))
+    fails.push('the control that opens the records does not say it is shut at rest');
+  if (!/id="rpFoundBox"[^>]*role="dialog"[^>]*aria-modal="true"/.test(html))
+    fails.push('the records sheet is not a modal dialog');
+  if (!/id="rpFoundBox"[^>]*hidden/.test(html))
     fails.push('the records are open before anybody asked for them');
-  /* And the order on the page: the verdict, the control, the records, the way
-     on to what to do. The action is never above the thing it acts on. */
+  /* It closes, and it closes more than one way: a control, the scrim and the
+     escape key. A sheet with one way out is a trap on a phone. */
+  for (const [k, why] of [['rpFoundX', 'a close control'], ['rpFoundBack', 'a way back to the result'],
+                          ['rpFoundToAct', 'a way on to what to do']])
+    if (!found_.includes('id="' + k + '"'))
+      fails.push('the records sheet has no ' + why);
+  if (!/id\("rpFoundBox"\)\.addEventListener\("click"[\s\S]{0,120}rpFoundHide/.test(script))
+    fails.push('the records sheet does not close on its own scrim');
+  if (!/fb && !fb\.hidden\) rpFoundHide\(\)/.test(script))
+    fails.push('the records sheet does not close on escape');
+  if (!/body\.rp-fvup\{overflow:hidden\}/.test(styleBlock))
+    fails.push('the page behind the records sheet still scrolls under it');
+  /* And the order on the page: the verdict, the way in, the records in their
+     favour, what we could not answer, then the action. */
   const at = x => r.indexOf(x);
-  for (const [a, b] of [['id="rpTonight"', 'id="rpToFound"'], ['id="rpToFound"', 'id="rpFoundIn"'],
-                        ['id="rpFoundIn"', 'id="rpToAct"']])
+  for (const [a, b] of [['id="rpTonight"', 'id="rpToFound"'],
+                        ['id="rpToFound"', 'id="rpGoodSec"'],
+                        ['id="rpGoodSec"', 'id="rpActWay"']])
     if (at(a) > at(b)) fails.push('the result page reads in the wrong order: ' + b + ' is above ' + a);
   /* THE ACTION IS ON THE RESULT PAGE.
      Two presses and a screen of evidence used to sit between a reader being
@@ -3944,7 +4066,22 @@ if (/rpIdRow\("When we looked"/.test(script))
       else if (/^4orm/i.test(src))
         fails.push('a ticker line is sourced to ourselves, which is advertising, not education: '
           + t.slice(0, 50));
+      /* THE PERIOD IS PART OF THE FACT. A figure about fraud with no year on
+         it cannot be judged, and an old one read as current is the same
+         mistake as an invented one. Every line names a year or the date it
+         counts from, on the line and in the source. */
+      const yr = (/yr:"([^"]+)"/.exec(c) || [])[1] || '';
+      if (!/^(20\d\d|Since 20\d\d)$/.test(yr))
+        fails.push('a ticker line carries no period: ' + t.slice(0, 50));
+      if (!/20\d\d/.test(src))
+        fails.push('a ticker source names no year: ' + src);
+      if (/^20\d\d$/.test(yr) && +yr < 2025)
+        fails.push('a ticker line is older than 2025: ' + yr + ', ' + t.slice(0, 50));
     }
+    if (!/<span class="tickyr">/.test(script))
+      fails.push('the ticker no longer prints the period beside the figure');
+    if (!/!e\.tick \|\| !e\.v \|\| !e\.src \|\| !e\.yr/.test(script))
+      fails.push('the ticker will show a line that carries no period');
   }
   /* AND THE SOURCE IS NEVER DROPPED TO SAVE ROOM.
      A figure with its source taken off is a figure somebody has to take our

@@ -110,34 +110,44 @@ const pillPair = async where => {
   if (!n.foot) fail('the result screen has no route to how we decide at all now');
 }
 
-/* Forward. WHAT WE FOUND IS NOT A PLACE ANY MORE.
-   It opens under the door that names it, on the result the reader is already
-   reading, so pressing it must not move them anywhere. A reader who has just
-   been given a verdict and then been moved to a second screen to see the
-   records behind it has been asked to hold two pages in their head. */
-await p.click('#rpToFound'); await p.waitForTimeout(600);
+/* Forward. WHAT WE FOUND OPENS OVER THE RESULT, NOT INSTEAD OF IT.
+   A reader who has just been given a verdict wants to see what it rests on and
+   then get back to the verdict. So the records open on top, the page behind
+   does not move, and closing puts them back where they were standing. */
+const before = await p.evaluate(() => Math.round(window.scrollY));
+await p.click('#rpToFound'); await p.waitForTimeout(700);
 await one('rpReport', 'opening what we found');
 {
   const n = await p.evaluate(() => {
-    const box = document.getElementById('rpFoundIn');
+    const box = document.getElementById('rpFoundBox');
     const btn = document.getElementById('rpToFound');
-    return { open: !box.hidden, exp: btn.getAttribute('aria-expanded'),
-             ctl: btn.getAttribute('aria-controls'),
-             gone: !document.getElementById('rpFound'),
+    const s = getComputedStyle(document.body);
+    return { open: !box.hidden, on: box.classList.contains('rp-on'),
+             role: box.getAttribute('role'), modal: box.getAttribute('aria-modal'),
+             pop: btn.getAttribute('aria-haspopup'), exp: btn.getAttribute('aria-expanded'),
+             gone: !document.querySelector('#rpReport #rpFoundIn'),
+             locked: s.overflow === 'hidden',
              holds: ['#rpFindsSec', '#rpTwoWays', '#rpClaimsSec']
-               .filter(q => !box.querySelector(q)) };
+               .filter(q => !box.querySelector(q)),
+             focus: document.activeElement && document.activeElement.id,
+             scroll: Math.round(window.scrollY) };
   });
-  if (!n.gone) fail('what we found is still a screen of its own');
-  if (!n.open) fail('what we found did not open');
-  if (n.exp !== 'true') fail('the door does not report that it is open');
-  if (n.ctl !== 'rpFoundIn') fail('the door does not name what it opens');
-  if (n.holds.length) fail('what we found opened without: ' + n.holds.join(', '));
+  if (!n.gone) fail('the records are still inside the result page');
+  if (!n.open || !n.on) fail('what we found did not open');
+  if (n.role !== 'dialog' || n.modal !== 'true') fail('what we found is not a modal dialog');
+  if (n.pop !== 'dialog') fail('the control does not say it opens a dialog');
+  if (n.exp !== 'true') fail('the control does not report that the sheet is open');
+  if (!n.locked) fail('the page behind the sheet still scrolls');
+  if (n.holds.length) fail('the sheet opened without: ' + n.holds.join(', '));
+  if (n.focus !== 'rpFoundX') fail('focus did not move into the sheet, it is on ' + n.focus);
+  if (Math.abs(n.scroll - before) > 4)
+    fail('the page behind the sheet moved, from ' + before + ' to ' + n.scroll);
 }
 
 /* AND THE FINDINGS ARE ONE LINE EACH UNTIL SOMEBODY OPENS ONE. */
 {
   const f = await p.evaluate(() => {
-    const rows = [...document.querySelectorAll('#rpFoundIn .rp-fd')];
+    const rows = [...document.querySelectorAll('#rpFoundBox .rp-fd')];
     return rows.map(d => ({
       open: d.open,
       lines: (d.querySelector('.rp-t').textContent.match(/\S/g) || []).length > 0,
@@ -156,13 +166,13 @@ await one('rpReport', 'opening what we found');
      record itself is there wherever the evidence carries a URL, and some of the
      specimen records honestly do not, so that one is asserted across the set
      rather than on every row. */
-  const rows = await p.$$('#rpFoundIn .rp-fd summary');
+  const rows = await p.$$('#rpFoundBox .rp-fd summary');
   for (const r of rows) { await r.click(); }
   await p.waitForTimeout(400);
   const o = await p.evaluate(() => {
     const has = (d, s) => !!d.querySelector(s) && d.querySelector(s)
       .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true });
-    return [...document.querySelectorAll('#rpFoundIn .rp-fd')].map(d =>
+    return [...document.querySelectorAll('#rpFoundBox .rp-fd')].map(d =>
       ({ open: d.open, x: has(d, '.rp-x'), from: has(d, '.rp-from'), lk: has(d, '.rp-lk') }));
   });
   o.forEach((r, i) => {
@@ -175,12 +185,26 @@ await one('rpReport', 'opening what we found');
      none. So the assertion here is that a missing link is missing, rather than
      present and hidden. That the emitter puts .rp-lk inside the open body at
      all is checked statically in verify.mjs. */
-  const ghost = await p.evaluate(() => [...document.querySelectorAll('#rpFoundIn .rp-fd')]
+  const ghost = await p.evaluate(() => [...document.querySelectorAll('#rpFoundBox .rp-fd')]
     .filter(d => d.querySelector('.rp-lk') && !d.querySelector('.rp-lk')
       .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true })).length);
   if (ghost) fail(ghost + ' open finding(s) carry a link to the record that cannot be seen');
   for (const r of rows) { await r.click(); }
   await p.waitForTimeout(300);
+}
+/* And it closes back to the result, at the same place on the page. */
+await p.click('#rpFoundBack'); await p.waitForTimeout(700);
+{
+  const shut = await p.evaluate(() => {
+    const box = document.getElementById('rpFoundBox');
+    return { hidden: box.hidden, exp: document.getElementById('rpToFound').getAttribute('aria-expanded'),
+             locked: getComputedStyle(document.body).overflow === 'hidden',
+             focus: document.activeElement && document.activeElement.id };
+  });
+  if (!shut.hidden) fail('the sheet did not close');
+  if (shut.exp !== 'false') fail('the control still reports the sheet as open');
+  if (shut.locked) fail('the page is still locked after the sheet closed');
+  if (shut.focus !== 'rpToFound') fail('focus did not come back to the control, it is on ' + shut.focus);
 }
 await p.click('#rpToAct');   await p.waitForTimeout(500); await one('rpAct', 'the way on to what to do');
 await pillPair('the act screen');
@@ -285,34 +309,37 @@ await one('rpReport', 'back to the result before reading its order');
 const order = await p.evaluate(() => {
   const s = document.getElementById('rpReport');
   const y = sel => { const e = s.querySelector(sel); return e ? e.getBoundingClientRect().top + window.scrollY : null; };
-  return { gap: y('.rp-gapnote'), onward: y('#rpToFound'), already: y('#rpAlready') };
+  return { tonight: y('#rpTonight'), onward: y('#rpToFound'), good: y('#rpGoodSec'),
+           gap: y('.rp-gapnote'), act: y('#rpActWay'), already: y('#rpAlready') };
 });
-if (order.gap === null || order.onward === null)
-  fail('the result screen is missing the gap note or the way on');
+for (const k of ['tonight', 'onward', 'good', 'gap', 'act'])
+  if (order[k] === null) fail('the result screen is missing ' + k);
 if (order.already !== null)
   fail('the already-sent door is back on the result screen; it belongs at the top of what to do');
-if (!(order.gap < order.onward))
+/* THE ORDER CHAD ASKED FOR, READ OFF THE RENDERED PAGE.
+   The verdict, the half width way in to the records, the records that came
+   back in their favour, what we could not answer, then the full width action. */
+if (!(order.tonight < order.onward && order.onward < order.good
+      && order.good < order.gap && order.gap < order.act))
   fail('the result screen reads in the wrong order: ' + JSON.stringify(order));
+/* AND THE TWO WIDTHS ARE THE TWO WIDTHS. The way in is about half the column
+   and matched to the grey box; the action runs the full width under it. */
+{
+  const w = await p.evaluate(() => {
+    const q = s => { const e = document.querySelector(s); return e ? Math.round(e.getBoundingClientRect().width) : null; };
+    return { found: q('#rpReport .rp-foundway'), gap: q('#rpReport .rp-gapnote'),
+             act: q('#rpActWay'), col: q('#rpReport .rp-heromain') };
+  });
+  if (w.found === null || w.gap === null || w.act === null) fail('a width could not be measured');
+  if (Math.abs(w.found - w.gap) > 2)
+    fail('the way in is ' + w.found + 'px and the grey box is ' + w.gap + 'px; they should match');
+  if (w.found > w.act * 0.72)
+    fail('the way in is not meaningfully narrower than the action: ' + w.found + ' against ' + w.act);
+  if (w.act < w.col * 0.94)
+    fail('the action does not run the full width: ' + w.act + ' of ' + w.col);
+}
 
-/* The already-sent door now opens the what-to-do screen, above its title. */
-await p.click('#rpToFound'); await p.waitForTimeout(400);
-await p.click('#rpToAct');   await p.waitForTimeout(500);
-const actOrder = await p.evaluate(() => {
-  const s = document.getElementById('rpAct');
-  const y = sel => { const e = s.querySelector(sel); return e ? e.getBoundingClientRect().top + window.scrollY : null; };
-  return { already: y('#rpAlready'), title: y('.rp-stitle') };
-});
-if (actOrder.already === null || actOrder.title === null)
-  fail('what to do is missing the already-sent door or its title');
-/* Directly under the title, not above it. The title and its one line say where
-   the reader is; the door is the next thing they meet. Above the title opened
-   the page with a red panel about money already gone before the page had said
-   what it was. */
-if (!(actOrder.title < actOrder.already))
-  fail('the already-sent door sits above the what-to-do title; it belongs under it: '
-    + JSON.stringify(actOrder));
-
-console.log('screens walked, two moves on the result, both pills on the rest, order held');
-if (errs.length) fail('page errors ' + errs.slice(0,2).join(' | '));
+if (errs.length) fail('page errors: ' + errs.join(' | '));
+console.log('screens walked, the result reads in the asked-for order, both widths held');
 console.log('PASSED');
-await b.close();
+process.exit(0);

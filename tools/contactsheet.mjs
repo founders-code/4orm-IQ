@@ -62,8 +62,9 @@ for (let i=0;i<40;i++){
 }
 await p.waitForTimeout(1200);
 await shot('07-result', true);
-await p.click('#rpToFound'); await p.waitForTimeout(600);
+await p.click('#rpToFound'); await p.waitForTimeout(700);
 await shot('08-found', true);
+await p.click('#rpFoundBack'); await p.waitForTimeout(600);
 await p.click('#rpToAct'); await p.waitForTimeout(600);
 await p.evaluate(()=>document.querySelectorAll('#rpAct details').forEach(d=>d.open=true));
 await p.waitForTimeout(400);

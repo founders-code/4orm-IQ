@@ -24,7 +24,10 @@ for (let i = 0; i < 6; i++) {
   if (!await p.evaluate(() => document.getElementById('waitBox').classList.contains('on'))) break;
   await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(500);
 }
-await p.click('#rpToFound'); await p.waitForTimeout(500);
+/* What we found opens over the result now, so it is closed again before the
+   way on to what to do is reachable. */
+await p.click('#rpToFound'); await p.waitForTimeout(600);
+await p.click('#rpFoundBack'); await p.waitForTimeout(600);
 await p.click('#rpToAct');   await p.waitForTimeout(500);
 
 /* The fingerprint of everything the sector is forbidden to touch. */
