@@ -101,7 +101,7 @@ export const CATALOGUE = [
   S({ source_id:'NZ_COMPANIES_OFFICE', display_name:'New Zealand Companies Office',
       category:'01', jurisdictions:['NZ'], domain:'companiesoffice.govt.nz',
       supports_person_search:true }),
-  S({ source_id:'OFFSHORE_REGISTRIES',
+  S({ source_id:'OFFSHORE_REGISTRIES', unmapped:'Fourteen jurisdictions, each with its own registry and its own host. None checked yet, so the row is declared rather than counted as reached.',
       display_name:'Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones',
       category:'01', source_tier:'B', jurisdictions:['INTL'], transport:'parallel',
       domain:'' }),
@@ -165,8 +165,27 @@ export const CATALOGUE = [
       jurisdictions:['CA-ON'], domain:'reco.on.ca' }),
   S({ source_id:'CA_ON_FSRA', display_name:'FSRA Ontario, mortgage and insurance licences',
       category:'02', jurisdictions:['CA-ON'], domain:'fsrao.ca' }),
-  S({ source_id:'CA_PROV_SECTOR_REGULATORS',
-      display_name:'BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators',
+  /* Was one row reading 'BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic
+     regulators' with no host on it, so it could never light and the gap it
+     stood for had no name. Seven of those bodies have a host we checked
+     against the body's own site. The two that are left are named on their own
+     row and declared. Entity level only, as above. */
+  S({ source_id:'CA_BC_BCFSA', display_name:'BC Financial Services Authority',
+      category:'02', jurisdictions:['CA-BC'], domain:'bcfsa.ca' }),
+  S({ source_id:'CA_AB_RECA', display_name:'Real Estate Council of Alberta',
+      category:'02', jurisdictions:['CA-AB'], domain:'reca.ca' }),
+  S({ source_id:'CA_QC_AMF', display_name:'Autorite des marches financiers',
+      category:'02', jurisdictions:['CA-QC'], domain:'lautorite.qc.ca' }),
+  S({ source_id:'CA_SK_FCAA', display_name:'Financial and Consumer Affairs Authority of Saskatchewan',
+      category:'02', jurisdictions:['CA-SK'], domain:'fcaa.gov.sk.ca' }),
+  S({ source_id:'CA_MB_MSC', display_name:'Manitoba Securities Commission',
+      category:'02', jurisdictions:['CA-MB'], domain:'mbsecurities.ca' }),
+  S({ source_id:'CA_NB_FCNB', display_name:'Financial and Consumer Services Commission of New Brunswick',
+      category:'02', jurisdictions:['CA-NB'], domain:'fcnb.ca' }),
+  S({ source_id:'CA_NS_NSSC', display_name:'Nova Scotia Securities Commission',
+      category:'02', jurisdictions:['CA-NS'], domain:'nssc.novascotia.ca' }),
+  S({ source_id:'CA_ATLANTIC_SMALL_REGULATORS', unmapped:'Prince Edward Island and Newfoundland and Labrador. Two bodies, no host checked yet, so the row is declared rather than counted as reached.',
+      display_name:'Prince Edward Island and Newfoundland and Labrador regulators',
       category:'02', jurisdictions:['CA'], transport:'parallel', domain:'' }),
   S({ source_id:'US_NMLS', display_name:'NMLS Consumer Access', category:'02', also:['04'],
       jurisdictions:['US'], domain:'nmlsconsumeraccess.org',
@@ -181,9 +200,18 @@ export const CATALOGUE = [
   S({ source_id:'CA_AUTONOMOUS_SANCTIONS',
       display_name:'Canadian Consolidated Autonomous Sanctions List', category:'03',
       jurisdictions:['CA'], domain:'international.gc.ca', supports_person_search:true }),
-  S({ source_id:'CONSUMER_AGENCY_ALERTS',
-      display_name:'Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts', category:'03',
-      jurisdictions:['INTL'], transport:'parallel', domain:'' }),
+  /* Was one row standing for five agencies with no host, so a hit on any of
+     them had nowhere to land. Four now carry the host we checked on the
+     agency's own site. The fifth, the Department of Justice, was already a
+     row of its own and is not duplicated here. */
+  S({ source_id:'CA_COMPETITION_BUREAU', display_name:'Competition Bureau Canada',
+      category:'03', jurisdictions:['CA'], domain:'competition-bureau.canada.ca' }),
+  S({ source_id:'US_FTC', display_name:'Federal Trade Commission', category:'03',
+      jurisdictions:['US'], domain:'ftc.gov' }),
+  S({ source_id:'US_CFPB', display_name:'Consumer Financial Protection Bureau',
+      category:'03', jurisdictions:['US'], domain:'consumerfinance.gov' }),
+  S({ source_id:'US_IC3', display_name:'Internet Crime Complaint Center', category:'03',
+      jurisdictions:['US'], domain:'ic3.gov' }),
   S({ source_id:'SG_MAS_ALERT', display_name:'MAS Investor Alert List', category:'03',
       jurisdictions:['SG'], domain:'mas.gov.sg' }),
   S({ source_id:'BCSC_CAUTION', display_name:'BCSC Caution List', category:'03',
@@ -267,11 +295,23 @@ export const CATALOGUE = [
   S({ source_id:'CA_SCC_FC', display_name:'Supreme Court of Canada and Federal Court',
       category:'05', jurisdictions:['CA'], domain:'decisions.fct-cf.gc.ca',
       supports_historical:true }),
-  S({ source_id:'CA_PROV_COURTS', display_name:'Provincial courts and tribunals',
-      category:'05', jurisdictions:['CA'], transport:'parallel', domain:'',
+  /* Had no host and so could never light, while the decisions it stands for
+     are published by CanLII, which we already ask. The row now points at the
+     host that actually serves it rather than declaring a gap that is not one. */
+  S({ source_id:'CA_PROV_COURTS', display_name:'Provincial court decisions',
+      category:'05', jurisdictions:['CA'], domain:'canlii.org',
       supports_historical:true }),
-  S({ source_id:'CA_SEC_TRIBUNALS',
-      display_name:'Securities tribunals and the Competition Tribunal', category:'05',
+  /* Two different bodies were sitting in one hostless row. Both have a host we
+     checked. The securities tribunals outside Ontario keep a row of their own,
+     declared, because their decisions are not all served from one place. */
+  S({ source_id:'CA_CAPITAL_MARKETS_TRIBUNAL', display_name:'Capital Markets Tribunal',
+      category:'05', also:['03'], jurisdictions:['CA-ON'],
+      domain:'capitalmarketstribunal.ca', supports_historical:true }),
+  S({ source_id:'CA_COMPETITION_TRIBUNAL', display_name:'Competition Tribunal',
+      category:'05', also:['03'], jurisdictions:['CA'], domain:'ct-tc.gc.ca',
+      supports_historical:true }),
+  S({ source_id:'CA_SEC_TRIBUNALS', unmapped:'Securities tribunal decisions outside Ontario. Each province serves them from its own commission site and no host list has been checked yet, so the row is declared rather than counted as reached.',
+      display_name:'Securities tribunals outside Ontario', category:'05',
       also:['03'], jurisdictions:['CA'], transport:'parallel', domain:'',
       supports_historical:true }),
   S({ source_id:'OSB_BANKRUPTCY', display_name:'OSB Bankruptcy', category:'05',
@@ -446,7 +486,25 @@ export const CATALOGUE = [
 export const BY_ID = Object.fromEntries(CATALOGUE.map(s => [s.source_id, s]));
 export const BY_NAME = Object.fromEntries(CATALOGUE.map(s => [s.display_name, s]));
 
+/* ===================== WHAT WE ASK, AND WHAT WE WORK OUT. TWO DIFFERENT THINGS.
+   The catalogue held both in one list and every coverage figure this product
+   ever printed divided by the total. Fourteen of those rows are connectors: the
+   operator graph, wallet reuse, the infrastructure cluster, the document
+   fingerprint and the rest. They are not registers and were never going to be
+   asked, so a run that reached every register on earth would still have read
+   about eighty-seven per cent on the board, and the missing thirteen looked
+   like a coverage hole rather than a category error.
+   A register is a place we send a question. A connector is something we run
+   over what the run already holds. They get different denominators because
+   they answer different questions: how much of the record did we reach, and
+   did our own checks run. */
+export const ASKABLE  = CATALOGUE.filter(s => s.enabled && s.transport !== 'connector');
+export const COMPUTED = CATALOGUE.filter(s => s.enabled && s.transport === 'connector');
+
 export const TOTAL_SOURCES = CATALOGUE.filter(s => s.enabled).length;
+/* The denominator for coverage. Never TOTAL_SOURCES: a figure divided by things
+   that cannot be asked is a figure that cannot reach a hundred. */
+export const TOTAL_ASKABLE = ASKABLE.length;
 
 /* Every check a source can contribute to: its home category plus its also list. */
 export function categoriesFor(s) {
@@ -534,4 +592,4 @@ export function counts(plan = {}) {
   };
 }
 
-export default { CATALOGUE, BY_ID, BY_NAME, TOTAL_SOURCES, board, applicable, counts, VERTICALS };
+export default { CATALOGUE, BY_ID, BY_NAME, TOTAL_SOURCES, TOTAL_ASKABLE, ASKABLE, COMPUTED, board, applicable, counts, VERTICALS };

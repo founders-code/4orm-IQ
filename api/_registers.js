@@ -1,3 +1,4 @@
+import { CATALOGUE } from './_catalogue.js';
 /**
  * 4orm - Know Before You Send
  * Register mapping.
@@ -24,7 +25,7 @@
 /* hostname -> the board register or registers it satisfies.
    Where one host serves two registers, both are listed, because reaching
    securities-administrators.ca does reach the CSA in both senses. */
-const HOST_MAP = {
+const HOST_MAP_HAND = {
   /* 01 Identity */
   'sunbiz.org':                 ['Florida Sunbiz'],
   'search.sunbiz.org':          ['Florida Sunbiz'],
@@ -254,12 +255,50 @@ const PATH_MAP = [
   ['dfpi.ca.gov',  /crypto-?scam/i, ['DFPI Crypto Scam Tracker']]
 ];
 
+/* ========================= AND EVERY REGISTER IN THE CATALOGUE, BY ITS OWN HOST
+   The table above is hand written, and the catalogue already carries the host
+   of every register it lists. Two lists of the same fact drift, and this pair
+   had: ten enabled registers, among them ACRA, both MAS registers, the Hong
+   Kong and New Zealand company offices, NMLS, RECO, FSRA and the Quebec
+   registraire, appeared in the catalogue with a real domain and in no line of
+   the map. A page from any of them came back and lit nothing, so those ten
+   could never be counted as reached however well the sweep ran.
+   The catalogue is now the source of that fact and the table above is what it
+   was always meant to be: the aliases. A host that serves a register under a
+   different domain, or two registers at once, is written by hand. A register's
+   own domain is read off the register. Add one to the catalogue and it is
+   reachable the same day, which is the whole point.
+   The hand written entry wins where both have an opinion, because it is the
+   specific one. */
+const CATALOGUE_HOSTS = (() => {
+  const m = {};
+  CATALOGUE.filter(s => s.enabled && s.domain).forEach(s => {
+    const h = String(s.domain).toLowerCase().replace(/^www\./, '');
+    (m[h] = m[h] || []).push(s.display_name);
+  });
+  return m;
+})();
+
+const HOST_MAP = (() => {
+  const m = {};
+  Object.entries(CATALOGUE_HOSTS).forEach(([h, regs]) => { m[h] = [...regs]; });
+  Object.entries(HOST_MAP_HAND).forEach(([h, regs]) => { m[h] = [...regs]; });
+  return m;
+})();
+
 /* Everything a host can serve, whatever the path. Used when we know a domain
    was queried but have no page from it: asking cftc.gov asks both the RED list
    and the enforcement record, and the board should say we asked both. */
 const HOST_SERVES = (() => {
   const m = {};
   Object.entries(HOST_MAP).forEach(([h, regs]) => { m[h] = new Set(regs); });
+  /* The catalogue's own hosts are added rather than replaced here, because a
+     hand written entry that names one register on a host must not hide the
+     register that host belongs to in the catalogue. */
+  Object.entries(CATALOGUE_HOSTS).forEach(([h, regs]) => {
+    m[h] = m[h] || new Set();
+    regs.forEach(r => m[h].add(r));
+  });
   PATH_MAP.forEach(([h, , regs]) => {
     m[h] = m[h] || new Set();
     regs.forEach(r => m[h].add(r));
@@ -294,6 +333,27 @@ function registersFor(h, url) {
  * Which registers we can honestly say were ASKED when this domain was pinned
  * on a search. Broader than registersFor on purpose.
  */
+/* Which enabled registers no host can ever light. The derived ones belong here
+   and say so: the operator graph, wallet reuse and the rest are computed from
+   what the run already holds rather than fetched from anywhere, so they have no
+   domain and never will. Anything else on this list is a register we publish in
+   the catalogue and cannot reach, which is a gap worth failing a build over. */
+export function unreachableRegisters() {
+  const served = new Set();
+  Object.values(HOST_SERVES).forEach(a => a.forEach(n => served.add(n)));
+  /* Set directly by reachedBoard from the connector records rather than from a
+     retrieved page. */
+  ['ICANN RDAP', 'Mail Config', 'Infrastructure Cluster'].forEach(n => served.add(n));
+  /* ONLY THE ONES WE ASK. A connector is not a register and cannot be
+     unreachable: it either ran or it did not, which is a different reading with
+     a different denominator. Counting them here is what made a category error
+     look like a thirteen point coverage hole. */
+  return CATALOGUE.filter(s => s.enabled && s.transport !== 'connector'
+                            && !served.has(s.display_name))
+    .map(s => ({ source_id: s.source_id, display_name: s.display_name,
+                 domain: s.domain || '' }));
+}
+
 export function registersServedBy(h) {
   if (!h) return [];
   const k = hostKey(String(h).toLowerCase().replace(/^www\./, ''), HOST_SERVES);

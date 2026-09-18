@@ -72,7 +72,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260918.0742';
+const BUILD = '20260918.1754';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -247,8 +247,22 @@ function toRenderShape(a, meta) {
      thing being complained about, rather than counted in a vacuum. */
   const scale = a.entity?.scale || null;
 
+  /* THE NAME ON THE PAGE IS THE COMPANY'S NAME, NOT THE BOX'S CONTENTS.
+     A run on atb.com put "Atb" at the top of the report in forty point type,
+     because the display name had been taken from the identifier and title
+     cased. It reads as a product that could not find out who it was looking
+     at, on a page whose whole job is to say who it is looking at, and the
+     records right beside it named the company in full. Where the display name
+     is nothing but the domain label dressed up, the legal entity the records
+     DID establish is used instead. */
+  const label = (a.entity?.domain || '').split('.')[0].toLowerCase();
+  let display = a.entity?.display_name || '';
+  const legal = a.entity?.legal_entity || '';
+  if (legal && label && display.toLowerCase().replace(/[^a-z0-9]/g, '') === label)
+    display = legal;
+
   return {
-    name: a.entity?.display_name || '', domain: a.entity?.domain || '',
+    name: display, domain: a.entity?.domain || '',
     scale,
     verdict,
     headline,
@@ -294,7 +308,20 @@ function toRenderShape(a, meta) {
 
     cats,
     claims: claims.map(c => ({ q: c.claim, s: c.adjudicating_source, r: c.record_says, v: c.result })),
-    issues: issues.map(i => ({ t: i.title, x: i.explanation, sev: i.severity, tier: i.tier })),
+    /* A FINDING THAT IS NOT ABOUT THEM IS NOT A FINDING AGAINST THEM.
+       The attachment rule reached the verdict and stopped there, so a run on a
+       provincial bank produced four findings at HIGH of which three were about
+       somebody else: a lookalike domain the regulator had warned about,
+       fraudsters running fake phone lines in the party's name, and a second
+       lookalike on an alert list. Every one of them true, not one of them a
+       finding against the party. They are carried through with their subject
+       named, and the page files them where they belong.
+       A gap in our own reading is dropped outright: it is not a finding about
+       anybody at any severity, and it is already reported as a gap. */
+    issues: issues
+      .filter(i => i.kind !== 'coverage_gap')
+      .map(i => ({ t: i.title, x: i.explanation, sev: i.severity, tier: i.tier,
+                   about: i.about || '', match: ATTACH.has(i.match) ? i.match : 'probable' })),
     bys: a.before_you_send || [],
     gaps: (a.coverage_gaps || []).map(g => [g.source, g.reason]),
     unresolved: a.unresolved_questions || [],
@@ -570,7 +597,7 @@ export default async function handler(req, res) {
        On a product whose first promise is that coverage is COUNTED from the
        retrieval log rather than asserted, that is the worst failure available:
        it is indistinguishable, on screen, from having checked and found a clean
-       record. A reader about to send money cannot tell "we asked 121 registers
+       record. A reader about to send money cannot tell "we asked 133 registers
        and none held anything" from "we never managed to ask".
 
        It also has a tell, which is the clock. A real sweep takes minutes. A
@@ -858,7 +885,7 @@ export default async function handler(req, res) {
        The health table above is written from the review ledger, which covers
        the customer-review platforms and nothing else, and writes them under
        their board names. The back office counts registers reached by looking
-       for catalogue source_ids in that same table, so it found none of the 121
+       for catalogue source_ids in that same table, so it found none of the 133
        and printed nought per cent on a finished run.
 
        The board is the record of what this run reached: clear means a page
@@ -866,16 +893,54 @@ export default async function handler(req, res) {
        nothing, which is reached without a match. Anything else was not asked.
        Fire and forget, like the ledger above: a counter never holds up a
        response. */
+    /* EVERY REGISTER THAT COULD HAVE HELD A RECORD, WITH WHAT HAPPENED TO IT.
+       This wrote only the registers the board had lit, which meant a register
+       that applied to this party and was never asked left no row at all, and a
+       register that does not apply to this party left no row either. Those are
+       different things and the back office could not tell them apart: it read
+       a missing row as "not called" for both, so the reader of the board saw
+       nought of a hundred and twenty one reached on a finished run and had no
+       way to know whether that meant the sweep was narrow, the routing was
+       tight, or the counter was broken.
+       Routing already decides, before the run, which registers could hold a
+       record for this party. So the whole of that decision is written down:
+
+         ok           a page came back from it
+         no_match     asked, and it had nothing
+         failed       it applied to this party and the run never reached it
+         out_of_scope routing ruled it out before the run, with a reason
+
+       Every enabled register in the catalogue now gets exactly one row per
+       run, which is what makes "registers reached" a number rather than a
+       guess. Fire and forget, like the ledger above: a counter never holds up
+       a response. */
+    const srcWrites = [];
     try {
+      const applicableIds = new Set(app.applicable.map(x => x.source_id).filter(Boolean));
+      const outOfScope    = new Set(app.notApplicable.map(x => x.source.source_id).filter(Boolean));
+      const done = new Set();
       for (const [name, state] of Object.entries(board || {})) {
         const row = BY_NAME[name];
-        if (!row || !row.source_id) continue;
-        if (state === 'clear' || state === 'caution' || state === 'adverse')
-          recordSource(row.source_id, 'ok', null);
-        else if (state === 'searched')
-          recordSource(row.source_id, 'no_match', null);
+        if (!row || !row.source_id || done.has(row.source_id)) continue;
+        if (state === 'clear' || state === 'caution' || state === 'adverse') {
+          done.add(row.source_id); srcWrites.push(recordSource(row.source_id, 'ok', null));
+        } else if (state === 'searched') {
+          done.add(row.source_id); srcWrites.push(recordSource(row.source_id, 'no_match', null));
+        }
       }
+      for (const id of applicableIds)
+        if (!done.has(id)) { done.add(id); srcWrites.push(recordSource(id, 'failed', null)); }
+      for (const id of outOfScope)
+        if (!done.has(id)) { done.add(id); srcWrites.push(recordSource(id, 'out_of_scope', null)); }
     } catch {}
+    /* AND A COUNTER THAT CANNOT FAIL LOUDLY IS A COUNTER NOBODY CAN TRUST.
+       recordSource swallows every database error and returns ok:false, so a
+       health table that had stopped being written looks exactly like a sweep
+       that asked nothing. Rather than build a second counter that can fail the
+       same way, the failure is left for the back office to DERIVE: a finished
+       run always asks something, so runs in the window with nought registers
+       recorded is an impossible pair, and the board says so in those words
+       instead of printing a nought that reads like a measurement. */
 
     if (stream) { emit('result', payload); try { res.end(); } catch {} return; }
     res.setHeader('Cache-Control', 'no-store');

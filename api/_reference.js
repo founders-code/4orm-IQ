@@ -72,11 +72,60 @@ export const REFERENCE = {
   look: "Match the licence to the activity. A licence to sell insurance is not a licence to arrange a mortgage, and a firm holding one while doing the other is the thing to notice."
 },
 
-"BCFSA, RECA, AMF, FCAA, Manitoba and Atlantic regulators": {
-  info: ["CA","A","The provincial bodies that license real estate, mortgage and insurance outside Ontario: the BC Financial Services Authority, the Real Estate Council of Alberta, the Autorite des marches financiers, the Financial and Consumer Affairs Authority of Saskatchewan, and their Manitoba and Atlantic counterparts.","https://www.bcfsa.ca/"],
-  hit: "The firm holds a licence in that province for what it is doing, or it appears in that regulator's enforcement record.",
-  miss: "No licence found in that province. A licence in one province is not a licence in another.",
-  look: "Check the province the money is going to, not only the province you are in. These regulators do not share one register, and each one only answers for its own."
+"BC Financial Services Authority": {
+  info: ["CA-BC","A","The British Columbia regulator of mortgage brokers, real estate services, credit unions and insurance.","https://www.bcfsa.ca/"],
+  hit: "The firm holds a British Columbia licence for what it is doing, or it appears in BCFSA's enforcement record.",
+  miss: "No British Columbia licence found for that activity. A licence in another province does not cover work done here.",
+  look: "Match the licence to the activity and to the province the money is going to, not the province you are in."
+},
+
+"Real Estate Council of Alberta": {
+  info: ["CA-AB","A","The Alberta regulator that licenses real estate, mortgage and property management brokerages and holds their conduct record.","https://www.reca.ca/"],
+  hit: "The brokerage is licensed in Alberta, or it appears in RECA's conduct and discipline record.",
+  miss: "No Alberta brokerage licence found. Arranging a mortgage or a property deal in Alberta needs one.",
+  look: "The licence is held by the brokerage. An individual agent working outside a licensed brokerage is the thing to notice."
+},
+
+"Autorite des marches financiers": {
+  info: ["CA-QC","A","Quebec's single financial regulator, covering securities, insurance, deposit institutions and mortgage brokerage.","https://lautorite.qc.ca/"],
+  hit: "The firm is authorised in Quebec, or it appears in the AMF's warning and enforcement record.",
+  miss: "No Quebec authorisation found. Quebec licenses separately from the rest of Canada and a firm can be registered elsewhere and not here.",
+  look: "Whether the authorisation covers the product being sold. The AMF registers by discipline, and the discipline is the point."
+},
+
+"Financial and Consumer Affairs Authority of Saskatchewan": {
+  info: ["CA-SK","A","The Saskatchewan regulator of securities, mortgage brokers, payday lenders and consumer credit.","https://fcaa.gov.sk.ca/"],
+  hit: "The firm is registered in Saskatchewan, or it appears in the authority's orders.",
+  miss: "No Saskatchewan registration found for that activity.",
+  look: "Which division registered it. This one body covers several very different markets and a registration in one says nothing about another."
+},
+
+"Manitoba Securities Commission": {
+  info: ["CA-MB","A","The Manitoba securities and real estate regulator, holding registrations, orders and investor warnings.","https://www.mbsecurities.ca/"],
+  hit: "The firm or person is registered in Manitoba, or an order names them.",
+  miss: "No Manitoba registration found. The register is smaller than the larger provinces and an absence is common for an out of province firm.",
+  look: "Whether the firm relies on an exemption rather than a registration, and whether that exemption fits what it is actually selling."
+},
+
+"Financial and Consumer Services Commission of New Brunswick": {
+  info: ["CA-NB","A","The New Brunswick regulator across securities, insurance, mortgage brokers, real estate, payday lending and consumer credit.","https://fcnb.ca/"],
+  hit: "The firm holds a New Brunswick licence, or it appears in the commission's warnings and orders.",
+  miss: "No New Brunswick licence found across any of those sectors.",
+  look: "This one commission covers many markets, so read which licence was found before reading it as cover for the deal in front of you."
+},
+
+"Nova Scotia Securities Commission": {
+  info: ["CA-NS","A","The Nova Scotia securities regulator, holding registrations, orders and investor warnings.","https://nssc.novascotia.ca/"],
+  hit: "The firm or person is registered in Nova Scotia, or an order or warning names them.",
+  miss: "No Nova Scotia securities registration found.",
+  look: "Whether anything found is a registration or an order. They sit on the same site and they mean opposite things."
+},
+
+"Prince Edward Island and Newfoundland and Labrador regulators": {
+  info: ["CA","A","The two Atlantic regulators whose registers we have not yet pinned to a host, kept on the board so the gap has a name.","https://www.bcfsa.ca/"],
+  hit: "Not asked yet. Nothing can be found here until a host is pinned for each of these two registers.",
+  miss: "We do not ask these, so an empty answer is our gap and not the regulator's. Check them yourself if the money is going to either province.",
+  look: "That this row is a declared gap, not a clean result. Nothing here is evidence either way."
 },
 
 "NMLS Consumer Access": {
@@ -100,11 +149,32 @@ export const REFERENCE = {
   look: "Match the full legal name and any listed alias. Sanctions lists carry aliases precisely because names get changed."
 },
 
-"Competition Bureau, FTC, CFPB, DOJ, IC3 public alerts": {
-  info: ["INTL","A","The public warnings issued by the consumer and competition authorities of Canada and the United States, and by the FBI's internet crime centre.","https://competition-bureau.canada.ca/"],
-  hit: "A consumer authority has published something naming this party or this scheme.",
-  miss: "No consumer alert found. These bodies publish selectively, so silence here is very weak evidence.",
-  look: "Whether the alert names this party or names a pattern the approach you received matches. Both are worth knowing, and they are not the same thing."
+"Competition Bureau Canada": {
+  info: ["CA","A","Canada's competition law enforcer, publishing deceptive marketing cases and fraud warnings.","https://competition-bureau.canada.ca/"],
+  hit: "The Bureau has published something naming this party, or a warning describing this approach.",
+  miss: "No Canadian competition action found. The Bureau publishes only what it has acted on, so silence is weak evidence.",
+  look: "Whether the item names the party or describes a pattern. Both are worth knowing and they are not the same thing."
+},
+
+"Federal Trade Commission": {
+  info: ["US","A","The United States consumer protection agency, publishing cases, refund programmes and consumer alerts.","https://www.ftc.gov/"],
+  hit: "The FTC has sued, settled with, or published an alert naming this party.",
+  miss: "No federal consumer case found. The FTC brings a small number of cases against a very large market.",
+  look: "Whether a refund programme exists. If the party has been sued and money was returned, there may be a claim you can still make."
+},
+
+"Consumer Financial Protection Bureau": {
+  info: ["US","A","The United States regulator for consumer lending, payments and credit reporting, publishing enforcement and complaint records.","https://www.consumerfinance.gov/"],
+  hit: "The Bureau has an enforcement action or a body of complaints naming this party.",
+  miss: "No CFPB record found. A firm outside consumer lending and payments is expected to be absent.",
+  look: "Complaint volume is not a finding. Read the enforcement record separately from the complaint database."
+},
+
+"Internet Crime Complaint Center": {
+  info: ["US","A","The FBI's reporting hub for internet crime, publishing alerts on active fraud patterns.","https://www.ic3.gov/"],
+  hit: "An IC3 alert describes the pattern the approach you received matches.",
+  miss: "No matching alert found. IC3 publishes patterns and rarely names a firm, so silence here says almost nothing about one business.",
+  look: "This is where a loss is reported in the United States. Whatever it says about the party, the reporting route is the useful part."
 },
 
 "MAS Investor Alert List": {
@@ -128,18 +198,32 @@ export const REFERENCE = {
   look: "What the party was doing in the case. Being sued, suing somebody, and being prosecuted are three different facts."
 },
 
-"Provincial courts and tribunals": {
-  info: ["CA","A","The published decisions of the provincial superior and small claims courts and of the provincial tribunals.","https://www.canlii.org/"],
+"Provincial court decisions": {
+  info: ["CA","A","The published decisions of the provincial superior and small claims courts, served through CanLII.","https://www.canlii.org/"],
   hit: "A decision names the party. Most commercial disputes end up here rather than in a federal court.",
   miss: "No published decision found. Many proceedings are settled or never published, so an absence is not a clean record.",
   look: "The date and the outcome. An old settled dispute and a current unsatisfied judgment are not the same thing at all."
 },
 
-"Securities tribunals and the Competition Tribunal": {
-  info: ["CA","A","The tribunals that decide securities enforcement in each province, and the federal Competition Tribunal.","https://www.canlii.org/"],
-  hit: "A tribunal has made a finding about this party. This is the record behind most regulator caution list entries.",
-  miss: "No tribunal decision found. A regulator can warn about a party long before any tribunal has heard it.",
-  look: "Whether the decision is a finding, an order, or a settlement, and what the party agreed to. A settlement without an admission is still a fact, and it is not a finding of wrongdoing."
+"Capital Markets Tribunal": {
+  info: ["CA-ON","A","Ontario's securities tribunal, which hears enforcement proceedings under the Securities Act and publishes its decisions.","https://www.capitalmarketstribunal.ca/"],
+  hit: "The tribunal has made a finding, an order or approved a settlement naming this party.",
+  miss: "Nothing heard in Ontario. A matter can be under investigation for years and never reach a hearing.",
+  look: "Whether it is a finding, an order or a settlement, and what the party agreed to. A settlement without an admission is still a fact and it is not a finding of wrongdoing."
+},
+
+"Competition Tribunal": {
+  info: ["CA","A","The federal tribunal that hears competition matters, including deceptive marketing.","https://www.ct-tc.gc.ca/"],
+  hit: "The Tribunal has decided a matter naming this party.",
+  miss: "No Tribunal decision found. Very few matters reach it, so absence is the normal state for almost every business.",
+  look: "The remedy, not only the finding. What the party was ordered to stop doing tells you what it was doing."
+},
+
+"Securities tribunals outside Ontario": {
+  info: ["CA","A","The securities tribunals of the other provinces, each publishing from its own commission site. No host is pinned for these yet, so the row is kept on the board to give the gap a name.","https://www.canlii.org/"],
+  hit: "Not asked yet. Nothing can be found here until a host is pinned for each province.",
+  miss: "We do not ask these, so an empty answer is our gap and not the tribunal's. A provincial regulator can have decided something we did not see.",
+  look: "That this row is a declared gap, not a clean result. Check the commission for the province the money is going to."
 },
 
 "Corporations Canada": {
@@ -410,7 +494,7 @@ export const REFERENCE = {
 
 "SFC Alert List": {
   info: ["HK","A","Hong Kong's list of suspicious websites, unlicensed companies and entities impersonating licensed firms.","https://www.sfc.hk/en/alert-list"],
-  hit: "The SFC has classified this party or its website. The classification itself is the finding: impersonation of a licensed firm is a different problem from operating unlicensed.",
+  hit: "The SFC has classified this party or its website. The classification itself is the finding: impersonation of a licensed firm is a different fault from operating unlicensed.",
   miss: "Not listed.",
   look: "The classification the SFC used, and whether the entry names a firm being impersonated. If it does, the real firm is not the one you are dealing with."
 },
@@ -516,7 +600,7 @@ export const REFERENCE = {
 "ICANN RDAP": {
   info: ["GLOBAL","A","The registry record for a domain. Registrar, nameservers, status and the creation date.","https://rdap.org/"],
   hit: "The registry record for the domain: registrar, nameservers, status and creation date.",
-  miss: "The registry did not answer. It almost always does, so a failure here usually means a temporary problem rather than a missing domain.",
+  miss: "The registry did not answer. It almost always does, so a failure here usually means a temporary fault rather than a missing domain.",
   look: "The creation date. Everything else on this page can be argued about. That date cannot."
 },
 
@@ -699,7 +783,7 @@ export const REFERENCE = {
   info: ["4orm","B","Internet wide scan data: hosts, TLS certificates and the relationships between them, including historical infrastructure.","https://censys.io/"],
   hit: "The host and certificate relationships are on record, which extends the certificate check in category 06 into a map rather than a single date.",
   miss: "No scan data retrieved. Often a missing key, and it is published as a gap.",
-  look: "Certificates covering several unrelated brand names at once. One certificate issued for four brands is one operator running four brands."
+  look: "Certificates covering several unrelated brand names at once. One certificate naming four brands is a question about who runs them, and it is a question rather than an answer."
 },
 
 "Wallet Reuse": {

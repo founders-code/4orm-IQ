@@ -142,12 +142,26 @@ export const PAYLOAD_SCHEMA = {
       description: 'Ranked most serious first. Empty array is valid and correct when nothing was found.',
       items: {
         type: 'object',
-        required: ['title', 'explanation', 'severity', 'tier'],
+        required: ['title', 'explanation', 'severity', 'tier', 'about', 'match'],
         properties: {
           title:       { type: 'string', description: 'A complete sentence stating the finding.' },
           explanation: { type: 'string' },
           severity:    { type: 'string', enum: ['critical', 'high', 'medium', 'low'] },
-          tier:        TIER
+          tier:        TIER,
+          /* A FINDING IS ABOUT SOMEBODY, AND IT HAS TO SAY WHO.
+             The attachment rule reached the verdict and not this list, so a
+             run on a provincial bank produced four findings at HIGH of which
+             three were about somebody else: a lookalike domain the regulator
+             had warned about, fraudsters running fake phone lines in the
+             party's name, and a second lookalike on an alert list. All three
+             are true and none of them is a finding against the party. */
+          about:       { type: 'string', description:
+            'The identifier this finding is ABOUT, copied from the record. Usually the party under check. Where the finding concerns a lookalike, an impersonator or a differently named entity, it is that one.' },
+          match:       { type: 'string', enum: ['exact', 'probable', 'unconnected'], description:
+            'exact: this finding is about the party under check. probable: about something the retrieval ties to them, with the tie stated. unconnected: about a different party that merely resembles them, including a lookalike domain and anybody impersonating them. Somebody using the party\'s name to defraud people is a finding about the impersonator, never about the party.' },
+          /* A gap in our own reading is not a finding about anybody. */
+          kind:        { type: 'string', enum: ['finding', 'coverage_gap'], description:
+            'coverage_gap where the item is something WE did not read or could not reach. A record we did not open is a gap in our coverage and belongs in coverage_gaps, never in this list as a finding at any severity.' }
         }
       }
     },

@@ -165,6 +165,27 @@ about a bank are a fact about a bank. They become a finding when a regulator has
 when the pattern is specific and mechanical rather than a spread of service grievances,
 or when the count is extreme for the institution's size. Say which of the three it is.
 
+### A finding is about somebody, and it has to say who
+
+\`material_issues\` carries the same two fields as evidence, for the same reason. A run
+on a provincial bank produced four findings at HIGH of which three were about somebody
+else: a lookalike domain a regulator had warned about, fraudsters running fake phone
+lines in the bank's name, and a second lookalike on an alert list. Every one of them
+true. Not one of them a finding against the bank.
+
+- **Somebody impersonating the party is a finding about the impersonator.** Fake phone
+  lines, fake text messages, a lookalike domain, a cloned site: all \`unconnected\`,
+  because the subject of the finding is whoever is doing it. It is not a mark against
+  the name they borrowed. Being impersonated is something that happens TO a firm.
+- **A record we did not read is not a finding at any severity.** Set \`kind\` to
+  \`coverage_gap\` and put it in \`coverage_gaps\`, where it says what it is. "An alert
+  exists in the archive and was not read in full during this run" is a sentence about
+  us, not about them.
+- **\`display_name\` is the company's name.** Not the domain label with a capital
+  letter. If the retrieval established a legal or trading name, that is the name.
+
+### Size
+
 Fill \`entity.scale\` from what the retrieval established, and leave it null where it
 established nothing. Never estimate a figure into it. \`band\` is your reading of the
 rest: \`major\` for a systemically sized regulated institution, \`established\` for one

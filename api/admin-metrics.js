@@ -22,7 +22,7 @@ import { DOCUMENTS, DOCS, DOCS_SUPPORTING, DOCS_POSTURE } from './_documents.js'
 /* The build this API was deployed from. The page sends its own stamp on the
    query string and the two are compared here, because guessing which build is
    live has cost this project hours. */
-const BUILD = '20260918.0742';
+const BUILD = '20260918.1754';
 
 /* Amber is not a fault and must never be drawn as one. The rule below has no
    time threshold in it on purpose: a part is DOWN only when we asked it and it
@@ -92,7 +92,14 @@ export default async function handler(req, res) {
          from ops_source_day where day > current_date - $1::int
          group by source_id having sum(attempts) > 0
          order by ok_pct asc nulls last limit 15`, [days]),
-      q(`select source_id, sum(attempts)::int as attempts, sum(ok)::int as ok
+      /* The whole row, not two columns of it. Reached, asked and empty, applied
+         and never asked, and ruled out before the run are four different
+         things, and the board could only tell the first from everything else
+         while this selected attempts and ok alone. */
+      q(`select source_id, sum(attempts)::int as attempts, sum(ok)::int as ok,
+                coalesce(sum(no_match),0)::int as no_match,
+                coalesce(sum(failed),0)::int as failed,
+                coalesce(sum(out_of_scope),0)::int as out_of_scope
          from ops_source_day where day > current_date - $1::int group by source_id`, [days]),
       q(`select coalesce(sum(attempts),0)::int as attempts,
                 coalesce(sum(ok),0)::int as ok,
@@ -176,11 +183,38 @@ export default async function handler(req, res) {
        of the attempts. A board that prints "40.5% of 126" leaves a reader
        working out which of the two it is, and 126 is neither the catalogue nor
        a percentage of anything they can see. */
-    const enabled = CATALOGUE.filter(x => x.enabled);
+    /* THE DENOMINATOR IS WHAT WE ASK, NEVER THE WHOLE CATALOGUE.
+       Fourteen rows are connectors, which are run rather than asked, so a
+       coverage figure divided by the whole catalogue could never reach a
+       hundred however well the sweep ran, and the missing thirteen points read
+       as a hole rather than as the category error they were. */
+    const enabled = CATALOGUE.filter(x => x.enabled && x.transport !== 'connector');
+    const computedRows = CATALOGUE.filter(x => x.enabled && x.transport === 'connector');
     const reach = {
       catalogue: enabled.length,
       asked:     enabled.filter(x => (seen[x.source_id] || {}).attempts > 0).length,
-      answered:  enabled.filter(x => (seen[x.source_id] || {}).ok > 0).length
+      answered:  enabled.filter(x => (seen[x.source_id] || {}).ok > 0).length,
+      /* Asked and it had nothing, which is reached, and applied to the party
+         and never got asked, which is a hole. Both used to be a missing row,
+         and a missing row also meant routing had ruled the register out, so
+         three different things read as one. */
+      empty:     enabled.filter(x => ((seen[x.source_id] || {}).no_match || 0) > 0).length,
+      missed:    enabled.filter(x => ((seen[x.source_id] || {}).failed || 0) > 0).length,
+      out:       enabled.filter(x => ((seen[x.source_id] || {}).out_of_scope || 0) > 0).length
+    };
+    /* A FINISHED RUN ALWAYS ASKS SOMETHING.
+       So runs in the window with nought registers recorded is not a low number,
+       it is an impossible pair, and it means the health table is not being
+       written rather than that the sweep asked nothing. Printing the nought as
+       though it were a measurement is how this sat unnoticed: the board showed
+       nought per cent reached beside a healthy looking fifty nine per cent
+       answering, and the two numbers were describing different tables. */
+    reach.unwritten = (r.attempted || 0) > 0 && reach.asked === 0;
+    /* And the checks we compute, counted apart and measured on whether they
+       ran rather than on whether a source answered. */
+    reach.computed = {
+      total: computedRows.length,
+      ran:   computedRows.filter(x => (seen[x.source_id] || {}).attempts > 0).length
     };
     const rdapRow = seen.ICANN_RDAP || seen.RDAP_DATE || null;
     const dl = del[0] || {};
