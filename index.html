@@ -3180,13 +3180,25 @@ body[data-stage="report"] .foot{display:none}
   box-shadow:0 20px 50px rgba(214,51,78,.10)}
 #rpt .rp-clock .rp-clockin{border-radius:0 0 calc(var(--r-xl) - 7px) calc(var(--r-xl) - 7px)}
 #rpt .rp-clockin{background:var(--surface);border-radius:calc(var(--r-xl) - 7px);padding:30px 32px 28px}
-#rpt .rp-clockh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-#rpt .rp-clockh .rp-t{font-size:clamp(21px,2.6vw,28px);font-weight:800;letter-spacing:-.032em;line-height:1.12}
-#rpt .rp-clockh .rp-c{font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--bad);background:var(--bad-bg);border:1px solid var(--bad-br);
-  border-radius:999px;padding:6px 12px}
-#rpt .rp-clocks{margin-top:12px;font-size:14.5px;line-height:1.6;color:var(--tx-2);max-width:70ch}
-#rpt .rp-win{display:grid;gap:2px;margin-top:24px;grid-template-columns:repeat(3,1fr);
+/* FOUR BLOCKS, ONE SHAPE EACH.
+   A lettered tag, a short title, one line of summary, then the thing itself.
+   Declared once and worn by all four, so a reader who learns the shape on the
+   first one is not asked to learn it again three more times. The big headline
+   and the paragraph that used to open this door are gone: a reader who has
+   pressed a door marked "if you have sent money" does not need the door
+   explained to them again on the other side of it. */
+#rpt .rp-cbk{padding-top:26px;margin-top:26px;border-top:1px solid var(--border)}
+#rpt .rp-cbk:first-child{padding-top:0;margin-top:0;border-top:none}
+#rpt .rp-cbh{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:800;
+  letter-spacing:-.024em;line-height:1.25;color:var(--tx)}
+#rpt .rp-cbn{flex:none;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;
+  justify-content:center;background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-br);
+  font-family:var(--rmono);font-size:11px;font-weight:800;letter-spacing:0}
+#rpt .rp-cbs{margin:8px 0 0 36px;font-size:14.5px;line-height:1.55;color:var(--tx-2);max-width:68ch}
+#rpt .rp-cbs:empty{display:none}
+#rpt .rp-cbk .rp-win,#rpt .rp-cbk .rp-tel,#rpt .rp-cbk .rp-steps,#rpt .rp-cbk .rp-bundle{margin-left:36px}
+@media(max-width:560px){#rpt .rp-cbs,#rpt .rp-cbk .rp-win,#rpt .rp-cbk .rp-tel,#rpt .rp-cbk .rp-steps,#rpt .rp-cbk .rp-bundle{margin-left:0}}
+#rpt .rp-win{display:grid;gap:2px;margin-top:16px;grid-template-columns:repeat(3,1fr);
   background:var(--border);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 #rpt .rp-winc{background:var(--surface-2);padding:18px 20px 20px;position:relative}
 #rpt .rp-winc::before{content:"";position:absolute;left:0;right:0;top:0;height:3px}
@@ -3201,7 +3213,7 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-winc .rp-wv{margin-top:11px;font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 #rpt .rp-winc .rp-wx{margin-top:8px;font-size:13px;line-height:1.52;color:var(--tx-2)}
 @media(max-width:760px){#rpt .rp-win{grid-template-columns:1fr}}
-#rpt .rp-tel{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+#rpt .rp-tel{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 #rpt .rp-tel a{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:10px 16px;
   border:1px solid var(--bad-br);background:var(--bad-bg);color:var(--bad);text-decoration:none;
   font-family:var(--rmono);font-size:11px;font-weight:800;letter-spacing:.06em;
@@ -3209,13 +3221,17 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-tel a:hover{transform:translateY(-1px);border-color:var(--bad)}
 #rpt .rp-tel a em{font-style:normal;color:var(--tx-3);font-weight:700;letter-spacing:.12em;font-size:8.5px;
   text-transform:uppercase}
-/* A number with nothing to dial, on a desktop or where no tel link exists. It
-   is the same pill without the affordance, rather than bare text in the row. */
-#rpt .rp-telx{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:10px 16px;
-  border:1px solid var(--border-strong);background:var(--surface-2);color:var(--tx);
-  font-family:var(--rmono);font-size:11px;font-weight:800;letter-spacing:.06em}
-#rpt .rp-telx em{font-style:normal;color:var(--tx-3);font-weight:700;letter-spacing:.12em;
-  font-size:8.5px;text-transform:uppercase}
+/* THE LINE WITH NO NUMBER ON IT IS A SENTENCE, NOT A PILL.
+   The bank's entry is an instruction about where to look, and set in mono at
+   eleven points inside a pill it read as a very long dial code. A pill is the
+   right shape for a number somebody presses; it is the wrong shape for a
+   sentence. This one takes the whole row and reads as what it is. */
+#rpt .rp-telx{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;width:100%;
+  border-radius:var(--r-sm);padding:12px 16px;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--tx);
+  font-size:14.5px;line-height:1.55}
+#rpt .rp-telx em{flex:none;font-style:normal;color:var(--tx-3);font-weight:800;letter-spacing:.12em;
+  font-family:var(--rmono);font-size:8.5px;text-transform:uppercase;white-space:nowrap}
 
 /* ------------------------------------------------------------- findings */
 #rpt .rp-finds{margin-top:32px;display:grid;gap:14px}
@@ -3398,17 +3414,21 @@ body[data-stage="report"] .foot{display:none}
   color:#0B5C40;max-width:68ch}
 #rpt .rp-pakfoot b{font-weight:700}
 
-#rpt .rp-bundle{margin-top:32px;display:grid;gap:2px;background:var(--border);border:1px solid var(--border);
+#rpt .rp-bundle{margin-top:16px;display:grid;gap:2px;background:var(--border);border:1px solid var(--border);
   border-radius:var(--r-lg);overflow:hidden}
 #rpt .rp-brow{background:var(--surface);display:grid;grid-template-columns:186px minmax(0,1fr);gap:20px;
   padding:15px 24px;align-items:baseline}
-#rpt .rp-brow.rp-hd{background:var(--surface-2)}
 #rpt .rp-brow .rp-bk{font-family:var(--rmono);font-size:8.5px;font-weight:800;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx-3)}
 #rpt .rp-brow .rp-bv{font-size:13.5px;line-height:1.5;color:var(--tx);font-weight:600;word-break:break-word}
-#rpt .rp-brow .rp-bv.rp-you{font-weight:500;color:var(--tx-3);font-style:normal}
-#rpt .rp-brow .rp-bv.rp-you::before{content:"You add this. ";font-family:var(--rmono);font-size:8.5px;
-  font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--acc-dp)}
+#rpt .rp-brow .rp-bv.rp-you{font-family:var(--rmono);font-size:9px;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--blue-dp)}
+/* The band that says whose half this is. It replaces a column header that
+   labelled both halves at once and therefore labelled neither. */
+#rpt .rp-bband{background:var(--surface-2);padding:10px 22px;font-family:var(--rmono);
+  font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-bband.rp-byou{background:var(--blue-50);color:var(--blue-dp)}
+
 @media(max-width:680px){#rpt .rp-brow{grid-template-columns:1fr;gap:5px;padding:14px 18px}}
 
 /* the honest half */
@@ -4150,9 +4170,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-already.rp-ajar .rp-alreadybtn .rp-go{transform:rotate(180deg)}
 #rpt .rp-already.rp-ajar .rp-alreadybtn{border-radius:var(--r-xl) var(--r-xl) 0 0}
 #rpt .rp-clock[hidden]{display:none}
-#rpt .rp-shame{margin-top:20px;padding:15px 18px;border-radius:var(--r-sm);
-  background:var(--surface-2);border:1px solid var(--border);font-size:14.5px;
-  line-height:1.6;color:var(--tx-2);max-width:68ch}
 /* WHAT WE FOUND AND DID NOT PRINT.
    This is the page telling the reader that a rule we set ourselves cost them
    something. It is the most important paragraph in the report and it had no
@@ -5053,35 +5070,45 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </button>
     </div>
 
+    <!-- FOUR BLOCKS, EACH ONE A SHORT TITLE AND ONE LINE.
+         What used to be behind this door ran to two thousand pixels of
+         unbroken reading: a kicker, a headline, two lines, a reassurance box,
+         three cards, three numbers, an unlabelled list, a second unlabelled
+         list and a twenty row table, with no way to tell where one thought
+         ended and the next began. A frightened person cannot triage that.
+         Now: how long you have, who to ring, what to read out, and what only
+         they can answer. Each one titled, each one summed up in a line, and
+         the record reachable without reading a word of the rest. -->
     <div class="rp-clock" id="rpClock" hidden>
       <div class="rp-clockin">
-        <div class="rp-clockh">
-          <span class="rp-c" id="rpClockC"></span>
-          <span class="rp-t" id="rpClockT"></span>
+
+        <div class="rp-cbk">
+          <div class="rp-cbh"><span class="rp-cbn">A</span><span id="rpClockT"></span></div>
+          <p class="rp-cbs" id="rpClockX"></p>
+          <div class="rp-tel" id="rpTels"></div>
         </div>
-        <p class="rp-clocks" id="rpClockX"></p>
-        <div class="rp-shame" id="rpShame"></div>
-        <div class="rp-win" id="rpWindows"></div>
-        <div class="rp-tel" id="rpTels"></div>
-        <!-- THE ORDER, AND WHAT THE CALL WILL ASK FOR, BOTH BELONG IN HERE.
-             They were two separate menus outside this door, which meant the
-             instruction to ring the bank was behind one control and the list of
-             things the bank will ask for was behind another, three rows down.
-             In the first hour that is the difference between a short call and a
-             long one. -->
-        <div class="rp-clocksub">
-          <div class="rp-clockh2" id="rpStepsH"></div>
+
+        <div class="rp-cbk" id="rpWinBlk">
+          <div class="rp-cbh"><span class="rp-cbn">B</span>How long you have</div>
+          <p class="rp-cbs" id="rpShame"></p>
+          <div class="rp-win" id="rpWindows"></div>
+        </div>
+
+        <div class="rp-cbk" id="rpStepsSub">
+          <div class="rp-cbh"><span class="rp-cbn">C</span><span id="rpStepsH"></span></div>
+          <p class="rp-cbs" id="rpStepsS"></p>
           <div class="rp-steps" id="rpSteps"></div>
         </div>
-        <div class="rp-clocksub">
-          <div class="rp-clockh2">What the call will ask you for</div>
-          <p class="rp-sub">Everything we already know is filled in. The rest only you can
-            answer, and writing it down before you ring turns a long call into a short one.</p>
+
+        <div class="rp-cbk">
+          <div class="rp-cbh"><span class="rp-cbn">D</span>What to read out</div>
+          <p class="rp-cbs">The top half comes straight off the screen. The four at the bottom
+            are yours.</p>
           <div class="rp-bundle" id="rpBundle"></div>
         </div>
+
       </div>
     </div>
-
 
     <details class="rp-acc">
       <summary class="rp-acch">
@@ -5094,11 +5121,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <span class="rp-accg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </summary>
       <div class="rp-accbody">
-        <p class="rp-sub"><b>Each of these is a report card, built for the one body it is going
-          to.</b> It carries what the public record holds on this name: every record we found, the
-          body that published each one and the day we read it. None of it asks for your details.
-          At the foot of each is a short note on what to put in the message, which is the one part
-          only you can write.</p>
+        <p class="rp-sub">Each one is a report card of what the public record holds on this
+          name, ready to send. None of them asks for your details.</p>
         <div class="rp-pakgrid" id="rpPaks"></div>
         <p class="rp-pakfoot"><b>Only your bank or your card company can move money.</b> Only your
           local police will investigate what happened to you. Everything else on this list records
@@ -12430,7 +12454,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260918.0448";
+var KBYS_BUILD = "20260918.0644";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -13196,18 +13220,23 @@ function rpClaims(d){
    ordered by how often they turn out to matter, and the last one is the one
    nobody says out loud. */
 var RP_TIPS = [
-  ["Pay in a way that can be undone",
-   "A credit card can be disputed and a bank transfer usually cannot. An e-Transfer, a wire, crypto or a gift card is gone the moment it lands. If somebody steers you away from the card, that is the tip on this list you needed."],
+  /* SIX LINES, NOT SIX PARAGRAPHS.
+     A reader arrives here having already read a verdict and a page of what to
+     do. Anything on this list that takes a paragraph to land will not be read,
+     and a tip that is not read is not a tip. Each one is the title and the one
+     sentence that makes it act on. */
+  ["Pay in a way you can undo",
+   "A credit card can be disputed. A wire, an e-Transfer, crypto or a gift card is gone the moment it lands."],
   ["Look up the number yourself",
-   "Never ring a number from the message, the email or the website they sent you. Find the firm on a register or on its own published contact page and ring that. The same goes for a link: type the address yourself."],
-  ["Check the name on the account against the name on the contract",
-   "Money going to a personal name, a numbered company or a different country from the one you are dealing with is worth a question before it is worth a payment. Ask, in writing, why they do not match."],
-  ["Ask for the registration number and check it on the register",
-   "A real firm answers in one line and the register agrees with them. Take the number they give you, open the regulator's own site, and search it. Two minutes."],
-  ["Make the decision on a different day",
-   "Nothing legitimate needs your money tonight. A deadline that appears once you hesitate was put there for you. Sleeping on it costs nothing and it is the single most effective thing on this page."],
-  ["Say it out loud to one person first",
-   "Describe the offer to somebody who is not involved, in your own words. Most people hear the fault themselves halfway through the sentence. This is the step almost everybody skips, and it is free."]
+   "Never ring a number, or follow a link, from the message they sent. Find the firm's own published contact page."],
+  ["Check the name on the account",
+   "If the money goes to a personal name, a numbered company or another country, ask in writing why before you pay."],
+  ["Check the registration number",
+   "Take the number they give you to the regulator's own site and search it. Two minutes, and a real firm holds up."],
+  ["Decide on a different day",
+   "Nothing legitimate needs your money tonight. A deadline that appears once you hesitate was put there for you."],
+  ["Say it out loud to one person",
+   "Describe the offer to somebody not involved. Most people hear the fault themselves halfway through the sentence."]
 ];
 function rpTips(){
   var out="", i;
@@ -13326,19 +13355,24 @@ function rpPaks(){
   return out;
 }
 function rpBundle(d){
-  var out='<div class="rp-brow rp-hd"><span class="rp-bk">Field</span>'
-    +'<span class="rp-bk">What to give them</span></div>';
+  /* TWO HALVES, LABELLED, AND THE SECOND ONE IS FOUR LINES.
+     The table used to run eighteen rows under one heading, and every row in
+     the second half said "You add this. Only you can answer this", which is
+     the same sentence twice. A frightened person reading down a phone needs to
+     see, at a glance, where our part stops and theirs starts. So: a band that
+     says ours, the record, a band that says theirs, and four lines. Seven was
+     a list of everything a bank might ever ask; four is what opens a file. */
+  var out='<div class="rp-bband">Read these off the screen</div>';
   var h=rpHold(d), i;
   for(i=0;i<h.length;i++){
     out+='<div class="rp-brow"><span class="rp-bk">'+rpEsc(h[i][0])+'</span>'
       +'<span class="rp-bv">'+rpEsc(h[i][1])+'</span></div>';
   }
-  var yours=["Amount and currency","Date and time you paid","How you paid",
-             "Name on the receiving account","Receiving bank and country","Wallet address, if crypto",
-             "How they first contacted you"];
+  var yours=["What you paid","When you paid it","How you paid it","Who you paid it to"];
+  out+='<div class="rp-bband rp-byou">These four are yours</div>';
   for(i=0;i<yours.length;i++){
     out+='<div class="rp-brow"><span class="rp-bk">'+rpEsc(yours[i])+'</span>'
-      +'<span class="rp-bv rp-you">Only you can answer this</span></div>';
+      +'<span class="rp-bv rp-you">You add this</span></div>';
   }
   return out;
 }
@@ -14222,33 +14256,24 @@ var RP_ACT_DEFAULT = {
       +"needs a lawyer, and nothing on it costs anything.",
   calm:{
     doorT:"If something has gone wrong with your account, start here",
-    doorX:"A regulated firm has a complaints process, and a regulator above it. Both are open "
-         +"to you.",
+    doorX:"A regulated firm has a complaints process, and a regulator above it.",
     clockC:"Put it in writing",
     clockT:"Raise it with the firm first, then take it above them.",
-    clockX:"A registered firm is required to have a complaints process, and the regulator that "
-          +"registered them will want to see that you used it. Write down what happened, with "
-          +"dates and amounts, and send it to the firm in writing so there is a record of when "
-          +"you raised it. If they do not resolve it, that written record is what you take to "
-          +"the regulator.",
-    shame:"Raising a complaint is not an accusation and it is not a fight. It is how a regulated "
-         +"business is supposed to find out that something is not working, and the regulator "
-         +"counts them.",
+    clockX:"Put it to the firm in writing first, with dates and amounts. That record is what "
+          +"you take to the regulator if they do not fix it.",
+    shame:"A complaint is not a fight. It is how a regulated business is told something is not "
+         +"working, and the regulator counts them.",
     windows:false
   },
   urgent:{
     doorT:"If you have sent money and you think something has gone wrong, start here",
-    doorX:"This is not a statement about this company. It is what to do in the first hours if a "
-         +"payment has gone somewhere you are no longer sure about, whoever it went to. Some of "
-         +"it may still be recoverable, and that depends on hours rather than days.",
+    doorX:"What to do in the first hours, whoever the money went to. Some of it may still be "
+         +"recoverable.",
     clockC:"Ring the bank first",
     clockT:"If money has already gone, the next few hours decide whether it comes back.",
-    clockX:"Call the bank or card company that sent the money before you do anything else on "
-          +"this page. Nothing here matters more than that call, and it gets harder every hour.",
-    shame:"Calling costs you nothing and settles it either way. These approaches catch "
-         +"accountants and solicitors, your bank hears them every day, and you will not be the "
-         +"first call they take tonight. If it turns out to be nothing, that is the best outcome "
-         +"and it took ten minutes.",
+    clockX:"Hours, not days. A transfer caught early can often be stopped.",
+    shame:"The call costs nothing and settles it either way. Your bank hears this every day, and "
+         +"you will not be the first one tonight.",
     windows:true
   }
 };
@@ -14288,16 +14313,14 @@ var RP_SECTORS = {
            +"whoever is on the other end of the line.",
     calm:{
       doorT:"If you have already sent money or given out a code, start here",
-      doorX:"This is what to do in the first hours. Some of it may still be undone, and that "
-           +"depends on hours rather than days.",
+      doorX:"What to do in the first hours. Some of it may still be undone.",
       clockC:"Ring the bank on a number you found yourself",
       clockT:"If money has gone or a code was shared, the next few hours decide what can be "
             +"undone.",
-      clockX:"Call your bank or card company on the number on the back of your card, not any "
-            +"number you were given. Say the words fraud claim. If you shared a passcode or let "
-            +"anyone connect to your device, say that too, because it changes what they do next.",
-      shame:"Nobody works out that a call was not their bank while the call is happening. That "
-           +"is the whole design of it, and your bank hears it every day.",
+      clockX:"Hours, not days. Use the number on the back of your card, never one you were "
+            +"given. Say if you shared a code or let anyone connect to your device.",
+      shame:"Nobody spots it while the call is happening. That is the design of it, and your "
+           +"bank hears it every day.",
       windows:true
     }
   }
@@ -14337,11 +14360,17 @@ function rpApplySector(d, clean){
   id("rpAlready").setAttribute("data-c", clean ? "calm" : "urgent");
   id("rpAlreadyT").textContent = v.doorT;
   id("rpAlreadyX").textContent = v.doorX;
-  id("rpClockC").textContent   = v.clockC;
-  id("rpClockT").textContent   = v.clockT;
+  /* THE BLOCK TITLE IS THE SHORT ONE, NOT THE LONG ONE.
+     clockC was a pill above a headline that said the same thing at length.
+     Two lines to say one thing, at the top of a door somebody opened because
+     they are frightened. The short one is the title now and the long one is
+     gone. */
+  id("rpClockT").textContent   = v.clockC;
   id("rpClockX").textContent   = v.clockX;
   id("rpShame").textContent    = v.shame;
-  id("rpWindows").style.display = v.windows ? "" : "none";
+  /* The whole block goes, rather than only the cards inside it: a heading
+     and a line of summary over nothing is worse than no block at all. */
+  var wb=id("rpWinBlk"); if(wb) wb.hidden = !v.windows;
   return key;
 }
 
@@ -14684,9 +14713,17 @@ function renderReport(d){
 
   id("rpSteps").innerHTML=rpSteps(d);
   id("rpTips").innerHTML=rpTips();
-  /* The page title already says do this right now. Saying it again at 01 told
-     the reader nothing and pushed the four menus they came for down a rung. */
-  id("rpStepsH").textContent="Do these, in this order";
+  /* THE THIRD BLOCK IS ABOUT THIS COMPANY, AND ITS TITLE SAYS SO.
+     The steps here are written from this party's own record, so they are a
+     different job from getting the money back and the reader should be able
+     to tell at a glance. Where the run wrote none, the block goes entirely
+     rather than standing empty under a heading. */
+  var bys_=(d.bys||[]).slice(0,3);
+  var sb_=id("rpStepsSub");
+  if(sb_) sb_.hidden = !bys_.length;
+  id("rpStepsH").textContent="Then these, about this company";
+  var ss_=id("rpStepsS");
+  if(ss_) ss_.textContent="Written from what the record says about this name.";
   id("rpBundle").innerHTML=rpBundle(d);
   id("rpPaks").innerHTML=rpPaks();
 
