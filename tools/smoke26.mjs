@@ -1,8 +1,8 @@
-/* THE REPORT IS FOUR SCREENS, WALKED THE WAY A READER WALKS IT.
-   Forward on the green pills, back on the back buttons, and out to sources and
-   method from every one of them. The bug this replaces: back from the findings
-   screen landed on the findings screen, because one back button was routed
-   through the logic that decides where the SOURCES screen goes back to. */
+/* THE REPORT IS THREE SCREENS, WALKED THE WAY A READER WALKS IT.
+   The result, what to do, and how we decide. What we found used to be a fourth
+   and is not any more: it opens in place on the result, so the walk below goes
+   result to act to how we decide and back, and the old fourth stop is checked
+   as a disclosure rather than as a screen. */
 import { chromium } from 'playwright';
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -74,7 +74,7 @@ const pillPair = async where => {
     const t = [...s.querySelectorAll('.rp-nav .rp-pill')].map(e => e.textContent.trim());
     return t;
   });
-  if (!n.some(t => /Sources and method/.test(t))) fail(where + ' has no sources and method pill');
+  if (!n.some(t => /How we decide/.test(t))) fail(where + ' has no how we decide pill');
   /* On what to do, support sits inside the reach-out row, which is a closed
      disclosure until the reader opens it, so it is present rather than drawn.
      Everywhere else it has to be on the screen without opening anything. */
@@ -110,40 +110,34 @@ const pillPair = async where => {
   if (!n.foot) fail('the result screen has no route to how we decide at all now');
 }
 
-/* Forward. */
-await p.click('#rpToFound'); await p.waitForTimeout(500); await one('rpFound', 'the way on to what we found');
-/* WHAT WE FOUND OFFERS ONE THING AT THE TOP AND IT IS THE WAY BACK.
-   A reader gets here by choosing to go deeper, and the way on is the door at
-   the foot of the page. Three ways off a screen whose whole job is to be read
-   to the bottom is two too many. The way back is a pill now, in the row on the
-   right where every other control on this product lives, rather than an
-   underlined word stranded mid-header where nobody looks for one. */
+/* Forward. WHAT WE FOUND IS NOT A PLACE ANY MORE.
+   It opens under the door that names it, on the result the reader is already
+   reading, so pressing it must not move them anywhere. A reader who has just
+   been given a verdict and then been moved to a second screen to see the
+   records behind it has been asked to hold two pages in their head. */
+await p.click('#rpToFound'); await p.waitForTimeout(600);
+await one('rpReport', 'opening what we found');
 {
   const n = await p.evaluate(() => {
-    const s = [...document.querySelectorAll('#rpt .rp-sheet')].find(x => !x.hidden);
-    return { pills: [...s.querySelectorAll('.rp-nav .rp-pill')].map(e => e.textContent.trim()),
-             backs: s.querySelectorAll('.rp-navb.rp-back').length,
-             right: (() => {
-               const b = s.querySelector('.rp-nav .rp-pill-back'), h = s.querySelector('.rp-head');
-               if (!b || !h) return null;
-               const br = b.getBoundingClientRect(), hr = h.getBoundingClientRect();
-               return Math.round(hr.right - br.right);
-             })() };
+    const box = document.getElementById('rpFoundIn');
+    const btn = document.getElementById('rpToFound');
+    return { open: !box.hidden, exp: btn.getAttribute('aria-expanded'),
+             ctl: btn.getAttribute('aria-controls'),
+             gone: !document.getElementById('rpFound'),
+             holds: ['#rpFindsSec', '#rpTwoWays', '#rpClaimsSec']
+               .filter(q => !box.querySelector(q)) };
   });
-  if (n.pills.length !== 1)
-    fail('what we found has ' + n.pills.length + ' pills and should have exactly one, the way back: '
-      + n.pills.join(', '));
-  if (!/^Back to\s+the result$/i.test(n.pills[0].replace(/\s+/g,' ')))
-    fail('the one pill on what we found is not the way back, it says: ' + n.pills[0]);
-  if (n.backs) fail('the way back on what we found is an underlined word again; it belongs in the pill row');
-  if (n.right === null || n.right > 4)
-    fail('the way back on what we found is not on the right edge, it sits ' + n.right + 'px in');
+  if (!n.gone) fail('what we found is still a screen of its own');
+  if (!n.open) fail('what we found did not open');
+  if (n.exp !== 'true') fail('the door does not report that it is open');
+  if (n.ctl !== 'rpFoundIn') fail('the door does not name what it opens');
+  if (n.holds.length) fail('what we found opened without: ' + n.holds.join(', '));
 }
 
 /* AND THE FINDINGS ARE ONE LINE EACH UNTIL SOMEBODY OPENS ONE. */
 {
   const f = await p.evaluate(() => {
-    const rows = [...document.querySelectorAll('#rpFound .rp-fd')];
+    const rows = [...document.querySelectorAll('#rpFoundIn .rp-fd')];
     return rows.map(d => ({
       open: d.open,
       lines: (d.querySelector('.rp-t').textContent.match(/\S/g) || []).length > 0,
@@ -162,13 +156,13 @@ await p.click('#rpToFound'); await p.waitForTimeout(500); await one('rpFound', '
      record itself is there wherever the evidence carries a URL, and some of the
      specimen records honestly do not, so that one is asserted across the set
      rather than on every row. */
-  const rows = await p.$$('#rpFound .rp-fd summary');
+  const rows = await p.$$('#rpFoundIn .rp-fd summary');
   for (const r of rows) { await r.click(); }
   await p.waitForTimeout(400);
   const o = await p.evaluate(() => {
     const has = (d, s) => !!d.querySelector(s) && d.querySelector(s)
       .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true });
-    return [...document.querySelectorAll('#rpFound .rp-fd')].map(d =>
+    return [...document.querySelectorAll('#rpFoundIn .rp-fd')].map(d =>
       ({ open: d.open, x: has(d, '.rp-x'), from: has(d, '.rp-from'), lk: has(d, '.rp-lk') }));
   });
   o.forEach((r, i) => {
@@ -181,7 +175,7 @@ await p.click('#rpToFound'); await p.waitForTimeout(500); await one('rpFound', '
      none. So the assertion here is that a missing link is missing, rather than
      present and hidden. That the emitter puts .rp-lk inside the open body at
      all is checked statically in verify.mjs. */
-  const ghost = await p.evaluate(() => [...document.querySelectorAll('#rpFound .rp-fd')]
+  const ghost = await p.evaluate(() => [...document.querySelectorAll('#rpFoundIn .rp-fd')]
     .filter(d => d.querySelector('.rp-lk') && !d.querySelector('.rp-lk')
       .checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true })).length);
   if (ghost) fail(ghost + ' open finding(s) carry a link to the record that cannot be seen');
@@ -229,8 +223,12 @@ await pillPair('the act screen');
              })() };
   });
   const flat = n.pills.map(t => t.replace(/\s+/g, ' ').trim().toLowerCase());
-  for (const w of ['back to what we found', 'back to the result'])
-    if (!flat.includes(w)) fail('what to do is missing the pill: ' + w + ', it has ' + n.pills.join(' / '));
+  /* ONE WAY BACK, NOT TWO. What we found is no longer somewhere to return to,
+     so the only destination left is the result. */
+  if (!flat.includes('back to the result'))
+    fail('what to do is missing the pill: back to the result, it has ' + n.pills.join(' / '));
+  if (flat.includes('back to what we found'))
+    fail('what to do still offers a way back to a screen that no longer exists');
   if (n.navb) fail('a way back on what to do is an underlined word again');
   const o = n.order;
   for (const k of Object.keys(o)) if (o[k] === null) fail('what to do is missing ' + k);
@@ -253,13 +251,11 @@ await pillPair('the act screen');
   }
 }
 
-/* Back, one step at a time, to where the reader actually came from. */
-await p.click('#rpActBack');   await p.waitForTimeout(500); await one('rpFound', 'back from what to do');
-await p.click('#rpFoundBack'); await p.waitForTimeout(500); await one('rpReport', 'back from what we found');
+/* Back from what to do goes to the result, because the result is now where
+   the records live. */
+await p.click('#rpActBack'); await p.waitForTimeout(500); await one('rpReport', 'back from what to do');
 
-/* Out to sources from the middle of the report, and back to where they were.
-   From the ACT screen now: what we found no longer carries the pill. */
-await p.click('#rpToFound'); await p.waitForTimeout(400);
+/* Out to how we decide from the act screen, and back to where they were. */
 await p.click('#rpToAct'); await p.waitForTimeout(400);
 await p.click('#rpToSources_act'); await p.waitForTimeout(400);
 await one('rpSources', 'sources from the act screen');
@@ -285,7 +281,6 @@ await one('rpAct', 'back from sources');
 
 /* The order on the result screen, read off the rendered page. */
 await p.click('#rpActBack'); await p.waitForTimeout(400);
-await p.click('#rpFoundBack'); await p.waitForTimeout(400);
 await one('rpReport', 'back to the result before reading its order');
 const order = await p.evaluate(() => {
   const s = document.getElementById('rpReport');

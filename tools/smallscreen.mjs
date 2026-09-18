@@ -103,7 +103,9 @@ for (const w of [1440,640,560,480,390,360]) {
     await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();}); await p.waitForTimeout(380); }
   await p.waitForTimeout(500); await p.click('#rpToFound'); await p.waitForTimeout(500);
   const r = await p.evaluate(()=>{
-    const b=document.querySelector('#rpFound .rp-find .rp-b');
+    /* What we found opens in place on the result now, so the findings live
+       inside the disclosure rather than on a screen of their own. */
+    const b=document.querySelector('#rpFoundIn .rp-find .rp-b');
     return b?Math.round(b.getBoundingClientRect().width):0; });
   const bad = w<=640 ? r<250 : r<400;
   console.log(`  ${String(w).padStart(5)}  finding text column ${r}px` + (bad?'   <-- BAD':''));

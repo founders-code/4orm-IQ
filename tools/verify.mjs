@@ -775,9 +775,9 @@ if (operatorClaims.length)
 {
   const fn = script.slice(script.indexOf('function rpFinds('),
                           script.indexOf('function rpFinds(') + 3000);
-  if (!/<details class="rp-fd">/.test(fn))
+  if (!/<details class="rp-fd"/.test(fn))
     fails.push('the findings are not collapsed; each one should be a line that opens');
-  if (/<details class="rp-fd" open/.test(fn))
+  if (/<details class="rp-fd"[^>]* open/.test(fn))
     fails.push('a finding is emitted already open, so the page loads as a wall of text again');
   /* The heading is the closed line, so it is the only thing in the summary
      besides the number, the severity and the chevron. */
@@ -959,7 +959,56 @@ if (/class="[^"]*\brp-rp-/.test(html))
   if (!packs) fails.push('the recipient packs are gone');
   const ids = (script.match(/"id": "(bank|card|police|cafc|bureau|bcsc|ic3|ftc|crypto)"/g) || []);
   if (ids.length !== 9) fails.push('expected 9 recipient packs, found ' + ids.length);
+  /* THE ORDER IS THE ADVICE. Whoever moved the money first, because they are
+     the only ones who can move it back, then the people who investigate, then
+     the national record. The Anti-Fraud Centre publishes that order itself, and
+     a list that leads with the national record sends a frightened reader to the
+     one body that says plainly it will not investigate. */
+  const want_ = ['bank', 'card', 'police', 'cafc'];
+  const got_ = ids.slice(0, 4).map(t => t.match(/"id": "([a-z]+)"/)[1]);
+  if (want_.join(',') !== got_.join(','))
+    fails.push('who to reach out to is in the wrong order: expected '
+      + want_.join(' then ') + ', found ' + got_.join(' then '));
 }
+/* A CONTROL BESIDE THE VERDICT, WHERE THERE IS SOMETHING TO DO TONIGHT.
+   Adverse, or the money has already gone. Amber never earns one: amber is not
+   a fault, and handing somebody a red button for it would make it one. */
+if (!/d\.verdict==="RED" \|\| \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT"/.test(script))
+  fails.push('the verdict no longer carries a way to act where the result is adverse or money has gone');
+if (!/data-act="1">'\s*\+ 'Do this right now<\/button>/.test(script))
+  fails.push('the control beside the verdict lost its label');
+if (/verdict==="AMBER"[^\n]*data-act/.test(script))
+  fails.push('amber is being handed a red button, and amber is not a fault');
+if (!/if\(t\.getAttribute\("data-act"\)\) rpAct\(\);/.test(script))
+  fails.push('the control beside the verdict is not wired to what to do');
+
+/* THE NEXT ACTION, PINNED ON A PHONE.
+   It belongs to the result screen, so it lives inside it; it is a phone rule,
+   so it is display:none until the narrow breakpoint; and it must stand down
+   while the door on the page is in view, or the reader is offered the same
+   thing twice at once. */
+{
+  if (!/id="rpPin"/.test(html))
+    fails.push('the next action is not pinned anywhere on the result');
+  if (!/id="rpPinGo"/.test(html))
+    fails.push('the pinned next action has no button');
+  if (!/#rpt \.rp-pin\{display:none\}/.test(styleBlock))
+    fails.push('the pinned next action is not held back on a wide screen');
+  if (!/@media\(max-width:820px\)\{[\s\S]{0,200}#rpt \.rp-pin\{display:block/.test(styleBlock))
+    fails.push('the pinned next action never appears on a phone');
+  if (!/id\("rpPinGo"\)[\s\S]{0,2000}r\.top < window\.innerHeight-40/.test(script))
+    fails.push('the pinned next action does not stand down when the door itself is on screen');
+  if (!/body\.rp-pinon #rpReport \.rp-behind\{padding-bottom/.test(styleBlock))
+    fails.push('the pinned next action covers the foot of the page');
+}
+/* Every row a reader could be told to look at can be pointed at. */
+if (!/id="rpStep-'\+\(i\+1\)\+'"/.test(script))
+  fails.push('the rows on what to do carry no id, so nothing can point at one');
+if (!/id="rpFind-'\+\(i\+1\)\+'"/.test(script))
+  fails.push('the findings carry no id, so nothing can point at one');
+/* A live region is cleared when it stops being true. */
+if (!/function waitClose\(\)[\s\S]{0,400}id\("waitPhase"\);\s*if\(wph\) wph\.textContent=""/.test(script))
+  fails.push('the waiting screen leaves its last words in the live region after it closes');
 {
   const hand = (script.match(/toResult\(d,q\);\s*rpEnter\(d,q\);/g) || []).length;
   if (hand !== 2) fails.push('both run paths must open the report, found ' + hand + ' of 2');
@@ -1240,7 +1289,10 @@ const sheet_ = id => {
   const b = rest.indexOf('<div class="rp-sheet" id="');
   return b < 0 ? html.slice(a) : html.slice(a, a + 10 + b);
 };
-const SHEETS_ = ['rpReport', 'rpFound', 'rpAct', 'rpSources'];
+/* WHAT WE FOUND IS NOT A SHEET ANY MORE.
+   The records explain the result, so they open underneath it on the same page.
+   Three screens: the result and its evidence, what to do, and how we decide. */
+const SHEETS_ = ['rpReport', 'rpAct', 'rpSources'];
 const sheets_ = {};
 for (const x of SHEETS_) {
   sheets_[x] = sheet_(x);
@@ -1268,19 +1320,19 @@ belongs_('What we could not answer', 'rpReport', 'the gap note');
    door is the first thing on it, above the title. */
 belongs_('id="rpAlready"', 'rpAct', 'the door for somebody who has already paid');
 belongs_('id="rpToFound"', 'rpReport', 'the way on to what we found');
-belongs_('id="rpFindsSec"', 'rpFound', 'the findings');
+belongs_('id="rpFindsSec"', 'rpReport', 'the findings');
 /* The door to the whole console is the last thing on the last screen, after
    everything a reader can act on without it. */
 belongs_('id="rpOpenRecord"', 'rpAct', 'the door to the whole record');
-belongs_('id="rpTwoWays"', 'rpFound', 'the two things a pattern of complaints can mean');
-belongs_('id="rpToAct"', 'rpFound', 'the way on to what to do');
+belongs_('id="rpTwoWays"', 'rpReport', 'the two things a pattern of complaints can mean');
+belongs_('id="rpToAct"', 'rpReport', 'the way on to what to do');
 belongs_('id="rpStepsSec"', 'rpAct', 'the three things to do now');
 belongs_('id="rpBundle"', 'rpAct', 'what to have ready before the call');
 belongs_('id="rpPaks"', 'rpAct', 'who to tell');
 /* IT MOVED TO WHAT WE FOUND. What somebody said about themselves, set against
    what the record says, is evidence about the party. It is not an action, and
    on the page of things to do it read as a fifth errand. */
-belongs_('id="rpClaimsSec"', 'rpFound', 'their words against the records');
+belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
 {
   const a = sheets_.rpAct;
   if (a.indexOf('id="rpOpenRecord"') < a.indexOf('id="rpStepsSec"'))
@@ -1366,15 +1418,17 @@ belongs_('id="rpClaimsSec"', 'rpFound', 'their words against the records');
     /* Evidence about the party is not an action. */
     if (/id="rpClaims"/.test(a))
       fails.push('their words against the records is back on the page of things to do');
-    if (!/id="rpClaims"/.test(sheets_.rpFound || ''))
-      fails.push('their words against the records is not on what we found either');
+    if (!/id="rpClaims"/.test(sheets_.rpReport || ''))
+      fails.push('their words against the records is not with the rest of the evidence either');
   }
-  /* Both ways back, as pills, in the row the reader already uses. */
-  /* "Back to " sits in its own span so a phone can drop it and let the arrow
-     carry the direction, so the label is matched in two pieces. */
-  for (const w of ['What we found', 'The result'])
+  /* One way back, as a pill, in the row the reader already uses. What we found
+     is no longer a screen of its own, it opens in place on the result, so the
+     only place to go back to is the result. */
+  for (const w of ['The result'])
     if (!new RegExp('rp-pill rp-pill-back"[\\s\\S]{0,300}rp-pw">Back to </span>' + w).test(a))
       fails.push('what to do is missing the pill: Back to ' + w.toLowerCase());
+  if (/rp-pw">Back to <\/span>What we found/.test(a))
+    fails.push('what to do still offers a way back to a screen that no longer exists');
   if (/class="rp-navb rp-back"/.test(a))
     fails.push('a way back on what to do is an underlined word again; both belong in the pill row');
 }
@@ -1403,7 +1457,13 @@ belongs_('id="rpClaimsSec"', 'rpFound', 'their words against the records');
    back. Everywhere else the pair stays, side by side, hard right. */
 const PILLED_ = ['rpAct', 'rpSources'];
 for (const x of PILLED_) {
-  if (!/Sources and method/.test(sheets_[x])) fails.push(x + ' has lost the sources and method pill');
+  /* ONE NAME FOR ONE DESTINATION.
+     It was called Sources and method on a pill, How we decide in three feet,
+     and a third thing in its own sections. A reader paid the recognition cost
+     three times and could not tell they had already been there. */
+  if (!/How we decide/.test(sheets_[x])) fails.push(x + ' has lost the way to how we decide');
+  if (/Sources and method/.test(sheets_[x]))
+    fails.push(x + ' calls how we decide by a second name');
   if (!/Find support/.test(sheets_[x])) fails.push(x + ' has lost the find support pill');
 }
 {
@@ -1467,17 +1527,34 @@ for (const x of PILLED_) {
   if (!/#rpt \.rp-more\[hidden\]\{display:none\}/.test(styleBlock))
     fails.push('a hidden scroll cue has no rule taking it off the page');
 }
+/* WHAT WE FOUND OPENS UNDER THE RESULT, AND THE CONTROL SAYS SO.
+   It was a screen of its own, which made reading the evidence a journey away
+   from the verdict and left the action two presses further on. */
 {
-  const f = sheets_.rpFound;
-  if (/Sources and method/.test(f) || /Find support/.test(f))
-    fails.push('what we found has the pills back in its header, and it is meant to offer only the way back');
-  /* The way back is a pill now, sitting on the right with the other controls,
-     rather than an underlined word stranded in the middle of the header. Still
-     exactly one, and still the only control on this screen. */
-  const backs = (f.match(/class="rp-pill rp-pill-back"/g) || []).length;
-  if (backs !== 1) fails.push('what we found has ' + backs + ' controls in its header and should have exactly one');
-  if (/class="rp-navb rp-back"/.test(f))
-    fails.push('the way back on what we found is an underlined word again; it belongs in the pill row');
+  const r = sheets_.rpReport;
+  if (!/id="rpFoundIn"/.test(r))
+    fails.push('the records have no place on the result page');
+  const btn = (r.match(/<button[^>]*id="rpToFound"[^>]*>/) || [''])[0];
+  if (!/aria-expanded="false"/.test(btn))
+    fails.push('the control that opens the records does not say it is a disclosure');
+  if (!/aria-controls="rpFoundIn"/.test(btn))
+    fails.push('the control that opens the records is not tied to what it opens');
+  if (!/id="rpFoundIn" hidden/.test(r))
+    fails.push('the records are open before anybody asked for them');
+  /* And the order on the page: the verdict, the control, the records, the way
+     on to what to do. The action is never above the thing it acts on. */
+  const at = x => r.indexOf(x);
+  for (const [a, b] of [['id="rpTonight"', 'id="rpToFound"'], ['id="rpToFound"', 'id="rpFoundIn"'],
+                        ['id="rpFoundIn"', 'id="rpToAct"']])
+    if (at(a) > at(b)) fails.push('the result page reads in the wrong order: ' + b + ' is above ' + a);
+  /* THE ACTION IS ON THE RESULT PAGE.
+     Two presses and a screen of evidence used to sit between a reader being
+     told not to send anything tonight and the only page that tells them to
+     ring their bank. That call is measured in hours. */
+  if (!/id="rpActWay"/.test(r))
+    fails.push('the way on to what to do is not on the result page');
+  if (at('id="rpActWay"') > at('class="rp-behind"'))
+    fails.push('the way on to what to do sits below the small print');
 }
 
 /* THE REFERENCE IS NOT PRINTED TWICE.
@@ -1505,12 +1582,20 @@ for (const x of ['rpAct', 'rpSources']) {
     fails.push(x + ' does not put its way back in the middle column');
 }
 {
-  const nav = html.slice(html.indexOf('<div class="navactions">'), html.indexOf('</nav>', html.indexOf('<div class="navactions">')));
-  const a = nav.indexOf('Sources and method'), b = nav.indexOf('Find support');
-  if (a < 0) fails.push('the landing has no sources and method pill');
+  /* Comments out first: one of them names the pair, and a label matched inside
+     a comment puts the two pills further apart than they are. */
+  const nav = html.slice(html.indexOf('<div class="navactions">'), html.indexOf('</nav>', html.indexOf('<div class="navactions">')))
+    .replace(/<!--[\s\S]*?-->/g, ' ');
+  /* One label for one destination. The page it opens is titled How we decide,
+     so every door into it carries those three words and nothing else. Two
+     names for one place makes a reader think there are two places. */
+  const a = nav.indexOf('How we decide'), b = nav.indexOf('Find support');
+  if (a < 0) fails.push('the landing has no how we decide pill');
   else if (b < 0) fails.push('the landing has no find support pill');
   else if (nav.slice(Math.min(a, b), Math.max(a, b)).split('<button').length > 2)
-    fails.push('sources and method and find support are not next to each other on the landing');
+    fails.push('how we decide and find support are not next to each other on the landing');
+  if (/>\s*Sources and method\s*</.test(html))
+    fails.push('a door into how we decide is still labelled sources and method');
 }
 
 /* THE THREE DOORS ARE ONE CONTROL IN THREE PLACES.
@@ -3564,7 +3649,7 @@ if (/[\u2014\u2013]/.test(eviPage))
     fails.push('leaving a document no longer hides all three, so a stale sheet can sit over the landing');
   /* Back has to name where it goes, from every one of the five origins. */
   const bn = (script.match(/var RP_BACKNAME = \{[\s\S]*?\};/) || [''])[0];
-  for (const k of ['result', 'found', 'act', 'console', 'landing', 'wait'])
+  for (const k of ['result', 'act', 'console', 'landing', 'wait'])
     if (!new RegExp('\\b' + k + ':"Back').test(bn))
       fails.push('the back button has no name for a reader who arrived from "' + k + '"');
   /* Reachable from the landing, from the data room and from every report foot. */
@@ -3839,6 +3924,33 @@ if (/rpIdRow\("When we looked"/.test(script))
     fails.push('the ticker and the standing documents are not both on the landing');
   else if (at('id="tickRow"') > at('class="docrow'))
     fails.push('the standing documents sit above the ticker rather than under it');
+  /* EVERY LINE ON THE TICKER IS SOMEBODY ELSE'S PUBLISHED NUMBER.
+     The line exists to teach a reader how common this is and how much it
+     takes, and a figure is only worth reading if it can be checked. Our own
+     experience is true and it is not a source, so it belongs on the waiting
+     deck, where there is room to say whose experience it is, and never on the
+     line. A card marked for the line must name an outside body. */
+  {
+    const eduAt_ = script.indexOf('var EDU = [');
+    const edu_ = script.slice(eduAt_, script.indexOf('\n];', eduAt_));
+    const cards = [...edu_.matchAll(/\{tone:[^{}]*?tick:1[^{}]*?\}/g)].map(m => m[0]);
+    if (cards.length < 8)
+      fails.push('the ticker is down to ' + cards.length + ' lines');
+    for (const c of cards) {
+      const src = (/src:"([^"]+)"/.exec(c) || [])[1] || '';
+      const t = (/t:"([^"]+)"/.exec(c) || [])[1] || '';
+      if (!src)
+        fails.push('a ticker line carries no source: ' + t.slice(0, 50));
+      else if (/^4orm/i.test(src))
+        fails.push('a ticker line is sourced to ourselves, which is advertising, not education: '
+          + t.slice(0, 50));
+    }
+  }
+  /* AND THE SOURCE IS NEVER DROPPED TO SAVE ROOM.
+     A figure with its source taken off is a figure somebody has to take our
+     word for, and this line exists precisely so that nobody has to. */
+  if (/\.ticks\{display:none\}/.test(styleBlock))
+    fails.push('the ticker hides its sources at some width, which leaves the figures unattributed');
   /* And it stops for anybody who has asked for less movement. */
   if (!/prefers-reduced-motion[\s\S]{0,240}\.tickrail\{animation:none\}/.test(styleBlock))
     fails.push('the ticker keeps moving under reduced motion');
