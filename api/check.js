@@ -72,7 +72,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260919.0608';
+const BUILD = '20260919.0830';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -440,7 +440,11 @@ export default async function handler(req, res) {
     return allowed.includes(x) ? x : null;
   };
   const ask = {
-    sector:  ONE_OF(body?.sector,  ['INVESTMENT', 'MORTGAGE', 'AUTO', 'INSURANCE', 'OTHER']),
+    /* CRYPTO joined the list on the page. A value the page can send and this
+       line does not accept is a value that arrives as null, which reads in the
+       log as a reader who declined to answer rather than one who told us
+       exactly what this was. */
+    sector:  ONE_OF(body?.sector,  ['INVESTMENT', 'CRYPTO', 'MORTGAGE', 'AUTO', 'INSURANCE', 'OTHER']),
     stage:   ONE_OF(body?.stage,   ['BEFORE', 'SENT', 'DILIGENCE']),
     channel: ONE_OF(body?.channel, ['DEALER', 'PRIVATE']),
     /* What the reader asserted in order to run this at all. The console
