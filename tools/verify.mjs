@@ -2779,8 +2779,27 @@ if (!/id="waitForming"/.test(html))
     fails.push('the person block has no door in it, so a company named like a person cannot be checked');
   if (!/function assertActive\(/.test(html) || !/function assertClear\(/.test(html))
     fails.push('nothing scopes the reader assertion to the identifier it was made about');
-  if (!/if\(USER_ASSERT\) o\.assert=USER_ASSERT;/.test(html))
+  if (!/o\.assert=USER_ASSERT;/.test(html))
     fails.push('the reader assertion never leaves the browser, so it cannot be in the chain');
+  /* THE ASSERTION IS NOT THE GATE ON ITS OWN.
+     It used to be: a string shaped like a person's name ran against every
+     applicable source on nothing but the reader's word, and the statutes that
+     bite attach when the check runs rather than when a name would have been
+     shown. Three things hold it now: the page only draws the door where
+     something corroborates it, the handler refuses to act without one anyway,
+     and the endpoint refuses the run. All three are checked, because any one
+     of them alone is one deployment from being the old build. */
+  if (!/function assertBasis\(/.test(html))
+    fails.push('nothing corroborates the reader assertion, so their word is the whole gate again');
+  if (!/var basis_ = t==="Person" \? assertBasis\(v\) : "";/.test(html))
+    fails.push('the person block draws its door without asking what would hold it open');
+  if (!/var basis=assertBasis\(input\.value\);\s*\n\s*if\(!basis\)/.test(html))
+    fails.push('the override handler opens the gate without a basis');
+  if (!/o\.assert_basis=USER_ASSERT_BASIS/.test(html))
+    fails.push('what held the door open does not travel with the run');
+  const chkSrc = fs.readFileSync(new URL('../api/check.js', import.meta.url), 'utf8');
+  if (!/if \(ask\.assert && !ask\.assert_basis\)/.test(chkSrc))
+    fails.push('the endpoint runs a person-shaped name on the reader\'s word alone');
   /* Only the person block gets a door. A phone number has no company reading. */
   if (!/t==="Person"\s*\n?\s*\?/.test(html))
     fails.push('the override is offered on blocks other than a person name');
@@ -4000,7 +4019,7 @@ if (!/class="panellamps" id="house"/.test(admin))
   if (empties.length !== info.length)
     fails.push('a register readout has no sentence for what an empty answer means');
   if (new Set(empties).size < 40)
-    fails.push('only ' + new Set(empties).size + ' distinct empty-answer sentences across 133 registers. '
+    fails.push('only ' + new Set(empties).size + ' distinct empty-answer sentences across 134 registers. '
       + 'One sentence copied everywhere is the same as not having one.');
   /* A link may only ever be the domain retrieval is already pinned to. */
   if (!/u:null/.test(admin))
@@ -4402,6 +4421,55 @@ if (prev && fs.existsSync(prev)) {
     '  (intended removals are fine; anything you did not mean to remove is a bug)');
 }
 
+/* ============ EVERY PAGE SAYS THE SAME NUMBER, AND IT IS THE REAL ONE
+
+   The size of the catalogue is written into the consumer page, the evidence
+   map and the back office, in prose, because a reader is entitled to know how
+   many places were asked. Three copies of a number is three chances for it to
+   go stale, and a page that says 121 while the engine asks 134 is the product
+   telling a reader something that is not true about itself. So every printed
+   count is read back and compared against the catalogue. There is no way to
+   pass this by editing one file. */
+{
+  const CATN = (await import('../api/_catalogue.js')).TOTAL_SOURCES;
+  const pages = { 'index.html': html, 'evidence.html': eviPage, 'admin.html': admin };
+  const pats = [/(\d{2,4}) registers\b/g, /catalogue of (\d{2,4})\b/g,
+                /the (\d{2,4}) in the catalogue/g, /catalogue:(\d{2,4})\b/g];
+  for (const [name, body] of Object.entries(pages)) {
+    for (const re of pats) {
+      for (const m of body.matchAll(re)) {
+        const n = Number(m[1]);
+        /* A figure about somebody else's register count is not ours to police,
+           and neither is a year. Only numbers in the range a catalogue count
+           could plausibly be. */
+        if (n < 20 || n > 5000) continue;
+        if (n !== CATN)
+          fails.push(name + ' says "' + m[0] + '" while the catalogue holds ' + CATN
+            + '. A page that misstates how many places were asked is the product '
+            + 'being wrong about itself.');
+      }
+    }
+  }
+}
+
+/* THE WORKBOOK AGAINST THE CATALOGUE, AS A WARNING AND NEVER AS A FAILURE.
+   A register waiting on a signature is not a defect in the code, and blocking a
+   deploy on it would teach somebody to sign without reading. It is printed
+   where the build is read, so it cannot drift in silence. tools/srcheck.mjs
+   prints it by name. */
+{
+  const CAT2 = await import('../api/_catalogue.js');
+  const M = JSON.parse(fs.readFileSync(new URL('../api/_sr001.json', import.meta.url), 'utf8'));
+  const cleared = new Set(M.enabled || []);
+  const notCleared = CAT2.CATALOGUE.filter(s => s.enabled && !cleared.has(s.display_name));
+  if (notCleared.length)
+    warn.push(notCleared.length + ' register(s) the engine asks are not on SR-001 of '
+      + M.generated + ', so every run counts them out of scope. node tools/srcheck.mjs names them.');
+  if (CAT2.PENDING.length)
+    warn.push(CAT2.PENDING.length + ' register(s) are published and waiting on a signature. '
+      + 'Nothing asks them until SR-001 clears them.');
+}
+
 /* ----------------------------------------------------------------- report */
 const line = s => console.log('  ' + s);
 console.log('\n4orm IQ build check');
@@ -4455,6 +4523,7 @@ if (/rpIdRow\("When we looked"/.test(script))
   if (!/\["rpOpenRecord","rpOpenRecordR","rpOpenRecordF","rpOpenRecordS"\]/.test(script))
     fails.push('the data room links are wired one at a time, so one of them will be missed');
 }
+
 
 /* THE PACK IS A DOCUMENT THE READER CAN HAND OVER WITHOUT APOLOGISING FOR IT.
    It goes to a fraud desk, a police officer and a regulator's inbox. Rules made

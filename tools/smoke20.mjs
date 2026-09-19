@@ -38,7 +38,7 @@ const payload = {
     history:[{ seq:3, version:'2026-09-01', effective_from:'2026-09-01', change_kind:'RULE_CHANGED',
                summary:'Row hashes carry a schema marker.',
                reason:'Recorded fields have to grow without invalidating earlier hashes.',
-               sources_enabled:133, sources_total:153, enforcement_on:true }] },
+               sources_enabled:134, sources_total:153, enforcement_on:true }] },
   pulse:{ label_at:25, rows:[
     { identifier_hash:'a41f77c9e0b3', input_type:'COMPANY', label:null, n:9, was:6,
       adverse:0, clean:7, incomplete:2, first_seen:'2026-09-06T09:12:00Z' }] }

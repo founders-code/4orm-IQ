@@ -1,0 +1,17 @@
+# 4orm IQ
+#
+# A result is not a page. It is rendered in the browser from a check somebody
+# asked for, it has no address of its own, and nothing here should ever be in
+# an index. Globe24h turned on a name being indexed against a record, and the
+# Privacy Commissioner's finding against publicexecutions.ca, 2017-007, turned
+# on the same thing. The absence of a crawlable result address is a property of
+# this build, and this file makes it a rule rather than a happy accident.
+
+User-agent: *
+Disallow: /api/
+Disallow: /real-run-live-go
+Disallow: /real-run-live-go/
+Allow: /
+
+# No archive of a check, and no snippet of one, anywhere.
+Noarchive: /api/

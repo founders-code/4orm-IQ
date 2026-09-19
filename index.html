@@ -644,6 +644,9 @@ body[data-stage="console"] .lampgo{display:none}
 body[data-stage="landing"] .kbblocked{margin-left:auto;margin-right:auto;text-align:center}
 .kbblocked .kb-bt{display:block}
 .kbblocked[data-ok] .kb-bt{color:var(--ok)}
+/* What would open the door, said once, under the refusal. It is a sentence
+   rather than a control, because there is nothing here to press. */
+.kbblocked .kb-bx{display:block;margin-top:8px;color:var(--tx-3)}
 .kb-ovr{display:inline-flex;align-items:center;margin-top:11px;padding:8px 16px;
   border-radius:999px;border:1px solid rgba(214,168,74,.42);background:rgba(214,168,74,.09);
   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.13em;
@@ -5651,6 +5654,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <div class="rp-dli"><div class="rp-dlk">Gaps are published</div><div class="rp-dlv">Every
             register we could not reach is printed beside the ones we did. Coverage is counted
             off the retrieval log, never asserted.</div></div>
+          <div class="rp-dli"><div class="rp-dlk">A country we do not hold</div><div class="rp-dlv">Our
+            registers do not cover every country, and a gap we do not name reads as a place we
+            looked. Where the record points at a country whose registers we do not yet hold, the
+            result says which country, and names the authority there to ask instead.</div></div>
           <div class="rp-dli"><div class="rp-dlk">Nobody can pay</div><div class="rp-dlv">No party
             can pay to change what a result says, to have an entry removed, or to be checked more
             kindly. We take no fee from any party we report on.</div></div>
@@ -5679,7 +5686,28 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
 
       <div class="rp-dsec">
-        <h3><i>06</i>How to reach us</h3>
+        <h3><i>06</i>If you want us to stop, rather than to correct</h3>
+        <p><b>This is a different request from the one above, and it has its own answer.</b>
+          Correcting a record and ceasing to report one are not the same thing, and Quebec's
+          <i>Act respecting the protection of personal information in the private sector</i>,
+          CQLR c. P-39.1, section 28.1, in force since 22 September 2023, gives a named person the
+          right to require that we stop disseminating information about them, or de-index a link
+          attached to their name.</p>
+        <p>Write to <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a> with the
+          subject line <b>cessation request</b>, the identifier that was checked, and what you say
+          the harm is. It is read by a named reviewer, not a queue. <b>We acknowledge within two
+          working days and answer within thirty days of receiving it.</b></p>
+        <p>We decide it on the test the section sets, and we write the answer against each part of
+          it: whether the dissemination causes serious injury to your reputation or privacy;
+          whether that injury outweighs the public interest in the information being known; and whether stopping would exceed what is necessary to prevent the injury. If we
+          refuse, we say which part of the test we relied on, so the answer can be taken to the
+          Commission rather than argued with us.</p>
+        <p>Every request and every answer is recorded, with its date and the reviewer's name, and
+          the record is kept whether we agreed or refused.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>07</i>How to reach us</h3>
         <p>Write to <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>. For anything
           about personal information, the privacy notice sets out the route and the regulators you
           can go to instead of us.</p>
@@ -5878,7 +5906,20 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
 
       <div class="rp-dsec">
-        <h3><i>07</i>If we get it wrong</h3>
+        <h3><i>08</i>Asking us to stop, which is not the same as asking us to correct</h3>
+        <p>Quebec's <i>Act respecting the protection of personal information in the private
+          sector</i>, CQLR c. P-39.1, section 28.1, in force since 22 September 2023, lets a named
+          person require that an enterprise stop disseminating information about them, or de-index
+          a link attached to their name. That is a different request from a correction and it gets
+          a different answer.</p>
+        <p>The route, the test we decide it on, the reviewer and the thirty day answer are set out
+          in section 06 of the <button type="button" class="rp-lk" data-doc="compliance">compliance
+          statement</button>. Write to <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>
+          with the subject line <b>cessation request</b>.</p>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>09</i>If we get it wrong</h3>
         <p>Tell us first, so we have the chance to fix it. If we do not, you can take it to the
           <a href="https://www.priv.gc.ca/en/report-a-concern/" target="_blank"
           rel="noopener noreferrer">Office of the Privacy Commissioner of Canada</a>, or to the
@@ -7549,7 +7590,7 @@ var REGREAD = {
 
 /* THE GENERATED CATALOGUE METADATA IS GONE, AND THIS NOTE IS WHY.
    tools/sync-catalogue.mjs wrote sixteen kilobytes of per-source metadata into
-   this file for all 133 registers, and nothing in the page ever read one field
+   this file for all 134 registers, and nothing in the page ever read one field
    of it. The board draws from SOURCES and REGINFO; the register drawer draws
    from SR001. If a screen ever needs the transport, tier or vertical of a named
    source, regenerate it with that tool rather than hand-writing a copy. */
@@ -9424,12 +9465,12 @@ function hasTradeWord(w){
    the operations chain under its own field so a run that only exists because
    somebody overrode the gate can always be told apart from one the gate never
    questioned. Nothing about it is a finding, and it never touches a verdict. */
-var USER_ASSERT = null, USER_ASSERT_FOR = "";
+var USER_ASSERT = null, USER_ASSERT_FOR = "", USER_ASSERT_BASIS = "";
 function assertActive(v){
   return USER_ASSERT === "NOT_A_PERSON"
       && USER_ASSERT_FOR === String(v || "").trim().toLowerCase();
 }
-function assertClear(){ USER_ASSERT=null; USER_ASSERT_FOR=""; }
+function assertClear(){ USER_ASSERT=null; USER_ASSERT_FOR=""; USER_ASSERT_BASIS=""; }
 /* FREE FOR LIFE. Off until the commitment is made. One word to turn it on. */
 var FREE_FOR_LIFE = false;
 /* The one sentence that lists what the box takes, built from the list itself. */
@@ -9487,6 +9528,48 @@ var input=id("kbInput"), go=id("kbGo");
   }
   ph(); window.addEventListener("resize",ph,{passive:true});
 })();
+/* ============ THE READER'S WORD IS NO LONGER THE WHOLE GATE
+
+   The console refused a string shaped like a person's name and then reopened
+   on the reader answering that it was not one. The scrubber holds the screen
+   afterwards, but a scrubber does not unwind a collection: Ontario's Consumer
+   Reporting Act s. 3, Quebec's P-39.1 s. 70 and Saskatchewan's licensing
+   position all attach when the check RUNS, not when a name would have been
+   shown. And our own compliance statement already promises this is not a
+   background check on a person. The code and the page disagreed, and the page
+   was right.
+
+   So the assertion is kept and demoted. It is no longer sufficient. It has to
+   be corroborated by something in the identifier itself: a website, an email,
+   a wallet, or a legal ending that a person does not have. That is the
+   resolve-first option, in the form that needs no call before a run. A name
+   with nothing beside it does not open the door, and the page asks for the one
+   thing that would open it rather than asking the reader to insist.
+
+   What corroborated it travels with the run, so a check that happened because
+   of a company ending can be told from one that happened because a website was
+   given. The reader's say-so alone is not on that list any more. */
+var COMPANY_ENDINGS = ("inc inc. incorporated ltd ltd. limited llc l.l.c llp l.l.p plc "
+  + "corp corp. corporation co co. company gmbh ag nv bv sarl sa s.a pty pte kk oy ab as "
+  + "srl spa sp.z.o.o ulc cic lp l.p pllc dmcc fzco fze").split(" ");
+var COMPANY_END_SET = (function(){ var m={}, i;
+  for(i=0;i<COMPANY_ENDINGS.length;i++) m[COMPANY_ENDINGS[i]]=true; return m; })();
+/* What, other than the reader saying so, says this is a company. Returns the
+   basis in plain words, or an empty string where there is none. */
+function assertBasis(v){
+  var t=String(v||"").trim();
+  if(!t) return "";
+  if(/^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(t)) return "a website";
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(t)) return "an email address";
+  if(/^(0x[a-fA-F0-9]{40}|[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{20,}|T[A-Za-z0-9]{33})$/.test(t))
+    return "a wallet address";
+  var w=t.split(/\s+/), last=String(w[w.length-1]||"").toLowerCase().replace(/[^a-z.]/g,"");
+  if(COMPANY_END_SET[last]) return "a legal ending on the name";
+  /* A word businesses use and people do not is already enough for detect() to
+     read the string as a company, so it never reaches this door. */
+  return "";
+}
+
 function kbBlockPaint(){
   var v=input.value, t=detect(v), bad=t&&BLOCKED_INPUT[t];
   var w=id("kbBlocked");
@@ -9496,16 +9579,23 @@ function kbBlockPaint(){
   if(assertActive(v)) bad=null;
   if(w){
     if(bad){
+      /* The door is only there where something other than the reader's word
+         can hold it open. On a bare name it is not a door, it is a question. */
+      var basis_ = t==="Person" ? assertBasis(v) : "";
       w.innerHTML='<span class="kb-bt">'+rpEsc(BLOCKED_INPUT[t])+'</span>'
-        + (t==="Person"
+        + (basis_
             ? '<button type="button" class="kb-ovr" id="kbOverride">'
               +'This is a company, not a person</button>'
-            : '');
+            : (t==="Person"
+               ? '<span class="kb-bx">Add the website, the email it came from, or the '
+                 +'full legal name with its ending, and we will run it.</span>'
+               : ''));
       w.style.display="";
       w.removeAttribute("data-ok");
     } else if(assertActive(v)){
-      w.innerHTML='<span class="kb-bt">You told us this is a company. We will run it, '
-        +'and the record of this check will show that you said so.</span>'
+      w.innerHTML='<span class="kb-bt">You told us this is a company, and '
+        +rpEsc(assertBasis(v))+' says the same. We will run it, and the record of this '
+        +'check will show both.</span>'
         +'<button type="button" class="kb-ovr" id="kbUndo">Undo</button>';
       w.style.display="";
       w.setAttribute("data-ok","1");
@@ -9521,7 +9611,13 @@ id("kbBlocked").addEventListener("click", function(e){
   var t=e.target;
   if(!t || !t.id) return;
   if(t.id==="kbOverride"){
+    /* Belt and braces. The button is only written where a basis exists, and
+       this refuses to act without one anyway: a control that appears through
+       any path the paint does not own must not be able to open the gate. */
+    var basis=assertBasis(input.value);
+    if(!basis){ kbBlockPaint(); input.focus(); return; }
     USER_ASSERT="NOT_A_PERSON";
+    USER_ASSERT_BASIS=basis;
     USER_ASSERT_FOR=String(input.value||"").trim().toLowerCase();
     kbBlockPaint();
     input.focus();
@@ -9607,7 +9703,12 @@ function ctxPayload(){
   var o={};
   /* The reader's assertion is part of what this run was allowed to be, so it
      travels with the run rather than being a fact only the browser knows. */
-  if(USER_ASSERT) o.assert=USER_ASSERT;
+  if(USER_ASSERT){
+    o.assert=USER_ASSERT;
+    /* What held the door open, beside the reader saying so. A run that only
+       exists because of an assertion has to carry the reason it was allowed. */
+    o.assert_basis=USER_ASSERT_BASIS || "";
+  }
   if(CTX.sector)  o.sector=CTX.sector;
   if(CTX.stage)   o.stage=CTX.stage;
   if(CTX.sector==="AUTO" && CTX.channel) o.channel=CTX.channel;
@@ -12728,7 +12829,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260919.0903";
+var KBYS_BUILD = "20260919.1016";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one

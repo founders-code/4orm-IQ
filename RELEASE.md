@@ -184,9 +184,19 @@ its own state and never means reached and never means clean.
 
 `SR001_ENFORCE` is `true`. Every register on SR-001 carries a draft
 classification and an operational status, so enforcement selects rather than
-blanks: 68 registers are in scope and 36 are held out because they appear on the
-board with no source row behind them. If it is ever turned off, a dev-only
-banner appears and `node tools/verify.mjs --production` fails.
+blanks. If it is ever turned off, a dev-only banner appears and
+`node tools/verify.mjs --production` fails.
+
+The workbook and the catalogue are two different things and they drift. Run
+`node tools/srcheck.mjs` for the current count by name: it reports how many
+registers the engine asks that the workbook does not clear, which the run
+records as out of scope, and how many rows are published and waiting on a
+signature. As of the September 2026 revision of this file the workbook is dated
+1 September 2026 and the catalogue has moved twice since, so the number is read
+from the tool rather than typed here. The build prints the same figure under
+Worth a look and never fails on it: a register waiting on a signature is not a
+defect in the code, and failing a build on it would only teach somebody to sign
+without reading.
 
     node tools/verify.mjs --production
 
