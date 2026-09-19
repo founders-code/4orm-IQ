@@ -139,7 +139,7 @@ const SCENES = [
     reach: async p => { await p.fill('#kbInput','Meridian Yield Partners'); await p.click('#kbGo');
     await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
       await p.waitForTimeout(2200); await tap(p,'investment'); await p.waitForTimeout(1400);
-      await tap(p,'already sent money');
+      await tap(p,'Yes');
       /* THE RESULT NO LONGER OPENS ITSELF.
          The waiting screen used to count down and open the report after three
          seconds, so waiting was enough to reach it. The disclaimer is a real

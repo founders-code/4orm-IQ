@@ -1,7 +1,7 @@
 /* The two questions, and what they change.
  *
  * The property under test is not that chips render. It is that answering them
- * cannot promote an answer. A person who ticks "I already sent money" must not
+ * cannot promote an answer. A person who answers yes to having sent money must not
  * be pointed at their bank on the strength of two bad reviews, and a person
  * who ticks nothing must get exactly the report they would have got before
  * these questions existed. */

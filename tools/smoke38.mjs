@@ -33,7 +33,14 @@ const fail = m => { console.error('FAIL: ' + m); process.exit(1); };
   if (t.count < 6) fail('the ticker carries only ' + t.count + ' lines');
   if (!t.sourced) fail('a line on the ticker carries no source');
   if (!t.doubled) fail('the ticker is not doubled, so the loop has a gap in it');
-  if (parseFloat(t.dur) < 20) fail('the ticker runs at ' + t.dur + ', too fast to read');
+  /* Two durations now, because the rail comes in from off the right edge
+     before it loops: the entrance, then the loop. The entrance is short by
+     design, it covers one screen width, so the loop is the one measured for
+     whether a sentence can be finished. */
+  const durs = String(t.dur).split(',').map(x => parseFloat(x));
+  const loop = Math.max.apply(null, durs);
+  if (durs.length < 2) fail('the ticker no longer starts off the right edge: one animation, ' + t.dur);
+  if (loop < 20) fail('the ticker loops in ' + loop + 's, too fast to read');
   const o = t.order;
   for (const k of Object.keys(o)) if (o[k] === null) fail('the landing is missing ' + k);
   if (!(o.tie < o.tick && o.tick < o.docs))

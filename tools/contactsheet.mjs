@@ -42,7 +42,7 @@ await p.evaluate(()=>{ const i=document.getElementById('kbInput');
 await p.evaluate(()=>document.getElementById('kbForm').requestSubmit());
 await p.waitForTimeout(2200);
 await shot('04-thread');
-for (const label of ['An investment','I have not sent anything yet']) {
+for (const label of ['An investment','No, not yet']) {
   const btn = await p.$(`#kbChat button:has-text("${label}")`);
   if (btn) { await btn.click(); await p.waitForTimeout(1400); }
 }

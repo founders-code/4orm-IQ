@@ -55,7 +55,7 @@ const answer = async (text) => {
   console.error('FAIL: the thread never offered "' + text + '"'); process.exit(1);
 };
 await answer('An investment');
-await answer('I have not sent anything yet');
+await answer('No, not yet');
 /* Wait for the run itself, then acknowledge. Clicking through before the
    result lands leaves CURRENT with no categories, and every assertion below
    then fails for a reason that has nothing to do with what it is testing. */

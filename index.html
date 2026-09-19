@@ -711,8 +711,15 @@ body[data-stage="landing"] .tlead{display:block}
    conversation appeared to shuffle sideways as it went. The wrap takes the
    whole line, and everything under it measures against a fixed thing. */
 body[data-stage="landing"] .console > .wrap{flex:1 1 100%;width:100%;min-width:0}
+/* THE THREAD BREATHES, AND THE CHOICES BREATHE MORE.
+   Twelve points between everything gave a reader a wall of bubbles to read at
+   the one moment they are least able to: they have just typed the name of
+   something they are frightened of. The gap between what is said is wider now,
+   and the row of answers stands further off the question than the sentences
+   stand off each other, because it is a different kind of thing. The first is
+   reading. The second is a decision. */
 .chat{width:min(680px,100%);margin:64px auto 0;text-align:left;
-  flex-direction:column;gap:12px;flex:none;align-self:center}
+  flex-direction:column;gap:18px;flex:none;align-self:center}
 body[data-stage="landing"] .chat.landing-only{display:flex}
 .chat[hidden]{display:none!important}
 /* The hidden ATTRIBUTE loses to any display rule written with a class, so an
@@ -728,8 +735,10 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 .bub.me{align-self:flex-end;background:var(--blue);border-bottom-right-radius:7px;color:#fff;
   font-weight:600}
 .bub.q{font-size:17px;font-weight:650;letter-spacing:-.015em}
+/* The note explains the question above it, so it stays with it rather than
+   floating in the middle of the wider gap. */
 .bub.note{background:none;border:none;padding:2px 4px;font-size:12.5px;color:var(--tx-3);
-  line-height:1.55;max-width:100%}
+  line-height:1.55;max-width:100%;margin-top:-8px}
 .dots{align-self:flex-start;display:inline-flex;gap:5px;padding:17px 19px;border-radius:20px;
   border-bottom-left-radius:7px;background:var(--bg-2);border:1px solid var(--border);
   animation:bubrise .3s var(--spring) both}
@@ -737,7 +746,8 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 .dots i:nth-child(2){animation-delay:.16s} .dots i:nth-child(3){animation-delay:.32s}
 @keyframes blip{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 @media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.6}.bub,.dots{animation:none}}
-.pills{align-self:flex-start;display:flex;flex-wrap:wrap;gap:8px;max-width:100%;
+.pills{align-self:flex-start;display:flex;flex-wrap:wrap;gap:12px;max-width:100%;
+  margin-top:10px;margin-bottom:6px;
   animation:bubrise .42s var(--spring) both}
 .pill{padding:12px 18px;border-radius:999px;font-size:14.5px;font-weight:600;cursor:pointer;
   color:var(--tx-1);background:var(--bg-2);border:1px solid var(--border-strong);
@@ -809,14 +819,30 @@ body[data-stage="landing"][data-chat="on"] .tielink{display:none}
    at a glance, it stops the moment a pointer or a keyboard reaches it, and it
    stops dead under reduced motion, where it becomes a line a reader scrolls
    themselves. The rail is doubled so the loop has no seam. */
-.tick{margin:26px auto 0;max-width:1120px;padding:11px 0;
+/* TALLER, DOWNWARDS ONLY. The line sits under a block whose spacing is
+   already settled, so the room is taken below it rather than pushing what is
+   above it up the page. */
+.tick{margin:26px auto 0;max-width:1120px;padding:11px 0 18.4px;
   border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .tickmask{overflow:hidden;position:relative;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
   mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+/* IT STARTS OFF THE RIGHT EDGE, NOT IN THE MIDDLE OF A SENTENCE.
+   The rail used to begin at rest with the first figure already sitting at the
+   left edge, so the page loaded, the line started moving, and half of the
+   first sentence was gone before a reader had looked at it. The first thing
+   the strip says was the thing nobody could read.
+   So there are two movements. The first runs once and brings the rail in from
+   beyond the right edge, which is where a line of moving text is expected to
+   come from. The second is the loop, and it starts the moment the first
+   finishes, from exactly where it left off, so the join cannot be seen. */
 .tickrail{display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;
-  animation:tickrun var(--tickdur,70s) linear infinite}
+  animation:tickin var(--tickin,9s) linear 1 both,
+            tickrun var(--tickdur,75s) linear infinite var(--tickin,9s)}
 .tick:hover .tickrail,.tick:focus-within .tickrail{animation-play-state:paused}
+@keyframes tickin{
+  0%{transform:translateX(var(--tickstart,100%))}
+  100%{transform:translateX(0)}}
 @keyframes tickrun{
   0%{transform:translateX(0)}
   100%{transform:translateX(-50%)}}
@@ -834,8 +860,9 @@ body[data-stage="landing"][data-chat="on"] .tielink{display:none}
    statistic that makes it worth anything in the faintest ink on the page. */
 .ticks{font-size:11.5px;color:var(--tx-3)}
 @media(prefers-reduced-motion:reduce){
-  /* No movement at all. The line becomes something the reader scrolls. */
-  .tickrail{animation:none}
+  /* No movement at all, including the entrance: a rail parked off the right
+     edge with the animation removed is a strip that reads as empty. */
+  .tickrail{animation:none;transform:none}
   .tickmask{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
 }
 body[data-stage="landing"][data-chat="on"] .tick{display:none}
@@ -9505,8 +9532,16 @@ input.addEventListener("input",function(){
  * at their bank is the evidence, never the box they ticked.
  * ------------------------------------------------------------------ */
 var ASK_STEPS = [
+  /* CRYPTO IS ITS OWN ANSWER.
+     It was not on this list, so every crypto platform a reader asked about
+     arrived as "an investment" or "something else". A token is not a fund: the
+     registers that could hold a record on it are different ones, the record
+     lives in a contract as much as in a register, and the reader who types the
+     name of a coin is not asking the same question as the reader who types the
+     name of a dealer. The list has to be able to say so. */
   { key:"sector", q:"What is this about?", opts:[
     { v:"INVESTMENT", label:"An investment" },
+    { v:"CRYPTO",     label:"Crypto or a token" },
     { v:"MORTGAGE",   label:"A mortgage or a loan" },
     { v:"AUTO",       label:"A vehicle" },
     { v:"INSURANCE",  label:"Insurance" },
@@ -9522,10 +9557,18 @@ var ASK_STEPS = [
     { v:"DEALER",  label:"A dealership" },
     { v:"PRIVATE", label:"A private seller" }
   ]},
-  { key:"stage", q:"Where are you with it?", opts:[
-    { v:"BEFORE",    label:"I have not sent anything yet" },
-    { v:"SENT",      label:"I already sent money" },
-    { v:"DILIGENCE", label:"I am just doing my homework" }
+  /* ONE QUESTION, ASKED THE WAY A PERSON WOULD ASK IT.
+     "Where are you with it?" is a question about a process. The thing we need
+     to know is simpler and it is the only thing on this screen that changes
+     what happens next: money either has gone or it has not. If it has, the
+     page leads with the call that can still pull it back, and that call is
+     measured in hours. It never touches the verdict. What somebody ticks
+     cannot make a record worse than it is, and the answer to this question is
+     never evidence about anybody. */
+  { key:"stage", q:"Have you already sent money?", opts:[
+    { v:"SENT",      label:"Yes" },
+    { v:"BEFORE",    label:"No, not yet" },
+    { v:"DILIGENCE", label:"Just researching" }
   ]}
 ];
 var CTX = { sector:null, stage:null, channel:null };
@@ -12241,13 +12284,27 @@ function eduNavPaint(){
                  + '<span class="tickrun" aria-hidden="true">'+one+'</span>';
   /* The speed is a constant, not a duration: a longer list takes longer to
      pass rather than moving faster to fit the same clock. */
-  requestAnimationFrame(function(){
+  /* Fifty six points a second, seven per cent slower than the sixty it ran at.
+     The speed is a constant rather than a duration, so a longer list takes
+     longer to pass instead of moving faster to fit the same clock. */
+  var TICK_SPEED = 56;
+  function tickMeasure(){
     var w = rail.scrollWidth / 2;
-    /* Sixty points a second. Fast enough to read as a moving line rather than
-       a stuck one, slow enough that a sentence can be finished before it
-       leaves the screen. */
-    if(w > 0) rail.style.setProperty("--tickdur", Math.round(w / 60) + "s");
-  });
+    if(w > 0) rail.style.setProperty("--tickdur", Math.round(w / TICK_SPEED) + "s");
+    /* The entrance covers the width of the window the line runs in, at the
+       same speed as the loop, so the rail arrives at its loop position moving
+       at exactly the speed it will keep. Measured rather than set to a
+       percentage: a percentage here is read against the rail, which is twice
+       the width of the strip and two screens too far to the right. */
+    var mask = rail.parentNode, mw = mask ? mask.clientWidth : 0;
+    if(mw > 0){
+      rail.style.setProperty("--tickstart", mw + "px");
+      rail.style.setProperty("--tickin", (mw / TICK_SPEED).toFixed(2) + "s");
+    }
+  }
+  requestAnimationFrame(tickMeasure);
+  /* A rotated phone changes the width the entrance has to cover. */
+  window.addEventListener("resize", tickMeasure, {passive:true});
 })();
 
 /* FOURTEEN SECONDS A CARD, NOT SEVEN.
@@ -12620,7 +12677,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260919.0608";
+var KBYS_BUILD = "20260919.0830";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
