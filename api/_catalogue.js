@@ -312,10 +312,25 @@ export const CATALOGUE = [
       jurisdictions:['SG'], domain:'mas.gov.sg' }),
   S({ source_id:'BCSC_CAUTION', display_name:'BCSC Caution List', category:'03',
       jurisdictions:['CA-BC'], domain:'bcsc.bc.ca' }),
+  /* ============ TWO REGULATORS BAR THEIR OWN CONTENT FROM A PRODUCT
+     The Alberta Securities Commission's terms bar putting site content "into
+     any database or into any product or service offered for or without fee",
+     which closes the argument that a free service sits outside them. The
+     Ontario Securities Commission's terms bar commercial use outright. Neither
+     has been asked for permission, and asking is the whole of the fix.
+     Until one of them answers, both are link_out_only: the run may point a
+     reader at the list and may never copy what it holds into a result, a pack
+     or the corpus. The field is read by the cue and enforced in the page. */
   S({ source_id:'ASC_CAUTION', display_name:'ASC Caution List', category:'03',
-      jurisdictions:['CA-AB'], domain:'asc.ca' }),
+      jurisdictions:['CA-AB'], domain:'asc.ca',
+      terms:'link_out_only',
+      terms_why:'ASC terms bar site content from any database, product or service offered for '
+               +'or without fee. Permission not yet requested. Link and label only.' }),
   S({ source_id:'OSC_ALERTS', display_name:'OSC Alerts', category:'03',
-      jurisdictions:['CA-ON'], domain:'osc.ca' }),
+      jurisdictions:['CA-ON'], domain:'osc.ca',
+      terms:'link_out_only',
+      terms_why:'OSC terms bar commercial use outright. Permission not yet requested. '
+               +'Link and label only.' }),
   S({ source_id:'CSA_ALERTS', display_name:'CSA Alerts', category:'03',
       jurisdictions:['CA'], domain:'securities-administrators.ca' }),
   S({ source_id:'FCA_WARNING', display_name:'FCA Warning List', category:'03',
@@ -609,6 +624,15 @@ export const TOTAL_ASKABLE = ASKABLE.length;
    and so that enabling one is a signature rather than a commit. They are in no
    count, on no board, and nothing asks them. */
 export const PENDING = CATALOGUE.filter(s => !s.enabled && s.pending);
+
+/* A SOURCE WE MAY POINT AT AND MAY NOT REPRODUCE.
+   Two regulators bar their own content from a product, one of them in terms
+   that name a free service. The row stays askable, because a link is not a
+   reproduction and Crookes v. Newton, 2011 SCC 47 at paragraph 44 says so. The
+   flag is what stops the answer being copied into a result, a pack or the
+   corpus, and it is read rather than remembered. */
+export const LINK_OUT_ONLY = CATALOGUE.filter(s => s.terms === 'link_out_only')
+  .map(s => s.display_name);
 
 /* Every check a source can contribute to: its home category plus its also list. */
 export function categoriesFor(s) {

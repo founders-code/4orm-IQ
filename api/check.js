@@ -25,7 +25,7 @@ import { runConnectors, siblingCheck } from './_connectors.js';
 import { exa, parallel, plan, planRound2, extractSeeds, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
 import { retrievedSources, reachedBoard, searchedBoard, applicabilityBoard, overlayBoard, reviewLedger } from './_registers.js';
 import { classify, jurisdictions } from './_classify.js';
-import { applicable, TOTAL_SOURCES, BY_NAME } from './_catalogue.js';
+import { applicable, TOTAL_SOURCES, BY_NAME, LINK_OUT_ONLY } from './_catalogue.js';
 import { recordRun } from './_store.js';
 /* Two write sides, and the difference between them is the whole architecture.
    _store.js holds entity-level identifiers so the operator graph can say
@@ -72,7 +72,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260919.0903';
+const BUILD = '20260919.1016';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -193,12 +193,36 @@ function toRenderShape(a, meta) {
      an item marked unconnected cannot hold a category at RED, and where a RED
      category has no record that actually names the party, it comes down. The
      model is still asked to get this right. It is no longer trusted to. */
+  /* ============ A SOURCE WE MAY POINT AT AND MAY NOT REPRODUCE
+     Two regulators bar their own content from any product, one of them in
+     terms that name a free service. Their entries still count, because what
+     the register said is a fact we may report in our own words with a link to
+     it. What may not survive is their text. Anything the model returned as a
+     quotation of theirs is dropped here, at the boundary, before the payload
+     is built, rather than being left to how the page happens to render. */
+  const LINKOUT = new Set(LINK_OUT_ONLY);
+  const stripQuoted = (e) => {
+    if (!e || !LINKOUT.has(String(e.src || e.reg || ''))) return e;
+    const out = { ...e };
+    /* A sentence in quotation marks from one of these two is their writing on
+       our page. Ours says the same thing without borrowing the words. */
+    if (typeof out.find === 'string' && /["\u201C\u201D]/.test(out.find)) {
+      out.find = out.find.replace(/["\u201C][^"\u201D]{0,400}["\u201D]/g,
+        'the entry as that register published it, which is on their page at the link');
+    }
+    /* The quote field exists to carry a source's own sentence. From these two
+       it carries the one thing their terms refuse, so it does not travel. */
+    out.quote = '';
+    out.link_out_only = true;
+    return out;
+  };
+
   const ATTACH = new Set(['exact', 'probable', 'unconnected']);
   const matchOf = e => ATTACH.has(e.match) ? e.match : 'probable';
   const demoted = [];
   const cats = {};
   (a.categories || []).forEach(c => {
-    const ev = (c.evidence || []).map(e => ({
+    const ev = (c.evidence || []).map(e => stripQuoted({
       t: e.tier, src: e.source, when: e.retrieved,
       find: e.finding, plain: e.plain || '', quote: e.quote || '', url: e.url || '',
       /* Carried to the page so the reader can be told which party a record is
@@ -402,6 +426,15 @@ function toRenderShape(a, meta) {
 
 /* --------------------------------- handler --------------------------------- */
 export default async function handler(req, res) {
+  /* A RESULT IS NEVER INDEXED, AND NOT BECAUSE OF HOW THE PAGE HAPPENS TO WORK.
+     A check has no address of its own: it is rendered in the browser from a
+     response nobody can link to. That is a property of the build, and a
+     property is one refactor away from not being true. The header makes it a
+     rule. Globe24h turned on a name being indexed against a record, and the
+     Privacy Commissioner's finding against publicexecutions.ca, 2017-007,
+     turned on the same thing. robots.txt says it again at the root for the
+     crawlers that read that instead. */
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   if (req.method !== 'POST')
     return res.status(405).json({ error: 'method_not_allowed', message: 'POST only.' });
   if (!process.env.ANTHROPIC_API_KEY)
@@ -453,11 +486,37 @@ export default async function handler(req, res) {
        Allow-listed like everything else here: a free string from a browser
        never reaches a hashed column. */
     assert:  ONE_OF(body?.assert,  ['NOT_A_PERSON']),
+    /* WHAT HELD THE DOOR OPEN, BESIDE THE READER SAYING SO.
+       The assertion used to be the whole gate: a string shaped like a person's
+       name ran against every applicable register on nothing but the reader's
+       word. Ontario's Consumer Reporting Act s. 3, Quebec's P-39.1 s. 70 and
+       Saskatchewan's licensing position attach when the check runs, not when a
+       name would have been shown, so a scrubber on the way out does not answer
+       them. The page now requires a website, an email, a wallet or a legal
+       ending on the name, and sends which one it was. A run that carries an
+       assertion and no basis is refused below. */
+    assert_basis: typeof body?.assert_basis === 'string'
+      ? body.assert_basis.slice(0, 40) : null,
   };
   /* A channel answer only means anything for a vehicle. Carried over from a
      sector somebody switched away from, it would be a fact about the run that
      nobody stated. */
   if (ask.sector !== 'AUTO') ask.channel = null;
+
+  /* THE SERVER DOES NOT TAKE THE READER'S WORD EITHER.
+     The page is one deployment away from being an old build, and this is the
+     only line between a name-shaped string and thirty four sources. An
+     assertion with no basis is not a weaker assertion, it is the thing the
+     statutes attach to, so the run does not start. */
+  if (ask.assert && !ask.assert_basis) {
+    return res.status(400).json({
+      error: 'assert_without_basis',
+      message: 'We do not run checks on a person\'s name. Add the website, the email address '
+             + 'it came from, or the full legal name with its ending, and we will run it.',
+      operator: 'an assertion arrived with nothing corroborating it, and the run was refused '
+              + 'before any source was asked'
+    });
+  }
 
   /* Stage rides the purpose field that already exists rather than becoming a
      new hashed column. It describes why somebody is asking, which is what that
@@ -601,7 +660,7 @@ export default async function handler(req, res) {
        On a product whose first promise is that coverage is COUNTED from the
        retrieval log rather than asserted, that is the worst failure available:
        it is indistinguishable, on screen, from having checked and found a clean
-       record. A reader about to send money cannot tell "we asked 133 registers
+       record. A reader about to send money cannot tell "we asked 134 registers
        and none held anything" from "we never managed to ask".
 
        It also has a tell, which is the clock. A real sweep takes minutes. A
@@ -889,7 +948,7 @@ export default async function handler(req, res) {
        The health table above is written from the review ledger, which covers
        the customer-review platforms and nothing else, and writes them under
        their board names. The back office counts registers reached by looking
-       for catalogue source_ids in that same table, so it found none of the 133
+       for catalogue source_ids in that same table, so it found none of the 134
        and printed nought per cent on a finished run.
 
        The board is the record of what this run reached: clear means a page

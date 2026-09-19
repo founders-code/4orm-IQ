@@ -9,7 +9,30 @@ Tier A/B/C/D authority model, the separation of retrieval from judgment, the reg
 board, the audit report structure and the Exa / Parallel / connector architecture are all
 as they were. This expanded what the system searches and what category 09 is.
 
-## The numbers
+## Where the catalogue stands, 19 September 2026
+
+| | Count |
+|---|---|
+| Rows published | 151 |
+| Enabled and counted | 134 |
+| Registers we ask | 120 |
+| Checks we compute, counted apart | 14 |
+| Declared gaps, named on the board | 4 |
+| Published and waiting on SR-001 | 17 |
+
+The seventeen pending rows are the aggregators and the jurisdictions added on
+19 September: GLEIF, the offshore broker belt (Cayman, BVI, Bahamas, Barbados,
+St Vincent and the Grenadines, Belize, Seychelles, Mauritius), the Eastern
+Caribbean Securities Regulatory Commission, which covers eight states on one
+row, and the corridor (Thailand, Malaysia, the Philippines, and the four
+separate UAE authorities). Every host was read off that body's own site.
+They carry `enabled:false` and `pending:'SR-001'`. Nothing asks them, they
+are in no count, and enabling one is a signature rather than a commit. Run
+`node tools/reachcheck.mjs` to see them listed apart from the declared gaps,
+which is the distinction between a register we cannot reach and one we have
+not signed for.
+
+## The earlier expansion
 
 | | Before | After |
 |---|---|---|

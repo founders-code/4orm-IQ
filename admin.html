@@ -1168,7 +1168,7 @@ var CLEAR = {
   /* How wide we looked, counted once per register, against the catalogue. A
      different question from how often an ask came back, and they used to be
      one number. */
-  reach:{catalogue:133,asked:104,answered:101},
+  reach:{catalogue:134,asked:104,answered:101},
   /* All ten are written as of 6 September 2026, which is a real change: the
      shelf is no longer empty. None is signed off, so none is green, and the
      two that record a NO-GO on their own cover are red for that reason rather
@@ -1198,7 +1198,7 @@ TROUBLE.registers={down:{0:2,1:5,2:7,4:2,7:1},quiet:{0:1,3:3,5:2,6:2,8:1,9:5}};
    blocker on top of the two that already record a NO-GO. */
 TROUBLE.documents={hra:"bad",mg:"bad",lr:"warn",pub:"bad",sub:"bad",
                    vend:"warn",ret:"warn",ir:"warn",sec:"bad",cou:"warn"};
-TROUBLE.reach={catalogue:133,asked:52,answered:38};
+TROUBLE.reach={catalogue:134,asked:52,answered:38};
 TROUBLE.systems={search:"bad",reason:"bad",connectors:"warn",rdap:"ok",db:"ok",
                  chain:"bad",policy:"ok",retention:"bad",auth:"ok",deploy:"bad"};
 TROUBLE.pulse={label_at:25,named:2,adverse:1,unknown:1,rows:[
@@ -1237,7 +1237,7 @@ function machine(d){
   return [
     {k:"searching", plate:"Asking registers", s:S("search"), v:WORD[S("search")],
      name:"Reading the registers",
-     what:"The searches that go out and ask the 133 registers.",
+     what:"The searches that go out and ask the 134 registers.",
      amber:"No search has run yet in this window. Normal first thing in the morning.",
      red:"No register was reached. A check that reads nothing says so, and never draws a clean record out of silence.",
      go:"Look at the search provider first: its key, its credit, and its rate limit."},
@@ -1654,7 +1654,7 @@ var REGCATS=[
   ["09 4orm",["Infrastructure Cluster","Identifier Reuse","Document Fingerprint","Analytics and Pixel Reuse","Site Technology","DNS and IP History","Host and Certificate Graph","Wallet Reuse","Beneficiary Reuse","People Cluster","Operator Graph"]],
   ["10 Claim dates",["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile","Form D First Filing","Form D First Sale","EDGAR First Filing","SEDAR+ First Filing","SEDI First Insider Record","IAPD First Registration","App Store First Release","Google Play First Release","GitHub Repository Created","GitHub First Commit","First Press Release","First YouTube Video","First Social Post"]]
 ];
-/* The engraved label for every one of the 133 registers, written by hand. An
+/* The engraved label for every one of the 134 registers, written by hand. An
    auto-shortener turned "Registraire des entreprises du Quebec" into
    "REGISTRAIRE DES" and made SEC EDGAR and SEC IAPD read the same, which on a
    panel is worse than no label at all. The full name is on the tile. */
@@ -1739,7 +1739,7 @@ function gauges(d){
   /* THE TWO REGISTER NUMBERS, WHICH WERE ONE.
      Coverage and reliability are different questions and the old dial answered
      neither cleanly: "40.5% of 126" is a share of attempts, printed beside a
-     catalogue of 133, and a reader has to work out which number is which.
+     catalogue of 134, and a reader has to work out which number is which.
        Registers reached  how many of the catalogue we put a question to
        Answers back       how many of the times we asked came back with something
      A register nobody had cause to call is not a register that failed, so the
@@ -1767,7 +1767,7 @@ function gauges(d){
                       : "nothing has run in this window",
         secState,"pace",secFill)
     /* NOUGHT IS NOT ALWAYS A MEASUREMENT.
-       This printed "0 of the 133 in the catalogue were asked at all" beside a
+       This printed "0 of the 134 in the catalogue were asked at all" beside a
        healthy looking answering rate, and the two numbers were reading
        different tables. A finished run always asks something, so runs in the
        window with no register recorded is an impossible pair and means the
@@ -1847,7 +1847,7 @@ function openRegister(name,pct){
                      : "Red. Below 85 per cent of attempts answered.";
   var rows=[];
   if(d){ rows.push(["What it is",d[0]]); rows.push(["What it answers",d[1]]); }
-  else  { rows.push(["What it is","One of the 133 registers in the catalogue. Press a check in the flow chart to see which of them it belongs to."]); }
+  else  { rows.push(["What it is","One of the 134 registers in the catalogue. Press a check in the flow chart to see which of them it belongs to."]); }
   rows.push(["The number",pct+" per cent of the times we asked it in this window, it came back with something. "+band]);
   rows.push(["What a fall means","A register that starts failing quietly is the one hazard this product cannot survive, because a failure reported as a clean result is the only dishonest output it can make. A check that could not reach this register says so, and the run is marked incomplete rather than clean."]);
   rows.push(["What to do","Check whether the other registers from the same publisher are falling too. One register is usually the publisher. All of them is usually us."]);
@@ -1938,7 +1938,7 @@ var LANES=[
   {lab:"What is it",        sub:"suitability",            y:94,   h:88},
   {lab:"The gate",          sub:"who is let through",     y:182,  h:88},
   {lab:"Routing",           sub:"which registers apply",  y:270,  h:88},
-  {lab:"Retrieval",         sub:"133 registers",          y:358,  h:296},
+  {lab:"Retrieval",         sub:"134 registers",          y:358,  h:296},
   {lab:"Second pass",       sub:"what round one learned", y:654,  h:86},
   {lab:"The reading",       sub:"one call, no searching", y:740,  h:86},
   {lab:"What a reader sees",sub:"publication",            y:826,  h:86},
@@ -2283,7 +2283,7 @@ function openRegister2(nm, state, ci){
     rows.push(["What it is", R.k+". "+R.s]);
     rows.push(["What an empty answer means", R.e]);
   } else {
-    rows.push(["What it is","One of the 133 registers in the catalogue. No readout has been written for it yet."]);
+    rows.push(["What it is","One of the 134 registers in the catalogue. No readout has been written for it yet."]);
   }
   rows.push(["In this window", state==="answered" ? "It answered."
     : state==="not called today" ? "We had no cause to call it. That is not a fault."
@@ -2499,7 +2499,7 @@ var NODE_INFO = {
           ["What it turns away","Anything that reads as a person rather than a party to a transaction, and anything outside the jurisdictions this product operates in."],
           ["The number on it","Asks turned away in this window. A high count is the gate working, not an error."]]},
   route:{ t:"Routing",
-    rows:[["What it is","The step that decides which of the 133 registers apply to this particular ask, from its sector and its jurisdiction."],
+    rows:[["What it is","The step that decides which of the 134 registers apply to this particular ask, from its sector and its jurisdiction."],
           ["Why it matters","A check that asks every register of every subject is slower, more expensive and no more truthful. Routing is what keeps the scope honest."],
           ["When it fails","Nothing should run. A check with no rules is a check with no scope, and the rulebook lamp turns amber."]]},
   exa:{ t:"Search",
@@ -3319,7 +3319,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260919.0903";
+var BUILD = "20260919.1016";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
