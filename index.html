@@ -5974,7 +5974,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <button class="rp-pvsec2" type="button" id="rpPvClose">Close</button>
         <button class="rp-pvdl" type="button" id="rpPvDl">
           <svg viewBox="0 0 24 24"><path d="M12 4v12M6 12l6 6 6-6M5 20h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Download this pack</button>
+          Download this pack as a PDF</button>
       </span>
     </footer>
   </div>
@@ -11912,7 +11912,18 @@ if(/[?&]debug=1\b/.test(window.location.search)){
                        the document a bank receives rather than guess at it. */
                     packs:function(){ return RP_PACKS; },
                     pack:function(i){ return rpPackHTML(RP, RP_PACKS[i||0]); },
-                    packFile:function(i){ return rpPackFile(RP, RP_PACKS[i||0]); } };
+                    packFile:function(i){ return rpPackFile(RP, RP_PACKS[i||0]); },
+                    /* And the file itself, the bytes a reader's machine saves,
+                       so a test can hand the actual PDF to a reader that is
+                       not ours and see whether it opens. */
+                    /* Opened the way a reader opens it, so a test can press
+                       the button rather than reach past it. */
+                    openPack:function(i){ rpPvShow(RP_PACKS[i||0].id, document.body); },
+                    packPdf:function(i){
+                      var pk=RP_PACKS[i||0];
+                      return rpPdfPack(rpPackBlocks(RP,pk),
+                        { ref:rpRef(RP), pack:pk.name, title:pk.name });
+                    } };
 }
 
 /* ------------------------------------------------------------------ *
@@ -12609,7 +12620,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260918.2008";
+var KBYS_BUILD = "20260919.0608";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -14051,34 +14062,333 @@ function rpMark(){
    do with it, how to reach them, what we already know, what only they can
    answer, and the identification at the foot so that every page can be tied
    back to the run that produced it. */
-function rpPackHTML(d,p){
-  var e=rpEsc, i, H=[];
-  var ref=rpRef(d), party=d.name||"", read=d.asOf||"";
-  H.push('<!doctype html><html lang="en"><head><meta charset="utf-8">');
-  H.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
-  H.push('<title>'+e(p.name)+', '+e(party)+', '+e(ref)+'</title>');
-  H.push('<style>'+RP_PACK_CSS+'</style></head><body><main class="pk">');
+/* ============================================================ THE PACK IS A PDF
 
-  /* the head */
-  H.push('<header class="pk-hd">');
-  var mk=rpMark();
-  if(mk) H.push('<img class="pk-mark" src="'+mk+'" alt="4orm Finance">');
-  H.push('<div class="pk-hdr"><div class="pk-kick">Pack '+(p.n<10?"0":"")+p.n
-    +' of '+(RP_PACKS.length<10?"0":"")+RP_PACKS.length+'</div>'
-    +'<div class="pk-ref">'+e(ref)+'</div></div></header>');
-  H.push('<h1 class="pk-h1">'+e(p.name)+'</h1>');
-  H.push('<p class="pk-lead">'+e(p.sub||"")+'</p>');
+   The pack is the thing a reader hands to a bank's fraud desk, an officer or a
+   regulator's inbox. It downloaded as an .html file, which on most machines
+   opens in a browser rather than landing in a folder, and an attachment that
+   opens a web page is an attachment a fraud desk does not trust and a reader
+   cannot print. A document that is handed over is a PDF.
 
-  /* who you are calling, and on what number, first, because it is the only
-     thing on the page somebody can act on in the next minute */
-  H.push('<section class="pk-reach"><h2>Who you are contacting, and how</h2>');
-  H.push('<dl class="pk-rows">');
-  for(i=0;i<p.route.length;i++)
-    H.push('<dt>'+e(p.route[i][0])+'</dt><dd>'+e(p.route[i][1])+'</dd>');
-  H.push('</dl>');
-  H.push('<p class="pk-does"><b>What they do with it.</b> '+e(String(p.name))+' '+e(p.does)+'</p>');
-  if(p.clock) H.push('<p class="pk-clock"><b>Timing.</b> '+e(p.clock)+'</p>');
-  H.push('</section>');
+   There is no library here and there will not be one. Everything this page
+   loads, it carries, and a document writer that a reader's safety depends on
+   is not the place to start fetching code from somebody else's host. So this
+   writes the file itself: a Letter page, the two base fonts every reader
+   already has, and the house geometry. It is a few hundred lines and it is
+   ours.
+
+   The mark is not in it. The house standard says the Letter documents carry no
+   logo, and a logo may never be redrawn or traced to get around that, so the
+   head is set in type. The HTML preview still carries the real file. */
+
+/* The standard widths of the two base fonts, codes 32 to 126, in thousandths
+   of the point size. Measured text is the whole job: guess the width and every
+   line either overflows the margin or stops short of it, and a document with a
+   ragged right edge that wanders is a document that looks produced by nobody. */
+var RP_PDF_WR = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,
+  556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,
+  667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,
+  611,722,667,944,667,667,611,278,278,278,469,556,333,
+  556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,
+  278,556,500,722,500,500,500,334,260,334,584];
+var RP_PDF_WB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,
+  556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,
+  722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,
+  611,722,667,944,667,667,611,333,278,333,584,556,333,
+  556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,
+  333,611,556,778,556,556,500,389,280,389,584];
+
+/* WinAnsi is what the reader's viewer expects, and the few characters this
+   product actually prints outside ASCII are named here rather than dropped.
+   A pack that prints "Autorit? des march?s financiers" is a pack that looks
+   like it was produced by something broken. */
+var RP_PDF_MAP = {"‘":"\u0091","’":"\u0092","“":"\u0093","”":"\u0094",
+  "•":"\u0095","·":"·","…":"\u0085"," ":" ","\u2013":"-","\u2014":"-",
+  "é":"é","è":"è","ê":"ê","à":"à","ç":"ç",
+  "ô":"ô","î":"î","û":"û","£":"£","€":"\u0080"};
+function rpPdfChar(ch){
+  if(RP_PDF_MAP[ch]) return RP_PDF_MAP[ch];
+  var c=ch.charCodeAt(0);
+  return (c>=32 && c<=255) ? ch : " ";
+}
+function rpPdfTxt(s){
+  var out="", i, ch;
+  s=String(s==null?"":s);
+  for(i=0;i<s.length;i++){
+    ch=rpPdfChar(s.charAt(i));
+    if(ch==="("||ch===")"||ch==="\\") out+="\\"+ch;
+    else out+=ch;
+  }
+  return out;
+}
+function rpPdfW(s,bold,size){
+  var t=RP_PDF_WB, n=0, i, c;
+  if(!bold) t=RP_PDF_WR;
+  s=String(s==null?"":s);
+  for(i=0;i<s.length;i++){
+    c=rpPdfChar(s.charAt(i)).charCodeAt(0);
+    n += (c>=32 && c<=126) ? t[c-32] : 556;
+  }
+  return n*size/1000;
+}
+/* Wrapping breaks on spaces, and a single word longer than the measure is cut
+   rather than allowed to run off the page: a URL that disappears into the
+   margin is a source the reader cannot check. */
+function rpPdfWrap(s,bold,size,max){
+  var words=String(s==null?"":s).split(/\s+/), out=[], line="", i, w, test;
+  for(i=0;i<words.length;i++){
+    w=words[i]; if(!w) continue;
+    test = line ? line+" "+w : w;
+    if(rpPdfW(test,bold,size)<=max){ line=test; continue; }
+    if(line){ out.push(line); line=""; }
+    while(rpPdfW(w,bold,size)>max && w.length>1){
+      var cut=w.length;
+      while(cut>1 && rpPdfW(w.slice(0,cut),bold,size)>max) cut--;
+      out.push(w.slice(0,cut)); w=w.slice(cut);
+    }
+    line=w;
+  }
+  if(line) out.push(line);
+  return out.length?out:[""];
+}
+
+/* The house page. Letter, 46.8pt side margins, the header rule under a
+   letterspaced line, the footer pinned to the foot and never floating up. */
+var RP_PDF = { W:612, H:792, M:46.8, TOP:64, BOT:60,
+  NAVY:[0.075,0.122,0.212], BLUE:[0.180,0.420,0.949], BODY:[0.275,0.333,0.431],
+  CAP:[0.369,0.431,0.533], RULE:[0.839,0.867,0.914], INK:[0.078,0.125,0.212] };
+
+function rpPdfDoc(){
+  var d={ pages:[], cur:null, y:0, page:0 };
+  d.open=function(){
+    d.cur={ ops:[] }; d.pages.push(d.cur); d.page=d.pages.length;
+    d.y = RP_PDF.H - RP_PDF.TOP;
+    return d.cur;
+  };
+  d.col=function(c){ d.cur.ops.push(c[0].toFixed(3)+" "+c[1].toFixed(3)+" "+c[2].toFixed(3)+" rg"); };
+  d.rect=function(x,y,w,h,c){
+    d.cur.ops.push("q "+c[0].toFixed(3)+" "+c[1].toFixed(3)+" "+c[2].toFixed(3)+" rg "
+      +x.toFixed(2)+" "+y.toFixed(2)+" "+w.toFixed(2)+" "+h.toFixed(2)+" re f Q");
+  };
+  /* track is letterspacing, in points, applied by the viewer between glyphs. */
+  d.text=function(x,y,s,o){
+    o=o||{};
+    var f=o.bold?"/F2":"/F1", size=o.size||9.5, c=o.col||RP_PDF.BODY, tr=o.track||0;
+    d.cur.ops.push("q "+c[0].toFixed(3)+" "+c[1].toFixed(3)+" "+c[2].toFixed(3)+" rg BT "
+      +f+" "+size+" Tf "+(tr?tr.toFixed(2)+" Tc ":"")
+      +"1 0 0 1 "+x.toFixed(2)+" "+y.toFixed(2)+" Tm ("+rpPdfTxt(s)+") Tj ET Q");
+  };
+  return d;
+}
+
+/* The pack, laid out. One pass over the blocks the HTML pack is built from, so
+   the two can never say different things. */
+function rpPdfPack(blocks, meta){
+  var P=RP_PDF, L=P.M, R=P.W-P.M, CW=R-L, d=rpPdfDoc();
+  var KEYW=150;                    /* the key column in a two column row */
+
+  function pdfHead(){
+    var y=P.H-40;
+    d.text(L, y, "4ORM FINANCE  ·  "+String(meta.pack||"").toUpperCase(),
+      {bold:true,size:7.5,col:P.NAVY,track:0.7});
+    var ref="REF "+String(meta.ref||"");
+    d.text(R-rpPdfW(ref,true,7.5)-(ref.length*0.5), y, ref, {bold:true,size:7.5,col:P.BLUE,track:0.5});
+    d.rect(L, y-9, CW, 1.1, P.NAVY);
+  }
+  function pdfFoot(n){
+    d.rect(L, 42, CW, 0.6, P.RULE);
+    d.text(L, 32, "4ORM FINANCE  ·  4ORMIQ.COM", {size:7,col:P.CAP,track:0.55});
+    var s="PAGE "+n;
+    d.text(R-rpPdfW(s,false,7)-(s.length*0.55), 32, s, {size:7,col:P.CAP,track:0.55});
+  }
+  function fresh(){ d.open(); pdfHead(); d.y = P.H - P.TOP - 12; }
+  function room(h){ if(d.y-h < P.BOT+10){ fresh(); } }
+
+  fresh();
+
+  function para(s,o){
+    o=o||{};
+    var size=o.size||9.5, lead=size*1.55, bold=!!o.bold, col=o.col||P.BODY,
+        x=L+(o.indent||0), w=CW-(o.indent||0), lines=rpPdfWrap(s,bold,size,w), i;
+    for(i=0;i<lines.length;i++){
+      room(lead);
+      d.text(x, d.y-size, lines[i], {bold:bold,size:size,col:col});
+      d.y -= lead;
+    }
+  }
+  /* A lead word in bold and the sentence after it in text, on one flow. The
+     pack leans on this shape and faking it with a whole bold line changes what
+     the sentence emphasises. */
+  function leadPara(lead,rest){
+    var size=9.5, lh=size*1.55;
+    var first=rpPdfWrap(lead+" "+rest,false,size,CW)[0];
+    var lw=rpPdfW(lead,true,size);
+    room(lh);
+    d.text(L, d.y-size, lead, {bold:true,size:size,col:P.INK});
+    var restLines=rpPdfWrap(rest,false,size,CW-lw-3);
+    d.text(L+lw+3, d.y-size, restLines[0], {size:size,col:P.BODY});
+    d.y -= lh;
+    var tail=rest.slice(restLines[0].length).replace(/^\s+/,"");
+    if(tail) para(tail,{});
+  }
+  function h1(s){
+    var size=20, lines=rpPdfWrap(s,true,size,CW), i;
+    for(i=0;i<lines.length;i++){ room(size*1.25); d.text(L,d.y-size,lines[i],{bold:true,size:size,col:P.INK}); d.y-=size*1.25; }
+    d.y -= 6;
+  }
+  function h2(s){
+    room(40);
+    d.y -= 14;
+    d.rect(L, d.y+4, CW, 0.8, P.RULE);
+    d.y -= 8;
+    var size=11;
+    d.text(L, d.y-size, s, {bold:true,size:size,col:P.INK});
+    d.y -= size*1.5;
+  }
+  function rows(list){
+    var size=8.3, lh=size*1.48, i, k, v, kl, vl, n, y0;
+    for(i=0;i<list.length;i++){
+      k=rpPdfWrap(String(list[i][0]),true,size,KEYW-10);
+      v=rpPdfWrap(String(list[i][1]),false,size,CW-KEYW);
+      n=Math.max(k.length,v.length);
+      room(n*lh+6);
+      y0=d.y;
+      for(kl=0;kl<k.length;kl++) d.text(L, y0-size-kl*lh, k[kl], {bold:true,size:size,col:P.INK});
+      for(vl=0;vl<v.length;vl++) d.text(L+KEYW, y0-size-vl*lh, v[vl], {size:size,col:P.BODY});
+      d.y = y0 - n*lh - 3;
+      d.rect(L, d.y+2, CW, 0.6, P.RULE);
+      d.y -= 5;
+    }
+  }
+  /* A record row: what it says, then who published it and when, then where it
+     came from. The source line is never dropped to save space. */
+  function recs(list){
+    var i, r, size=9.5, small=8.3, j;
+    for(i=0;i<list.length;i++){
+      r=list[i];
+      var t=rpPdfWrap(r.t,false,size,CW-14);
+      var by=r.by+(r.when?", read "+r.when:"")+(r.weight?"  \u00B7  "+r.weight:"");
+      var b=rpPdfWrap(by,false,small,CW-14);
+      var u=r.url?rpPdfWrap(r.url,false,small,CW-14):[];
+      /* The whole entry is measured before a mark is made, because the rule
+         down its left edge has to be as tall as the thing it belongs to. Drawn
+         off the first line only it came out as a two point stub, which on the
+         page read as a stray character sitting in the margin. */
+      var H = t.length*size*1.5 + (b.length+u.length)*small*1.45;
+      room(H+12);
+      var top=d.y;
+      for(j=0;j<t.length;j++){ d.text(L+14, d.y-size, t[j], {size:size,col:P.INK}); d.y-=size*1.5; }
+      for(j=0;j<b.length;j++){ d.text(L+14, d.y-small, b[j], {size:small,col:P.CAP}); d.y-=small*1.45; }
+      for(j=0;j<u.length;j++){ d.text(L+14, d.y-small, u[j], {size:small,col:P.BLUE}); d.y-=small*1.45; }
+      /* Only where the entry did not break across a page: a rule drawn from a
+         top that is now on the sheet before would run the height of this one. */
+      if(d.y<top) d.rect(L, d.y+2, 2.2, top-d.y-2, P.BLUE);
+      d.y -= 10;
+    }
+  }
+
+
+  blocks.forEach(function(b){
+    if(b.k==="h1")    return h1(b.t);
+    if(b.k==="lead")  return para(b.t,{size:10.5,col:P.BODY});
+    if(b.k==="h2")    return h2(b.t);
+    if(b.k==="note")  return para(b.t,{size:8.3,col:P.CAP});
+    if(b.k==="p")     return b.lead ? leadPara(b.lead,b.t) : para(b.t,{});
+    if(b.k==="rows")  return rows(b.rows);
+    if(b.k==="rec")   return recs(b.rows);
+    /* The identification block. It was falling through this list in silence,
+       which took the reference, the party and the website off the file while
+       leaving them on the screen: a pack a fraud desk could not tie back to a
+       run. Every block kind this list does not know about now says so. */
+    if(b.k==="foot"){
+      /* THE COLOPHON IS PINNED TO THE FOOT.
+         It used to flow like everything else, and on a short pack that put six
+         identification rows and two paragraphs of fine print at the top of a
+         second sheet with two thirds of it blank underneath. The house rule is
+         that no page ends in a block of white space. A document's
+         identification belongs at the foot of its last page, so it is measured
+         and placed there, and what space is left sits above it where it reads
+         as a margin rather than as something missing. */
+      var need = 14+8+11*1.5 + b.rows.length*(8.3*1.48+8);
+      (b.fine||[]).forEach(function(t){
+        need += rpPdfWrap(t,false,8.3,CW).length*8.3*1.55 + 6;
+      });
+      if(d.y-need < P.BOT+10) fresh();
+      d.y = P.BOT + 10 + need;
+      h2(b.t); rows(b.rows);
+      (b.fine||[]).forEach(function(t){ para(t,{size:8.3,col:P.CAP}); });
+      return;
+    }
+    if(b.k==="fine")  return b.inFoot ? undefined : para(b.t,{size:8.3,col:b.warn?P.INK:P.CAP});
+    if(b.k==="gap")   { d.y -= (b.h||10); return; }
+    throw new Error("pdf: the pack carries a block this file cannot draw: "+b.k);
+  });
+
+  var i, n=d.pages.length;
+  for(i=0;i<n;i++){ d.cur=d.pages[i]; pdfFoot(i+1); }
+
+  /* ---- the file itself ---- */
+  var objs=[], out="";
+  function obj(s){ objs.push(s); return objs.length; }
+  var fontR=obj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+  var fontB=obj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+  /* Two fonts are written, then a content stream and a page object per page,
+     and the Pages object comes straight after them. */
+  var pagesId=objs.length+n*2+1;
+  var kids=[], pageIds=[];
+  for(i=0;i<n;i++){
+    var stream=d.pages[i].ops.join("\n");
+    var cid=obj("<< /Length "+stream.length+" >>\nstream\n"+stream+"\nendstream");
+    var pid=obj("<< /Type /Page /Parent "+pagesId+" 0 R /MediaBox [0 0 "+P.W+" "+P.H+"] "
+      +"/Resources << /Font << /F1 "+fontR+" 0 R /F2 "+fontB+" 0 R >> >> /Contents "+cid+" 0 R >>");
+    pageIds.push(pid); kids.push(pid+" 0 R");
+  }
+  var realPages=obj("<< /Type /Pages /Count "+n+" /Kids ["+kids.join(" ")+"] >>");
+  /* The page objects were written before the Pages object existed, so they name
+     it by the number it was always going to get. If that arithmetic ever drifts
+     the file opens blank, so it is asserted rather than trusted. */
+  if(realPages!==pagesId) throw new Error("pdf: the page tree moved");
+  var info=obj("<< /Title ("+rpPdfTxt(meta.title||"4orm IQ pack")+") /Author (4orm Finance) "
+    +"/Creator (4orm IQ) /Producer (4orm IQ) >>");
+  var cat=obj("<< /Type /Catalog /Pages "+pagesId+" 0 R >>");
+
+  out="%PDF-1.4\n%âãÏÓ\n";
+  var offs=[0];
+  for(i=0;i<objs.length;i++){
+    offs.push(out.length);
+    out += (i+1)+" 0 obj\n"+objs[i]+"\nendobj\n";
+  }
+  var xref=out.length;
+  out += "xref\n0 "+(objs.length+1)+"\n0000000000 65535 f \n";
+  for(i=1;i<=objs.length;i++){
+    var o=String(offs[i]); while(o.length<10) o="0"+o;
+    out += o+" 00000 n \n";
+  }
+  out += "trailer\n<< /Size "+(objs.length+1)+" /Root "+cat+" 0 R /Info "+info+" 0 R >>\n"
+      +  "startxref\n"+xref+"\n%%EOF";
+
+  var bytes=new Uint8Array(out.length);
+  for(i=0;i<out.length;i++) bytes[i]=out.charCodeAt(i)&0xFF;
+  return bytes;
+}
+
+/* ============================ ONE PACK, WRITTEN ONCE, RENDERED TWICE
+   The pack is read on screen and handed over as a file, and those used to be
+   two pieces of code that happened to say the same things. They do not happen
+   to any more: the words, the order and the sources are decided here, once,
+   and the screen and the file are two renderings of this list. A sentence
+   changed in one of them cannot go missing from the other. */
+function rpPackBlocks(d,p){
+  var B=[], i, ref=rpRef(d), party=d.name||"", read=d.asOf||"";
+  B.push({k:"h1",   t:p.name});
+  B.push({k:"lead", t:p.sub||""});
+
+  /* Who you are calling and on what number comes first, because it is the only
+     thing in here somebody can act on in the next minute. */
+  B.push({k:"h2",   t:"Who you are contacting, and how"});
+  B.push({k:"rows", rows:p.route.slice(), cls:"pk-reach"});
+  B.push({k:"p",    lead:"What they do with it.", t:String(p.name)+" "+p.does, cls:"pk-does"});
+  if(p.clock) B.push({k:"p", lead:"Timing.", t:p.clock, cls:"pk-clock"});
 
   /* THE RECORD, WHICH IS THE WHOLE REASON THIS FILE EXISTS.
      Three sections used to sit here: what we know, a form of nine blank lines
@@ -14088,73 +14398,129 @@ function rpPackHTML(d,p){
      twice. What a fraud desk cannot get from the reader is the record, so the
      record leads and it carries who published each line and the day we read
      it. */
-  H.push('<section><h2>What the records say about this name</h2>');
-  H.push('<p class="pk-note">Every line names the body that published it and the day we read it. '
-    +'This is the part that cannot come from you.</p>');
+  B.push({k:"h2",   t:"What the records say about this name"});
+  B.push({k:"note", t:"Every line names the body that published it and the day we read it. "
+    +"This is the part that cannot come from you."});
   var rows=rpPackRecord(d);
-  if(rows.length){
-    H.push('<ul class="pk-rec">');
-    for(i=0;i<rows.length;i++){
-      var r=rows[i];
-      H.push('<li class="pk-r" data-k="'+e(r.k)+'"><span class="pk-rt">'+e(r.t)+'</span>'
-        +'<span class="pk-rb">'+e(r.by)+(r.when?', read '+e(r.when):'')
-        +(r.weight?' &middot; '+e(r.weight):'')+'</span>'
-        +(r.url?'<span class="pk-ru">'+e(r.url)+'</span>':'')+'</li>');
-    }
-    H.push('</ul>');
-  } else {
-    H.push('<p class="pk-p">No register we reached held anything either way on this name. That is '
-      +'not the same as a clean record: it means those registers had nothing on the day we looked.</p>');
-  }
-  H.push('</section>');
+  if(rows.length) B.push({k:"rec", rows:rows});
+  else B.push({k:"p", t:"No register we reached held anything either way on this name. That is "
+    +"not the same as a clean record: it means those registers had nothing on the day we looked."});
 
-  H.push('<section><h2>What the record holds</h2>');
-  H.push('<p class="pk-note">Read from public sources'+(read?' on '+e(read):'')
-    +' and not re-read since. Every line can be checked against the source named in the full report.</p>');
-  H.push('<dl class="pk-rows pk-hold">');
-  var h=rpHold(d);
-  for(i=0;i<h.length;i++) H.push('<dt>'+e(h[i][0])+'</dt><dd>'+e(h[i][1])+'</dd>');
-  H.push('</dl></section>');
+  B.push({k:"h2",   t:"What the record holds"});
+  B.push({k:"note", t:"Read from public sources"+(read?" on "+read:"")
+    +" and not re-read since. Every line can be checked against the source named in the full report."});
+  B.push({k:"rows", rows:rpHold(d), cls:"pk-hold"});
 
   /* AND ONE SHORT NOTE AT THE FOOT ON WHAT TO SAY. Not a form, not a
      checklist: four lines, which is all it takes to open a file anywhere on
      this list. */
-  H.push('<section><h2>What to put in the message</h2>');
-  H.push('<p class="pk-p"><b>Attach this pack.</b> It carries the name, the website, the records '
-    +'and the date each one was read.</p>');
-  H.push('<p class="pk-p"><b>Quote the reference.</b> '+e(ref)+'. It is at the top of this pack.</p>');
-  H.push('<p class="pk-p"><b>Say what happened to you, in your own words.</b> What you paid, when, '
-    +'how you paid it, and who you paid it to. That is the only part they cannot read off this '
-    +'pack, and it does not need to be long.</p>');
+  B.push({k:"h2", t:"What to put in the message"});
+  B.push({k:"p", lead:"Attach this pack.", t:"It carries the name, the website, the records "
+    +"and the date each one was read."});
+  B.push({k:"p", lead:"Quote the reference.", t:ref+". It is at the top of this pack."});
+  B.push({k:"p", lead:"Say what happened to you, in your own words.", t:"What you paid, when, "
+    +"how you paid it, and who you paid it to. That is the only part they cannot read off this "
+    +"pack, and it does not need to be long."});
   if(p.note && p.note.length)
-    H.push('<p class="pk-p"><b>One thing worth knowing.</b> '+e(p.note[0])+'</p>');
-  H.push('</section>');
+    B.push({k:"p", lead:"One thing worth knowing.", t:p.note[0]});
 
-  /* THE IDENTIFICATION, AT THE FOOT, ON EVERY PACK.
+  /* THE IDENTIFICATION, ON EVERY PACK.
      Whoever receives this has to be able to tie it back to a single run, and
      the person handing it over has to be able to quote one reference on the
      phone. */
-  H.push('<footer class="pk-ft"><div class="pk-ftg">');
-  var ft=[["Report reference",ref],["Party",party],["Website",rpDomain(d)||"Nothing identified"],
-          ["Records read",read||"Not recorded"],["Pack",p.name],
-          ["Produced by","4orm Finance, 4ormiq.com"]];
-  for(i=0;i<ft.length;i++)
-    H.push('<div class="pk-ftc"><span class="pk-ftk">'+e(ft[i][0])+'</span>'
-      +'<span class="pk-ftv">'+e(ft[i][1])+'</span></div>');
-  H.push('</div>');
-  H.push('<p class="pk-fine">Nothing in this pack is a finding that any law has been broken, and '
-    +'nothing in it is legal advice. It reports what public records showed'+(read?' on '+e(read):'')
-    +', with the source named beside each item, so that you and the recipient can open them and '
-    +'judge for yourselves.</p>');
-  H.push('<p class="pk-fine pk-warn">Nobody legitimate will ask you to pay money to get your money '
-    +'back. The Canadian Anti-Fraud Centre publishes that fraudsters often target victims a second '
-    +'or third time with the promise of recovering money.</p>');
+  B.push({k:"foot", t:"How to tie this pack back to one check", rows:[
+    ["Report reference",ref],["Party",party],["Website",rpDomain(d)||"Nothing identified"],
+    ["Records read",read||"Not recorded"],["Pack",p.name],
+    ["Produced by","4orm Finance, 4ormiq.com"]]});
+  /* The fine print belongs to the identification and travels with it, so a page
+     break can never put the two of them on different sheets. */
+  B[B.length-1].fine = [
+    "Nothing in this pack is a finding that any law has been broken, and "
+    +"nothing in it is legal advice. It reports what public records showed"+(read?" on "+read:"")
+    +", with the source named beside each item, so that you and the recipient can open them and "
+    +"judge for yourselves.",
+    "Nobody legitimate will ask you to pay money to get your money "
+    +"back. The Canadian Anti-Fraud Centre publishes that fraudsters often target victims a second "
+    +"or third time with the promise of recovering money."];
+  /* The screen prints them after the identification block. The file draws them
+     inside it, pinned to the foot, so it marks them as already spoken for
+     rather than printing the same two paragraphs twice. */
+  B.push({k:"fine", inFoot:true, t:B[B.length-1].fine[0]});
+  B.push({k:"fine", inFoot:true, warn:true, t:B[B.length-2].fine[1]});
+  return B;
+}
+
+function rpPackHTML(d,p){
+  var e=rpEsc, i, j, H=[], B=rpPackBlocks(d,p);
+  var ref=rpRef(d);
+  H.push('<!doctype html><html lang="en"><head><meta charset="utf-8">');
+  H.push('<meta name="viewport" content="width=device-width,initial-scale=1">');
+  H.push('<title>'+e(p.name)+', '+e(d.name||"")+', '+e(ref)+'</title>');
+  H.push('<style>'+RP_PACK_CSS+'</style></head><body><main class="pk">');
+
+  H.push('<header class="pk-hd">');
+  var mk=rpMark();
+  if(mk) H.push('<img class="pk-mark" src="'+mk+'" alt="4orm Finance">');
+  H.push('<div class="pk-hdr"><div class="pk-kick">Pack '+(p.n<10?"0":"")+p.n
+    +' of '+(RP_PACKS.length<10?"0":"")+RP_PACKS.length+'</div>'
+    +'<div class="pk-ref">'+e(ref)+'</div></div></header>');
+
+  var open=false;
+  function shutSec(){ if(open){ H.push('</section>'); open=false; } }
+  for(i=0;i<B.length;i++){
+    var b=B[i];
+    if(b.k==="h1"){ H.push('<h1 class="pk-h1">'+e(b.t)+'</h1>'); continue; }
+    if(b.k==="lead"){ H.push('<p class="pk-lead">'+e(b.t)+'</p>'); continue; }
+    if(b.k==="h2"){ shutSec(); H.push('<section><h2>'+e(b.t)+'</h2>'); open=true; continue; }
+    if(b.k==="note"){ H.push('<p class="pk-note">'+e(b.t)+'</p>'); continue; }
+    if(b.k==="p"){
+      H.push('<p class="'+(b.cls||"pk-p")+'">'+(b.lead?'<b>'+e(b.lead)+'</b> ':'')+e(b.t)+'</p>');
+      continue;
+    }
+    if(b.k==="rows"){
+      H.push('<dl class="pk-rows'+(b.cls==="pk-hold"?" pk-hold":"")+'">');
+      for(j=0;j<b.rows.length;j++)
+        H.push('<dt>'+e(b.rows[j][0])+'</dt><dd>'+e(b.rows[j][1])+'</dd>');
+      H.push('</dl>');
+      continue;
+    }
+    if(b.k==="rec"){
+      H.push('<ul class="pk-rec">');
+      for(j=0;j<b.rows.length;j++){
+        var r=b.rows[j];
+        H.push('<li class="pk-r" data-k="'+e(r.k)+'"><span class="pk-rt">'+e(r.t)+'</span>'
+          +'<span class="pk-rb">'+e(r.by)+(r.when?', read '+e(r.when):'')
+          +(r.weight?' &middot; '+e(r.weight):'')+'</span>'
+          +(r.url?'<span class="pk-ru">'+e(r.url)+'</span>':'')+'</li>');
+      }
+      H.push('</ul>');
+      continue;
+    }
+    if(b.k==="foot"){
+      shutSec();
+      H.push('<footer class="pk-ft"><div class="pk-ftg">');
+      for(j=0;j<b.rows.length;j++)
+        H.push('<div class="pk-ftc"><span class="pk-ftk">'+e(b.rows[j][0])+'</span>'
+          +'<span class="pk-ftv">'+e(b.rows[j][1])+'</span></div>');
+      H.push('</div>');
+      continue;
+    }
+    if(b.k==="fine"){
+      H.push('<p class="pk-fine'+(b.warn?" pk-warn":"")+'">'+e(b.t)+'</p>');
+      continue;
+    }
+  }
+  shutSec();
   H.push('</footer></main></body></html>');
   return H.join("");
 }
 
 function rpPackFile(d,p){
-  return "4ormIQ-"+rpRef(d)+"-"+p.id+".html";
+  /* It is handed to a fraud desk, an officer and a regulator's inbox. An .html
+     attachment opens as a web page on most machines instead of landing in a
+     folder, and a document somebody has to trust should not arrive looking
+     like a link. */
+  return "4ormIQ-"+rpRef(d)+"-"+p.id+".pdf";
 }
 
 /* --------------------------------------------------------- sources and method */
@@ -15361,9 +15727,10 @@ function rpPvHide(){
 function rpDownload(){
   var p=RP_PV_OPEN;
   if(!p||!RP) return;
-  var text=rpPackHTML(RP,p);
   try{
-    var blob=new Blob([text],{type:"text/html;charset=utf-8"});
+    var bytes=rpPdfPack(rpPackBlocks(RP,p), {
+      ref:rpRef(RP), pack:p.name, title:p.name+", "+(RP.name||"")+", "+rpRef(RP) });
+    var blob=new Blob([bytes],{type:"application/pdf"});
     var url=URL.createObjectURL(blob);
     var a=document.createElement("a");
     a.href=url; a.download=rpPackFile(RP,p); a.rel="noopener";

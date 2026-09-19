@@ -4441,8 +4441,24 @@ if (/rpIdRow\("When we looked"/.test(script))
   for (const need of ['Report reference', 'Records read', 'Produced by'])
     if (!fn.includes(need))
       fails.push('the pack foot does not carry: ' + need);
-  if (!/rpPackFile[\s\S]{0,120}\.html/.test(script))
-    fails.push('the pack still downloads as a text file');
+  /* THE PACK IS A FILE SOMEBODY HANDS OVER, SO IT IS A PDF.
+     It downloaded as .html, which opens as a web page rather than landing in a
+     folder, and an attachment that opens a browser is one a fraud desk does not
+     open twice. */
+  const nameFn = script.slice(script.indexOf('function rpPackFile'),
+                              script.indexOf('function rpPackFile') + 400);
+  if (!/return "4ormIQ-[\s\S]{0,80}\.pdf"/.test(nameFn))
+    fails.push('the pack does not download as a PDF');
+  if (!/function rpPdfPack/.test(script) || !/function rpPackBlocks/.test(script))
+    fails.push('nothing writes the pack as a file the reader can hand over');
+  /* The screen and the file are two renderings of one list, and the renderer
+     that meets a block it does not know says so rather than dropping it. This
+     is how the identification block went missing from the file while staying on
+     the screen. */
+  if (!/the pack carries a block this file cannot draw/.test(script))
+    fails.push('the pack writer drops a block it does not recognise instead of failing');
+  if (!/rpPdfPack\(rpPackBlocks\(/.test(script))
+    fails.push('the download builds the file from something other than the pack itself');
   /* AND IT SAYS WHOSE NUMBER IT IS AND WHO PICKS IT UP.
      A bare number on a page beside a fraud warning is the shape of the thing
      the product exists to warn people about. */
