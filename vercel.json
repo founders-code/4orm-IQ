@@ -1,16 +1,59 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/check.js": { "maxDuration": 300 }
+    "api/check.js": {
+      "maxDuration": 300
+    }
   },
   "headers": [
     {
       "source": "/api/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     },
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/real-run-live-go(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/real-run-live-go",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/real-run-live-go/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/real-run-live-go/room",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/real-run-live-go/evidence",
+      "destination": "/evidence.html"
     }
   ]
 }

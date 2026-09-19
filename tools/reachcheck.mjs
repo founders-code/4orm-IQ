@@ -25,7 +25,7 @@
 
    Anything else fails this check.                                            */
 import { unreachableRegisters } from '../api/_registers.js';
-import { CATALOGUE, ASKABLE, COMPUTED } from '../api/_catalogue.js';
+import { CATALOGUE, ASKABLE, COMPUTED, PENDING } from '../api/_catalogue.js';
 
 const by = Object.fromEntries(CATALOGUE.map(s => [s.display_name, s]));
 const un = unreachableRegisters();
@@ -58,6 +58,28 @@ if (silent.length) {
   console.log('fetched, or declare it unmapped with the reason written beside it. A');
   console.log('register we publish and cannot ask is a promise the board counts against.\n');
   process.exit(1);
+}
+
+/* PUBLISHED, AND WAITING ON A SIGNATURE.
+   These are not gaps in the sense the block above means. A declared gap is a
+   register we publish and cannot reach. A pending row is one we have found,
+   checked the host of, and written down, and which will stay dark until
+   somebody signs for it. Printing them apart is the difference between "we
+   cannot" and "we have not yet", and an operator is entitled to know which of
+   the two they are looking at. */
+if (PENDING.length) {
+  console.log('\n  Published and waiting on SR-001. Asked by nothing until it is signed:');
+  PENDING.forEach(x => {
+    console.log('    ' + (x.domain || '(no host)').padEnd(24) + x.display_name);
+    console.log('      ' + (x.pending_why || ''));
+  });
+  const noHost = PENDING.filter(x => !x.domain);
+  if (noHost.length) {
+    console.log('\nFAILED');
+    noHost.forEach(x => console.log('  ' + x.source_id
+      + ' is waiting on sign-off with no host checked. Sign-off is not the thing missing.'));
+    process.exit(1);
+  }
 }
 
 /* The coverage ceiling is a real number and it should be said out loud rather

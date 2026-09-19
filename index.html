@@ -469,6 +469,11 @@ body[data-stage="console"] #room{display:none}
 
 /* Invisible by opacity rather than display, because an element that is not
    displayed cannot be pressed. It exists only where the lamp does. */
+#runGate{position:sticky;top:0;z-index:9000;padding:9px 16px;text-align:center;
+  font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:#0C0F11;background:#D6AC55;border-bottom:1px solid #8A6414}
+@media(max-width:560px){#runGate{font-size:10px;letter-spacing:.06em;padding:8px 12px}}
+
 .lampgo{
   position:fixed;left:50%;top:28px;transform:translateX(-50%);
   width:36px;height:36px;border-radius:50%;z-index:3;opacity:0;
@@ -476,6 +481,13 @@ body[data-stage="console"] #room{display:none}
 }
 body[data-stage="report"] .lampgo,
 body[data-stage="console"] .lampgo{display:none}
+
+/* The real run strip. It reads as an instrument rather than a banner, because
+   that is what it is: the page telling an operator which mode it is in. */
+#runGate{position:sticky;top:0;z-index:9000;padding:9px 16px;text-align:center;
+  font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:#0C0F11;background:#D6AC55;border-bottom:1px solid #8A6414}
+@media(max-width:560px){#runGate{font-size:10px;letter-spacing:.06em;padding:8px 12px}}
 
 #room .lit{
   position:absolute;inset:0;
@@ -4447,7 +4459,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
      pressed. It carries no label, is out of the tab order, and is silent to a
      screen reader, because it is a convenience for one person rather than
      navigation for a visitor. -->
-<a class="lampgo" href="admin.html" tabindex="-1" aria-hidden="true"></a>
+<a class="lampgo" id="lampGo" href="admin.html" tabindex="-1" aria-hidden="true"></a>
 
 
 <!-- ====================================================================
@@ -5029,6 +5041,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <div class="rp-x" id="rpGap1"></div>
         <div class="rp-x" id="rpGap2"></div>
         <div class="rp-x" id="rpGap3"></div>
+        <!-- The jurisdiction we hold nothing for, named. Hidden unless the run
+             actually pointed at one, because a list of countries on every
+             result is wallpaper. -->
+        <div class="rp-x rp-gapj" id="rpGap4" hidden></div>
       </div>
     </div>
 
@@ -6896,7 +6912,7 @@ var GREY = {
    the right order during a sweep. */
 /* GENERATED:SOURCES - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
 var SOURCES = [
- {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones"]},
+ {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama","Turks and Caicos, and Eastern Caribbean company registries"]},
  {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]},
  {c:"03 Enforcement", w:3, items:["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau Canada","Federal Trade Commission","Consumer Financial Protection Bureau","Internet Crime Complaint Center","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]},
  {c:"04 People", w:1, items:["Corporations Canada, Individuals with Significant Control","ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]},
@@ -6934,7 +6950,7 @@ var REGINFO = {
 "ACRA":["SG","A","Singapore's corporate register. Confirms a Singapore entity exists and its standing.","https://www.acra.gov.sg/"],
 "Hong Kong Companies Registry":["HK","A","Hong Kong's companies register. Confirms incorporation and standing.","https://www.cr.gov.hk/"],
 "New Zealand Companies Office":["NZ","A","New Zealand's companies register. Confirms incorporation, standing and directors.","https://companies-register.companiesoffice.govt.nz/"],
-"Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones":["INTL","B","The company registers of the jurisdictions most often used to hold a fund or an operating entity offshore. Coverage differs by island: some publish a searchable register, some publish almost nothing.","https://www.opencorporates.com/"],
+"Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama":["INTL","B","The company registers of seven jurisdictions often used to hold a fund or an operating entity offshore. Coverage differs by jurisdiction: some publish a searchable register, some publish almost nothing.","https://www.opencorporates.com/"],
 "CSA Registration":["CA","A","The Canadian Securities Administrators National Registration Search. Answers whether a party may lawfully sell investments anywhere in Canada.","https://www.securities-administrators.ca/nrs/"],
 "CIRO AdvisorReport":["CA","A","Registration and disciplinary history for an individual adviser or dealer.","https://www.ciro.ca/investors/advisorreport"],
 "FINTRAC MSB":["CA","A","Canada's money services business register. Required for anyone exchanging or transmitting value as a business.","https://fintrac-canafe.canada.ca/msb-esm/msb-search-recherche-eng"],
@@ -6959,6 +6975,7 @@ var REGINFO = {
 "Nova Scotia Securities Commission":["CA-NS","A","The Nova Scotia securities regulator, holding registrations, orders and investor warnings.","https://nssc.novascotia.ca/"],
 "Prince Edward Island and Newfoundland and Labrador regulators":["CA","A","The two Atlantic regulators whose registers we have not yet pinned to a host, kept on the board so the gap has a name.","https://www.bcfsa.ca/"],
 "NMLS Consumer Access":["US","A","The United States national register of mortgage and consumer lending licences, for companies and individuals.","https://www.nmlsconsumeraccess.org/"],
+"Turks and Caicos, and Eastern Caribbean company registries":["INTL","B","The company registries of Turks and Caicos and of the Eastern Caribbean states, which are separate from the securities commission that covers those states.","https://www.opencorporates.com/"],
 "MAS Financial Institutions Directory":["SG","A","The Monetary Authority of Singapore's directory of the institutions it regulates.","https://eservices.mas.gov.sg/fid"],
 "IOSCO I-SCAN":["GLOBAL","A","The investor alerts portal carrying warnings from more than ninety national authorities in one place.","https://www.iosco.org/i-scan/"],
 "Canadian Consolidated Autonomous Sanctions List":["CA","A","Canada's own sanctions list, held by Global Affairs Canada. Names the people and entities Canadians are prohibited from dealing with.","https://www.international.gc.ca/world-monde/international_relations-relations_internationales/sanctions/consolidated-consolide.aspx"],
@@ -7161,9 +7178,9 @@ var REGREAD = {
 "New Zealand Companies Office":["A New Zealand company by that name exists, with its directors on the record.",
   "Nothing in New Zealand. The company may be registered elsewhere.",
   "The registered office address and the directors. A New Zealand shell with an overseas director and a virtual address is a known pattern."],
-"Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones":["An entity by that name is recorded in one of those jurisdictions.",
-  "Nothing found. Several of these registers are closed to the public, so an absence here proves very little.",
-  "Which jurisdiction it is in, and whether that jurisdiction actually publishes the register. An offshore entity is legal and common. What matters is whether the one you were told about is the one that exists."],
+"Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama":["A company of that name exists in one of these jurisdictions, and the register says what it is and whether it is in good standing.",
+  "Nothing found. These are the registers we have not pinned a host for yet, so an empty answer here is our gap and not the jurisdiction's.",
+  "Where the entity is registered against where the money is going. An offshore holding company is ordinary. An offshore company taking deposits from you is not the same thing at all."],
 "CSA Registration":["The party is registered to sell investments somewhere in Canada, and the categories say what it may sell.",
   "No matching registration was found. That is not proof they are unregistered, and it is the single most important question to put to them.",
   "Match the exact legal name and the category. A firm registered as an exempt market dealer may not sell you what a portfolio manager can."],
@@ -7236,6 +7253,9 @@ var REGREAD = {
 "NMLS Consumer Access":["The firm holds a state lending licence, with the states it covers listed.",
   "No NMLS record. A firm arranging a mortgage or a consumer loan in the United States needs one in every state it operates in.",
   "The states listed on the licence. A licence in one state is not a licence to lend in yours."],
+"Turks and Caicos, and Eastern Caribbean company registries":["A company of that name is on one of these registries.",
+  "We do not ask these yet, so an empty answer is our gap and not theirs.",
+  "That a company registry says a company exists. It says nothing about whether anybody is allowed to take your money, which is a different register and usually a different building."],
 "MAS Financial Institutions Directory":["The firm is regulated in Singapore, with the activities it is licensed for.",
   "Not regulated by MAS. A firm claiming a Singapore licence with no directory entry is claiming something the regulator does not confirm.",
   "The licence type against what they are actually offering you."],
@@ -10027,7 +10047,38 @@ function toResult(d,label){
    must never serve. ?demo=1 reads the built-in corpus instead, for showing
    the console without spending a check, and ?live=1 stays valid so links
    already in circulation keep working. */
-var LIVE = !/[?&]demo=1\b/.test(window.location.search);
+/* ================================================= THE REAL RUN DOOR
+   A path you have to type, ending real-run-live-go, which serves this same
+   page and does one thing: it runs for real and says so. It exists because a
+   check on this product costs money and takes a minute, and the only way to
+   know the live path works is to walk it, which is not something to do by
+   accident on a page somebody is showing to a room. The path is not linked
+   from anywhere, carries noindex, and is not a secret: it is a door you have
+   to mean to open. Anyone who finds it gets a real check, which is the same
+   thing every visitor gets. */
+var RUN_GATE = /(^|\/)real-run-live-go\/?$/.test(window.location.pathname)
+            || /[?&]real-run-live-go\b/.test(window.location.search);
+var LIVE = RUN_GATE || !/[?&]demo=1\b/.test(window.location.search);
+(function(){
+  if(!RUN_GATE) return;
+  /* SAY IT OUT LOUD. A page that spends a real check and looks identical to one
+     that does not is how somebody burns twenty checks demonstrating a feature.
+     The strip is mono, small, and sits above everything. */
+  try{
+    var b=document.createElement("div");
+    b.id="runGate";
+    b.setAttribute("role","status");
+    b.textContent="REAL RUN \u00B7 every check on this page is live and spends a check \u00B7 the control room is at /real-run-live-go/room";
+    document.addEventListener("DOMContentLoaded",function(){
+      document.body.insertBefore(b, document.body.firstChild);
+      document.body.setAttribute("data-rungate","1");
+      /* The staff door follows the door you came in by. Reached from the gate,
+         the room is a sibling of this page rather than a file at the root. */
+      var lg=document.getElementById("lampGo");
+      if(lg) lg.setAttribute("href","/real-run-live-go/room");
+    });
+  }catch(e){}
+})();
 /* ?live=1 used to be how somebody opted into a real check. Live is the default
    now and ?demo=1 is the escape hatch, so the old parameter means nothing and
    has no business sitting in the address bar, where it gets copied, bookmarked
@@ -12677,7 +12728,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260919.0830";
+var KBYS_BUILD = "20260919.0903";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -14429,6 +14480,69 @@ function rpPdfPack(blocks, meta){
   return bytes;
 }
 
+/* =================== THE JURISDICTION WE HOLD NOTHING FOR, BY NAME
+
+   A run went past a Thai enforcement record in silence, and the page said only
+   that there were things it could not answer. That is true of every run ever
+   made and it told the reader nothing. What it should have said is the one
+   sentence that was actually useful: we hold no register for Thailand.
+
+   Every entry below is an authority whose host has been checked and which is
+   written into the catalogue as waiting on SR-001. Nothing here is asked. The
+   point is the opposite: to say out loud which door we did not knock on, and
+   where it is, so the reader can knock on it themselves tonight. */
+var RP_NO_REGISTER = {
+  "thailand":{ n:"Thailand", who:["SEC Thailand","sec.or.th"] },
+  "thai":{ n:"Thailand", who:["SEC Thailand","sec.or.th"] },
+  "malaysia":{ n:"Malaysia", who:["the Securities Commission Malaysia","sc.com.my"] },
+  "philippines":{ n:"the Philippines", who:["SEC Philippines","sec.gov.ph"] },
+  "dubai":{ n:"Dubai", who:["the Virtual Assets Regulatory Authority","vara.ae"] },
+  "united arab emirates":{ n:"the United Arab Emirates", who:["the UAE Capital Market Authority","uaecma.gov.ae"] },
+  "abu dhabi":{ n:"Abu Dhabi", who:["the ADGM regulator","adgm.com"] },
+  "cayman":{ n:"the Cayman Islands", who:["the Cayman Islands Monetary Authority","cima.ky"] },
+  "british virgin islands":{ n:"the British Virgin Islands", who:["the BVI Financial Services Commission","bvifsc.vg"] },
+  "bahamas":{ n:"the Bahamas", who:["the Securities Commission of The Bahamas","scb.gov.bs"] },
+  "barbados":{ n:"Barbados", who:["the Financial Services Commission of Barbados","fsc.gov.bb"] },
+  "st vincent":{ n:"St Vincent and the Grenadines", who:["the Financial Services Authority","svgfsa.com"] },
+  "saint vincent":{ n:"St Vincent and the Grenadines", who:["the Financial Services Authority","svgfsa.com"] },
+  "grenadines":{ n:"St Vincent and the Grenadines", who:["the Financial Services Authority","svgfsa.com"] },
+  "saint lucia":{ n:"Saint Lucia", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "st lucia":{ n:"Saint Lucia", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "antigua":{ n:"Antigua and Barbuda", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "grenada":{ n:"Grenada", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "dominica":{ n:"Dominica", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "st kitts":{ n:"St Kitts and Nevis", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "nevis":{ n:"St Kitts and Nevis", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "anguilla":{ n:"Anguilla", who:["the Eastern Caribbean Securities Regulatory Commission","ecsrc.com"] },
+  "belize":{ n:"Belize", who:["the Financial Services Commission of Belize","belizefsc.org.bz"] },
+  "seychelles":{ n:"Seychelles", who:["the Financial Services Authority Seychelles","fsaseychelles.sc"] },
+  "mauritius":{ n:"Mauritius", who:["the Financial Services Commission Mauritius","fscmauritius.org"] }
+};
+/* Read off what the run itself carried: the party's own words about where it
+   is, and the records we retrieved. Never inferred from a name, an accent or a
+   guess about somebody, and never from a single letter pair: "st kitts" is a
+   place, "kn" is two letters that appear in a thousand words. */
+function rpNoRegister(d){
+  if(!d) return [];
+  var hay = [];
+  hay.push(String(d.name||""), String(d.domain||""), String(d.statement||""));
+  (d.claims||[]).forEach(function(c){ hay.push(String(c.t||""), String(c.x||"")); });
+  (d.issues||[]).forEach(function(i){ hay.push(String(i.t||""), String(i.x||"")); });
+  for(var k in (d.cats||{})){
+    var c=d.cats[k]||{};
+    hay.push(String(c.sum||""));
+    (c.ev||[]).forEach(function(e){ hay.push(String(e.find||""), String(e.about||"")); });
+  }
+  var text = hay.join(" ").toLowerCase(), seen={}, out=[];
+  for(var key in RP_NO_REGISTER){
+    if(text.indexOf(key)<0) continue;
+    var v=RP_NO_REGISTER[key];
+    if(seen[v.n]) continue;
+    seen[v.n]=1; out.push(v);
+  }
+  return out.slice(0,3);
+}
+
 /* ============================ ONE PACK, WRITTEN ONCE, RENDERED TWICE
    The pack is read on screen and handed over as a file, and those used to be
    two pieces of code that happened to say the same things. They do not happen
@@ -15727,6 +15841,23 @@ function renderReport(d){
   id("rpGap2").textContent="An empty register is not a clean record. It only means that register "
     +"had nothing on them on the day we looked"+(d.asOf?", which was "+d.asOf:"")
     +". A new fraud is not on any register yet.";
+  /* THE DOOR WE DID NOT KNOCK ON, WITH ITS ADDRESS.
+     Named only where the run itself pointed at the place. It is the last line
+     of what we could not answer because it is the most actionable one: it
+     tells a reader the one thing they can go and do that we did not. */
+  var noreg_ = rpNoRegister(d), g4_=id("rpGap4");
+  if(g4_){
+    if(noreg_.length){
+      var names_ = noreg_.map(function(x){ return x.n; });
+      var where_ = names_.length===1 ? names_[0]
+        : names_.slice(0,-1).join(", ")+" and "+names_[names_.length-1];
+      g4_.textContent = "This record points at "+where_+", and we hold no register there yet. "
+        + "That is our gap and not a finding about them. The authority to ask is "
+        + noreg_.map(function(x){ return x.who[0]+" at "+x.who[1]; }).join(", and ")
+        + ".";
+      g4_.hidden=false;
+    } else { g4_.textContent=""; g4_.hidden=true; }
+  }
   id("rpGap3").textContent="Nothing here says anyone has broken the law. We report what public "
     +"records showed on the day we read them, with the source beside every item, so you can open "
     +"them and decide for yourself.";

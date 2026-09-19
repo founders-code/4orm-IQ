@@ -390,8 +390,12 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   /* The way into the back office from the landing is a transparent hit area over
      the light. It has to stay invisible, stay pressable, and stay out of the way
      of anybody reading the page with assistive technology. */
-  if (!/class="lampgo" href="admin\.html"/.test(html))
+  if (!/class="lampgo" id="lampGo" href="admin\.html"/.test(html))
     fails.push('the quiet way into the back office is gone from the lamp');
+  /* And on the real run door it follows the door you came in by, so the room
+     is a sibling of that page rather than a file at the root. */
+  if (!/lg\.setAttribute\("href","\/real-run-live-go\/room"\)/.test(html))
+    fails.push('the control room does not hang off the real run link');
   if (!/^\.lampgo\{[^}]*opacity:0/m.test(html))
     fails.push('the back office hit area is no longer invisible');
   /* the stage-scoped rule that hides it on the report and the console is
@@ -506,9 +510,27 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
      the seeded corpus, which meant a visitor sent the bare link got a canned
      answer that looked exactly like a check and wrote nothing to the log. The
      demo is now the thing you have to ask for. */
-  if (!/var LIVE = !\/\[\?&\]demo=1/.test(html))
+  if (!/var LIVE = RUN_GATE \|\| !\/\[\?&\]demo=1/.test(html))
     fails.push('the console no longer runs live by default, so a visitor sent the bare '
       + 'link gets the seeded corpus instead of a check');
+
+  /* THE REAL RUN DOOR IS A PATH, NOT A FLAG.
+     A query string is something a browser keeps, autocompletes and shares. The
+     door is a path somebody has to type, it is served by a rewrite, and it
+     carries noindex. If the rewrite goes the path 404s and the door is gone
+     with nothing saying so, which is why it is checked here and not only in
+     the host's dashboard. */
+  {
+    const vc = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+    const rw = (vc.rewrites || []).map(r => r.source + ' -> ' + r.destination);
+    for (const need of ['/real-run-live-go -> /index.html', '/real-run-live-go/room -> /admin.html'])
+      if (!rw.includes(need)) fails.push('the real run door is not routed: ' + need);
+    const noindex = (vc.headers || []).some(h => /real-run-live-go/.test(h.source)
+      && h.headers.some(x => /X-Robots-Tag/i.test(x.key) && /noindex/i.test(x.value)));
+    if (!noindex) fails.push('the real run door is not marked noindex');
+  }
+  if (!/id="runGate"/.test(html))
+    fails.push('the real run page does not say it is spending a real check');
 
   /* Auth fails closed, and identity is not authorisation. */
   if (!/if \(!secret\) return \{ ok: false, status: 503/.test(auth))
@@ -3955,8 +3977,21 @@ if (!/class="panellamps" id="house"/.test(admin))
     fails.push(noInfo.length + ' register(s) on the board have no readout: ' + noInfo.slice(0,4).join(', '));
   if (orphan.length)
     fails.push(orphan.length + ' readout(s) name a register the board does not carry: ' + orphan.slice(0,4).join(', '));
-  if (info.length !== 133)
-    fails.push('the readouts cover ' + info.length + ' registers, the catalogue has 133');
+  /* Read off the catalogue rather than typed here. A literal in this line is a
+     number that goes stale the day a register is added, and a check that
+     passes because both sides drifted together is not a check. */
+  const CAT = await import('../api/_catalogue.js');
+  if (info.length !== CAT.TOTAL_SOURCES)
+    fails.push('the readouts cover ' + info.length + ' registers, the catalogue has ' + CAT.TOTAL_SOURCES);
+  /* And the back office board is the catalogue's board, not a second copy of
+     it somebody keeps in step by hand. */
+  {
+    const boardNames = CAT.board().flatMap(g => g.items);
+    const missingHere = boardNames.filter(n => !info.includes(n));
+    if (missingHere.length)
+      fails.push(missingHere.length + ' register(s) in the catalogue are not on the back office board: '
+        + missingHere.slice(0,4).join(', '));
+  }
   /* Every readout says what an empty answer means, because that is the
      sentence that stops a silence being read as clearance, and it has to be
      different per register: absent from FINTRAC means something, absent from

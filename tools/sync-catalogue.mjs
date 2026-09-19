@@ -23,7 +23,17 @@ const target = path.join(root, 'index.html');
 const { CATALOGUE, board, TOTAL_SOURCES } = await import(path.join(root, 'api/_catalogue.js'));
 const { REFERENCE } = await import(path.join(root, 'api/_reference.js'));
 
-const missing = CATALOGUE.filter(s => !REFERENCE[s.display_name]);
+/* Only what the board carries. A row waiting on SR-001 is on no board and is
+   asked by nothing, and its explanation is the pending_why written beside it
+   in the catalogue rather than a register readout for a register we do not
+   yet ask. */
+const missing = CATALOGUE.filter(s => s.enabled && !REFERENCE[s.display_name]);
+const unexplained = CATALOGUE.filter(s => !s.enabled && !s.pending_why);
+if (unexplained.length) {
+  console.error('a row is disabled without saying why it is waiting:');
+  unexplained.forEach(s => console.error('  ' + s.source_id));
+  process.exit(1);
+}
 if (missing.length) {
   console.error('every register on the board needs a reference entry. Missing:');
   missing.forEach(s => console.error('  ' + s.display_name));
@@ -45,12 +55,12 @@ const sources =
 /* ---- REGINFO and REGREAD ---- */
 const reginfo =
   'var REGINFO = {\n' +
-  CATALOGUE.map(s => q(s.display_name) + ':' + q(REFERENCE[s.display_name].info)).join(',\n') +
+  CATALOGUE.filter(s => s.enabled).map(s => q(s.display_name) + ':' + q(REFERENCE[s.display_name].info)).join(',\n') +
   '\n};';
 
 const regread =
   'var REGREAD = {\n' +
-  CATALOGUE.map(s => {
+  CATALOGUE.filter(s => s.enabled).map(s => {
     const r = REFERENCE[s.display_name];
     return q(s.display_name) + ':[' + q(r.hit) + ',\n  ' + q(r.miss) + ',\n  ' + q(r.look) + ']';
   }).join(',\n') +
@@ -61,7 +71,7 @@ const meta =
   'var CATALOGUE_META = {\n' +
   '  total: ' + TOTAL_SOURCES + ',\n' +
   '  sources: {\n' +
-  CATALOGUE.map(s =>
+  CATALOGUE.filter(s => s.enabled).map(s =>
     '    ' + q(s.display_name) + ':{id:' + q(s.source_id) + ',cat:' + q(s.category) +
     ',tier:' + q(s.source_tier) + ',jur:' + q(s.jurisdictions) +
     ',verts:' + q(s.verticals) + ',also:' + q(s.also || []) +

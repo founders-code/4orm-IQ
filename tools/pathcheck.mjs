@@ -131,7 +131,10 @@ console.log('nodes opening onto nothing:', empty.length);
     }
   }
   console.log('registers opened', opened, '| computed here, no outside link', noLink);
-  if (opened !== 133) fails.push('only ' + opened + ' of 133 registers open');
+  /* Counted off the catalogue rather than typed here, so adding a register
+     cannot pass this check by being forgotten in two places at once. */
+  const TOTAL = (await import('../api/_catalogue.js')).TOTAL_SOURCES;
+  if (opened !== TOTAL) fails.push('only ' + opened + ' of ' + TOTAL + ' registers open');
   if (silent.length) fails.push(silent.length + ' register card(s) are wrong: ' + silent.slice(0,4).join(' | '));
   /* The ones with no link are the ones we compute. If every register had a
      link, one of them would be borrowing somebody else's name. */
