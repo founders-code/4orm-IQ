@@ -1510,7 +1510,8 @@ var REGINFO = {
   "Registraire des entreprises du Quebec": { k:"Register", s:"Quebec's register of enterprises, businesses and their named officers.", e:"Absence means no Quebec registration. Quebec is outside our approved service boundary.", u:"https://registreentreprises.gouv.qc.ca" },
   "Hong Kong Companies Registry": { k:"Register", s:"Hong Kong's register of incorporated companies and registered non-Hong Kong companies.", e:"Absence means no Hong Kong incorporation.", u:"https://cr.gov.hk" },
   "New Zealand Companies Office": { k:"Register", s:"New Zealand's register of companies, directors and shareholders.", e:"Absence means no New Zealand company.", u:"https://companiesoffice.govt.nz" },
-  "Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones": { k:"Several", s:"Fourteen offshore company registers, read together because a party rarely names which one it used.", e:"Most of these charge for a search or do not publish one. An empty answer here is usually the register, not the party.", u:null },
+  "Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama": { k:"Several", s:"Fourteen offshore company registers, read together because a party rarely names which one it used.", e:"Most of these charge for a search or do not publish one. An empty answer here is usually the register, not the party.", u:null },
+  "Turks and Caicos, and Eastern Caribbean company registries": { k:"Several", s:"The company registries of Turks and Caicos and of the Eastern Caribbean states, which are separate bodies from the securities commission covering those states.", e:"We do not ask these yet, so an empty answer here is our gap and not theirs.", u:null },
   "OpenCorporates": { k:"Aggregate", s:"A gathered copy of company registers from many countries in one place.", e:"It republishes other registers and can lag them. An empty answer sends the question back to the official register.", u:"https://opencorporates.com" },
   "SEC EDGAR": { k:"Filing", s:"Every document a company has filed with the United States securities regulator.", e:"Absence usually means the company had nothing it was required to file. It is not a licence check.", u:"https://sec.gov" },
   "ACRA": { k:"Register", s:"Singapore's register of companies and business entities.", e:"Absence means no Singapore entity.", u:"https://acra.gov.sg" },
@@ -1642,7 +1643,7 @@ var REGINFO = {
 /* Every register by name, in the check it serves. Generated from SOURCES in
    the console, so the board and the engine cannot drift apart. */
 var REGCATS=[
-  ["01 Identity",["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones"]],
+  ["01 Identity",["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama","Turks and Caicos, and Eastern Caribbean company registries"]],
   ["02 Licensing",["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]],
   ["03 Enforcement",["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau Canada","Federal Trade Commission","Consumer Financial Protection Bureau","Internet Crime Complaint Center","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]],
   ["04 People",["Corporations Canada, Individuals with Significant Control","ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]],
@@ -1658,7 +1659,7 @@ var REGCATS=[
    "REGISTRAIRE DES" and made SEC EDGAR and SEC IAPD read the same, which on a
    panel is worse than no label at all. The full name is on the tile. */
 var PLATES=[
-  ["CORP CANADA","ONTARIO","BC REGISTRY","ALBERTA","SEC EDGAR","UK CO HOUSE","FL SUNBIZ","OPENCORP","QUEBEC REQ","ACRA SG","HK REGISTRY","NZ COMPANIES","OFFSHORE"],
+  ["CORP CANADA","ONTARIO","BC REGISTRY","ALBERTA","SEC EDGAR","UK CO HOUSE","FL SUNBIZ","OPENCORP","QUEBEC REQ","ACRA SG","HK REGISTRY","NZ COMPANIES","OFFSHORE","CARIB REG"],
   ["CSA REG","CIRO ADVISOR","FINTRAC MSB","BOC PSP","FCA UK","BROKERCHECK","NFA BASIC","FINCEN MSB","SEC IAPD","SEC FORM D","ASIC PRO","SFC HK","ESMA MICA","RECO","FSRA ONT","BCFSA BC","RECA AB","AMF QC","FCAA SK","MSC MB","FCNB NB","NSSC NS","PEI AND NL","NMLS","MAS SG"],
   ["IOSCO SCAN","CAN SANCTIONS","COMP BUREAU","FTC","CFPB","IC3","MAS ALERT","BCSC CAUTION","ASC CAUTION","OSC ALERTS","CSA ALERTS","FCA WARNING","OFAC","UN LIST","DOJ PRESS","IRS CI","STATE AG","SEC SUSPEND","CFTC RED","CFTC ACTIONS","DFPI SCAMS","CIRO DISCIPLINE","ASIC ALERTS","SFC ALERTS"],
   ["CANADA ISC","ISC OWNERS","UK PSC","ASIC BANNED","CSA DISCIPLINED","CSA PERSONS","SEDI INSIDERS"],
@@ -3318,7 +3319,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260919.0830";
+var BUILD = "20260919.0903";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){

@@ -51,12 +51,20 @@ export const REFERENCE = {
   look: "The registered office address and the directors. A New Zealand shell with an overseas director and a virtual address is a known pattern."
 },
 
-"Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones": {
-  info: ["INTL","B","The company registers of the jurisdictions most often used to hold a fund or an operating entity offshore. Coverage differs by island: some publish a searchable register, some publish almost nothing.","https://www.opencorporates.com/"],
-  hit: "An entity by that name is recorded in one of those jurisdictions.",
-  miss: "Nothing found. Several of these registers are closed to the public, so an absence here proves very little.",
-  look: "Which jurisdiction it is in, and whether that jurisdiction actually publishes the register. An offshore entity is legal and common. What matters is whether the one you were told about is the one that exists."
+"Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama": {
+  info: ["INTL","B","The company registers of seven jurisdictions often used to hold a fund or an operating entity offshore. Coverage differs by jurisdiction: some publish a searchable register, some publish almost nothing.","https://www.opencorporates.com/"],
+  hit: "A company of that name exists in one of these jurisdictions, and the register says what it is and whether it is in good standing.",
+  miss: "Nothing found. These are the registers we have not pinned a host for yet, so an empty answer here is our gap and not the jurisdiction's.",
+  look: "Where the entity is registered against where the money is going. An offshore holding company is ordinary. An offshore company taking deposits from you is not the same thing at all."
 },
+
+"Turks and Caicos, and Eastern Caribbean company registries": {
+  info: ["INTL","B","The company registries of Turks and Caicos and of the Eastern Caribbean states, which are separate from the securities commission that covers those states.","https://www.opencorporates.com/"],
+  hit: "A company of that name is on one of these registries.",
+  miss: "We do not ask these yet, so an empty answer is our gap and not theirs.",
+  look: "That a company registry says a company exists. It says nothing about whether anybody is allowed to take your money, which is a different register and usually a different building."
+},
+
 
 "RECO real estate register": {
   info: ["CA-ON","A","The Real Estate Council of Ontario's register. Says whether a brokerage is registered to trade in real estate in Ontario.","https://www.reco.on.ca/"],

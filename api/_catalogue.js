@@ -101,8 +101,23 @@ export const CATALOGUE = [
   S({ source_id:'NZ_COMPANIES_OFFICE', display_name:'New Zealand Companies Office',
       category:'01', jurisdictions:['NZ'], domain:'companiesoffice.govt.nz',
       supports_person_search:true }),
-  S({ source_id:'OFFSHORE_REGISTRIES', unmapped:'Fourteen jurisdictions, each with its own registry and its own host. None checked yet, so the row is declared rather than counted as reached.',
-      display_name:'Offshore registries: Cayman, BVI, Bermuda, Bahamas, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Mauritius, Seychelles, Belize, Panama, UAE free zones',
+  /* ============================ WAITING ON SR-001, AND SAID SO
+     Every row below carries pending:'SR-001' and enabled:false. They are
+     published, they are counted nowhere, and nothing asks them. They exist so
+     the gap they cover has a name on the board and on the page instead of
+     being a silence, and so that enabling one is a signature rather than a
+     code change. Every host was read off that body's own site on 19 September
+     2026. Not one was typed from memory. */
+  S({ source_id:'GLEIF_LEI', display_name:'GLEIF, the Global LEI Index',
+      category:'01', source_tier:'A', jurisdictions:['INTL'], domain:'gleif.org',
+      enabled:false, pending:'SR-001',
+      pending_why:'One row that answers who an entity legally is in 140 jurisdictions, from open data with published terms. The highest leverage row on this list and the lowest legal surface.' }),
+
+  /* What is left of the row that used to stand for fourteen jurisdictions.
+     Ten of them now have a named authority and a checked host below. These
+     seven do not yet, so they keep their own row and their own names. */
+  S({ source_id:'OFFSHORE_REGISTRIES', unmapped:'Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus and Panama. Seven jurisdictions, each with its own authority and host, none checked yet, so the row is declared rather than counted as reached.',
+      display_name:'Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama',
       category:'01', source_tier:'B', jurisdictions:['INTL'], transport:'parallel',
       domain:'' }),
 
@@ -190,6 +205,87 @@ export const CATALOGUE = [
   S({ source_id:'US_NMLS', display_name:'NMLS Consumer Access', category:'02', also:['04'],
       jurisdictions:['US'], domain:'nmlsconsumeraccess.org',
       supports_person_search:true }),
+  /* ---- THE OFFSHORE BROKER BELT, PENDING SR-001 ----
+     Where the money goes when somebody wants a licence that costs little and
+     asks less. Each one is a named authority with a public register, and a
+     host read off its own site. Two of these are worth more than the rest of
+     the row put together: an authority that publishes what it does NOT cover
+     turns "not on the register" into "that register was never able to cover
+     what they told you", and those are different sentences. */
+  S({ source_id:'KY_CIMA', display_name:'Cayman Islands Monetary Authority',
+      category:'02', also:['03'], jurisdictions:['KY'], domain:'cima.ky',
+      enabled:false, pending:'SR-001',
+      pending_why:'Licenses funds, securities, banking, trusts, money services and virtual asset providers, and publishes warning notices naming entities it does not regulate.' }),
+  S({ source_id:'VG_FSC', display_name:'BVI Financial Services Commission',
+      category:'02', also:['03'], jurisdictions:['VG'], domain:'bvifsc.vg',
+      enabled:false, pending:'SR-001',
+      pending_why:'Licenses investment business, banking, insurance, trust and virtual asset business, with a public list of regulated entities and published enforcement.' }),
+  S({ source_id:'BS_SCB', display_name:'Securities Commission of The Bahamas',
+      category:'02', also:['03'], jurisdictions:['BS'], domain:'scb.gov.bs',
+      enabled:false, pending:'SR-001',
+      pending_why:'Registers securities firms, fund administrators and digital asset businesses, and publishes investor alerts and notices.' }),
+  S({ source_id:'BB_FSC', display_name:'Financial Services Commission of Barbados',
+      category:'02', jurisdictions:['BB'], domain:'fsc.gov.bb',
+      enabled:false, pending:'SR-001',
+      pending_why:'Regulates insurance, credit unions, securities and pensions in Barbados.' }),
+  S({ source_id:'VC_FSA', display_name:'Financial Services Authority of St Vincent and the Grenadines',
+      category:'02', also:['03'], jurisdictions:['VC'], domain:'svgfsa.com',
+      enabled:false, pending:'SR-001',
+      pending_why:'The jurisdiction named on more offshore broker paperwork than any other in the region. The row exists to answer what this authority does and does not cover, which is the question the paperwork is counting on nobody asking.' }),
+  S({ source_id:'BZ_FSC', display_name:'Financial Services Commission of Belize',
+      category:'02', also:['03'], jurisdictions:['BZ'], domain:'belizefsc.org.bz',
+      enabled:false, pending:'SR-001',
+      pending_why:'Licenses securities dealers and investment advisors, with a searchable public register and published warning notices about unlicensed operators.' }),
+  S({ source_id:'SC_FSA', display_name:'Financial Services Authority Seychelles',
+      category:'02', also:['03'], jurisdictions:['SC'], domain:'fsaseychelles.sc',
+      enabled:false, pending:'SR-001',
+      pending_why:'Licenses securities, fiduciary and virtual asset business, publishes a register of licensees and names unauthorised platforms in its notices.' }),
+  S({ source_id:'MU_FSC', display_name:'Financial Services Commission Mauritius',
+      category:'02', also:['03'], jurisdictions:['MU'], domain:'fscmauritius.org',
+      enabled:false, pending:'SR-001',
+      pending_why:'The integrated non-bank regulator, with an online public register of licensees and published investor alerts naming unauthorised entities.' }),
+  S({ source_id:'ECSRC', display_name:'Eastern Caribbean Securities Regulatory Commission',
+      category:'02', also:['03'], jurisdictions:['AI','AG','DM','GD','MS','KN','LC','VC'],
+      domain:'ecsrc.com', enabled:false, pending:'SR-001',
+      pending_why:'One authority covering eight states: Anguilla, Antigua and Barbuda, Dominica, Grenada, Montserrat, St Kitts and Nevis, Saint Lucia, and St Vincent and the Grenadines. It licenses securities business across all of them and publishes market warnings. Eight jurisdictions for one row.' }),
+  S({ source_id:'CARIB_SMALL_REGISTRIES', unmapped:'Turks and Caicos, and the company registries of the Eastern Caribbean states, which are separate from the securities commission that covers them. No host checked yet.',
+      display_name:'Turks and Caicos, and Eastern Caribbean company registries',
+      category:'01', source_tier:'B', jurisdictions:['INTL'], transport:'parallel',
+      domain:'' }),
+
+  /* ---- THE CORRIDOR, PENDING SR-001 ----
+     In the order money actually leaves Canada. Singapore and Hong Kong we
+     already ask. These we do not, and the run that went past a Thai
+     enforcement record in silence is the reason this list exists. */
+  S({ source_id:'TH_SEC', display_name:'SEC Thailand',
+      category:'02', also:['03'], jurisdictions:['TH'], domain:'sec.or.th',
+      enabled:false, pending:'SR-001',
+      pending_why:'Licenses securities and digital asset business in Thailand and publishes enforcement actions and investor alerts. We held nothing for Thailand and did not say so.' }),
+  S({ source_id:'MY_SC', display_name:'Securities Commission Malaysia',
+      category:'02', also:['03'], jurisdictions:['MY'], domain:'sc.com.my',
+      enabled:false, pending:'SR-001',
+      pending_why:'Publishes the Investor Alert List of unauthorised entities, the single most useful list in the region.' }),
+  S({ source_id:'PH_SEC', display_name:'SEC Philippines',
+      category:'02', also:['03'], jurisdictions:['PH'], domain:'sec.gov.ph',
+      enabled:false, pending:'SR-001',
+      pending_why:'Publishes advisories naming unregistered investment schemes and the people soliciting for them.' }),
+  S({ source_id:'AE_CMA', display_name:'UAE Capital Market Authority',
+      category:'02', jurisdictions:['AE'], domain:'uaecma.gov.ae',
+      enabled:false, pending:'SR-001',
+      pending_why:'The federal securities and commodities authority. Note the host: the old sca.gov.ae redirects here, and a row pointed at the old one would read as reached while asking nothing.' }),
+  S({ source_id:'AE_DFSA', display_name:'Dubai Financial Services Authority',
+      category:'02', also:['03'], jurisdictions:['AE'], domain:'dfsa.ae',
+      enabled:false, pending:'SR-001',
+      pending_why:'The DIFC regulator, with a public register of authorised firms and published alerts. A firm claiming Dubai regulation is usually claiming this one, VARA or ADGM, and they are three different things.' }),
+  S({ source_id:'AE_VARA', display_name:'Virtual Assets Regulatory Authority, Dubai',
+      category:'02', jurisdictions:['AE'], domain:'vara.ae',
+      enabled:false, pending:'SR-001',
+      pending_why:'Licenses virtual asset service providers in Dubai and publishes the list of who holds one. An agreement with a Dubai company is not a VARA licence, and this row is how that gets checked.' }),
+  S({ source_id:'AE_ADGM', display_name:'ADGM Financial Services Regulatory Authority',
+      category:'02', jurisdictions:['AE'], domain:'adgm.com',
+      enabled:false, pending:'SR-001',
+      pending_why:'The Abu Dhabi Global Market regulator and registration authority, with an official public register.' }),
+
   S({ source_id:'SG_MAS_FI_DIRECTORY', display_name:'MAS Financial Institutions Directory',
       category:'02', jurisdictions:['SG'], domain:'mas.gov.sg',
       verticals:['BROKER_DEALER','INVESTMENT_ADVISER','FOREX_CFD','CRYPTO','PRIVATE_FUND','PUBLIC_STOCK'] }),
@@ -505,6 +601,14 @@ export const TOTAL_SOURCES = CATALOGUE.filter(s => s.enabled).length;
 /* The denominator for coverage. Never TOTAL_SOURCES: a figure divided by things
    that cannot be asked is a figure that cannot reach a hundred. */
 export const TOTAL_ASKABLE = ASKABLE.length;
+
+/* PUBLISHED, NOT ASKED, AND WAITING ON A SIGNATURE.
+   A register reaches a reader only through a signed SR-001 row and legal
+   review, so a new one cannot be turned on by editing code. These rows sit
+   here so the jurisdiction they cover has a name the page can say out loud,
+   and so that enabling one is a signature rather than a commit. They are in no
+   count, on no board, and nothing asks them. */
+export const PENDING = CATALOGUE.filter(s => !s.enabled && s.pending);
 
 /* Every check a source can contribute to: its home category plus its also list. */
 export function categoriesFor(s) {
