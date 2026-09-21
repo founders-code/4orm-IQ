@@ -156,7 +156,11 @@ console.log('nodes opening onto nothing:', empty.length);
     .find(x => x.getAttribute('data-id') === 'cat7'); g.dispatchEvent(new MouseEvent('click',{bubbles:true})); });
   await p.waitForTimeout(350);
   const fs2 = await p.evaluate(() => {
-    const card = document.querySelector('.sheetcard').getBoundingClientRect();
+    /* Scoped to the sheet this test is about. There is more than one .sheet on
+       the board now and a bare class selector takes whichever is first in the
+       document, which is a shut one, so this reported the card off screen on a
+       page where it had opened correctly. */
+    const card = document.querySelector('#sheet .sheetcard').getBoundingClientRect();
     const sh = getComputedStyle(document.getElementById('sheet'));
     return { title: document.getElementById('shT').textContent,
       onscreen: card.width > 200 && card.top >= 0 && card.top < innerHeight,

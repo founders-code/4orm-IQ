@@ -3498,20 +3498,37 @@ body[data-stage="report"] .foot{display:none}
 @media(max-width:1080px){#rpt{--rp-card:340px;--rp-gap:30px}}
 @media(max-width:680px){#rpt{--rp-half:100%}}
 #rpt .rp-foundway{margin-top:26px;max-width:none}
+/* ============================ THE DOOR TO THE RECORDS CARRIES NO VERDICT
+   It was green, and a colour on this door is a verdict about what is behind it
+   before anybody has opened it. Green says the records are fine on a page that
+   may be red. Red would say they are damning on a clean check where the door
+   opens six ordinary registry entries. Amber says be uneasy either way, which
+   is the same error at lower volume.
+
+   It was also the same green as "Do this right now", so the door that matters
+   most and the filing cabinet looked identical.
+
+   So it is neutral, and the work is done by the count beside it: seven records,
+   two of them from a regulator, is a fact rather than a mood. Red stays rare on
+   this page, which is the only reason red means anything when it comes. */
 #rpt .rp-foundbtn{font-family:inherit;display:flex;align-items:center;gap:18px;width:100%;
   text-align:left;padding:16px 20px;border-radius:var(--r);cursor:pointer;
-  background:var(--ok-bg);border:1px solid var(--ok-bd,rgba(14,138,95,.28));
+  background:var(--surface-2);border:1px solid var(--border-strong);
   transition:border-color .3s var(--ease),box-shadow .45s var(--ease),
     transform .5s var(--spring),background .3s var(--ease)}
-#rpt .rp-foundbtn:hover{background:#E4F6EE;transform:translateX(3px);box-shadow:var(--sh-sm)}
-#rpt .rp-foundbtn:focus-visible{outline:2px solid var(--ok);outline-offset:3px}
+#rpt .rp-foundbtn:hover{background:var(--surface-3,var(--surface-2));
+  border-color:var(--border-lit,var(--border-strong));
+  transform:translateX(3px);box-shadow:var(--sh-sm)}
+#rpt .rp-foundbtn:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 #rpt .rp-foundbtn .rp-b{flex:1;min-width:0;display:block}
 #rpt .rp-foundbtn .rp-t{display:block;font-size:17.5px;font-weight:800;letter-spacing:-.02em;
-  color:#0B5C40;line-height:1.3}
+  color:var(--tx);line-height:1.3}
 #rpt .rp-foundbtn .rp-x{display:block;margin-top:3px;font-size:13.6px;line-height:1.5;
-  color:#146B4C}
+  color:var(--tx-2)}
+/* The arrow is ink too. A coloured arrow on a neutral door puts the colour
+   back on a smaller surface and says the same thing more quietly. */
 #rpt .rp-foundbtn .rp-go{flex:none;display:flex;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:50%;background:var(--ok);color:#fff}
+  width:34px;height:34px;border-radius:50%;background:var(--tx);color:#fff}
 #rpt .rp-foundbtn .rp-go svg{width:16px;height:16px;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
@@ -12829,7 +12846,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260919.1016";
+var KBYS_BUILD = "20260921.0118";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -15005,6 +15022,19 @@ function rpHasOfficial(d){
 }
 /* A record that turned out to be about somebody else. The reader is told, in
    plain words, rather than left to assume the entry on the list is theirs. */
+/* HOW MANY OF THEM AN AUTHORITY PUBLISHED, counted the same way the verdict
+   counts them: tier A, and about THIS party. The door to the records carries no
+   colour, so this number is what tells a reader whether it is worth opening. A
+   count is a fact; a coloured door is a mood. */
+function rpOfficialCount(d){
+  var n=0;
+  for(var k in (d.cats||{})){
+    var c=d.cats[k], ev=c.ev||[];
+    if(c.state!=="RED") continue;
+    for(var i=0;i<ev.length;i++) if(ev[i].t==="A" && rpAttached(ev[i])) n++;
+  }
+  return n;
+}
 function rpLookalikes(d){
   var out=[], seen={};
   for(var k in (d.cats||{})){
@@ -15721,6 +15751,16 @@ function renderReport(d){
         + 'Open what to tell your bank</button>';
       actBox.hidden = false;
     } else if(d.verdict==="RED" || ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT"){
+      /* THE LABEL SAYS WHAT WE KNOW, AND NOT MORE.
+         This control appears for two different readers. One told us the money
+         has already gone: for them "Do this right now" is the whole sentence,
+         and a conditional on the end is a hedge on the one line that has to
+         land. The other is looking at a red verdict and has sent nothing: for
+         them the imperative was being issued about a thing they have not done,
+         so the condition goes back in and the sentence becomes true again. */
+      var sent_ = ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT";
+      var actLabel_ = sent_ ? "Do this right now"
+                            : "Do this right now if you\u2019ve sent money";
       /* THE OTHER TWO CASES THAT EARN A CONTROL BESIDE THE VERDICT.
          The records contradict each other or contradict the firm, or the money
          has already gone. Either way the reader has something to do tonight and
@@ -15730,7 +15770,7 @@ function renderReport(d){
          Amber is not a fault, so an amber result never gets this. A reader who
          is only weighing something up is left to read. */
       actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-act="1">'
-        + 'Do this right now</button>';
+        + rpEsc(actLabel_) + '</button>';
       actBox.hidden = false;
     } else {
       actBox.innerHTML = "";
@@ -15891,9 +15931,11 @@ function renderReport(d){
   /* And the way in names the size of what is behind it, rather than promising
      "every record" on a run that found two. */
   var fx=id("rpToFoundX");
+  var offN = rpOfficialCount(d);
   if(fx) fx.textContent = shown
-    ? (shown===1 ? "One record, who published it, and the date on it."
-                 : rpCap(rpWord(shown))+" records, who published each one, and the date on it.")
+    ? (rpCap(rpWord(shown)) + (shown===1 ? " record" : " records")
+       + (offN ? ", " + rpWord(offN) + " of them from a regulator, court or registry."
+               : ", who published each one, and the date on it."))
     : "Every register we asked, and what each one said back.";
   /* Both empty means the page has nothing to show, and the reader is owed a
      sentence rather than a blank. */
@@ -16817,8 +16859,42 @@ document.addEventListener("keydown", function(e){
      already promising. */
   var MODAL = ["sumBox","arBox","waitBox","primBox","roomBox","regBox","dirBox","infoBox","rpPv","rpFoundBox"];
   function trap(){
-    var open = MODAL.some(function(k){ var e=document.getElementById(k);
-      return e && !e.hasAttribute("inert"); });
+    var openEls = [];
+    MODAL.forEach(function(k){ var e=document.getElementById(k);
+      if(e && !e.hasAttribute("inert")) openEls.push(e); });
+    var open = openEls.length > 0;
+    /* FOCUS LEAVES THE BACK BEFORE ANYTHING GOES INERT.
+       The guard here used to read "inert everything the focused element is not
+       inside", which is there because marking an ancestor of the focused
+       element inert blurs it without saying so. The cost was that whatever
+       held focus when an overlay opened stayed reachable underneath it, and
+       the conversation thread holds focus on its own answer pills, so a reader
+       who got as far as the wait could tab back into a question that had
+       already been answered and was no longer on the screen.
+
+       So focus behind the overlay is dropped first, and then the page behind
+       goes inert without exception. What this deliberately does NOT do is put
+       focus somewhere of its own choosing: each overlay focuses the control it
+       wants focused, and a sweep like this one guessing at that would overrule
+       a decision made where the overlay was written. With the back inert and
+       nothing focused, the first Tab lands inside the overlay anyway, which is
+       what aria-modal already promises. */
+    var blurLater = null;
+    if(open){
+      var a = document.activeElement, inside = false, i;
+      for(i=0;i<openEls.length;i++) if(openEls[i].contains(a)) inside = true;
+      /* Only what is about to be made inert. Focus sitting in a container that
+         HOLDS an open overlay is not behind anything: that container is skipped
+         below, and blurring there fights the overlay's own close, which puts
+         focus back on the control that opened it a moment before the overlay
+         is marked shut. */
+      if(!inside && a && a !== document.body && typeof a.blur === "function")
+        blurLater = a;
+    }
+    function containsOpen(el){
+      for(var j=0;j<openEls.length;j++) if(el.contains(openEls[j])) return true;
+      return false;
+    }
     var kids = document.body.children;
     for(var i=0;i<kids.length;i++){
       var el = kids[i];
@@ -16829,8 +16905,25 @@ document.addEventListener("keydown", function(e){
          order. Two mechanisms, one attribute, and they have to stay out of
          each other's way. */
       if(MODAL.indexOf(el.id) >= 0 || SHEETS.indexOf(el.id) >= 0) continue;
-      if(open && !el.contains(document.activeElement)) el.setAttribute("inert","");
-      else if(!open) el.removeAttribute("inert");
+      /* AND NEVER INERT THE THING AN OPEN OVERLAY LIVES INSIDE.
+         Not every overlay is a child of the body. The records sheet sits
+         inside the report, so marking the report inert marks the sheet inert
+         with it, and the sheet's own close button stops being reachable the
+         moment it opens. The old guard hid this: it skipped whatever held
+         focus, and the sheet focuses itself. */
+      if(open && containsOpen(el)) continue;
+      if(open){
+        /* Dropped before the attribute lands, because marking an ancestor of
+           the focused element inert blurs it without saying so, and a silent
+           blur is how focus ends up on the body with nothing to say where it
+           went. */
+        if(blurLater && el.contains(blurLater)){
+          try { blurLater.blur(); } catch(e){}
+          blurLater = null;
+        }
+        el.setAttribute("inert","");
+      }
+      else el.removeAttribute("inert");
     }
   }
   var live=[];

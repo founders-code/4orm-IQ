@@ -1015,8 +1015,18 @@ if (/class="[^"]*\brp-rp-/.test(html))
    a fault, and handing somebody a red button for it would make it one. */
 if (!/d\.verdict==="RED" \|\| \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT"/.test(script))
   fails.push('the verdict no longer carries a way to act where the result is adverse or money has gone');
-if (!/data-act="1">'\s*\+ 'Do this right now<\/button>/.test(script))
+/* THE LABEL IS CHOSEN, NOT FIXED. It reads "Do this right now" for a reader
+   who has told us the money is gone, and adds the condition for one looking at
+   a red verdict who has sent nothing, because the imperative was otherwise
+   being issued about a thing they have not done. Both branches are required
+   here; tools/doorcheck.mjs drives the page and reads the rendered sentence. */
+if (!/data-act="1">'\s*\+ rpEsc\(actLabel_\)/.test(script))
   fails.push('the control beside the verdict lost its label');
+if (!/actLabel_ = sent_ \? "Do this right now"/.test(script))
+  fails.push('a reader who has told us the money is gone is given a conditional, '
+    + 'which hedges the one line that has to land');
+if (!/if you\\u2019ve sent money/.test(script))
+  fails.push('a reader who has sent nothing is told to act right now, with no condition');
 if (/verdict==="AMBER"[^\n]*data-act/.test(script))
   fails.push('amber is being handed a red button, and amber is not a fault');
 if (!/if\(t\.getAttribute\("data-act"\)\) rpAct\(\);/.test(script))
@@ -1595,8 +1605,23 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     fails.push('a register can be recorded more than once in a run, which inflates every rate on the board');
   /* The board reads the whole row, not two columns of it. */
   for (const c of ['no_match', 'failed', 'out_of_scope'])
-    if (!new RegExp('sum\\(' + c + '\\),0\\)::int as ' + c + '[\\s\\S]{0,200}group by source_id').test(met))
+    if (!new RegExp('sum\\(' + c + '\\),0\\)::int as ' + c + '[\\s\\S]{0,900}group by source_id').test(met))
       fails.push('the board cannot see ' + c + ' per register, so it cannot tell a hole from a register that does not apply');
+  /* The two newest are read out of the row as json, so a board deployed before
+     the migration is run reads them as absent rather than throwing and taking
+     every per-register number down with it. */
+  for (const c of ['not_asked', 'computed'])
+    if (!new RegExp("->>'" + c + "'").test(met))
+      fails.push('the board cannot see ' + c + ' per register, so three different things are one number again');
+  /* PLANNED AND NOT REACHED, NEVER PLANNED, AND COMPUTED ARE THREE THINGS.
+     All three were written as failed, so a healthy run wrote about a hundred
+     failures and the board read them back as an outage across every category
+     and every direct feed. */
+  for (const need of ['not_asked', 'computed'])
+    if (!new RegExp("recordSource\\(id, '" + need + "'").test(chk))
+      fails.push('a register that was ' + need.replace('_', ' ') + ' is still written down as a failure');
+  if (!/const connectorHealth = /.test(met))
+    fails.push('the direct feeds lamp is measured on whether a computed check answered, which it never can');
   /* AND A NOUGHT THAT MEANS A BROKEN TABLE IS NOT PRINTED AS A MEASUREMENT.
      A finished run always asks something, so runs with no register recorded is
      an impossible pair rather than a low number. */
@@ -1607,8 +1632,13 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     fails.push('the gauge still prints the nought as though it were a measurement');
   if (!/not one register "[\s\S]{0,40}was recorded against the catalogue/.test(adm))
     fails.push('the board does not lead with the fact that its own register readings are measuring nothing');
-  if (!/came back empty and/.test(adm))
-    fails.push('the gauge no longer separates asked-and-empty from applied-and-never-reached');
+  /* Four readings, and the gauge says all four. Asked and empty, planned and
+     not reached, applied and never planned, and computed apart. Three of those
+     used to be written down as the same failure. */
+  for (const need of ['came back empty', 'planned and not reached',
+                      'the plan did not include them', 'counted apart'])
+    if (!adm.includes(need))
+      fails.push('the reach gauge no longer says "' + need + '", so two different readings are one number again');
 }
 
 /* ============================ THE BEAT MEANS ONE THING, SO IT MEANS ONE THING
@@ -2844,8 +2874,13 @@ if (!/id="waitForming"/.test(html))
   if (!cat) fails.push('the check route has no outer catch, so an upstream failure escapes untranslated');
   if (/message:\s*(raw|err\?\.message|err\.message|String\(err)/.test(cat))
     fails.push("the check route returns a provider's own error text as the message a reader is shown");
-  if (!/console\.error\(/.test(cat))
+  /* The record is still required. What changed is who writes it: api/ has one
+     writer to the log, in _log.js, which scrubs an identifier out of a line
+     before it is written. A console call here would bypass that. */
+  if (!/log(?:Note|Fault)\(/.test(cat))
     fails.push('the check route translates an upstream failure and keeps no record of what actually failed');
+  if (/console\.\w+\(/.test(cat))
+    fails.push('the check route writes to the log directly instead of through _log.js, so nothing scrubs the line');
   if (!/operator:\s*\{/.test(cat))
     fails.push('the check route hides the real failure from the operator as well as the reader');
   /* Every branch has to hand back a sentence, so a status nobody planned for
@@ -3941,8 +3976,15 @@ if (!/"Time to result","s"/.test(admin))
 if (/"Time to spare"/.test(admin))
   fails.push('the time dial is back to a percentage of headroom');
 if (!/gauge\(reachPct,"Registers reached"/.test(admin)
-    || !/gauge\(s\.success_pct,"Answers back"/.test(admin))
+    || !/gauge\(s\.success_pct,"Asks that completed"/.test(admin))
   fails.push('coverage and reliability are back to being one register number');
+/* And reliability is measured against asks rather than against rows written.
+   Every applicable register leaves a row on every run, so dividing by rows
+   measured the writing down and read a healthy sweep as a half broken one. */
+if (!/asks: \(s\.ok \|\| 0\) \+ \(s\.no_match \|\| 0\)/.test(metrics))
+  fails.push('the answering rate is divided by every row written again, not by the questions that went out');
+if (!/came back empty, which is an answer/.test(admin))
+  fails.push('the board reads an empty register as a failure again');
 if (!/secs<=120 \? "ok" : \(secs<=180 \? "warn" : "bad"\)/.test(admin))
   fails.push('the time dial no longer turns at two and three minutes');
 if (!/function gauge\(pct,cap,unit,note,state,key,fill\)/.test(admin))

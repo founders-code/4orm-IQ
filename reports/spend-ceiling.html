@@ -1,0 +1,260 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The spend ceiling, and what it cost</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;--ink-3:#8B9296;
+  --rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+  --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink-2);
+  font:16px/1.6 "IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;padding:44px 16px 80px}
+.w{max-width:940px;margin:0 auto}
+.mast{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}
+.kick{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+h1{font:600 33px/1.15 Spectral,Georgia,serif;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+.dek{max-width:64ch;margin:0;color:var(--ink-2)}
+h2{font:600 19px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:38px 0 10px}
+h3{font:600 15px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);margin:22px 0 6px}
+p{margin:0 0 12px;max-width:74ch}
+.sechead{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--rule);padding-top:22px;margin-top:34px}
+.sechead .n{font:500 12px/1 "IBM Plex Mono",monospace;color:var(--ink-3)}
+.sechead h2{margin:0}
+ol,ul{margin:8px 0 0;padding-left:20px} li{margin:0 0 10px;max-width:74ch}
+b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;table-layout:fixed}
+th{font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  text-align:left;border-bottom:1px solid var(--rule);padding:8px 10px}
+td{padding:10px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+td.k{color:var(--ink);font-weight:500;width:32%}
+.chip{display:inline-block;font:500 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 8px;border-radius:3px;white-space:nowrap}
+.p0{background:var(--p0w);color:var(--p0)} .p1{background:var(--p1w);color:var(--p1)} .p2{background:var(--p2w);color:var(--p2)}
+.quote{border-left:3px solid var(--p2);background:var(--surface);padding:14px 18px;margin:14px 0}
+.quote.hot{border-left-color:var(--p0)}
+.src{font:400 11px/1.5 "IBM Plex Mono",monospace;color:var(--ink-3);margin:8px 0 0}
+a{color:var(--p2)}
+.foot{margin-top:52px;border-top:1px solid var(--rule);padding-top:14px;
+  font:400 11px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:640px){h1{font-size:27px}td.k{width:42%}}
+
+@media print{
+  html,body{background:#111416 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding:14mm 14mm 4mm;font-size:10.5pt;line-height:1.5}
+  .w{max-width:none}
+  .mast{padding-bottom:10pt;margin-bottom:16pt}
+  h1{font-size:20pt}
+  h2{font-size:13pt}
+  h3{font-size:11pt;break-after:avoid}
+  p,li{max-width:none}
+  table{font-size:9pt}
+  pre{font-size:8.6pt}
+  .sechead{break-after:avoid;margin-top:18pt;padding-top:12pt}
+  tr,li,.quote,pre{break-inside:avoid}
+  .foot{margin-top:20pt}
+}
+</style></head><body><div class="w">
+
+<header class="mast">
+  <div class="kick">
+    <span>4orm IQ</span><span>Security hardening, step 2</span>
+    <span>CR-002 &middot; v1.0</span><span>20 September 2026</span>
+  </div>
+  <h1>Nothing is allowed to spend money before something checks it can</h1>
+  <p class="dek">A spend ceiling that runs before the first vendor call, a ledger that
+  records what was reserved and refused, and a reader in the control room that says what
+  a check actually costs and what that figure is built on.</p>
+</header>
+
+<div class="sechead"><span class="n">01</span><h2>What was wrong</h2></div>
+
+<p>The route that spends money had a rate limit of five requests a minute, held in a
+map in memory, per instance, reset on every cold start. Its own comment said so:
+<b>move to Vercel KV before this URL is public</b>. It counted requests. It did not
+count dollars, and nothing anywhere counted dollars.</p>
+
+<p>Two consequences followed from that, and neither was visible from the board.</p>
+
+<table>
+  <tr><td class="k">A request cost whatever it cost</td>
+      <td>Five requests a minute is a ceiling on volume. With a search clamp of 34 and a
+      reasoning call of 16,000 output tokens, five requests a minute is not a ceiling on
+      spend, and the two were being treated as the same number.</td></tr>
+  <tr><td class="k">The documented ceiling was wrong</td>
+      <td><code>.env.example</code> said the search clamp was 3 to 14 with a default of
+      10. The code clamped 3 to 34 and defaulted to 22. Anyone sizing the bill off the
+      file was out by more than half.</td></tr>
+</table>
+
+<div class="sechead"><span class="n">02</span><h2>What was built</h2></div>
+
+<table>
+  <tr><td class="k">api/_budget.js</td>
+      <td>One module. <code>reserve()</code> decides before the first vendor call and
+      records the reservation as it decides, so a burst of concurrent requests cannot all
+      read the same low count and pass. <code>settle()</code> writes what the run
+      actually cost against what was reserved.</td></tr>
+  <tr><td class="k">db/spend.sql</td>
+      <td>The ledger. Salted client key, timestamp, estimate, measurement. No address,
+      no identifier, no party. Eight day purge. Not yet run against the database.</td></tr>
+  <tr><td class="k">api/admin-metrics.js</td>
+      <td>A <code>spend</code> block on the existing route. No second door, no second
+      auth path.</td></tr>
+  <tr><td class="k">admin.html</td>
+      <td>A spend pill on the reader row, and a reader behind it.</td></tr>
+  <tr><td class="k">tools/budgetcheck.mjs<br>tools/spendcheck.mjs</td>
+      <td>Twenty-nine assertions between them. Both in <code>npm test</code>.</td></tr>
+</table>
+
+<h3>Three counters, not one</h3>
+
+<p>Runs per window, dollars per window, dollars per day, all per client, plus a house
+ceiling for the day across everyone. Any one of them refuses.</p>
+
+<p>The house ceiling never escalates. A reader who arrives on the day it is reached has
+done nothing wrong, and treating them as though they had is how a product punishes
+somebody for its own budget.</p>
+
+<h3>Volume throttles. Repeat behaviour blocks.</h3>
+
+<p>A client refused three times inside fifteen minutes is paused, and the pause doubles
+each time it happens again, to a six hour cap. One oversized request is refused and
+never paused, because size is not behaviour. There is a test that fails if that
+inverts.</p>
+
+<div class="quote">
+<p>It never falls open. Where Postgres is unconfigured or fails, the in-memory ledger
+carries the same rules on a single instance and the refusal still fires. Storage must
+never be able to break a check, and must never be able to let one through either.</p>
+<p class="src">api/_budget.js, header comment</p>
+</div>
+
+<div class="sechead"><span class="n">03</span><h2>What a check costs</h2></div>
+
+<p>A typical party runs 18 Exa searches, 11 of them asking for full text, and 4 Parallel
+objectives. At the published list rates that is <b>$0.212</b>.</p>
+
+<table>
+  <tr><th>Component</th><th>Rate</th><th>Per check</th><th>Status</th></tr>
+  <tr><td class="k">Exa search</td><td>$7 per 1,000</td><td>$0.126</td>
+      <td><span class="chip p2">Billed</span></td></tr>
+  <tr><td class="k">Exa full text</td><td>$1 per 1,000 pages</td><td>$0.066</td>
+      <td><span class="chip p2">Billed</span></td></tr>
+  <tr><td class="k">Parallel</td><td>$5 per 1,000</td><td>$0.020</td>
+      <td><span class="chip p2">List rate</span></td></tr>
+  <tr><td class="k">Claude</td><td>per million tokens</td><td>not measured</td>
+      <td><span class="chip p1">Default rate</span></td></tr>
+</table>
+
+<p>Exa returns its own billed figure on every call and that figure is stored, so
+retrieval is an invoice number rather than a rate applied to a count. The reasoning half
+is not. No live run has had its token counts read back, and the rates in force are
+defaults I set rather than figures read off the invoice.</p>
+
+<div class="quote hot">
+<p>Until <code>KBYS_RATE_CLAUDE_IN_M</code> and <code>KBYS_RATE_CLAUDE_OUT_M</code> are
+set on the deployment, every dollar in the control room carries a line saying it is
+priced from a default. The screen is not allowed to let an estimate wear the clothes of
+a measurement.</p>
+<p class="src">The first band of the spend reader, above every figure on it</p>
+</div>
+
+<h3>The ceiling in force</h3>
+
+<table>
+  <tr><th>Ceiling</th><th>Value</th><th>What it means</th></tr>
+  <tr><td class="k">Per minute</td><td>5 checks, $3.75</td>
+      <td>Whichever bites first. At $0.74 reserved per check the two land together.</td></tr>
+  <tr><td class="k">Per client, per day</td><td>$12.00</td><td>About 16 checks.</td></tr>
+  <tr><td class="k">House, per day</td><td>$120.00</td>
+      <td>Checking pauses for everyone until midnight.</td></tr>
+  <tr><td class="k">Block</td><td>3 refusals, 15 minutes</td>
+      <td>15 minute pause, doubling, 6 hour cap.</td></tr>
+</table>
+
+<p>The reservation is the ceiling of a check, not its average: 28 searches, 4 objectives,
+90,000 tokens in and 16,000 out, which is <b>$0.74</b>. The average is what has to be
+affordable in aggregate; the ceiling is what has to be affordable when one request goes
+long.</p>
+
+<div class="sechead"><span class="n">04</span><h2>The spend reader</h2></div>
+
+<p>A third pill sits on the operations row beside New and the fix list, carrying today's
+spend. It is never red for spending money. It warms as the day's house ceiling fills,
+and only the last band raises its voice, because that is the only band where anything is
+about to stop.</p>
+
+<table>
+  <tr><th>Band</th><th>What it carries</th></tr>
+  <tr><td class="k">The rate card</td>
+      <td>What the dollars below are priced from. First, because everything under it
+      depends on it being true.</td></tr>
+  <tr><td class="k">Today</td>
+      <td>Spent, left before checking stops, the house ceiling, tokens in and out, and a
+      bar for the day.</td></tr>
+  <tr><td class="k">What one check costs</td>
+      <td>Average, median, ninth in ten, dearest. Tokens in and out per check. Reasoning
+      against retrieval as a split. An average on its own hides the run that cost four
+      times the rest.</td></tr>
+  <tr><td class="k">The last 30 days</td>
+      <td>Total, the two halves, average wait, and the last ten days one row each.</td></tr>
+  <tr><td class="k">The ceiling</td>
+      <td>Every limit in force, how many checks were refused today and why, and how many
+      clients are paused now.</td></tr>
+</table>
+
+<p>Where a run recorded no billed figure from Exa it is counted at nought for retrieval
+and the count of such runs is printed, rather than blending an estimate into a
+measurement. Where no run has been recorded at all, the reader says there is nothing to
+average and refuses to produce one.</p>
+
+<div class="sechead"><span class="n">05</span><h2>How it was proved</h2></div>
+
+<p>Every fix has a test that fails if the fix is reverted. Each was reverted and the
+failure observed.</p>
+
+<table>
+  <tr><th>Reverted</th><th>What failed</th></tr>
+  <tr><td class="k">The refusal on a failed reservation</td>
+      <td>budgetcheck, 2 lines</td></tr>
+  <tr><td class="k">The gate moved to after retrieval</td>
+      <td>budgetcheck, all 4 vendor calls</td></tr>
+  <tr><td class="k">The spend pill removed</td>
+      <td>spendcheck, 1 line</td></tr>
+  <tr><td class="k">The rate card warning removed</td>
+      <td>spendcheck, 1 line</td></tr>
+  <tr><td class="k">The spend block no longer served</td>
+      <td>spendcheck, 1 line</td></tr>
+</table>
+
+<p>The ordering test is guarded against passing vacuously: if it can no longer find at
+least three vendor calls in the route to order against, it fails rather than reporting
+success on an empty list.</p>
+
+<div class="sechead"><span class="n">06</span><h2>What is not done</h2></div>
+
+<table>
+  <tr><td class="k">The Claude rate card</td>
+      <td><span class="chip p1">Open</span> Two figures off the Anthropic console,
+      set as environment variables on the deployment. Until then the dollar ceilings are
+      approximately right, not exactly right.</td></tr>
+  <tr><td class="k">db/spend.sql</td>
+      <td><span class="chip p1">Open</span> Written, not run. The ceiling enforces
+      without it, per instance.</td></tr>
+  <tr><td class="k">db/telemetry.sql migration</td>
+      <td><span class="chip p1">Open</span> The <code>not_asked</code> and
+      <code>computed</code> columns are still waiting on the same run.</td></tr>
+  <tr><td class="k">Steps 3 to 8</td>
+      <td><span class="chip p0">Open</span> Response shaping, untrusted content
+      delimiting, scheduled route auth, SQL and error handling, the client bundle scan,
+      and the compliance gate with CI.</td></tr>
+</table>
+
+<div class="foot">
+  <span>4orm Finance &middot; Control Standard &middot; Internal</span>
+  <span>CR-002 &middot; 20 September 2026</span>
+</div>
+
+</div></body></html>

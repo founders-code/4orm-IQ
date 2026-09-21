@@ -102,7 +102,7 @@ if (doc.getElementById('mimic')) fails.push('the old mimic diagram is back');
 if (doc.querySelectorAll('#gauges .gauge').length !== 6) fails.push('a dial is missing');
 {
   const caps = [...doc.querySelectorAll('#gauges .gcap')].map(x => x.textContent.trim());
-  for (const want of ['Time to result','Registers reached','Answers back'])
+  for (const want of ['Time to result','Registers reached','Asks that completed'])
     if (!caps.includes(want)) fails.push('the dial "' + want + '" is gone: ' + caps.join(', '));
   if (caps.includes('Time to spare')) fails.push('the time dial is back to a percentage of headroom');
 }

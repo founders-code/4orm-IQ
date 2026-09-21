@@ -15,16 +15,27 @@
     "@clerk/backend": "^1.28.0"
   },
   "scripts": {
-    "verify": "node tools/verify.mjs",
-    "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs tools/pathcheck.mjs tools/opscheck.mjs tools/docscheck.mjs tools/uxgate.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
-    "opscheck": "node tools/opscheck.mjs",
+    "budgetcheck": "node tools/budgetcheck.mjs",
+    "catalogue": "node tools/sync-catalogue.mjs",
+    "check": "node tools/compliance.mjs && node tools/compliance-test.mjs && node tools/scanner.mjs && npm test",
+    "compliance": "node tools/compliance.mjs",
+    "compliance:test": "node tools/compliance-test.mjs",
     "docscheck": "node tools/docscheck.mjs",
-    "uxgate": "node tools/uxgate.mjs",
-    "uxgate:record": "node tools/uxgate.mjs --record",
+    "doorcheck": "node tools/doorcheck.mjs",
+    "fencecheck": "node tools/fencecheck.mjs",
+    "opscheck": "node tools/opscheck.mjs",
+    "scanner": "node tools/scanner.mjs",
+    "schedcheck": "node tools/schedcheck.mjs",
+    "shapecheck": "node tools/shapecheck.mjs",
+    "spendcheck": "node tools/spendcheck.mjs",
+    "sqlcheck": "node tools/sqlcheck.mjs",
+    "sr001": "node tools/sr001-build.mjs",
     "stamp": "node tools/stamp.mjs",
     "sweep": "node tools/sweep.mjs",
     "sweep:apply": "node tools/sweep.mjs --apply",
-    "sr001": "node tools/sr001-build.mjs",
-    "catalogue": "node tools/sync-catalogue.mjs"
+    "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs tools/pathcheck.mjs tools/opscheck.mjs tools/docscheck.mjs tools/uxgate.mjs tools/budgetcheck.mjs tools/spendcheck.mjs tools/shapecheck.mjs tools/sqlcheck.mjs tools/fencecheck.mjs tools/schedcheck.mjs tools/doorcheck.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
+    "uxgate": "node tools/uxgate.mjs",
+    "uxgate:record": "node tools/uxgate.mjs --record",
+    "verify": "node tools/verify.mjs"
   }
 }

@@ -51,8 +51,14 @@ t('a run with no searches planned at all is not called an outage', !dark([]));
 const msg = (src.match(/message: 'The check could not read any register[^']*'[\s\S]{0,300}?\n/) || [''])[0];
 t('the reader is told this is our fault and not a finding',
   /fault on our side/.test(src) && /not a finding about this party/.test(src));
+/* The record is still required. What changed is who writes it: api/ has one
+   writer to the log, in _log.js, which scrubs a domain or an address out of a
+   line before it is written. This route holds the failing party, so a console
+   call here is exactly the one that must not exist. */
 t('the real reason goes to the operator field and the log',
-  /operator: \{ status: 503/.test(src) && /console\.error\('\[check\] retrieval dark'/.test(src));
+  /operator: \{ status: 503/.test(src) && /logNote\('check', 'retrieval dark/.test(src));
+t('the log line goes through the one writer that scrubs',
+  !/console\.\w+\(/.test(src.replace(/\/\*[\s\S]*?\*\//g, '')));
 
 console.log('\n' + (fails.length ? fails.length + ' failed' : 'all passed'));
 process.exit(fails.length ? 1 : 0);
