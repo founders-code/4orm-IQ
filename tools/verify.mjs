@@ -4289,7 +4289,11 @@ if (/[\u2014\u2013]/.test(eviPage))
   }
 
   /* 4. THE TWO STANDING DOCUMENTS, and the routing that reaches them. */
-  for (const [id, back] of [['rpCompliance', 'rpCompBack'], ['rpPrivacy', 'rpPrivBack']]) {
+  /* The terms joined them on 21 September 2026, with the same routing and the
+     same back button, because a document a reader agrees to has to be as easy
+     to reach as the two that explain what we keep. */
+  for (const [id, back] of [['rpCompliance', 'rpCompBack'], ['rpPrivacy', 'rpPrivBack'],
+                            ['rpTerms', 'rpTermsBack']]) {
     if (!new RegExp('<div class="rp-sheet" id="' + id + '"').test(html))
       fails.push('the ' + id + ' document is gone');
     if (!new RegExp('id="' + back + '"').test(html) || !new RegExp('id="' + back + 'T"').test(html))
@@ -4297,8 +4301,8 @@ if (/[\u2014\u2013]/.test(eviPage))
     if (!new RegExp('id\\("' + back + '"\\)\\.addEventListener').test(script))
       fails.push(back + ' is not wired to anything');
   }
-  if (!/RP_DOCS = \{ sources:1, compliance:1, privacy:1 \}/.test(script))
-    fails.push('the three reachable-from-anywhere documents are no longer declared together');
+  if (!/RP_DOCS = \{ sources:1, compliance:1, privacy:1, terms:1 \}/.test(script))
+    fails.push('the reachable-from-anywhere documents are no longer declared together');
   if (!/compliance:"rpCompliance", privacy:"rpPrivacy"/.test(script))
     fails.push('the two documents are not registered as screens, so rpShow cannot switch to them');
   if (!/function rpDocsHide\(/.test(script))

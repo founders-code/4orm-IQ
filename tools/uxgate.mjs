@@ -148,9 +148,17 @@ const SCENES = [
          failures appeared on a screen nobody had touched. */
       for (let i=0;i<20;i++){
         await p.waitForTimeout(1200);
+        /* THE RESULT OPENS FROM "I UNDERSTAND" AND FROM NOTHING ELSE.
+           It used to open itself when the sweep landed, so waiting was enough
+           to reach it and this walk only pressed the button for a label that
+           has since gone. Now the click is the agreement to the terms and the
+           result waits for it, so the walk presses it, the way a reader has to.
+           Waiting instead measures the dark overlay and calls it the report. */
         const ready = await p.evaluate(() => {
           const b = document.getElementById('primOk');
-          return !!b && !b.disabled && /Show the result/i.test(b.textContent);
+          const box = document.getElementById('primBox');
+          return !!b && !b.disabled && !!box && box.classList.contains('on')
+              && /Show the result|I understand/i.test(b.textContent);
         });
         if (ready) { await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();}); break; }
         if (await p.evaluate(() => document.body.getAttribute('data-stage') === 'report')) break;

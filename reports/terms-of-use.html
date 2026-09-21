@@ -1,0 +1,378 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terms of use</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;--ink-3:#8B9296;
+  --rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+  --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink-2);
+  font:16px/1.6 "IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;padding:44px 16px 80px}
+.w{max-width:940px;margin:0 auto}
+.mast{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}
+.kick{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+h1{font:600 33px/1.15 Spectral,Georgia,serif;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+.dek{max-width:64ch;margin:0;color:var(--ink-2)}
+h2{font:600 19px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:38px 0 10px}
+h3{font:600 15px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);margin:22px 0 6px}
+p{margin:0 0 12px;max-width:74ch}
+.sechead{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--rule);padding-top:22px;margin-top:34px}
+.sechead .n{font:500 12px/1 "IBM Plex Mono",monospace;color:var(--ink-3)}
+.sechead h2{margin:0}
+ol,ul{margin:8px 0 0;padding-left:20px} li{margin:0 0 10px;max-width:74ch}
+b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;table-layout:fixed}
+th{font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  text-align:left;border-bottom:1px solid var(--rule);padding:8px 10px}
+td{padding:10px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+td.k{color:var(--ink);font-weight:500;width:32%}
+.chip{display:inline-block;font:500 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 8px;border-radius:3px;white-space:nowrap}
+.p0{background:var(--p0w);color:var(--p0)} .p1{background:var(--p1w);color:var(--p1)} .p2{background:var(--p2w);color:var(--p2)}
+.quote{border-left:3px solid var(--p2);background:var(--surface);padding:14px 18px;margin:14px 0}
+.quote.hot{border-left-color:var(--p0)}
+.src{font:400 11px/1.5 "IBM Plex Mono",monospace;color:var(--ink-3);margin:8px 0 0}
+a{color:var(--p2)}
+.foot{margin-top:52px;border-top:1px solid var(--rule);padding-top:14px;
+  font:400 11px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:640px){h1{font-size:27px}td.k{width:42%}}
+
+@media print{
+  html,body{background:#111416 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding:14mm 14mm 4mm;font-size:10.5pt;line-height:1.5}
+  .w{max-width:none}
+  .mast{padding-bottom:10pt;margin-bottom:16pt}
+  h1{font-size:20pt}
+  h2{font-size:13pt}
+  h3{font-size:11pt;break-after:avoid}
+  p,li{max-width:none}
+  table{font-size:9pt}
+  pre{font-size:8.6pt}
+  .sechead{break-after:avoid;margin-top:18pt;padding-top:12pt}
+  tr,li,.quote,pre{break-inside:avoid}
+  .foot{margin-top:20pt}
+}
+
+.heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:26px 0 8px}
+.heads>div{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:14px 16px}
+.hl{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.heads h3{font:600 15px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:9px 0 6px}
+.heads p{font-size:13px;line-height:1.5;margin:0;color:var(--ink-3)}
+code{font:400 .92em/1 "IBM Plex Mono",monospace;color:var(--ink)}
+.terms{background:#F4F7FB;color:#142036;border-radius:6px;padding:26px 30px;margin:18px 0}
+.terms h3{font:750 15px/1.3 Inter,"IBM Plex Sans",sans-serif;color:#142036;margin:20px 0 8px}
+.terms h3:first-child{margin-top:0}
+.terms h3 i{font:500 11px/1 "IBM Plex Mono",monospace;color:#2E6BF2;font-style:normal;margin-right:8px}
+.terms p{color:#46556E;font-size:14px;line-height:1.6;margin:0 0 10px;max-width:none}
+.terms b{color:#142036}
+.terms a,.terms .rp-lk{color:#2E6BF2;background:none;border:0;padding:0;font:inherit;text-decoration:underline}
+.terms .rp-dli{display:grid;grid-template-columns:190px 1fr;gap:16px;padding:10px 0;border-top:1px solid #E3E9F2}
+.terms .rp-dlk{font:600 10.5px/1.4 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#2E6BF2}
+.terms .rp-dlv{font-size:14px;line-height:1.55;color:#46556E}
+@media(max-width:640px){.terms{padding:18px}.terms .rp-dli{grid-template-columns:1fr;gap:4px}}
+@media print{.heads{break-inside:avoid}.terms{padding:16pt}.terms .rp-dsec{break-inside:avoid}
+  .terms p,.terms .rp-dlv{font-size:9.5pt}}
+</style></head><body><div class="w">
+<header class="mast">
+  <div class="kick"><span>4orm IQ</span><span>Terms of use and the click that accepts them</span>
+    <span>CR-004 &middot; v1.0</span><span>21 September 2026</span></div>
+  <h1>The click is the agreement, and nothing opens before it</h1>
+  <p class="dek">Terms of Use for 4ormiq.com, the notice beside "I understand" that makes
+  pressing it an agreement, and a fix so a fast check can no longer open its result before the
+  reader has agreed. The text is not advice from a lawyer and needs counsel before it is relied
+  on.</p>
+</header>
+
+<div class="heads">
+  <div><div class="hl">What you asked for</div><h3>A release from liability</h3>
+    <p>Given as far as the law allows it. A blanket release is the clause a court strikes.</p></div>
+  <div><div class="hl">What it hangs on</div><h3>"I understand", every check</h3>
+    <p>The terms named beside the button, readable in the card, version printed on the result.</p></div>
+  <div><div class="hl">What was broken</div><h3>A result could open first</h3>
+    <p>A check that landed before the click opened its result behind the card. Fixed.</p></div>
+  <div><div class="hl">What is open</div><h3>Counsel</h3>
+    <p>Four authorities could not be read at source. Named below.</p></div>
+</div>
+
+<div class="sechead"><span class="n">01</span><h2>Why the release is not "all liability"</h2></div>
+
+<p>You asked for terms that release 4orm Finance from all liability. The terms go as far as the
+law allows and stop there, for one reason: <b>a clause that claims more than the law allows can
+be struck against a consumer, and a struck clause protects nothing.</b> A release written to the
+limit of what is enforceable is worth more than one written past it.</p>
+
+<p>Quebec is the clearest case, and it is the one I could read in the statute itself.</p>
+
+<div class="quote hot">
+<p>"Any stipulation whereby a merchant is liberated from the consequences of his own act or the
+act of his representative is prohibited."</p>
+<p class="src">Consumer Protection Act, CQLR c P-40.1, s 10.
+<a href="https://www.legisquebec.gouv.qc.ca/en/document/cs/P-40.1">legisquebec.gouv.qc.ca</a></p>
+</div>
+
+<div class="quote">
+<p>"Any stipulation that obliges the consumer to refer a dispute to arbitration, that restricts
+the consumer's right to go before a court, in particular by prohibiting the consumer from bringing
+a class action, or that deprives the consumer of the right to be a member of a group bringing a
+class action is prohibited."</p>
+<p class="src">Consumer Protection Act, CQLR c P-40.1, s 11.1.
+<a href="https://www.legisquebec.gouv.qc.ca/en/document/cs/P-40.1">legisquebec.gouv.qc.ca</a></p>
+</div>
+
+<div class="quote">
+<p>"Any stipulation under which a merchant may amend a contract unilaterally is prohibited unless
+the stipulation also (a) specifies the elements of the contract that may be amended
+unilaterally; (b) provides that the merchant must send to the consumer, at least 30 days before
+the amendment comes into force, a written notice ..."</p>
+<p class="src">Consumer Protection Act, CQLR c P-40.1, s 11.2 (opening words).
+<a href="https://www.legisquebec.gouv.qc.ca/en/document/cs/P-40.1">legisquebec.gouv.qc.ca</a></p>
+</div>
+
+<h3>What the terms do with each one</h3>
+<table>
+  <tr><th>Rule</th><th>How the terms meet it</th></tr>
+  <tr><td class="k">s 10, no release for our own acts</td>
+      <td>The limit of liability applies "as far as the law allows", keeps our responsibility for
+      our own intentional or grossly negligent acts, and has its own Quebec section saying
+      nothing frees us from the consequences of our own acts.</td></tr>
+  <tr><td class="k">s 11.1, no arbitration, no class waiver</td>
+      <td>There is no arbitration clause and no class action waiver anywhere in the terms, and
+      section 10 of the terms says so in those words.</td></tr>
+  <tr><td class="k">s 11.2, no change at any time</td>
+      <td>There is no right to change the terms. Each check is its own agreement, made under the
+      version shown when "I understand" is pressed, and a new version applies only to checks
+      made after it is published. Nothing already agreed is ever changed.</td></tr>
+</table>
+
+<div class="sechead"><span class="n">02</span><h2>How the click becomes the agreement</h2></div>
+
+<p>A click binds somebody only if they were told what it meant before they made it, could read
+what they were agreeing to, and could not reach the thing it governs without making it. All
+three now hold, and each has a test.</p>
+
+<table>
+  <tr><th>Condition</th><th>What the page does</th><th>Test</th></tr>
+  <tr><td class="k">Told before the click</td>
+      <td>"By pressing I understand you agree to the Terms of Use, version 1.0, for this check",
+      above the button.</td><td><code>termscheck</code></td></tr>
+  <tr><td class="k">Could read them</td>
+      <td>"Terms of Use" opens the full text inside the card, scrollable, with the button still
+      under it. It does not leave the card.</td><td><code>termscheck</code></td></tr>
+  <tr><td class="k">Could not skip it</td>
+      <td>The result opens only from "I understand". Every check reopens the card and asks
+      again.</td><td><code>termscheck</code></td></tr>
+  <tr><td class="k">Holds the record</td>
+      <td>The result and every PDF pack print "Terms of Use version 1.0, agreed at 14:02 on 21
+      September 2026".</td><td><code>termscheck</code></td></tr>
+</table>
+
+<h3>Two things found while building it</h3>
+
+<p><b>A fast check opened its result before the agreement.</b> When the check landed, the page
+opened the result whether or not "I understand" had been pressed. On a normal check nobody
+noticed, because the reader agrees long before the check lands. On a quick one the result was
+drawn behind the card before the reader had agreed to anything. It now waits for the click.
+Reverting the fix makes <code>termscheck</code> fail.</p>
+
+<p><b>A link out of the card would have gone round it.</b> The usual way to open a document
+leaves the waiting screen, and the way back from a document during a check goes straight to the
+result. A Terms link that worked like the others would have let a reader reach the result
+without pressing "I understand". So the Terms open inside the card, and the links inside that
+copy are turned into plain text.</p>
+
+<h3>What is recorded, and what is not</h3>
+
+<p>The version and the time are printed on what the reader takes away. They are not stored
+against the reader, because there is no account to store them against and the privacy notice
+says we keep nothing that identifies one. The proof that every result was agreed to is the flow
+itself: the page cannot show a result without the click, and a test fails if that stops being
+true.</p>
+
+<div class="sechead"><span class="n">03</span><h2>What could not be confirmed</h2></div>
+
+<p>Only the three Quebec sections above were read at source. The sites that publish the rest
+refused a direct read, and I did not quote them from memory. Counsel should confirm each one
+against the terms before they go live.</p>
+
+<table>
+  <tr><th>Authority</th><th>Why it matters here</th><th>Status</th></tr>
+  <tr><td class="k">Tercon Contractors v British Columbia, 2010 SCC 4</td>
+      <td>The test a Canadian court applies before it enforces a clause excluding liability.</td>
+      <td><span class="chip p1">Not read</span></td></tr>
+  <tr><td class="k">Uber Technologies v Heller, 2020 SCC 16</td>
+      <td>When a standard form contract is unconscionable. The limitation and the misuse clause
+      in section 04 of the terms should be read against it.</td>
+      <td><span class="chip p1">Not read</span></td></tr>
+  <tr><td class="k">Douez v Facebook, 2017 SCC 33</td>
+      <td>A consumer's own province and courts can override a forum clause. Section 10 of the
+      terms is written to give that way already.</td>
+      <td><span class="chip p1">Not read</span></td></tr>
+  <tr><td class="k">Alberta Consumer Protection Act, RSA 2000 c C-26.3</td>
+      <td>Whether its rules on unfair practices and waiver reach a free service.</td>
+      <td><span class="chip p1">Not read</span></td></tr>
+  <tr><td class="k">Civil Code of Quebec, art 1474</td>
+      <td>The general Quebec limit on excluding liability for intentional or gross fault.</td>
+      <td><span class="chip p1">Not read</span></td></tr>
+</table>
+
+<h3>Questions for counsel</h3>
+<ol>
+  <li>Is a clickwrap agreement enforceable on a free service with no account, where the page is
+    the only evidence of the flow?</li>
+  <li>Does section 04, forbidding a result being used to judge an individual for hiring, lending,
+    insurance or tenancy, need anything more under provincial consumer reporting law?</li>
+  <li>Should the terms carry a narrow indemnity for misuse under section 04? It is left out,
+    because against a consumer it is the clause most likely to read as unconscionable.</li>
+  <li>Does the Quebec section need a French version before it can be relied on in Quebec?</li>
+</ol>
+
+<div class="sechead"><span class="n">04</span><h2>The terms, as the reader sees them</h2></div>
+
+<p>Version 1.0, in force from 21 September 2026. Reading grade 7.9, reading ease 72, no dashes,
+no banned words.</p>
+
+<div class="terms">
+<div class="rp-dsec">
+  <h3><i>01</i>The short version</h3>
+  <p><b>4ormIQ is a research tool. It is not advice.</b> We read public records about a
+    business and show you what they say, with the source and the date beside every line. We do
+    not tell you whether to send money, and we do not recommend or endorse anyone.</p>
+  <p><b>The decision is yours, and so is the risk.</b> Public records can be wrong, late or
+    incomplete, and a record we could not reach is not a clean one. Before you send money, check
+    the business with its regulator yourself, and speak to a licensed adviser if the amount
+    matters to you.</p>
+  <p>Pressing <b>I understand</b> on a check means you have read and agree to these terms for
+    that check. If you do not agree, do not use the result.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>02</i>What 4ormIQ is, and what it is not</h3>
+  <div class="rp-dl">
+    <div class="rp-dli"><div class="rp-dlk">It is not advice</div><div class="rp-dlv">Not
+      financial, investment, legal, tax or insurance advice, and not a recommendation to deal or
+      not to deal with anyone. We are not registered to give advice and we do not.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">It is not a regulator</div><div class="rp-dlv">We do
+      not license, investigate or supervise anyone. Where a result points at a regulator, the
+      regulator's own record is the authority, not our page.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">It is not a guarantee</div><div class="rp-dlv">A green
+      result never means we have certified a business or that your money is safe with them. It
+      means the records we reached showed nothing against them on the day we read them.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">It is not a finding of wrongdoing</div><div
+      class="rp-dlv">A red result means the records we read contradict each other, or contradict
+      what the business says about itself. It is not a legal finding and it is not an accusation
+      against anybody.</div></div>
+  </div>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>03</i>Where the information comes from</h3>
+  <p>Everything on a result comes from somebody else: a regulator, a court, a company registry,
+    a caution list, a review platform, a domain record. <b>We do not write those records and we
+    cannot correct them.</b> They can be out of date, wrong, or about a different business with a
+    similar name.</p>
+  <p>We name every source and link to it so you can open it and read it yourself. Where a
+    register would not answer, or we did not ask it, the result says so. <b>An absence is not
+    proof.</b> A business can be missing from every register because it is new, because it trades
+    under another name, or because nobody has reported it yet.</p>
+  <p>Some regulators do not allow their words to be copied into a service like ours. For those we
+    describe what the entry says in our own words and link you to the original.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>04</i>How you may use a result</h3>
+  <p>A result is for your own decision about a business you are thinking of dealing with. You may
+    share it with your bank, your card issuer, the police, a regulator, a lawyer or a family
+    member helping you decide. <b>You agree not to:</b></p>
+  <div class="rp-dl">
+    <div class="rp-dli"><div class="rp-dlk">Republish it as fact</div><div class="rp-dlv">Post it,
+      or present it to others, as a statement that a business has done something wrong. It is a
+      record of what sources said on one day, not a conclusion.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">Use it against someone</div><div class="rp-dlv">Use it
+      to harass, threaten, shame or make demands of a business or anybody connected to
+      one.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">Use it to judge a person</div><div class="rp-dlv">Use
+      it to decide whether to hire, lend to, insure or rent to an individual. It is not built for
+      that and must not be used for it.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">Overload or copy the service</div><div
+      class="rp-dlv">Run checks by script or in bulk, get around the limits on how many checks a
+      connection may run, copy the service, or try to reach any part of it you were not given.</div></div>
+  </div>
+  <p>We may refuse or pause checks from a connection that does any of these.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>05</i>What we are responsible for, and what we are not</h3>
+  <p>We will run each check as described, show you what we read and where we read it, and say plainly
+    what we could not reach.</p>
+  <p><b>As far as the law allows, 4orm Finance is not responsible for any loss that comes from
+    using, or relying on, a result.</b> That includes money you send or do not send, a deal you
+    make or do not make, and anything a business you checked does or fails to do. It includes
+    records published by others that turn out to be wrong, and websites we link to that we do not
+    run.</p>
+  <p>The service is free and is provided as it is, without any promise that it will be accurate,
+    complete, available or suited to your purpose.</p>
+  <p><b>Nothing in these terms takes away a right the law gives you that cannot be taken away by
+    agreement.</b> We do not limit our responsibility for our own intentional or grossly
+    negligent acts, or for anything else the law says we cannot limit. Where a limit in this
+    section is not allowed where you live, it does not apply to you, and the rest of these terms
+    still do.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>06</i>If you live in Quebec</h3>
+  <p>The Quebec <i>Consumer Protection Act</i> gives you rights these terms cannot reduce. In
+    particular, nothing here frees us from the consequences of our own acts or the acts of those
+    working for us, and nothing here requires you to go to arbitration, stops you going to court,
+    or stops you taking part in a class action.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>07</i>If a result is wrong about you or your business</h3>
+  <p>Tell us. We read every message and we answer. If a record we showed is about a different
+    business, or a source has since changed, we will correct what we show. If you represent a
+    business and want your side printed beside an entry, we will print it. The route and the
+    times are set out in the <button type="button" class="rp-lk"
+    data-doc="compliance">compliance statement</button>. Write to
+    <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>08</i>Your privacy</h3>
+  <p>There are no accounts. We do not keep what you typed and we do not keep the result. What we
+    do keep, and why, is set out in the <button type="button" class="rp-lk"
+    data-doc="privacy">privacy notice</button>, which forms part of these terms.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>09</i>When these terms change</h3>
+  <p>Each check is made under the version of these terms shown when you press
+    <b>I understand</b>, and that version is printed on the result. If we change the terms, the
+    new version applies only to checks made after it is published. A check you have already made
+    stays under the terms it was made under.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>10</i>The law that applies</h3>
+  <p>These terms are governed by the laws of Alberta and the federal laws of Canada that apply
+    there. If the consumer protection law of the province where you live gives you more
+    protection, or lets you bring a claim in your own province, that law and those courts apply
+    to you. <b>There is no arbitration clause and no waiver of class actions in these terms.</b></p>
+  <p>If a court decides that part of these terms cannot be enforced, the rest still applies.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>11</i>Who we are</h3>
+  <p>4ormIQ is run by 4orm Finance, of Calgary, Alberta. Questions about these terms go to
+    <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>.</p>
+</div>
+
+</div>
+
+<div class="foot">
+  <span>4orm Finance &middot; Control Standard &middot; Internal</span>
+  <span>CR-004 &middot; 21 September 2026</span>
+</div>
+</div></body></html>

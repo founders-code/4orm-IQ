@@ -1,8 +1,8 @@
-# 4orm IQ, build 20260921.0211
+# 4orm IQ, build 20260921.0327
 
 Everything in this archive is the working tree as it stands, plus the two
 control documents under `reports/`. It is a git repository: `git log` carries
-four commits and the reason for each.
+five commits and the reason for each.
 
 ## Run the gate
 
@@ -32,6 +32,7 @@ main. It needs no secret, because every check reads files.
 | `KBYS_SCHEDULE_SECRET` | `openssl rand -hex 32`. Until it is set, retention runs only when a person signs in and presses the button. |
 | `db/spend.sql` | Run once. The spend ceiling and the replay ledger enforce without it, per instance. |
 | `db/telemetry.sql` | The `not_asked` and `computed` columns. Until they are added the ops board counts a register nobody asked as one that refused. |
+| Counsel on the terms | `reports/terms-of-use.pdf`, section 03. Five authorities could not be read at source, and four questions need an answer before the terms are relied on. |
 | The remote | The repository is committed locally and has no remote. `check` should be a required status check on main. |
 
 ## What changed in this build
@@ -65,6 +66,18 @@ main. It needs no secret, because every check reads files.
 * **The scan.** `tools/scanner.mjs` reads what is served, not the repository.
 
 ### The pages
+
+* **Terms of use.** A page of their own, linked from every footer. "I understand"
+  on the card before each check is the agreement: the notice sits above the
+  button and names the version, the terms open inside the card, and the version
+  and time agreed are printed on the result and on every pack. Liability is
+  limited as far as the law allows and no further, because Quebec prohibits the
+  rest and a struck clause protects nothing.
+* **A fast check opened its result before the reader agreed.** It now waits for
+  the click.
+* **The answer pills** rose from fully transparent while holding focus, so a
+  keyboard reader sat on an invisible control for four tenths of a second. That
+  was the intermittent failure on the waiting screen.
 
 * **The search bar** carried three blue marks at once while somebody was
   typing: a halo outside the pill, a focus ring outside that, and an underline

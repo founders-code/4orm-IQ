@@ -768,10 +768,21 @@ body[data-stage="landing"] .chat.landing-only{display:flex}
 .dots i{width:6px;height:6px;border-radius:50%;background:var(--tx-3);animation:blip 1.25s infinite}
 .dots i:nth-child(2){animation-delay:.16s} .dots i:nth-child(3){animation-delay:.32s}
 @keyframes blip{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-@media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.6}.bub,.dots{animation:none}}
+@media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.6}.bub,.dots,.pills{animation:none}}
+/* THE ANSWERS RISE, AND THEY ARE NEVER INVISIBLE WHILE THEY DO.
+   The row used the bubble entrance, which starts at opacity nought, and the
+   page puts focus on the first answer the moment the row exists. So for the
+   length of the entrance a keyboard reader was sitting on a control nobody
+   could see, and a Tab in that window landed on one too. This was the phantom
+   the UX gate caught on the waiting scene whenever its walk happened to fall
+   inside those four tenths of a second, and it was intermittent for exactly
+   that reason. The answers keep the rise and lose the fade: they start faint
+   rather than absent, so there is never a moment when focus is somewhere the
+   eye cannot follow it. */
+@keyframes pillrise{from{opacity:.55;transform:translateY(9px)}to{opacity:1;transform:none}}
 .pills{align-self:flex-start;display:flex;flex-wrap:wrap;gap:12px;max-width:100%;
   margin-top:10px;margin-bottom:6px;
-  animation:bubrise .42s var(--spring) both}
+  animation:pillrise .42s var(--spring) both}
 .pill{padding:12px 18px;border-radius:999px;font-size:14.5px;font-weight:600;cursor:pointer;
   color:var(--tx-1);background:var(--bg-2);border:1px solid var(--border-strong);
   transition:background .2s var(--ease),border-color .2s var(--ease),transform .3s var(--pop)}
@@ -1609,6 +1620,40 @@ body.wait-up .dirbox{z-index:501}
   font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;
   transition:background .25s var(--ease),transform .3s var(--pop)}
 .primok:hover{background:var(--blue);transform:translateY(-1px)}
+.primterms{margin:14px 0 0;font-size:12.5px;line-height:1.55;color:var(--tx-3)}
+.primterms b{color:var(--tx-2)}
+.primtlink{background:none;border:0;padding:3px 0;margin:-3px 0;font:inherit;
+  color:var(--blue-lt,#82AAFF);text-decoration:underline;text-underline-offset:2px;cursor:pointer;
+  /* A link inside a line of small print is nineteen pixels tall, under the
+     twenty four a finger needs. The padding makes the target taller and the
+     negative margin gives the height back to the line, so the sentence does
+     not move and the tap still lands. */
+  display:inline-block}
+.primtlink:hover{color:#fff}
+.primtlink:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:2px}
+/* The terms, read in place. Tall enough to read a section at a time, capped so
+   the button under it never leaves the screen. */
+.primtermsbox{margin-top:12px;max-height:min(46vh,420px);overflow-y:auto;
+  padding:16px 18px;border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  background:rgba(255,255,255,.03);font-size:13px;line-height:1.6;color:var(--tx-2)}
+.primtermsbox[hidden]{display:none}
+#rpt .rp-agreed{margin:10px 0 0;font-family:var(--rmono);font-size:11px;letter-spacing:.04em;
+  color:var(--tx-3)}
+#rpt .rp-agreed[hidden]{display:none}
+.primtermsbox:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.primtermsbox h3{margin:16px 0 6px;font-size:13.5px;font-weight:750;color:var(--tx)}
+.primtermsbox h3:first-child{margin-top:0}
+.primtermsbox h3 i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--tx-4);
+  margin-right:8px}
+.primtermsbox p{margin:0 0 9px}
+.primtermsbox b{color:var(--tx)}
+.primtermsbox a{color:var(--blue-lt,#82AAFF)}
+.primtermsbox .rp-dli{margin:0 0 8px}
+.primtermsbox .rp-dlk{font-weight:700;color:var(--tx)}
+.primtermsbox .rp-dlv{color:var(--tx-2)}
+.primtermsbox .primtref{color:var(--tx)}
+/* On a short screen the card has to hold the terms and the button together. */
+@media (max-height:760px){ .primbox{max-height:calc(100vh - 24px);overflow-y:auto} }
 /* Two ways on rather than one, because being walked through a room is a thing
    some people want and some people resent. Neither is the quiet option: they
    are the same size and the same weight, and the tour is the one on the left
@@ -4804,6 +4849,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <button type="button" data-doc="compliance">Compliance statement</button>
           <span aria-hidden="true">&middot;</span>
           <button type="button" data-doc="privacy">Privacy notice</button>
+        <button type="button" data-doc="terms">Terms of use</button>
           <span aria-hidden="true">&middot;</span>
           <a href="https://4ormfinance.com" rel="noopener">4ormfinance.com</a>
         </p>
@@ -5103,6 +5149,9 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
     <div class="rp-behind">
       <p class="rp-spec" id="rpSpec"></p>
+      <!-- What the reader agreed to, and when. Printed rather than stored,
+           because there is no account to store it against. -->
+      <p class="rp-agreed" id="rpAgreed" hidden></p>
       <div class="rp-foot">
         <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
         <span><button type="button" class="rp-lk" id="rpAgainR">Check another name</button>
@@ -5110,6 +5159,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecordR">See the technical data room</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="terms">Terms</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
@@ -5359,6 +5409,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecord">See the technical data room</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="terms">Terms</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
@@ -5591,6 +5642,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" id="rpOpenRecordS">See the technical data room</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="compliance">Compliance</button>
           &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="terms">Terms</button>
           &nbsp;&middot;&nbsp; 4ormiq.com</span>
       </div>
     </div>
@@ -5751,6 +5803,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
       <nav class="rp-docnav" aria-label="Other documents">
         <button type="button" data-doc="privacy">Privacy notice</button>
+        <button type="button" data-doc="terms">Terms of use</button>
         <button type="button" data-doc="sources">How we decide</button>
       </nav>
 
@@ -5983,6 +6036,196 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
      the verdict off the top of the screen and left them scrolling to find
      their way back to the sentence they were reading. This opens on top, is
      scrolled on its own, and closes back to exactly where they were. -->
+<!-- ==================================================== THE TERMS OF USE
+     One copy of the text, here. The panel inside the "I understand" card and
+     the line on every PDF pack are both read from this sheet, so the terms a
+     reader agrees to and the terms the site publishes cannot drift apart. -->
+<div class="rp-sheet" id="rpTerms" hidden>
+  <div class="rp-wash"></div>
+  <div class="rp-wrap">
+    <div class="rp-head">
+      <div class="rp-hlogo"><img alt="4orm Finance" data-logo="1"></div>
+      <div class="rp-navmid">
+        <button class="rp-navb rp-back" type="button" id="rpTermsBack">
+          <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="rpTermsBackT">Back</span>
+        </button>
+      </div>
+      <nav class="rp-nav" aria-label="Around this report">
+        <span class="rp-pill rp-pill-green rp-on" aria-current="page">
+          <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v18H6.5A2.5 2.5 0 014 18.5zM20 5.5A2.5 2.5 0 0017.5 3H12v18h5.5a2.5 2.5 0 002.5-2.5z" stroke-linejoin="round"/></svg>
+          Terms
+        </span>
+        <button class="rp-pill rp-pill-gold" type="button" data-dir="open">
+          <span class="rp-flag" aria-hidden="true">&#9873;</span>
+          Find support
+        </button>
+      </nav>
+    </div>
+
+    <div class="rp-doc">
+      <h1 class="rp-stitle">Terms of use.</h1>
+      <p class="rp-slead">What 4ormIQ is, what it is not, and what you agree to when you press
+        I understand on a check.</p>
+
+      <div class="rp-docmeta">
+        <span>4orm Finance <b>Alberta, Canada</b></span>
+        <span>Applies to <b>4ormiq.com</b></span>
+        <span>Version <b id="rpTermsVer">1.0</b></span>
+        <span>In force from <b id="rpTermsDate">21 September 2026</b></span>
+      </div>
+
+      <div id="rpTermsBody">
+<div class="rp-dsec">
+  <h3><i>01</i>The short version</h3>
+  <p><b>4ormIQ is a research tool. It is not advice.</b> We read public records about a
+    business and show you what they say, with the source and the date beside every line. We do
+    not tell you whether to send money, and we do not recommend or endorse anyone.</p>
+  <p><b>The decision is yours, and so is the risk.</b> Public records can be wrong, late or
+    incomplete, and a record we could not reach is not a clean one. Before you send money, check
+    the business with its regulator yourself, and speak to a licensed adviser if the amount
+    matters to you.</p>
+  <p>Pressing <b>I understand</b> on a check means you have read and agree to these terms for
+    that check. If you do not agree, do not use the result.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>02</i>What 4ormIQ is, and what it is not</h3>
+  <div class="rp-dl">
+    <div class="rp-dli"><div class="rp-dlk">It is not advice</div><div class="rp-dlv">Not
+      financial, investment, legal, tax or insurance advice, and not a recommendation to deal or
+      not to deal with anyone. We are not registered to give advice and we do not.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">It is not a regulator</div><div class="rp-dlv">We do
+      not license, investigate or supervise anyone. Where a result points at a regulator, the
+      regulator's own record is the authority, not our page.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">It is not a guarantee</div><div class="rp-dlv">A green
+      result never means we have certified a business or that your money is safe with them. It
+      means the records we reached showed nothing against them on the day we read them.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">It is not a finding of wrongdoing</div><div
+      class="rp-dlv">A red result means the records we read contradict each other, or contradict
+      what the business says about itself. It is not a legal finding and it is not an accusation
+      against anybody.</div></div>
+  </div>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>03</i>Where the information comes from</h3>
+  <p>Everything on a result comes from somebody else: a regulator, a court, a company registry,
+    a caution list, a review platform, a domain record. <b>We do not write those records and we
+    cannot correct them.</b> They can be out of date, wrong, or about a different business with a
+    similar name.</p>
+  <p>We name every source and link to it so you can open it and read it yourself. Where a
+    register would not answer, or we did not ask it, the result says so. <b>An absence is not
+    proof.</b> A business can be missing from every register because it is new, because it trades
+    under another name, or because nobody has reported it yet.</p>
+  <p>Some regulators do not allow their words to be copied into a service like ours. For those we
+    describe what the entry says in our own words and link you to the original.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>04</i>How you may use a result</h3>
+  <p>A result is for your own decision about a business you are thinking of dealing with. You may
+    share it with your bank, your card issuer, the police, a regulator, a lawyer or a family
+    member helping you decide. <b>You agree not to:</b></p>
+  <div class="rp-dl">
+    <div class="rp-dli"><div class="rp-dlk">Republish it as fact</div><div class="rp-dlv">Post it,
+      or present it to others, as a statement that a business has done something wrong. It is a
+      record of what sources said on one day, not a conclusion.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">Use it against someone</div><div class="rp-dlv">Use it
+      to harass, threaten, shame or make demands of a business or anybody connected to
+      one.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">Use it to judge a person</div><div class="rp-dlv">Use
+      it to decide whether to hire, lend to, insure or rent to an individual. It is not built for
+      that and must not be used for it.</div></div>
+    <div class="rp-dli"><div class="rp-dlk">Overload or copy the service</div><div
+      class="rp-dlv">Run checks by script or in bulk, get around the limits on how many checks a
+      connection may run, copy the service, or try to reach any part of it you were not given.</div></div>
+  </div>
+  <p>We may refuse or pause checks from a connection that does any of these.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>05</i>What we are responsible for, and what we are not</h3>
+  <p>We will run each check as described, show you what we read and where we read it, and say plainly
+    what we could not reach.</p>
+  <p><b>As far as the law allows, 4orm Finance is not responsible for any loss that comes from
+    using, or relying on, a result.</b> That includes money you send or do not send, a deal you
+    make or do not make, and anything a business you checked does or fails to do. It includes
+    records published by others that turn out to be wrong, and websites we link to that we do not
+    run.</p>
+  <p>The service is free and is provided as it is, without any promise that it will be accurate,
+    complete, available or suited to your purpose.</p>
+  <p><b>Nothing in these terms takes away a right the law gives you that cannot be taken away by
+    agreement.</b> We do not limit our responsibility for our own intentional or grossly
+    negligent acts, or for anything else the law says we cannot limit. Where a limit in this
+    section is not allowed where you live, it does not apply to you, and the rest of these terms
+    still do.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>06</i>If you live in Quebec</h3>
+  <p>The Quebec <i>Consumer Protection Act</i> gives you rights these terms cannot reduce. In
+    particular, nothing here frees us from the consequences of our own acts or the acts of those
+    working for us, and nothing here requires you to go to arbitration, stops you going to court,
+    or stops you taking part in a class action.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>07</i>If a result is wrong about you or your business</h3>
+  <p>Tell us. We read every message and we answer. If a record we showed is about a different
+    business, or a source has since changed, we will correct what we show. If you represent a
+    business and want your side printed beside an entry, we will print it. The route and the
+    times are set out in the <button type="button" class="rp-lk"
+    data-doc="compliance">compliance statement</button>. Write to
+    <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>08</i>Your privacy</h3>
+  <p>There are no accounts. We do not keep what you typed and we do not keep the result. What we
+    do keep, and why, is set out in the <button type="button" class="rp-lk"
+    data-doc="privacy">privacy notice</button>, which forms part of these terms.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>09</i>When these terms change</h3>
+  <p>Each check is made under the version of these terms shown when you press
+    <b>I understand</b>, and that version is printed on the result. If we change the terms, the
+    new version applies only to checks made after it is published. A check you have already made
+    stays under the terms it was made under.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>10</i>The law that applies</h3>
+  <p>These terms are governed by the laws of Alberta and the federal laws of Canada that apply
+    there. If the consumer protection law of the province where you live gives you more
+    protection, or lets you bring a claim in your own province, that law and those courts apply
+    to you. <b>There is no arbitration clause and no waiver of class actions in these terms.</b></p>
+  <p>If a court decides that part of these terms cannot be enforced, the rest still applies.</p>
+</div>
+
+<div class="rp-dsec">
+  <h3><i>11</i>Who we are</h3>
+  <p>4ormIQ is run by 4orm Finance, of Calgary, Alberta. Questions about these terms go to
+    <a href="mailto:compliance@4ormiq.com">compliance@4ormiq.com</a>.</p>
+</div>
+
+      </div>
+
+      <nav class="rp-docnav" aria-label="Other documents">
+        <button type="button" data-doc="privacy">Privacy notice</button>
+        <button type="button" data-doc="compliance">Compliance statement</button>
+        <button type="button" data-doc="sources">How we decide</button>
+      </nav>
+
+      <div class="rp-foot">
+        <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
+        <span>4ormiq.com</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <section class="rp-fv" id="rpFoundBox" role="dialog" aria-modal="true" aria-labelledby="rpFoundT" hidden>
   <div class="rp-fvsheet">
     <div class="rp-fvhd">
@@ -6251,6 +6494,18 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     <li><b>We show the gaps.</b> Any register we could not open is named, so you can see what is missing.</li>
   </ol>
   <p class="primfine" id="primFine"></p>
+  <!-- THE AGREEMENT IS THE BUTTON, SO THE TERMS SIT BESIDE IT.
+       A click only binds anybody if they were told what it meant before they
+       made it, and could read what they were agreeing to. So the sentence names
+       the terms and the version, and the terms open here, inside this card,
+       rather than on another page. Another page would take the reader away from
+       the one control that is allowed to open the result. -->
+  <p class="primterms" id="primTermsLine">By pressing <b>I understand</b> you agree to the
+    <button type="button" class="primtlink" id="primTermsBtn" aria-expanded="false"
+      aria-controls="primTermsBox">Terms of Use</button>, version <span
+      id="primTermsVer">1.0</span>, for this check.</p>
+  <div class="primtermsbox" id="primTermsBox" hidden tabindex="0"
+       aria-label="Terms of Use"></div>
   <button class="primok" type="button" id="primOk" disabled>I understand</button>
 </div>
 
@@ -6316,6 +6571,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       <button type="button" data-doc="compliance">Compliance statement</button>
       <span aria-hidden="true">&middot;</span>
       <button type="button" data-doc="privacy">Privacy notice</button>
+        <button type="button" data-doc="terms">Terms of use</button>
       <span aria-hidden="true">&middot;</span>
       <button type="button" data-doc="sources">How we decide</button>
     </p>
@@ -12285,6 +12541,54 @@ var EDU = [
 ];
 
 var waitScrim=id("waitScrim"), waitBox=id("waitBox");
+/* ============================================================ THE TERMS
+   The version a reader agrees to, and when. Every check reopens the card and
+   asks again, so each check is its own agreement under the version in force
+   that day, and a change to the terms never reaches back over a check already
+   made. The text itself lives once, in the rpTerms sheet.
+
+   TERMS_AT is set by the one control that opens a result and by nothing else,
+   and is printed on the result and on every pack, so the reader holds the
+   record of what they agreed to. Nothing about the reader is stored with it:
+   there is no account to store it against, and that is by design. */
+var TERMS_VERSION = "1.0";
+var TERMS_DATE    = "21 September 2026";
+var TERMS_AT      = null;
+function termsStamp(){
+  if(!TERMS_AT) return "";
+  var M=["January","February","March","April","May","June","July","August",
+         "September","October","November","December"];
+  var d=TERMS_AT, hh=("0"+d.getHours()).slice(-2), mm=("0"+d.getMinutes()).slice(-2);
+  return "Terms of Use version "+TERMS_VERSION+", agreed at "+hh+":"+mm
+       +" on "+d.getDate()+" "+M[d.getMonth()]+" "+d.getFullYear();
+}
+/* The panel inside the card is a copy of the published sheet with its links
+   made inert. A link in there that opened another document would take the
+   reader off the card that stands between them and the result, and the way
+   back from a document during a check goes straight to the result. */
+function primTermsFill(){
+  var box=id("primTermsBox"), src=id("rpTermsBody");
+  if(!box || !src || box.getAttribute("data-filled")) return;
+  var c=src.cloneNode(true);
+  var links=c.querySelectorAll("[data-doc]"), i;
+  for(i=0;i<links.length;i++){
+    var sp=document.createElement("span");
+    sp.className="primtref"; sp.textContent=links[i].textContent;
+    links[i].parentNode.replaceChild(sp, links[i]);
+  }
+  box.innerHTML=c.innerHTML;
+  box.setAttribute("data-filled","1");
+}
+function primTermsToggle(){
+  var box=id("primTermsBox"), b=id("primTermsBtn");
+  if(!box || !b) return;
+  primTermsFill();
+  var open = box.hidden;
+  box.hidden = !open;
+  b.setAttribute("aria-expanded", open ? "true" : "false");
+  if(open){ box.scrollTop=0; try{ box.focus({preventScroll:true}); }catch(e){} }
+}
+
 var WAIT_DISCLAIMER = "<b>A research tool, not advice.</b> We report what public records show, with the source and the date beside every finding. An absence is not proof, and green never means we have certified anyone. The decision stays with you.";
 var eduI=0, eduT=null, waitDone=false, waitAck=false, waitPayload=null, waitRender=null, waitReturn=null;
 
@@ -12537,6 +12841,12 @@ function primOpen(){
   var b=id("primBox"), sc=id("primScrim"), f=id("primFine");
   if(!b||!sc) return;
   if(f) f.innerHTML=WAIT_DISCLAIMER;
+  /* A fresh agreement for a fresh check. The last one does not carry over. */
+  TERMS_AT=null;
+  var tv=id("primTermsVer"); if(tv) tv.textContent=TERMS_VERSION;
+  var tb=id("primTermsBox"), tl=id("primTermsBtn");
+  if(tb) tb.hidden=true;
+  if(tl) tl.setAttribute("aria-expanded","false");
   primReturn=document.activeElement;
   var k0=id("primOk"); if(k0) k0.disabled=false;
   sc.classList.add("on"); b.classList.add("on");
@@ -12774,11 +13084,17 @@ function waitFinish(render){
   /* Nothing is forming any more. A line that keeps saying so after the answer
      has landed is the page talking over its own result. */
   var wf=id("waitForming"); if(wf) wf.hidden=true;
-  /* AND IT OPENS ITSELF.
-     The disclaimer that used to be crossed here is read and agreed to on the
-     card that opens before the sweep, so there is nothing left for a reader to
-     press. Asking them to press one thing to agree and another to look is two
-     doors on one thought. */
+  /* AND IT OPENS ITSELF, ONCE THE READER HAS AGREED.
+     The disclaimer and the terms are read and agreed to on the card that opens
+     before the sweep, so there is nothing else for a reader to press. Asking
+     them to press one thing to agree and another to look is two doors on one
+     thought.
+     But a quick check can land before they have pressed it. Opening the result
+     then would put it on the page ahead of the agreement it is given under, so
+     it waits, and the "I understand" handler opens it the moment it is
+     pressed. On a normal check nobody sees the difference: they have agreed
+     long before the sweep lands. */
+  if(!waitAck) return;
   waitClose();
 }
 
@@ -12844,7 +13160,12 @@ waitBox.addEventListener("keydown",function(e){
   else if(e.key==="ArrowRight"){ eduStep(1); }
 });
 
+id("primTermsBtn").addEventListener("click", primTermsToggle);
 id("primOk").addEventListener("click",function(){
+  /* THIS IS THE AGREEMENT. The one control that opens a result, pressed with
+     the terms named beside it. The moment is kept so it can be printed on
+     what the reader takes away. */
+  TERMS_AT = new Date();
   primClose();
   /* Acknowledged. The sweep carries on and the result opens itself when it
      lands, so nobody is asked to agree to the same sentence twice. */
@@ -12865,7 +13186,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260921.0211";
+var KBYS_BUILD = "20260921.0327";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -14739,7 +15060,8 @@ function rpPackBlocks(d,p){
   B.push({k:"foot", t:"How to tie this pack back to one check", rows:[
     ["Report reference",ref],["Party",party],["Website",rpDomain(d)||"Nothing identified"],
     ["Records read",read||"Not recorded"],["Pack",p.name],
-    ["Produced by","4orm Finance, 4ormiq.com"]]});
+    ["Produced by","4orm Finance, 4ormiq.com"],
+    ["Terms", termsStamp() || ("Terms of Use version "+TERMS_VERSION)]]});
   /* The fine print belongs to the identification and travels with it, so a page
      break can never put the two of them on different sheets. */
   B[B.length-1].fine = [
@@ -16036,6 +16358,8 @@ function renderReport(d){
     var sp=id(x); if(!sp) return;
     sp.innerHTML=specHtml; sp.style.display = specHtml ? "" : "none";
   });
+  var ag=id("rpAgreed");
+  if(ag){ var st=termsStamp(); ag.textContent = st ? st + "." : ""; ag.hidden = !st; }
   rpSourcesFill();
 }
 
@@ -16118,12 +16442,13 @@ function rpTop(){
    The records explain the result, so they open underneath it on the same page
    rather than taking the reader somewhere and leaving the verdict behind. */
 var RP_SCREENS = { result:"rpReport", act:"rpAct", sources:"rpSources",
-                   compliance:"rpCompliance", privacy:"rpPrivacy" };
+                   compliance:"rpCompliance", privacy:"rpPrivacy", terms:"rpTerms" };
 /* The three that are reachable from ANYWHERE, including from the landing page
    where there is no result to go back to. Everything else in RP_SCREENS is part
    of a report and its back button already knows its own destination. */
-var RP_DOCS = { sources:1, compliance:1, privacy:1 };
-var RP_DOCBACK = { sources:"rpBackToReport", compliance:"rpCompBack", privacy:"rpPrivBack" };
+var RP_DOCS = { sources:1, compliance:1, privacy:1, terms:1 };
+var RP_DOCBACK = { sources:"rpBackToReport", compliance:"rpCompBack", privacy:"rpPrivBack",
+                   terms:"rpTermsBack" };
 var RP_AT = "result";
 function rpShow(which){
   if(!RP_SCREENS[which]) which="result";
@@ -16605,6 +16930,7 @@ id("rpSources").addEventListener("click", function(e){
 id("rpBackToReport").addEventListener("click", rpSourcesBack);
 id("rpCompBack").addEventListener("click", rpSourcesBack);
 id("rpPrivBack").addEventListener("click", rpSourcesBack);
+id("rpTermsBack").addEventListener("click", rpSourcesBack);
 /* THE MARK IS A FILE, AND IT IS INLINED ONCE.
    The two documents carry the same header as the sources sheet. Pasting the
    base64 into them a third and fourth time would add 50KB to every page load
