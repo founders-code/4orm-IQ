@@ -5,8 +5,8 @@
    The door to the records is neutral, because a colour on it is a verdict
    about what is behind it before anybody has opened it.
 
-   The imperative beside the verdict says "if you've sent money" wherever we
-   have not been told that money has gone. */
+   The imperative beside the verdict appears only where the reader told us
+   money has gone. Everyone else gets the next steps door instead. */
 import fs from 'fs';
 import { chromium } from 'playwright';
 
@@ -32,42 +32,39 @@ const src = fs.readFileSync('index.html', 'utf8');
   }
 }
 
-/* ---- 2. The count does the work --------------------------------------- */
+/* ---- 2. The count does the work, in one unit -------------------------- */
 {
-  ok(/function rpOfficialCount/.test(src),
-     'nothing counts how many records an authority published, so the neutral '
-   + 'door has no fact to carry');
-  const fn = src.slice(src.indexOf('function rpOfficialCount'),
-                       src.indexOf('function rpLookalikes'));
-  ok(/rpAttached\(/.test(fn),
-     'the count includes records that are not about this party, which is the '
-   + 'attachment rule broken on a smaller surface');
-  ok(/t==="A"/.test(fn), 'the count includes records no authority published');
-  ok(/regulator, court or registry/.test(src),
-     'the door no longer says how many of the records an authority published');
+  const i = src.indexOf('var shownL = rpSieve(');
+  ok(i > -1, 'the door count no longer counts the findings the sheet opens on');
+  const blk = src.slice(i, i + 900);
+  ok(/tier==="A"/.test(blk), 'the second number counts records no authority published');
+  ok(/regulator, court or registry/.test(blk),
+     'the door no longer says how many findings an authority published');
+  ok(!/function rpOfficialCount/.test(src),
+     'the old count is back, which counted records rather than findings and '
+   + 'printed "six records, nine of them from a regulator"');
 }
 
-/* ---- 3. The imperative says only what we know -------------------------- */
+/* ---- 3. The imperative goes only to a reader whose money has gone ------- */
 {
-  ok(/if you\\u2019ve sent money/.test(src) || /if you’ve sent money/.test(src),
-     'the imperative is issued without the condition, to readers who have sent nothing');
-  const i = src.indexOf('var actLabel_');
-  ok(i > -1, 'the label is no longer chosen from what we know');
-  const block = src.slice(i, i + 220);
-  ok(/sent_ \?/.test(block),
-     'the label does not turn on whether the reader told us money has gone');
-  ok(/sent_ \? "Do this right now"/.test(block),
-     'a reader who has told us the money is gone is still given a conditional, '
-   + 'which hedges the one line that has to land');
+  const i = src.indexOf('var sentNow_ =');
+  ok(i > -1, 'the control beside the verdict is no longer chosen from the answer');
+  const blk = src.slice(i, i + 900);
+  ok(/stage\)\|\|"BEFORE"\)==="SENT"/.test(blk),
+     'the control does not turn on whether the reader told us money has gone');
+  ok(/else if\(sentNow_\)/.test(blk) && /Do this right now<\/button>/.test(blk),
+     'a reader whose money has gone is not told to do this right now');
+  ok(/actBox\.hidden = true/.test(blk),
+     'a reader who has sent nothing is still shown an imperative beside the verdict');
 }
 
-/* ---- 4. The beat is still earned by one thing only -------------------- */
+/* ---- 4. The beat is earned by two things, and rests lit ----------------- */
 {
-  ok(/var beat_ = rpHasOfficial\(d\) \? " rp-beat" : ""/.test(src),
-     'the flashing is no longer gated on an authority having named this party');
-  ok(!/rp-beat[^\n]*stage/.test(src),
-     'the flashing has been tied to whether money was sent; it means one thing '
-   + 'and that thing is an authority record');
+  ok(/var beat_ = \(sentNow_ && rpHasOfficial\(d\)\) \? " rp-beat" : ""/.test(src),
+     'the flashing is not gated on money gone AND an authority having named this party');
+  ok(/animation:rpBeat 1\.5s var\(--ease\) 3\}/.test(src),
+     'the flashing is not three beats');
+  ok(!/rpBeat[^;}\n]*infinite/.test(src), 'the flashing never stops');
 }
 
 /* ---- 5. And it renders ------------------------------------------------- */
@@ -153,29 +150,48 @@ try {
   const hook = await q.evaluate(() => !!(window.__KBYS__ && window.__KBYS__.rerender));
   ok(hook, 'the debug hook is gone, so the not-sent case cannot be driven');
 
-  const n = hook ? await q.evaluate(() => {
+  const drive = stage => q.evaluate(st => {
     const K = window.__KBYS__;
     const d = K.lastReport();
     d.verdict = 'RED';
-    K.runCtx({ sector: 'INVESTMENT', stage: 'BEFORE', channel: null });
+    K.runCtx({ sector: 'INVESTMENT', stage: st, channel: null });
     K.rerender();
     const a = document.querySelector('#rpTonightA .rp-actb');
-    return { ctx: K.runCtx().stage, act: a ? a.textContent.trim() : null,
-             beat: a ? a.className.includes('rp-beat') : null };
-  }) : {};
-  console.log('  red, not sent  ctx=' + n.ctx + '  action ' + JSON.stringify(n.act)
-    + '  beats: ' + n.beat);
-  ok(n.ctx === 'BEFORE', 'the not-sent case did not take: ' + n.ctx);
-  ok(n.act, 'a red verdict offers no action at all');
-  ok(n.act && /if you\u2019ve sent money|if you’ve sent money/.test(n.act),
-     'a reader who has sent nothing is told to do something right now with no '
-   + 'condition: ' + JSON.stringify(n.act));
-  /* And the demo party has no attached authority record, so it must not beat. */
-  ok(n.beat === false,
-     'a red verdict with no authority record about this party is still flashing');
+    const w = document.getElementById('rpActWay');
+    return { ctx: K.runCtx().stage, act: a && !a.closest('[hidden]') ? a.textContent.trim() : null,
+             beat: a ? a.className.includes('rp-beat') : null,
+             mode: w ? w.getAttribute('data-mode') : null,
+             door: (document.getElementById('rpToActT')||{}).textContent };
+  }, stage);
+  for (const st of ['BEFORE', 'DILIGENCE']) {
+    const n = hook ? await drive(st) : {};
+    console.log('  red, ' + st + '  action ' + JSON.stringify(n.act) + '  door ' + JSON.stringify(n.door));
+    ok(n.ctx === st, 'the ' + st + ' case did not take: ' + n.ctx);
+    ok(!n.act, 'a reader who has sent nothing is shown an action beside the verdict: ' + n.act);
+    ok(n.mode === 'next', 'the door is in ' + n.mode + ' mode for a reader who has sent nothing');
+    ok(n.door === 'Next steps to protect you', 'the door reads ' + JSON.stringify(n.door));
+    /* The door opens the next steps page, not the act page. */
+    if (hook) {
+      const opened = await q.evaluate(() => { document.getElementById('rpToAct').click();
+        const r = !document.getElementById('rpNext').hidden;
+        document.getElementById('rpNextBack').click(); return r; });
+      ok(opened, 'the door does not open the next steps page for ' + st);
+    }
+  }
+  const s = hook ? await drive('SENT') : {};
+  console.log('  red, SENT  action ' + JSON.stringify(s.act) + '  beats: ' + s.beat + '  door ' + JSON.stringify(s.door));
+  ok(s.act && /right now|tell your bank/.test(s.act), 'a reader whose money has gone gets no action: ' + s.act);
+  ok(s.mode === 'sent' && s.door === 'Do this right now', 'the door is not the red act door for SENT');
+  /* The demo party has no attached authority record, so even SENT must not beat. */
+  ok(s.beat === false, 'a verdict with no authority record about this party is still flashing');
+  if (hook) {
+    const opened = await q.evaluate(() => { document.getElementById('rpToAct').click();
+      return !document.getElementById('rpAct').hidden; });
+    ok(opened, 'the red door does not open the act page for a reader whose money has gone');
+  }
 
   ok(e2.length === 0, 'page errors on the not-sent walk: ' + e2.join(' | '));
 } finally { await b.close(); }
 
 if (fails.length) { console.error('doorcheck FAIL\n  ' + fails.join('\n  ')); process.exit(1); }
-console.log('doorcheck ok  neutral door with the count, imperative conditional on what we know');
+console.log('doorcheck ok  neutral records door with the count, imperative only where money has gone');

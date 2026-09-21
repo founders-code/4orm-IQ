@@ -29,6 +29,10 @@ for (let i = 0; i < 6; i++) {
 await p.click('#rpToFound'); await p.waitForTimeout(600);
 await p.click('#rpFoundBack'); await p.waitForTimeout(600);
 await p.click('#rpToAct');   await p.waitForTimeout(500);
+/* Not sent opens next steps first; what to do is its red button. */
+await p.evaluate(() => { const n = document.getElementById('rpNext');
+  if (n && !n.hidden) document.getElementById('rpNextToAct').click(); });
+await p.waitForTimeout(500);
 
 /* The fingerprint of everything the sector is forbidden to touch. */
 const shape = () => p.evaluate(() => ({

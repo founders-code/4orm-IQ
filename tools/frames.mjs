@@ -21,7 +21,8 @@ const fails = [];
 const SCREENS = [
   ['result', null],
   ['found',  '#rpToFound'],
-  ['act',    '#rpToAct'],
+  ['next',   '#rpToAct'],
+  ['act',    '#rpNextToAct'],
   ['sources','#rpToSources_act'],
 ];
 for (const q of ['Goliath Ventures', 'atlanticglobalwealth.com', 'investhelm.com']) {

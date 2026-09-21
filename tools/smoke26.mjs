@@ -206,7 +206,10 @@ await p.click('#rpFoundBack'); await p.waitForTimeout(700);
   if (shut.locked) fail('the page is still locked after the sheet closed');
   if (shut.focus !== 'rpToFound') fail('focus did not come back to the control, it is on ' + shut.focus);
 }
-await p.click('#rpToAct');   await p.waitForTimeout(500); await one('rpAct', 'the way on to what to do');
+/* No answer to the money question reads as not sent, so the door under the
+   card opens the next steps page, and what to do is one button further on. */
+await p.click('#rpToAct');   await p.waitForTimeout(500); await one('rpNext', 'the way on for a reader who has not sent money');
+await p.click('#rpNextToAct'); await p.waitForTimeout(500); await one('rpAct', 'the way on to what to do');
 await pillPair('the act screen');
 
 /* THE DEEPEST SCREEN CARRIES BOTH WAYS BACK, AS PILLS.
@@ -281,6 +284,7 @@ await p.click('#rpActBack'); await p.waitForTimeout(500); await one('rpReport', 
 
 /* Out to how we decide from the act screen, and back to where they were. */
 await p.click('#rpToAct'); await p.waitForTimeout(400);
+await p.click('#rpNextToAct'); await p.waitForTimeout(400);
 await p.click('#rpToSources_act'); await p.waitForTimeout(400);
 await one('rpSources', 'sources from the act screen');
 /* The label names the screen it returns to. It used to say "Back to the
@@ -310,7 +314,7 @@ const order = await p.evaluate(() => {
   const s = document.getElementById('rpReport');
   const y = sel => { const e = s.querySelector(sel); return e ? e.getBoundingClientRect().top + window.scrollY : null; };
   return { tonight: y('#rpTonight'), onward: y('#rpToFound'), good: y('#rpGoodSec'),
-           gap: y('.rp-gapnote'), act: y('#rpActWay'), already: y('#rpAlready') };
+           gap: y('#rpGapsBox'), act: y('#rpActWay'), already: y('#rpAlready') };
 });
 for (const k of ['tonight', 'onward', 'good', 'gap', 'act'])
   if (order[k] === null) fail('the result screen is missing ' + k);
@@ -320,26 +324,25 @@ if (order.already !== null)
    The verdict, the half width way in to the records, the records that came
    back in their favour, what we could not answer, then the full width action. */
 if (!(order.tonight < order.onward && order.onward < order.good
-      && order.good < order.gap && order.gap < order.act))
+      && order.good < order.gap && order.gap <= order.act + 1))
   fail('the result screen reads in the wrong order: ' + JSON.stringify(order));
-/* AND THE TWO WIDTHS ARE THE TWO WIDTHS. The way in is about half the column
-   and matched to the grey box; the action runs the full width under it. */
+/* AND THE CLOSE IS ONE ROW. What we could not answer sits under the reading
+   column at its width, and the door sits beside it under the report card. */
 {
   const w = await p.evaluate(() => {
-    const q = s => { const e = document.querySelector(s); return e ? Math.round(e.getBoundingClientRect().width) : null; };
-    return { found: q('#rpReport .rp-foundway'), gap: q('#rpReport .rp-gapnote'),
-             act: q('#rpActWay'), col: q('#rpReport .rp-heromain') };
+    const r = s => { const e = document.querySelector(s); return e ? e.getBoundingClientRect() : null; };
+    const f = r('#rpReport .rp-foundway'), g = r('#rpGapsBox'), a = r('#rpActWay'), c = r('#rpReport .rp-card') || r('#rpReport .rp-heroside');
+    return { found: f && Math.round(f.width), gap: g && Math.round(g.width), gapR: g && g.right,
+             actL: a && a.left, act: a && Math.round(a.width) };
   });
   if (w.found === null || w.gap === null || w.act === null) fail('a width could not be measured');
   if (Math.abs(w.found - w.gap) > 2)
-    fail('the way in is ' + w.found + 'px and the grey box is ' + w.gap + 'px; they should match');
-  if (w.found > w.act * 0.72)
-    fail('the way in is not meaningfully narrower than the action: ' + w.found + ' against ' + w.act);
-  if (w.act < w.col * 0.94)
-    fail('the action does not run the full width: ' + w.act + ' of ' + w.col);
+    fail('the way in is ' + w.found + 'px and the gaps list is ' + w.gap + 'px; they should match');
+  if (!(w.actL >= w.gapR))
+    fail('the door is not beside the gaps list: ' + JSON.stringify(w));
 }
 
 if (errs.length) fail('page errors: ' + errs.join(' | '));
-console.log('screens walked, the result reads in the asked-for order, both widths held');
+console.log('screens walked, the result reads in the asked-for order, the close is one row');
 console.log('PASSED');
 process.exit(0);

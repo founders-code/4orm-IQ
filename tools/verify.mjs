@@ -1010,23 +1010,29 @@ if (/class="[^"]*\brp-rp-/.test(html))
     fails.push('who to reach out to is in the wrong order: expected '
       + want_.join(' then ') + ', found ' + got_.join(' then '));
 }
-/* A CONTROL BESIDE THE VERDICT, WHERE THERE IS SOMETHING TO DO TONIGHT.
-   Adverse, or the money has already gone. Amber never earns one: amber is not
-   a fault, and handing somebody a red button for it would make it one. */
-if (!/d\.verdict==="RED" \|\| \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT"/.test(script))
-  fails.push('the verdict no longer carries a way to act where the result is adverse or money has gone');
-/* THE LABEL IS CHOSEN, NOT FIXED. It reads "Do this right now" for a reader
-   who has told us the money is gone, and adds the condition for one looking at
-   a red verdict who has sent nothing, because the imperative was otherwise
-   being issued about a thing they have not done. Both branches are required
-   here; tools/doorcheck.mjs drives the page and reads the rendered sentence. */
-if (!/data-act="1">'\s*\+ rpEsc\(actLabel_\)/.test(script))
-  fails.push('the control beside the verdict lost its label');
-if (!/actLabel_ = sent_ \? "Do this right now"/.test(script))
-  fails.push('a reader who has told us the money is gone is given a conditional, '
-    + 'which hedges the one line that has to land');
-if (!/if you\\u2019ve sent money/.test(script))
-  fails.push('a reader who has sent nothing is told to act right now, with no condition');
+/* A CONTROL BESIDE THE VERDICT ONLY WHERE THE MONEY HAS GONE.
+   It used to appear on any red verdict too, and for a reader who was only
+   researching it said "do this right now" about a thing they had not done. For
+   them the dark summary is the whole of it, and the way on is next steps at the
+   foot of the page. Decided 21 September 2026. */
+if (!/var sentNow_ = \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT";/.test(script))
+  fails.push('the control beside the verdict no longer turns on whether money has gone');
+if (!/\} else if\(sentNow_\)\{[\s\S]{0,200}data-act="1">'\s*\+ 'Do this right now<\/button>/.test(script))
+  fails.push('a reader whose money has gone is no longer given "Do this right now" beside the verdict');
+if (/d\.verdict==="RED" \|\| \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT"/.test(script))
+  fails.push('a red verdict for a reader who has sent nothing is given a control beside it again');
+/* The way on at the foot, and the two other controls that mean "what now",
+   turn on the same answer, so none can say "do this right now" to a reader who
+   has not sent anything. */
+if (!/function rpOnward\(\)\{ if\(rpSentNow\(\)\) rpAct\(\); else rpNext\(\); \}/.test(script))
+  fails.push('the way on no longer sends a reader who has not sent money to next steps');
+for (const k of ['id("rpToAct").addEventListener("click", rpOnward)',
+                 'btn.addEventListener("click", rpOnward)',
+                 'rpFoundHide(); rpOnward();'])
+  if (!script.includes(k))
+    fails.push('a "what now" control bypasses the answer about money: ' + k);
+if (!/set\("rpToActT","Next steps to protect you"\)/.test(script))
+  fails.push('the door at the foot no longer says "Next steps to protect you" to a reader still deciding');
 if (/verdict==="AMBER"[^\n]*data-act/.test(script))
   fails.push('amber is being handed a red button, and amber is not a fault');
 if (!/if\(t\.getAttribute\("data-act"\)\) rpAct\(\);/.test(script))
@@ -1650,10 +1656,15 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
 {
   if (!/@keyframes rpBeat\{/.test(styleBlock))
     fails.push('the urgent control no longer beats at all');
-  if (!/#rpt \.rp-actb\.rp-beat\{animation:rpBeat/.test(styleBlock))
-    fails.push('the beat is not wired to the control');
-  if (!/var beat_ = rpHasOfficial\(d\) \? " rp-beat" : "";/.test(script))
-    fails.push('the beat is not gated on an authority naming this party');
+  /* THREE BEATS AND THEN IT STAYS LIT. An endless beat on a page read in a
+     panic is a light flashing in the corner of the eye while somebody tries to
+     read the words beside it. Decided 21 September 2026. */
+  if (!/#rpt \.rp-actb\.rp-beat\{background:var\(--bad\)[^}]*animation:rpBeat 1\.5s var\(--ease\) 3\}/.test(styleBlock))
+    fails.push('the beat is not wired to the control, or no longer rests lit after three');
+  if (/rp-beat\{[^}]*animation:rpBeat[^}]*infinite/.test(styleBlock))
+    fails.push('the beat runs forever again');
+  if (!/var beat_ = \(sentNow_ && rpHasOfficial\(d\)\) \? " rp-beat" : "";/.test(script))
+    fails.push('the beat is not gated on an authority naming this party and the money having gone');
   if (/rp-beat[^"]*"[\s\S]{0,200}verdict==="AMBER"/.test(script))
     fails.push('an amber result is being made to beat, and amber is not a fault');
   /* It stops under the pointer, and it never runs for a reader who asked for
@@ -1664,7 +1675,7 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     fails.push('the beat runs for a reader who has asked for less movement');
   /* And the reduced-motion case still marks the control, rather than silently
      dropping the one signal on the page. */
-  if (!/#rpt \.rp-actb\.rp-beat\{animation:none;box-shadow:0 0 0 3px/.test(styleBlock))
+  if (!/#rpt \.rp-actb\.rp-beat\{animation:none;background:var\(--bad\)[\s\S]{0,80}box-shadow:0 0 0 3px/.test(styleBlock))
     fails.push('with motion off the urgent control is no longer marked at all');
 }
 

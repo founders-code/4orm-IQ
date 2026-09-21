@@ -31,6 +31,10 @@ const act = async () => {
   if (await p.evaluate(() => document.getElementById('rpAct').hidden))
     await p.click('#rpToAct');
   await p.waitForTimeout(500);
+  /* Not sent opens next steps first; what to do is its red button. */
+  if (await p.evaluate(() => !document.getElementById('rpNext').hidden)) {
+    await p.click('#rpNextToAct'); await p.waitForTimeout(500);
+  }
 };
 
 await run('atlanticglobalwealth.com');

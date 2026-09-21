@@ -66,6 +66,8 @@ await p.click('#rpToFound'); await p.waitForTimeout(700);
 await shot('08-found', true);
 await p.click('#rpFoundBack'); await p.waitForTimeout(600);
 await p.click('#rpToAct'); await p.waitForTimeout(600);
+if (await p.evaluate(() => !document.getElementById('rpNext').hidden)) {
+  await p.click('#rpNextToAct'); await p.waitForTimeout(600); }
 await p.evaluate(()=>document.querySelectorAll('#rpAct details').forEach(d=>d.open=true));
 await p.waitForTimeout(400);
 await shot('09-act', true);

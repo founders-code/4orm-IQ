@@ -1,8 +1,8 @@
-# 4orm IQ, build 20260921.0327
+# 4orm IQ, build 20260921.0550
 
 Everything in this archive is the working tree as it stands, plus the two
 control documents under `reports/`. It is a git repository: `git log` carries
-five commits and the reason for each.
+six commits and the reason for each.
 
 ## Run the gate
 
@@ -19,7 +19,7 @@ npm run check
 | `compliance` | 16 rules, each naming the document it comes from |
 | `compliance:test` | breaks all 16 on purpose and requires each to notice |
 | `scanner` | the five files we actually serve |
-| `test` | verify, graph-tests, 41 smokes, 13 gates |
+| `test` | verify, graph-tests, 41 smokes, 14 gates |
 
 `.github/workflows/check.yml` runs the same command on every pull request into
 main. It needs no secret, because every check reads files.
@@ -36,6 +36,22 @@ main. It needs no secret, because every check reads files.
 | The remote | The repository is committed locally and has no remote. `check` should be a required status check on main. |
 
 ## What changed in this build
+
+### The report, for the reader who has sent money and the one who has not
+
+| Change | Where |
+|---|---|
+| The red button beats three times, then stays lit red. No more continuous flashing. | `index.html`, `.rp-beat` |
+| The button beside the verdict shows only when the reader said money has gone. It beats only when a regulator, court or registry has published something about this party by name. | `index.html`, `sentNow_` |
+| The money question carries a note: this is the important one. | the `stage` question |
+| The bottom of the report is one row: what we could not answer on the left under the reading column, the way on beside it under the report card. The grey box and the full width green bar are gone. | `#rpClose` |
+| Not sent, or just researching: the way on is blue, "Next steps to protect you". Sent: it is red, "Do this right now". The pinned phone bar and the button inside the records follow the same answer. | `rpOnward` |
+| New page, Next steps to protect you: four did you knows, each with its public source; nine tips on checking a business yourself (registers, review sites, consumer protection sites, social media, what a run of negative reviews means); and a red "Do this right now if you've sent money" at the foot. | `#rpNext` |
+| The records count uses one unit: "Two findings, one of them from a regulator, court or registry." It can no longer print a part larger than the whole. | door subline |
+| "What they present as" keeps capitals: VC startup, NFT, DeFi. | `rpKind` |
+| New gate `tools/nextcheck.mjs`; `doorcheck`, `smoke26/36/39/40`, `frames`, `packpdf`, `contactsheet` walk the new route. | `tools/` |
+
+### Earlier in this build
 
 ### The security pass, steps 1 to 8
 

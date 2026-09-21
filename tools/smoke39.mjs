@@ -126,7 +126,8 @@ await p.waitForTimeout(5400);
   if (mid.hidden || !mid.on) await fail('the pinned action never appeared on a phone');
   if (Math.abs(mid.bottom - mid.vh) > 2) await fail('the pinned action is not pinned to the foot');
   if (mid.h < 44) await fail('the pinned action is ' + mid.h + 'px tall, under the target floor');
-  if (!/Do this right now/.test(mid.label)) await fail('the pinned action is mislabelled: ' + mid.label);
+  /* Not sent: the pin names the next steps page. Sent: do this right now. */
+  if (!/Do this right now|Next steps to protect you/.test(mid.label)) await fail('the pinned action is mislabelled: ' + mid.label);
 
   /* It stands down while the door itself is on screen. */
   await p.evaluate(() => {
@@ -142,8 +143,12 @@ await p.waitForTimeout(5400);
   await p.waitForTimeout(500);
   await p.evaluate(() => document.getElementById('rpPinGo').click());
   await p.waitForTimeout(600);
-  const went = await p.evaluate(() => !document.getElementById('rpAct').hidden);
-  if (!went) await fail('the pinned action does not open what to do');
+  /* It goes where the door goes: next steps for a reader who has not sent
+     money, what to do for one who has. */
+  const went = await p.evaluate(() => {
+    const sent = window.__KBYS__ && window.__KBYS__.runCtx && window.__KBYS__.runCtx().stage === 'SENT';
+    return !document.getElementById(sent ? 'rpAct' : 'rpNext').hidden; });
+  if (!went) await fail('the pinned action does not open the page the door opens');
   console.log('pinned action: phone only, past the first screenful, stands down at the door');
 }
 

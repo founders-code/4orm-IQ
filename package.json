@@ -34,7 +34,7 @@
     "sweep": "node tools/sweep.mjs",
     "sweep:apply": "node tools/sweep.mjs --apply",
     "termscheck": "node tools/termscheck.mjs",
-    "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs tools/pathcheck.mjs tools/opscheck.mjs tools/docscheck.mjs tools/uxgate.mjs tools/budgetcheck.mjs tools/spendcheck.mjs tools/shapecheck.mjs tools/sqlcheck.mjs tools/fencecheck.mjs tools/schedcheck.mjs tools/doorcheck.mjs tools/termscheck.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
+    "test": "node tools/verify.mjs && node tools/graph-tests.mjs && for f in tools/smoke*.mjs tools/frames.mjs tools/smallscreen.mjs tools/handover.mjs tools/spacecheck.mjs tools/protocheck.mjs tools/waitstable.mjs tools/pathcheck.mjs tools/opscheck.mjs tools/docscheck.mjs tools/uxgate.mjs tools/budgetcheck.mjs tools/spendcheck.mjs tools/shapecheck.mjs tools/sqlcheck.mjs tools/fencecheck.mjs tools/schedcheck.mjs tools/doorcheck.mjs tools/nextcheck.mjs tools/termscheck.mjs; do echo \"-- $f\"; node \"$f\" || exit 1; done",
     "uxgate": "node tools/uxgate.mjs",
     "uxgate:record": "node tools/uxgate.mjs --record",
     "verify": "node tools/verify.mjs"

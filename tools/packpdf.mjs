@@ -139,6 +139,8 @@ for (const meta of packs) {
   /* The reader's own path: press "Do this right now", then a pack on the list. */
   await p.click('#rpToAct');
   await p.waitForTimeout(700);
+  if (await p.evaluate(() => !document.getElementById('rpNext').hidden)) {
+    await p.click('#rpNextToAct'); await p.waitForTimeout(600); }
   /* The list of who to reach out to sits inside a disclosure, shut until the
      reader opens it, so this opens it the way they do. */
   await p.evaluate(() => {

@@ -3642,6 +3642,82 @@ body.rp-fvup{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
   #rpt .rp-fv,#rpt .rp-fvsheet{transition:none}}
 
+/* ------------------------------------------------------------ next steps
+   Four facts, each one a number and a sentence and the body that published it,
+   then the checks. The facts come first because they are the reason the checks
+   matter: most fraud is never reported, so an empty record is not a clean one. */
+#rpt .rp-dyk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
+@media(max-width:720px){#rpt .rp-dyk{grid-template-columns:1fr}}
+#rpt .rp-dykc{background:var(--surface-2);border:1px solid var(--border-strong);
+  border-radius:var(--r-lg);padding:20px 22px}
+#rpt .rp-dykn{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--blue-dp);line-height:1.1}
+#rpt .rp-dykc p{margin:10px 0 0;font-size:14.5px;line-height:1.55;color:var(--tx-2)}
+#rpt .rp-dykc p b{color:var(--tx)}
+#rpt .rp-dykc .rp-dyks{margin-top:12px;font-size:12px;line-height:1.5;color:var(--tx-3)}
+#rpt .rp-dykc .rp-dyks a{color:var(--blue-dp)}
+#rpt .rp-tips{margin:6px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:14px}
+#rpt .rp-tips li{font-size:15px;line-height:1.6;color:var(--tx-2);padding-left:4px}
+#rpt .rp-tips li b{color:var(--tx)}
+#rpt .rp-tips li::marker{color:var(--blue-dp);font-weight:800}
+#rpt .rp-tips a{color:var(--blue-dp)}
+#rpt .rp-nextsent{display:flex;align-items:center;gap:18px;width:100%;text-align:left;
+  font-family:inherit;padding:20px 22px;border-radius:var(--r-lg);cursor:pointer;
+  background:var(--bad-bg);border:1px solid var(--bad-br);
+  transition:border-color .3s var(--ease),box-shadow .45s var(--ease),transform .5s var(--spring)}
+#rpt .rp-nextsent:hover{border-color:var(--bad);box-shadow:0 12px 34px rgba(214,51,78,.16);
+  transform:translateY(-2px)}
+#rpt .rp-nextsent:focus-visible{outline:2px solid var(--bad);outline-offset:3px}
+#rpt .rp-nextsent .rp-b{flex:1;min-width:0;display:block}
+#rpt .rp-nextsent .rp-t{display:block;font-size:18px;font-weight:800;letter-spacing:-.03em;color:#8A1F31}
+#rpt .rp-nextsent .rp-x{display:block;margin-top:7px;font-size:13.5px;line-height:1.5;color:#7A2E3D}
+#rpt .rp-nextsent .rp-go{display:flex;align-items:center;justify-content:center;flex:none;
+  width:38px;height:38px;border-radius:50%;background:var(--bad);color:#fff}
+#rpt .rp-nextsent .rp-go svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none}
+
+/* ------------------------------------------------ the gaps, under the summary
+   A list with a hairline above it, not a slab. It is the second half of the
+   answer, how much of the question it covers, and it reads as part of the
+   summary rather than as a box that arrived later. */
+#rpt .rp-gaps{margin-top:30px;padding-top:18px;border-top:1px solid var(--border-strong)}
+#rpt .rp-gapsk{font-family:var(--rmono);font-size:10.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx-3)}
+#rpt .rp-gapsx{margin-top:10px;font-size:14.5px;line-height:1.6;color:var(--tx-2);max-width:62ch}
+#rpt .rp-gapsx[hidden]{display:none}
+#rpt .rp-gapsx b{color:var(--tx)}
+
+/* -------------------------------------------------- the way on, under the card
+   Two readers, two doors, one place. Blue for somebody still deciding, because
+   next steps are the product doing its job and not a verdict. The alarm red is
+   kept for the reader whose money has gone, and it does not flash: the one that
+   flashes is beside the verdict, and one moving thing on a page is enough. */
+/* One row on the same two columns as the summary and the card above it. On a
+   phone it stacks, gaps first, because that is the reading order. */
+#rpt .rp-close{display:grid;grid-template-columns:var(--rp-half) var(--rp-card);
+  column-gap:var(--rp-gap);align-items:start;margin-top:44px}
+@media(max-width:860px){#rpt .rp-close{grid-template-columns:1fr;row-gap:26px}}
+#rpt .rp-close .rp-gaps{margin-top:0}
+#rpt #rpActWay{margin-top:0}
+#rpt #rpActWay .rp-onbtn{align-items:flex-start}
+#rpt #rpActWay .rp-onk{display:block;margin-bottom:6px;font-family:var(--rmono);font-size:10.5px;
+  font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+#rpt #rpActWay .rp-go{margin-top:4px}
+#rpt #rpActWay[data-mode="next"] .rp-onbtn{background:var(--blue-50);border:1px solid var(--blue-100)}
+#rpt #rpActWay[data-mode="next"] .rp-onbtn:hover{border-color:var(--blue-dp);
+  box-shadow:0 12px 34px rgba(46,107,242,.14)}
+#rpt #rpActWay[data-mode="next"] .rp-onbtn:focus-visible{outline:2px solid var(--blue-dp);outline-offset:3px}
+#rpt #rpActWay[data-mode="next"] .rp-onk{color:var(--blue-dp)}
+#rpt #rpActWay[data-mode="next"] .rp-t{color:var(--tx)}
+#rpt #rpActWay[data-mode="next"] .rp-x{color:var(--tx-2)}
+#rpt #rpActWay[data-mode="next"] .rp-go{background:var(--blue-dp)}
+#rpt #rpActWay[data-mode="sent"] .rp-onbtn{background:var(--bad-bg);border:1px solid var(--bad-br)}
+#rpt #rpActWay[data-mode="sent"] .rp-onbtn:hover{border-color:var(--bad);
+  box-shadow:0 12px 34px rgba(214,51,78,.16)}
+#rpt #rpActWay[data-mode="sent"] .rp-onbtn:focus-visible{outline:2px solid var(--bad);outline-offset:3px}
+#rpt #rpActWay[data-mode="sent"] .rp-onk{color:var(--bad-dp,#A81F38)}
+#rpt #rpActWay[data-mode="sent"] .rp-t{color:#8A1F31}
+#rpt #rpActWay[data-mode="sent"] .rp-x{color:#7A2E3D}
+#rpt #rpActWay[data-mode="sent"] .rp-go{background:var(--bad)}
+
 #rpt .rp-gapnote{margin-top:30px;max-width:var(--rp-half);background:#F1F2F4;border:1px solid #DCDFE4;
   border-left:3px solid #98A0AC;border-radius:0 var(--r-lg) var(--r-lg) 0;padding:25px 28px}
 #rpt .rp-gapnote .rp-t{font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
@@ -4138,13 +4214,24 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     box-shadow:0 0 0 0 rgba(214,51,78,0)}
   50%{background:var(--bad);color:#fff;border-color:var(--bad);
     box-shadow:0 0 0 7px rgba(214,51,78,.16)}}
-#rpt .rp-actb.rp-beat{animation:rpBeat 1.5s var(--ease) infinite}
+/* THREE BEATS, AND THEN IT STAYS ON.
+   It used to beat for as long as the page was open, which on a page somebody
+   is reading in a panic is a light flashing in the corner of their eye while
+   they try to take in the words beside it. Three is enough to draw the eye
+   once. After the third it rests lit, in the red it was pulsing towards, so
+   the control still reads as the urgent one without asking for attention a
+   second time. The resting state is the element's own style, and the
+   animation runs over the top of it and ends. */
+#rpt .rp-actb.rp-beat{background:var(--bad);color:#fff;border-color:var(--bad);
+  box-shadow:0 0 0 3px rgba(214,51,78,.18);
+  animation:rpBeat 1.5s var(--ease) 3}
 #rpt .rp-actb.rp-beat:hover,#rpt .rp-actb.rp-beat:focus-visible{animation:none;
   background:var(--bad);color:#fff;border-color:var(--bad)}
 @media(prefers-reduced-motion:reduce){
   /* Not a quieter beat: none. The state is carried by the ring, which is
      static, so the control still reads as the urgent one on the page. */
-  #rpt .rp-actb.rp-beat{animation:none;box-shadow:0 0 0 3px rgba(214,51,78,.22)}}
+  #rpt .rp-actb.rp-beat{animation:none;background:var(--bad);color:#fff;
+    border-color:var(--bad);box-shadow:0 0 0 3px rgba(214,51,78,.22)}}
 @media print{#rpt .rp-acta{display:none!important}}
 
 /* THE TWO PILLS
@@ -4982,6 +5069,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <div class="rp-saylab">In our own words</div>
           <p class="rp-say" id="rpSay"></p>
 
+
           <!-- The only control a check that did not run can honestly offer.
                Hidden on every run that did. -->
           <!-- WHAT ACTUALLY WENT WRONG, FOR WHOEVER RUNS THIS.
@@ -5048,6 +5136,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             </div>
           </details>
         </div></div>
+
         </div>
       </div>
       <!-- THE CUE THAT THERE IS MORE.
@@ -5119,33 +5208,48 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
         <p class="rp-asknote" id="rpAskNote" role="status" aria-live="polite"></p>
       </form>
     </div>
-
-    <div class="rp-sec rp-tight">
-      <div class="rp-gapnote">
-        <div class="rp-t">What we could not answer</div>
-        <div class="rp-x" id="rpGap1"></div>
-        <div class="rp-x" id="rpGap2"></div>
-        <div class="rp-x" id="rpGap3"></div>
+    <!-- THE CLOSE OF THE RESULT: WHAT WE COULD NOT ANSWER, THEN THE WAY ON.
+         This was a grey slab with a rule down its side, then a green band the
+         full width of the page, the same green as a good result on a page that
+         may be red. Two stacked blocks in two different colours, and the page
+         read as having two endings.
+         It is one row now, set on the same two columns as the summary and the
+         card above it: the words on the left, the one action on the right,
+         lined up under the report card. The order is unchanged and it matters:
+         the gaps are the honest edge of what the reader has just read, and they
+         come before the action, which is last because nothing may sit below it. -->
+    <div class="rp-close" id="rpClose">
+      <div class="rp-gaps" id="rpGapsBox">
+        <div class="rp-gapsk">What we could not answer</div>
+        <div class="rp-gapsx" id="rpGap1"></div>
+        <div class="rp-gapsx" id="rpGap2"></div>
+        <div class="rp-gapsx" id="rpGap3"></div>
         <!-- The jurisdiction we hold nothing for, named. Hidden unless the run
              actually pointed at one, because a list of countries on every
              result is wallpaper. -->
-        <div class="rp-x rp-gapj" id="rpGap4" hidden></div>
+        <div class="rp-gapsx rp-gapj" id="rpGap4" hidden></div>
+      </div>
+      <!-- THE WAY ON IS THE ACTION, AND IT IS ON THE RESULT PAGE.
+           It says what is behind it for the reader in front of it: next steps
+           for somebody still deciding, the calls to make for somebody whose
+           money has gone. -->
+      <div class="rp-onward" id="rpActWay" data-mode="next">
+        <button class="rp-onbtn" type="button" id="rpToAct">
+          <span class="rp-b">
+            <span class="rp-onk" id="rpToActK">Before you decide</span>
+            <span class="rp-t" id="rpToActT">Next steps to protect you</span>
+            <span class="rp-x" id="rpToActX">How to check a business yourself, what to look for in
+              reviews, and what to do if money has already gone.</span>
+          </span>
+          <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
       </div>
     </div>
 
-    <!-- THE WAY ON IS THE ACTION, AND IT IS ON THE RESULT PAGE.
-         A reader who has just been told not to send anything tonight had to
-         pass through a screen of evidence to reach the one page that tells
-         them to ring their bank. That call is measured in hours. -->
-    <div class="rp-onward" id="rpActWay">
-      <button class="rp-onbtn" type="button" id="rpToAct">
-        <span class="rp-b">
-          <span class="rp-t">Do this right now</span>
-          <span class="rp-x">Three things: what to do first if money has gone, who to reach out to with a report card ready for each of them, and the checks that catch most of it.</span>
-        </span>
-        <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      </button>
-    </div>
+
+
+
+
 
     <div class="rp-behind">
       <p class="rp-spec" id="rpSpec"></p>
@@ -5175,8 +5279,8 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     <div class="rp-pin" id="rpPin" hidden>
       <button class="rp-pinb" type="button" id="rpPinGo">
         <span class="rp-pb">
-          <span class="rp-pt">Do this right now</span>
-          <span class="rp-px">What to do, and who to reach out to</span>
+          <span class="rp-pt" id="rpPinT">Next steps to protect you</span>
+          <span class="rp-px" id="rpPinX">How to check a business yourself</span>
         </span>
         <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
@@ -5414,6 +5518,130 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ======================================================== NEXT STEPS
+     For the reader who has not sent money. The result told them what the
+     record says; this tells them how to check for themselves, so the decision
+     is theirs and they are better at the next one. Every figure on it names
+     the body that published it. The page for a reader whose money has gone is
+     one door away, at the foot, because it is the other half of the same
+     question. -->
+<div class="rp-sheet" id="rpNext" hidden>
+  <div class="rp-wash"></div>
+  <div class="rp-wrap">
+    <div class="rp-head">
+      <div class="rp-hlogo"><img alt="4orm Finance" data-logo="1"></div>
+      <div class="rp-navmid"></div>
+      <nav class="rp-nav" aria-label="Around this report">
+        <button class="rp-pill rp-pill-back" type="button" id="rpNextBack">
+          <svg viewBox="0 0 24 24"><path d="M19 12H6M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="rp-pw">Back to </span>The result
+        </button>
+      </nav>
+    </div>
+
+    <div class="rp-doc">
+      <h1 class="rp-stitle">Next steps to protect you.</h1>
+      <p class="rp-slead">Nothing here needs deciding tonight. These are the checks that catch
+        most of it, and none of them costs anything.</p>
+
+      <div class="rp-dsec">
+        <h3><i>01</i>Did you know</h3>
+        <div class="rp-dyk">
+          <div class="rp-dykc">
+            <div class="rp-dykn">$704 million</div>
+            <p>Canadians reported losing more than $704 million to fraud in 2025.</p>
+            <p class="rp-dyks">Department of Finance Canada, National Anti-Fraud Strategy,
+              <a href="https://www.canada.ca/en/department-finance/programs/consultations/2026/national-anti-fraud-strategy-discussion-paper.html"
+              target="_blank" rel="noopener noreferrer">discussion paper, 2026</a></p>
+          </div>
+          <div class="rp-dykc">
+            <div class="rp-dykn">5 to 10%</div>
+            <p>Only an estimated 5 to 10 per cent of fraud is ever reported. <b>A business with no
+              complaints on record is not the same as a business with no victims.</b></p>
+            <p class="rp-dyks">Department of Finance Canada,
+              <a href="https://www.canada.ca/en/department-finance/programs/consultations/2026/national-anti-fraud-strategy-discussion-paper.html"
+              target="_blank" rel="noopener noreferrer">same paper</a></p>
+          </div>
+          <div class="rp-dykc">
+            <div class="rp-dykn">Registered</div>
+            <p>Anyone selling investments or giving investment advice in Canada has to be
+              registered with the securities regulator in each province or territory where they
+              do business. <b>You can look them up in two minutes.</b></p>
+            <p class="rp-dyks">Canadian Securities Administrators,
+              <a href="https://www.securities-administrators.ca/investor-tools/are-they-registered/"
+              target="_blank" rel="noopener noreferrer">Are they registered?</a></p>
+          </div>
+          <div class="rp-dykc">
+            <div class="rp-dykn">Twice</div>
+            <p>If you have lost money once, fraudsters may come back offering to get it back.
+              <b>No real authority will ever ask you to pay to recover your money.</b></p>
+            <p class="rp-dyks">Canadian Anti-Fraud Centre,
+              <a href="https://antifraudcentre-centreantifraude.ca/scams-fraudes/recovery-recuperation-eng.htm"
+              target="_blank" rel="noopener noreferrer">Recovery pitch</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>02</i>How to check a business yourself</h3>
+        <ol class="rp-tips">
+          <li><b>Look them up with the regulator yourself.</b> Use the
+            <a href="https://www.securities-administrators.ca/investor-tools/are-they-registered/"
+            target="_blank" rel="noopener noreferrer">national registration search</a>, not a link
+            they sent you. The Canadian Anti-Fraud Centre says never to rely on the website or
+            phone number that came with an offer you did not ask for.</li>
+          <li><b>Check the name matches.</b> The legal name on the registration, the name on the
+            contract and the name on the bank account you are asked to pay should all be the same
+            business. A close match is not a match.</li>
+          <li><b>Read the review sites, and read the middle.</b> The Competition Bureau suggests
+            reading the two, three and four star reviews, because someone writing a fake review
+            is more likely to give one star or five.</li>
+          <li><b>Look for a trend in the negative ones.</b> Positive reviews can be bought: the
+            Competition Bureau warns that a business can hire a firm to post them. What is harder
+            to fake is <b>the same complaint, told by different people, on sites that have nothing
+            to do with each other, over months.</b> That is the pattern we look for too.</li>
+          <li><b>Watch for the signs of fake reviews.</b> A sudden spike of glowing reviews,
+            reviewers whose profiles are brand new, a business with nothing but five stars, and
+            different reviewers using the same words.</li>
+          <li><b>Check the consumer protection sites.</b> The
+            <a href="https://antifraudcentre-centreantifraude.ca/index-eng.htm" target="_blank"
+            rel="noopener noreferrer">Canadian Anti-Fraud Centre</a>, your province's consumer
+            protection office and the Better Business Bureau all publish complaints and warnings.</li>
+          <li><b>Check their social media.</b> How old the account is, whether the comments are
+            turned off, whether the same photos or the same people appear under other company
+            names. A new account with a large following and no conversation is worth a second
+            look.</li>
+          <li><b>Know the warning signs.</b> The Canadian Anti-Fraud Centre names an offer you did
+            not ask for, even from friends or family, returns higher than normal, pressure to act
+            fast, and being asked to pay in cryptocurrency.</li>
+          <li><b>Ask in writing.</b> Which regulator are you registered with, under what name, and
+            what is the registration number. Then look it up yourself. A real firm answers that
+            question easily.</li>
+        </ol>
+      </div>
+
+      <div class="rp-dsec">
+        <h3><i>03</i>If you have already sent money</h3>
+        <button class="rp-nextsent" type="button" id="rpNextToAct">
+          <span class="rp-b">
+            <span class="rp-t">Do this right now if you&rsquo;ve sent money</span>
+            <span class="rp-x">What to do first, who to reach out to with a report card ready for
+              each of them, and the call that can still pull money back.</span>
+          </span>
+          <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </button>
+      </div>
+
+      <div class="rp-foot">
+        <span>4orm Finance &nbsp;&middot;&nbsp; Know before you send</span>
+        <span><button type="button" class="rp-lk" data-doc="terms">Terms</button>
+          &nbsp;&middot;&nbsp; <button type="button" class="rp-lk" data-doc="privacy">Privacy</button>
+          &nbsp;&middot;&nbsp; 4ormiq.com</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -6313,7 +6541,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
     </div>
     <div class="rp-fvfoot">
       <button class="rp-fvback" type="button" id="rpFoundBack">Back to the result</button>
-      <button class="rp-fvon" type="button" id="rpFoundToAct">Do this right now</button>
+      <button class="rp-fvon" type="button" id="rpFoundToAct">Next steps to protect you</button>
     </div>
   </div>
 </section>
@@ -9973,7 +10201,10 @@ var ASK_STEPS = [
      measured in hours. It never touches the verdict. What somebody ticks
      cannot make a record worse than it is, and the answer to this question is
      never evidence about anybody. */
-  { key:"stage", q:"Have you already sent money?", opts:[
+  { key:"stage", q:"Have you already sent money?",
+    note:"This is the important one. If money has already gone, the report leads with "
+        +"the calls that can still get it back, and those are measured in hours.",
+    opts:[
     { v:"SENT",      label:"Yes" },
     { v:"BEFORE",    label:"No, not yet" },
     { v:"DILIGENCE", label:"Just researching" }
@@ -13186,7 +13417,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260921.0327";
+var KBYS_BUILD = "20260921.0550";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -13330,6 +13561,22 @@ function rpOut(url,text,cls){
 }
 function rpWord(n){ return (n>=0 && n<RP_ONES.length) ? RP_ONES[n] : String(n); }
 function rpCap(s){ s=String(s||""); return s.charAt(0).toUpperCase()+s.slice(1); }
+/* A CLASSIFICATION IS A PHRASE, NOT A NAME.
+   Title casing it turned VC_STARTUP into "Vc Startup", which reads as a typo on
+   the one line of the card that says what the party is. It is written the way
+   a sentence would carry it: sentence case, with the handful of initialisms a
+   reader expects in capitals kept in capitals. */
+var RP_CAPS = { vc:"VC", ico:"ICO", ido:"IDO", ieo:"IEO", nft:"NFT", defi:"DeFi", dao:"DAO",
+  cfd:"CFD", fx:"FX", otc:"OTC", psp:"PSP", msb:"MSB", atm:"ATM", p2p:"P2P", ipo:"IPO",
+  spv:"SPV", llc:"LLC", ltd:"Ltd", inc:"Inc", uk:"UK", us:"US", eu:"EU", uae:"UAE" };
+function rpKind(v){
+  var w = String(v||"").replace(/_/g," ").toLowerCase().split(/\s+/).filter(Boolean);
+  if(!w.length) return "";
+  w = w.map(function(x){ return RP_CAPS[x] || x; });
+  if(!RP_CAPS[String(v||"").split(/[_\s]+/)[0].toLowerCase()])
+    w[0] = w[0].charAt(0).toUpperCase() + w[0].slice(1);
+  return w.join(" ");
+}
 function rpTitle(s){
   s=String(s||"").toLowerCase();
   return s.replace(/(^|[\s(])([a-z])/g,function(m,a,b){return a+b.toUpperCase();});
@@ -13941,7 +14188,7 @@ function rpIdent(d){
 
   var cl=(d.classifications&&d.classifications[0]);
   out+=(cl&&cl.classification)
-    ? rpIdRow("What they present as",rpTitle(String(cl.classification).replace(/_/g," ")),
+    ? rpIdRow("What they present as",rpKind(cl.classification),
         "",false,false,false)
     : rpIdRow("What they present as","We could not tell","",true,false,false);
 
@@ -15363,19 +15610,6 @@ function rpHasOfficial(d){
 }
 /* A record that turned out to be about somebody else. The reader is told, in
    plain words, rather than left to assume the entry on the list is theirs. */
-/* HOW MANY OF THEM AN AUTHORITY PUBLISHED, counted the same way the verdict
-   counts them: tier A, and about THIS party. The door to the records carries no
-   colour, so this number is what tells a reader whether it is worth opening. A
-   count is a fact; a coloured door is a mood. */
-function rpOfficialCount(d){
-  var n=0;
-  for(var k in (d.cats||{})){
-    var c=d.cats[k], ev=c.ev||[];
-    if(c.state!=="RED") continue;
-    for(var i=0;i<ev.length;i++) if(ev[i].t==="A" && rpAttached(ev[i])) n++;
-  }
-  return n;
-}
 function rpLookalikes(d){
   var out=[], seen={};
   for(var k in (d.cats||{})){
@@ -16083,41 +16317,57 @@ function renderReport(d){
      than as instruction. */
   var actBox = id("rpTonightA");
   if(actBox){
-    /* The beat is earned by one thing only: an authority has published
-       something about THIS party, by name, under the attachment rule. Not an
-       amber, not a look-alike, not a pattern of complaints. */
-    var beat_ = rpHasOfficial(d) ? " rp-beat" : "";
-    if(dl.act){
+    /* A CONTROL BESIDE THE VERDICT ONLY WHERE THE MONEY HAS GONE.
+       This used to appear on any red verdict, and on a red verdict for a reader
+       who was only researching it said "do this right now" about a thing they
+       had not done. For them the summary in the dark panel is the whole of it,
+       and the way on is at the foot of the page, as next steps.
+       Where the money has gone, the control is here, beside the verdict, and it
+       beats three times only where an authority has published something about
+       THIS party by name. Not an amber, not a look-alike, not a pattern of
+       complaints. */
+    var sentNow_ = ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT";
+    var beat_ = (sentNow_ && rpHasOfficial(d)) ? " rp-beat" : "";
+    if(sentNow_ && dl.act){
       actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-pak="'+rpEsc(dl.act)+'">'
         + 'Open what to tell your bank</button>';
       actBox.hidden = false;
-    } else if(d.verdict==="RED" || ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT"){
-      /* THE LABEL SAYS WHAT WE KNOW, AND NOT MORE.
-         This control appears for two different readers. One told us the money
-         has already gone: for them "Do this right now" is the whole sentence,
-         and a conditional on the end is a hedge on the one line that has to
-         land. The other is looking at a red verdict and has sent nothing: for
-         them the imperative was being issued about a thing they have not done,
-         so the condition goes back in and the sentence becomes true again. */
-      var sent_ = ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT";
-      var actLabel_ = sent_ ? "Do this right now"
-                            : "Do this right now if you\u2019ve sent money";
-      /* THE OTHER TWO CASES THAT EARN A CONTROL BESIDE THE VERDICT.
-         The records contradict each other or contradict the firm, or the money
-         has already gone. Either way the reader has something to do tonight and
-         should not have to scroll past the whole record to find out what. The
-         door further down the page stays where it is: this is the same door,
-         offered at the moment the verdict lands.
-         Amber is not a fault, so an amber result never gets this. A reader who
-         is only weighing something up is left to read. */
+    } else if(sentNow_){
       actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-act="1">'
-        + rpEsc(actLabel_) + '</button>';
+        + 'Do this right now</button>';
       actBox.hidden = false;
     } else {
       actBox.innerHTML = "";
       actBox.hidden = true;
     }
   }
+
+  /* THE THREE WAYS ON SAY THE SAME THING, FOR THE SAME READER.
+     The door under the card, the bar pinned to a phone, and the button inside
+     the records. All three are set here from the one answer, so none of them
+     can say "do this right now" to somebody who has not sent anything. */
+  (function(){
+    var sent = rpSentNow();
+    var w=id("rpActWay"); if(w) w.setAttribute("data-mode", sent ? "sent" : "next");
+    var set=function(k,v){ var e=id(k); if(e) e.textContent=v; };
+    if(sent){
+      set("rpToActK","Your money has gone");
+      set("rpToActT","Do this right now");
+      set("rpToActX","What to do first, who to reach out to with a report card ready for "
+        +"each of them, and the call that can still pull money back.");
+      set("rpPinT","Do this right now");
+      set("rpPinX","What to do, and who to reach out to");
+      set("rpFoundToAct","Do this right now");
+    } else {
+      set("rpToActK","Before you decide");
+      set("rpToActT","Next steps to protect you");
+      set("rpToActX","How to check a business yourself, what to look for in reviews, and "
+        +"what to do if money has already gone.");
+      set("rpPinT","Next steps to protect you");
+      set("rpPinX","How to check a business yourself");
+      set("rpFoundToAct","Next steps to protect you");
+    }
+  })();
 
   /* ------------------------------------------------ A RUN THAT DID NOT HAPPEN
      The failure sentence was honest and everything around it was not. The page
@@ -16272,10 +16522,22 @@ function renderReport(d){
   /* And the way in names the size of what is behind it, rather than promising
      "every record" on a run that found two. */
   var fx=id("rpToFoundX");
-  var offN = rpOfficialCount(d);
+  /* ONE UNIT, AND THE PART IS A PART OF IT.
+     This counted the findings for the first number and every tier A record in
+     every red category for the second, so a run with six findings built on
+     nine official records printed "six records, nine of them from a regulator",
+     which reads as a sum that does not add up. Both numbers now count the
+     findings the sheet opens on, and the second is the ones among them that an
+     authority published. It cannot exceed the first by construction. */
+  var shownL = rpSieve(d.issues||[]);
+  var offN = 0;
+  for(var oi=0; oi<shownL.length; oi++) if(shownL[oi] && shownL[oi].tier==="A") offN++;
   if(fx) fx.textContent = shown
-    ? (rpCap(rpWord(shown)) + (shown===1 ? " record" : " records")
-       + (offN ? ", " + rpWord(offN) + " of them from a regulator, court or registry."
+    ? (rpCap(rpWord(shown)) + (shown===1 ? " finding" : " findings")
+       + (offN ? (offN===shown
+                   ? (shown===1 ? ", from a regulator, court or registry."
+                                : ", all of them from a regulator, court or registry.")
+                   : ", " + rpWord(offN) + " of them from a regulator, court or registry.")
                : ", who published each one, and the date on it."))
     : "Every register we asked, and what each one said back.";
   /* Both empty means the page has nothing to show, and the reader is owed a
@@ -16441,7 +16703,7 @@ function rpTop(){
 /* WHAT WE FOUND IS NO LONGER A SCREEN.
    The records explain the result, so they open underneath it on the same page
    rather than taking the reader somewhere and leaving the verdict behind. */
-var RP_SCREENS = { result:"rpReport", act:"rpAct", sources:"rpSources",
+var RP_SCREENS = { result:"rpReport", act:"rpAct", next:"rpNext", sources:"rpSources",
                    compliance:"rpCompliance", privacy:"rpPrivacy", terms:"rpTerms" };
 /* The three that are reachable from ANYWHERE, including from the landing page
    where there is no result to go back to. Everything else in RP_SCREENS is part
@@ -16622,6 +16884,15 @@ function rpFoundHide(){
   RP_FOUND_RETURN=null;
 }
 function rpAct(){ rpShow("act"); }
+function rpNext(){ rpShow("next"); }
+/* THE WAY ON DEPENDS ON ONE ANSWER.
+   A reader whose money has gone goes to the calls that can still get it back.
+   Everybody else goes to next steps, which ends with the same door for the day
+   they need it. Every control that means "what now" goes through this, so the
+   pinned bar on a phone and the button inside the records cannot send a reader
+   somewhere the door on the page would not. */
+function rpSentNow(){ return ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT"; }
+function rpOnward(){ if(rpSentNow()) rpAct(); else rpNext(); }
 function rpConsole(){
   rpPvHide();
   /* THE DATA ROOM OPENS AT THE TOP.
@@ -17031,18 +17302,20 @@ id("rpToFound").addEventListener("click", rpFound);
     timer = setTimeout(function(){ if(!done) el.classList.add("rp-on"); }, 900);
   };
 })();
-id("rpToAct").addEventListener("click", rpAct);
+id("rpToAct").addEventListener("click", rpOnward);
+id("rpNextBack").addEventListener("click", rpBackToReport);
+id("rpNextToAct").addEventListener("click", rpAct);
 /* The sheet closes on its own controls, on the scrim, and on escape. */
 id("rpFoundX").addEventListener("click", rpFoundHide);
 id("rpFoundBack").addEventListener("click", rpFoundHide);
-id("rpFoundToAct").addEventListener("click", function(){ rpFoundHide(); rpAct(); });
+id("rpFoundToAct").addEventListener("click", function(){ rpFoundHide(); rpOnward(); });
 id("rpFoundBox").addEventListener("click", function(e){ if(e.target===this) rpFoundHide(); });
 /* The pinned next action. Shown only on the result, only on a narrow screen,
    only once the reader has passed the first screenful, and never while the
    door on the page itself is in view. */
 (function(){
   var pin=id("rpPin"), btn=id("rpPinGo"); if(!pin||!btn) return;
-  btn.addEventListener("click", rpAct);
+  btn.addEventListener("click", rpOnward);
   function place(){
     var on = document.body.getAttribute("data-stage")==="report"
           && RP_AT==="result" && !!RP
