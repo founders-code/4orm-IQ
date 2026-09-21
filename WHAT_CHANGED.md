@@ -1,8 +1,8 @@
-# 4orm IQ, build 20260921.0118
+# 4orm IQ, build 20260921.0211
 
 Everything in this archive is the working tree as it stands, plus the two
 control documents under `reports/`. It is a git repository: `git log` carries
-three commits and the reason for each.
+four commits and the reason for each.
 
 ## Run the gate
 
@@ -65,6 +65,11 @@ main. It needs no secret, because every check reads files.
 * **The scan.** `tools/scanner.mjs` reads what is served, not the repository.
 
 ### The pages
+
+* **The search bar** carried three blue marks at once while somebody was
+  typing: a halo outside the pill, a focus ring outside that, and an underline
+  beneath the text. It now has one line, and it is the oval: the focus ring laid
+  along the pill's own edge. Nothing moves when it appears.
 
 * A modal marked the page behind it inert, except for whatever held focus. The
   conversation focuses its own answer pills, so a reader who reached the wait

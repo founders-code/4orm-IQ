@@ -622,7 +622,15 @@ body[data-stage="console"] .lampgo{display:none}
   border:1px solid var(--border-lit);box-shadow:inset 0 2px 12px rgba(16,32,64,.06);
   transition:border-color .3s var(--ease),box-shadow .3s var(--ease);
 }
-.searchbox:focus-within{border-color:var(--blue);box-shadow:inset 0 2px 12px rgba(16,32,64,.06),0 0 0 4px rgba(46,107,242,.13)}
+/* ONE LINE, AND IT IS THE OVAL.
+   This control carried three blue marks at once while somebody was typing: a
+   four pixel halo outside the pill, a focus ring three pixels outside that,
+   and an underline beneath the text. Three marks saying the same thing, and
+   two of them read as a second oval.
+   What is left is the focus ring, laid along the pill's own edge. The halo and
+   the underline are gone, and the border no longer changes colour, because the
+   ring is already drawn over it. A focus indicator is one mark or it is noise. */
+.searchbox:focus-within{box-shadow:inset 0 2px 12px rgba(16,32,64,.06)}
 .searchbox .pfx{font-family:var(--mono);font-size:15px;color:var(--blue);flex:none;user-select:none}
 .searchbox input{flex:1;min-width:0;padding:21px 0;font-size:18px;letter-spacing:-.012em}
 .searchbox input::placeholder{color:var(--tx-4)}
@@ -2759,8 +2767,19 @@ body[data-stage="report"] .foot{display:none}
    uniform and the inset is not. So the ring goes on the pill, which is the
    shape a reader is looking at, and the field carries a two pixel underline
    that says which control has focus without adding a second edge. */
-#kbInput:focus-visible{outline:none;box-shadow:0 2px 0 0 var(--blue)}
-#kbForm:focus-within{outline:2px solid var(--blue);outline-offset:3px}
+/* The input carries no mark of its own. The oval around it is the focus
+   indicator, and it is one line. A ruled underline inside a ring is the same
+   statement made twice, and on a control this size the second one reads as a
+   fault in the first. */
+#kbInput:focus-visible{outline:none;box-shadow:none}
+/* THE RING SITS ON THE OVAL, NOT OUTSIDE IT.
+   At an offset of three pixels this drew a second oval around the first, and
+   with the field underlined as well the control carried three blue marks at
+   once. A negative offset lays the ring along the pill's own edge, over the
+   border rather than beside it, so there is one line and it traces the shape a
+   reader is looking at. Nothing moves when it appears, because an outline is
+   outside the box model. */
+#kbForm:focus-within{outline:2px solid var(--blue);outline-offset:-1px}
 #rpt .rp-provb.rp-on{background:var(--blue);border-color:var(--blue);color:#fff}
 #rpt .rp-provout{margin-top:16px;padding:16px 18px;border-radius:var(--r-sm);
   background:var(--surface-2);border:1px solid var(--border)}
@@ -12846,7 +12865,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260921.0118";
+var KBYS_BUILD = "20260921.0211";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one

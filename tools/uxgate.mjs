@@ -198,8 +198,25 @@ async function tabWalk(p) {
       const onLayout = r.width > 0 && r.height > 0;
       return { key, who: key.replace('|',' "') + '"',
         seenByEye: (window.__uxVisible ? window.__uxVisible(a) : onLayout) && onLayout,
-        ring: (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0)
-              || (cs.boxShadow && cs.boxShadow !== 'none') };
+        /* A RING ON THE CONTROL, OR ON THE SHAPE THE READER IS LOOKING AT.
+           The search field is transparent and inset inside a pill. An outline
+           on the field draws a rectangle floating inside the pill, and an
+           outline cannot trace the pill from there because outline-offset is
+           uniform and the inset is not. So the ring belongs on the pill, and
+           reading only the focused element called that control unringed while
+           a two pixel blue line was plainly drawn around it.
+           This walks up while focus is on the element, so it can only see a
+           ring that is actually painted right now. A control with nothing
+           anywhere still fails. */
+        ring: (() => {
+          let n = a;
+          for (let up = 0; n && up < 4; n = n.parentElement, up++) {
+            const c = getComputedStyle(n);
+            if (c.outlineStyle !== 'none' && parseFloat(c.outlineWidth) > 0) return true;
+            if (c.boxShadow && c.boxShadow !== 'none') return true;
+          }
+          return false;
+        })() };
     });
     if (!s) continue;
     if (seen.has(s.key)) break;
