@@ -356,6 +356,21 @@ tr:last-child td{border-bottom:0}
   box-shadow:0 0 0 1px rgba(255,83,64,.12) inset}
 .rdpill[data-n="some"] b{color:#FF5340;text-shadow:0 0 8px rgba(255,83,64,.7)}
 .rdpill[data-n="none"]{opacity:.62}
+/* THE SPEND PILL IS NEVER RED.
+   Money spent is not a fault, and a red pill on this row means somebody has to
+   do something. It carries its own colour, it warms as the day's house ceiling
+   fills, and only the last band raises its voice, because that is the only
+   band where anything is actually about to stop. */
+#spendbtn{border-color:#2A3A4A;color:#9FB8CC}
+#spendbtn b{color:#7FB2B6;font-weight:800}
+#spendbtn:hover{border-color:#7FB2B6;color:#CFE3EA}
+#spendbtn[data-b="mid"]{border-color:rgba(214,172,85,.55);color:#E0C782}
+#spendbtn[data-b="mid"] b{color:#D6AC55;text-shadow:0 0 8px rgba(214,172,85,.55)}
+#spendbtn[data-b="high"]{border-color:rgba(226,119,90,.65);color:#F0A892}
+#spendbtn[data-b="high"] b{color:#E2775A;text-shadow:0 0 9px rgba(226,119,90,.7)}
+#spendbtn[data-b="off"]{opacity:.55}
+.reader[data-ack="yes"] #spendbtn{color:#9FB8CC;border-color:#2A3A4A}
+.reader[data-ack="yes"] #spendbtn b{color:#7FB2B6}
 .rdhd i{width:7px;height:7px;border-radius:50%;background:#26A16F;
   box-shadow:0 0 6px rgba(38,161,111,.6)}
 .rdline{font-family:var(--mono);font-size:16px;font-weight:500;line-height:1.55;
@@ -504,6 +519,50 @@ body.pathfull .fullhint{z-index:69}
   font-weight:500;letter-spacing:0;color:var(--ink-3)}
 .shleg span{display:inline-flex;align-items:center;gap:7px}
 .shleg i{width:9px;height:9px;border-radius:50%}
+/* ------------------------------------------------------------ the spend reader
+   Four bands down the card: what it cost, what one check costs, what the
+   ceiling is doing, and what the dollars are built on. The last band is not
+   decoration. A dollar figure priced off a default rate is an estimate wearing
+   the clothes of a measurement, and this page says which it is every time. */
+.spsheet{position:fixed;z-index:92}
+.spsheet .sheetcard{width:min(1080px,100%)}
+.sprow{display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));gap:10px}
+.spcell{padding:14px 15px 13px;background:var(--sunk);border:1px solid var(--edge);
+  border-radius:var(--r-sm)}
+.spcell em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;
+  font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-4)}
+.spcell b{display:block;margin-top:8px;font-family:var(--ui);font-size:25px;
+  font-weight:800;letter-spacing:-.01em;color:var(--ink);font-variant-numeric:tabular-nums}
+.spcell b.mid{color:#D6AC55}
+.spcell b.high{color:#E2775A}
+.spcell b.ok{color:#7FB2B6}
+.spcell s{display:block;margin-top:5px;text-decoration:none;font-size:11.5px;
+  line-height:1.45;color:var(--ink-4)}
+.spsec{margin-top:22px;padding-top:16px;border-top:1px solid var(--edge)}
+.spsec:first-child{margin-top:0;padding-top:0;border-top:0}
+.spsec h4{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 11px}
+.spbar{margin-top:12px;height:9px;border-radius:5px;background:var(--sunk);
+  border:1px solid var(--edge);overflow:hidden}
+.spbar i{display:block;height:100%;background:#7FB2B6}
+.spbar[data-b="mid"] i{background:#D6AC55}
+.spbar[data-b="high"] i{background:#E2775A}
+.spcap{margin-top:8px;font-size:12px;line-height:1.55;color:var(--ink-3)}
+table.sptab{width:100%;border-collapse:collapse;margin-top:4px}
+table.sptab th{text-align:left;font-family:var(--mono);font-size:9.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-4);
+  padding:0 12px 7px 0;border-bottom:1px solid var(--edge)}
+table.sptab td{padding:8px 12px 8px 0;font-size:13px;color:var(--ink-2);
+  border-bottom:1px solid var(--edge-2);font-variant-numeric:tabular-nums}
+table.sptab td:first-child{color:var(--ink);font-weight:600}
+table.sptab th.r,table.sptab td.r{text-align:right;padding-right:0}
+.spnote{margin-top:12px;padding:13px 15px;border-radius:var(--r-sm);
+  background:rgba(214,172,85,.09);border:1px solid rgba(214,172,85,.4);
+  font-size:12.5px;line-height:1.6;color:#E0C782}
+.spnote.good{background:rgba(127,178,182,.08);border-color:rgba(127,178,182,.4);color:#A8CCD0}
+.spnote b{color:inherit;font-weight:700}
+.spgone{padding:15px 16px;border-radius:var(--r-sm);background:var(--sunk);
+  border:1px dashed var(--edge-lit);font-size:12.5px;line-height:1.6;color:var(--ink-3)}
 /* ------------------------------------------------- sign in, boot and errors
    Nothing shows until Clerk has answered the only question that matters, which
    is whether this person is signed in. A page that renders its shell, then the
@@ -1057,6 +1116,11 @@ body:not(.pathfull) .fullhint{display:none}
             <div class="rdpills" id="rdPills">
               <button class="rdpill" type="button" id="newbtn" data-n="none">New <b>0</b></button>
               <button class="rdpill" type="button" id="fixbtn" data-n="none">Fix list <b>0</b></button>
+              <!-- THE THIRD PILL IS A DIFFERENT KIND OF NUMBER.
+                   New and the fix list are faults. This one is money, and it is
+                   on the same row because the question an operator asks at the
+                   same moment is "is anything wrong, and what is it costing". -->
+              <button class="rdpill" type="button" id="spendbtn" data-n="none">Spend <b>-</b></button>
             </div>
           </div>
           <div class="rdline" id="rdline"></div>
@@ -1092,6 +1156,24 @@ body:not(.pathfull) .fullhint{display:none}
     </div>
     <p class="fxnote" id="fxNote"></p>
     <div class="regbody" id="fxBody"></div>
+  </div>
+</div>
+
+<!-- ============================================== WHAT IT COST
+     A reader, not a dashboard. Everything on it is either a measurement taken
+     from a run that happened or a ceiling somebody set, and each one says
+     which it is. Nothing here is modelled.
+
+     It is fixed rather than absolute so it comes up over the full-screen
+     drawing as well as over the board. -->
+<div class="sheet spsheet" id="spendsheet" role="dialog" aria-modal="true" aria-labelledby="spT">
+  <div class="sheetcard">
+    <div class="shhd">
+      <div><h3 id="spT">What it cost</h3>
+        <div class="x" id="spX">Measured from the runs, not modelled</div></div>
+      <div class="c"><button class="trig" type="button" id="spClose">Close</button></div>
+    </div>
+    <div class="shbody" id="spB"></div>
   </div>
 </div>
 
@@ -1157,6 +1239,27 @@ var CLEAR = {
   policy:{head:{height:9,version:"2026-09-02"}},
   deletion:{days_run:30,days_failed:0,deleted:1840},
   incidents:{total:0,pi:0,rrosh:0,reported:0},
+  spend:{
+    measured:{present:true,window_days:30,
+      window:{runs:41,in_tok:2511640,out_tok:212380,tok:2724020,exa_calls:738,
+        parallel_calls:164,exa_unbilled:0,avg_ms:41200,
+        reasoning:10.72,retrieval:8.09,total:18.81},
+      today:{runs:3,in_tok:183720,out_tok:15540,reasoning:0.78,retrieval:0.59,total:1.37},
+      per_run:{runs:41,in_tok:61259,out_tok:5180,usd:0.4588,ms:41200,
+        median:0.4412,p90:0.6103,worst:0.7741},
+      by_day:[{day:"2026-09-18",runs:14,tok:929000,reasoning:3.66,retrieval:2.76,total:6.42},
+              {day:"2026-09-19",runs:24,tok:1596000,reasoning:6.28,retrieval:4.74,total:11.02},
+              {day:"2026-09-20",runs:3,tok:199260,reasoning:0.78,retrieval:0.59,total:1.37}]},
+    ledger:{present:true,reservations:3,clients:2,reserved_usd:2.22,settled_usd:1.37,
+      refusals:[],refused_total:0,clients_blocked:0},
+    headroom:{house_ceiling_usd:120,spent_usd:1.37,left_usd:118.63,pct:1,runs_left:258},
+    ceiling:{runs_per_window:5,window_s:60,usd_per_window:3.75,usd_per_client_day:12,
+      usd_house_day:120,strikes_to_block:3,block_s:900},
+    rate_card:{rates:{exaSearch:0.007,exaPage:0.001,parallelRun:0.005,
+      claudeInM:3,claudeOutM:15},exa_parallel:"published list rate",
+      claude_confirmed:false,
+      note:"Claude is priced from a default, not from the invoice."}
+  },
   rights:[{kind:"ACCESS",opened:3,closed:3,avg_days:4.2}],
   by_outcome:[["COMPLETED",1231],["BLOCKED",29],["ERROR",24]],
   by_input:[["Company",702],["Website",408],["Email",121],["Wallet",53]],
@@ -1780,13 +1883,24 @@ function gauges(d){
             "bad","reach")
         : gauge(reachPct,"Registers reached","%",
             cat ? num(asked)+" of the "+num(cat)+" registers we ask, "
-                  +num(rch.empty||0)+" came back empty and "+num(rch.missed||0)
-                  +" applied and were never reached. "
+                  +num(rch.empty||0)+" came back empty, "+num(rch.missed||0)
+                  +" were planned and not reached, and "+num(rch.unplanned||0)
+                  +" applied to a party and the plan did not include them. "
                   +num((rch.computed||{}).total||0)+" connectors are counted apart"
                 : "the catalogue has not been counted",
             band(reachPct,80,50),"reach"))
-    + gauge(s.success_pct,"Answers back","%",
-        num(s.ok)+" of "+num(s.attempts)+" asks came back with something",
+    /* AN EMPTY REGISTER IS AN ANSWER, AND THIS USED TO READ IT AS A FAILURE.
+       The lamp divided answers by every row written, and a row is written for
+       every applicable register on every run, including the hundred the plan
+       never included. So a healthy sweep read as forty four per cent and the
+       number nobody could act on sat at the top of the board. It now measures
+       the one thing a health lamp should: of the questions that went out, how
+       many reached the register. A register that answered with nothing
+       reached. A register nobody asked is not in the denominator at all. */
+    + gauge(s.success_pct,"Asks that completed","%",
+        num((s.ok||0)+(s.empty||0))+" of "+num(s.asks||0)+" asks reached the register. "
+        +num(s.ok||0)+" came back with something and "+num(s.empty||0)
+        +" came back empty, which is an answer",
         band(s.success_pct,95,85),"registers")
     + gauge(v.intact===undefined ? null : proof,"Runs we can prove","%",
         v.intact===true  ? num(v.checked)+" of "+num(ran)+" verify against the hashed log"
@@ -2229,7 +2343,14 @@ function sheetOpen(title,sub,html){
 }
 function sheetClose(){ document.getElementById("sheet").classList.remove("on"); STAGE=null; }
 document.getElementById("shC").addEventListener("click",sheetClose);
-document.addEventListener("keydown",function(e){ if(e.key==="Escape") sheetClose(); });
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Escape") return;
+  /* The spend reader sits over everything, so Escape closes that first and
+     leaves the board where it was rather than shutting two things at once. */
+  var sp=document.getElementById("spendsheet");
+  if(sp&&sp.classList.contains("on")){ closeSpend(); return; }
+  sheetClose();
+});
 
 function openInfo(spec){
   if(!spec) return;
@@ -2950,6 +3071,16 @@ function openFix(on, tab){
 }
 openFix(false);
 document.getElementById("newbtn").addEventListener("click", function(){ openFix(true,"new"); });
+/* Guarded. One missing element must never take the rest of the board down
+   with it: this script wires the whole control room, and a hard throw here
+   leaves an operator looking at a page that loaded and does nothing. */
+(function(){
+  var b=document.getElementById("spendbtn"), c=document.getElementById("spClose"),
+      sh=document.getElementById("spendsheet");
+  if(b) b.addEventListener("click", openSpend);
+  if(c) c.addEventListener("click", closeSpend);
+  if(sh) sh.addEventListener("click", function(e){ if(e.target===this) closeSpend(); });
+})();
 /* PRESSING FIX LIST TAKES EVERYTHING ON.
    New is the pile nobody has looked at, and the fix list is the pile somebody
    has. Pressing the fix list is that somebody saying "I have these", so it
@@ -3299,6 +3430,216 @@ document.addEventListener("keydown",function(e){
   else if(document.body.classList.contains("pathfull")) setFull(false);
 });
 
+/* ======================================================== WHAT IT COST
+   One pill and one reader. The pill carries today's spend against the house
+   ceiling for the day; the reader carries everything behind it.
+
+   Three rules this screen keeps.
+
+   Money is not a fault. The pill never goes red for spending money, only for
+   being close to the ceiling that stops checks running.
+
+   A measurement and a ceiling are different things and are never mixed in one
+   number. Tokens and Exa's billed figure come off the runs that spent them.
+   The ceiling is a number somebody chose. Both are shown; neither is averaged
+   into the other.
+
+   A price is not a bill. Where the Claude rate is still the default rather
+   than the invoice, every dollar on this screen says so, at the top, in the
+   band that cannot be scrolled past. */
+var SPEND = null;
+
+function usd(n){
+  if(n==null || !isFinite(n)) return "-";
+  var v = Number(n);
+  if(v >= 100) return "$" + v.toFixed(0);
+  if(v >= 10)  return "$" + v.toFixed(2);
+  return "$" + v.toFixed(v >= 1 ? 2 : 3);
+}
+function tok(n){
+  if(n==null || !isFinite(n)) return "-";
+  var v = Number(n);
+  if(v >= 1e9) return (v/1e9).toFixed(2) + "B";
+  if(v >= 1e6) return (v/1e6).toFixed(v >= 1e7 ? 1 : 2) + "M";
+  if(v >= 1e3) return Math.round(v/1e3) + "k";
+  return String(Math.round(v));
+}
+function band(pct){
+  if(pct==null) return "off";
+  return pct >= 85 ? "high" : (pct >= 55 ? "mid" : "low");
+}
+
+/* The pill. It reads the same object the reader does, so the two can never
+   disagree about what today cost. */
+function spendPill(d){
+  var b = document.getElementById("spendbtn");
+  if(!b) return;
+  var sp = d && d.spend;
+  if(!sp){
+    b.innerHTML = 'Spend <b>-</b>';
+    b.setAttribute("data-b","off");
+    b.setAttribute("aria-label","Spend is not being recorded. Open the spend reader.");
+    return;
+  }
+  var h = sp.headroom || {};
+  var bd = band(h.pct);
+  b.innerHTML = 'Spend <b>' + usd(h.spent_usd) + '</b>';
+  b.setAttribute("data-b", bd === "low" ? "" : bd);
+  b.setAttribute("aria-label",
+    usd(h.spent_usd) + " spent today of a " + usd(h.house_ceiling_usd)
+    + " ceiling. Open the spend reader.");
+}
+
+function spendReader(d){
+  var el = document.getElementById("spB");
+  if(!el) return;
+  var sp = d && d.spend;
+  SPEND = sp || null;
+  if(!sp){ el.innerHTML = '<div class="spgone">Nothing is recording what this costs. '
+    + 'The spend block is served by the metrics route, so this screen is reading an '
+    + 'older deployment.</div>'; return; }
+
+  var m = sp.measured || {}, L = sp.ledger || {}, h = sp.headroom || {},
+      c = sp.ceiling || {}, rc = sp.rate_card || {};
+  var out = [];
+
+  /* 1. What the dollars are built on. First, because everything under it
+        depends on it being true. */
+  out.push(rc.claude_confirmed
+    ? '<div class="spnote good">Priced from the rates set on this deployment. '
+      + '<b>' + usd(rc.rates.claudeInM) + '</b> per million in, <b>'
+      + usd(rc.rates.claudeOutM) + '</b> per million out. Exa bills per call and '
+      + 'reports what it billed, so retrieval is the invoice figure rather than a rate.</div>'
+    : '<div class="spnote">The reasoning half of every dollar below is priced from a '
+      + 'default, not from the invoice. Set <b>KBYS_RATE_CLAUDE_IN_M</b> and '
+      + '<b>KBYS_RATE_CLAUDE_OUT_M</b> on the deployment and these become measurements. '
+      + 'Retrieval is already the billed figure.</div>');
+
+  /* 2. Today, against the ceiling that stops checks. */
+  var hb = band(h.pct);
+  out.push('<div class="spsec"><h4>Today</h4><div class="sprow">'
+    + cell("Spent today", usd(h.spent_usd), hb === "low" ? "ok" : hb,
+        m.present ? (m.today.runs + (m.today.runs === 1 ? " check" : " checks")) : "from the ledger")
+    + cell("Left before checking stops", usd(h.left_usd), null,
+        h.runs_left == null ? "no average yet to count in checks"
+          : (h.runs_left + " more at today’s average"))
+    + cell("House ceiling", usd(h.house_ceiling_usd), null, "for the day, every client together")
+    + cell("Tokens today", m.present ? tok(m.today.in_tok + m.today.out_tok) : "-", null,
+        m.present ? (tok(m.today.in_tok) + " in, " + tok(m.today.out_tok) + " out") : "not recorded")
+    + '</div>'
+    + '<div class="spbar" data-b="' + hb + '"><i style="width:'
+      + Math.max(1, Math.min(100, h.pct || 0)) + '%"></i></div>'
+    + '<p class="spcap">' + (h.pct || 0) + '% of the day’s ceiling. '
+    + 'Reaching it pauses checking for everyone until midnight, which is the point of it: '
+    + 'the bill stops at a number somebody chose rather than at a number somebody discovers.</p>'
+    + '</div>');
+
+  /* 3. What one check costs. An average on its own hides the run that cost
+        four times the rest, so the spread is beside it. */
+  if(m.present && m.per_run && m.per_run.runs){
+    var r = m.per_run, w = m.window;
+    out.push('<div class="spsec"><h4>What one check costs, last '
+      + m.window_days + ' days</h4><div class="sprow">'
+      + cell("Average", usd(r.usd), "ok", r.runs + " checks")
+      + cell("Median", usd(r.median), null, "half cost less than this")
+      + cell("Ninth in ten", usd(r.p90), null, "one in ten cost more")
+      + cell("Dearest", usd(r.worst), null, "the single most expensive run")
+      + '</div><div class="sprow" style="margin-top:10px">'
+      + cell("Tokens in", tok(r.in_tok), null, "per check, average")
+      + cell("Tokens out", tok(r.out_tok), null, "per check, average")
+      + cell("Reasoning", usd(w.runs ? w.reasoning / w.runs : null), null,
+          pctOf(w.reasoning, w.total) + " of the cost")
+      + cell("Retrieval", usd(w.runs ? w.retrieval / w.runs : null), null,
+          pctOf(w.retrieval, w.total) + " of the cost")
+      + '</div>'
+      + '<p class="spcap">Reasoning is the Claude call reading everything retrieval found, '
+      + 'so it is the half that moves when the plan gets longer. '
+      + (w.exa_unbilled
+          ? w.exa_unbilled + ' of these runs recorded no billed figure from Exa and are '
+            + 'counted at nought for retrieval rather than estimated.'
+          : 'Every run in the window carries Exa’s own billed figure.')
+      + '</p></div>');
+
+    /* The window total, and the days behind it. */
+    out.push('<div class="spsec"><h4>Last ' + m.window_days + ' days</h4><div class="sprow">'
+      + cell("Total", usd(w.total), null, w.runs + " checks")
+      + cell("Reasoning", usd(w.reasoning), null, tok(w.tok) + " tokens")
+      + cell("Retrieval", usd(w.retrieval), null,
+          w.exa_calls + " searches, " + w.parallel_calls + " objectives")
+      + cell("Average wait", w.avg_ms ? Math.round(w.avg_ms/1000) + "s" : "-", null,
+          "start to answer")
+      + '</div>' + days(m.by_day) + '</div>');
+  } else {
+    out.push('<div class="spsec"><h4>What one check costs</h4>'
+      + '<div class="spgone">No finished run has been recorded in this window, so there is '
+      + 'nothing to average. This screen will not estimate one.</div></div>');
+  }
+
+  /* 4. The ceiling, and what it did. */
+  out.push('<div class="spsec"><h4>The ceiling</h4><div class="sprow">'
+    + cell("Per minute", c.runs_per_window + " checks", null, "and " + usd(c.usd_per_window)
+        + ", whichever comes first")
+    + cell("Per client, per day", usd(c.usd_per_client_day), null, "then refused until midnight")
+    + cell("Refused today", L.present ? String(L.refused_total) : "-",
+        L.present && L.refused_total ? "mid" : null,
+        L.present ? (L.clients + (L.clients === 1 ? " client seen" : " clients seen")) : "ledger not recording")
+    + cell("Paused now", L.present ? String(L.clients_blocked) : "-",
+        L.present && L.clients_blocked ? "high" : null,
+        "after " + c.strikes_to_block + " refusals inside 15 minutes")
+    + '</div>'
+    + (L.present && L.refusals && L.refusals.length ? reasons(L.refusals) : '')
+    + '<p class="spcap">Volume throttles. Repeat behaviour pauses, and the pause doubles each '
+    + 'time it happens again. One oversized request is refused, never paused, because size is '
+    + 'not behaviour.</p></div>');
+
+  el.innerHTML = out.join("");
+
+  function cell(label, val, tone, sub){
+    return '<div class="spcell"><em>' + label + '</em><b'
+      + (tone ? ' class="' + tone + '"' : '') + '>' + val + '</b>'
+      + (sub ? '<s>' + sub + '</s>' : '') + '</div>';
+  }
+  function pctOf(part, whole){
+    if(!whole) return "-";
+    return Math.round(100 * part / whole) + "%";
+  }
+  function reasons(rows){
+    return '<table class="sptab" style="margin-top:14px"><thead><tr>'
+      + '<th>Why a check was refused</th><th class="r">Today</th></tr></thead><tbody>'
+      + rows.map(function(x){
+          var name = { rate:"Too many in a minute", window_spend:"Past the minute’s dollars",
+                       day_spend:"Past the day’s dollars",
+                       house_ceiling:"House ceiling reached" }[x.reason] || x.reason;
+          return '<tr><td>' + name + '</td><td class="r">' + x.n + '</td></tr>';
+        }).join("") + '</tbody></table>';
+  }
+  function days(rows){
+    if(!rows || !rows.length) return '';
+    var recent = rows.slice(-10).reverse();
+    return '<table class="sptab" style="margin-top:16px"><thead><tr><th>Day</th>'
+      + '<th class="r">Checks</th><th class="r">Tokens</th><th class="r">Reasoning</th>'
+      + '<th class="r">Retrieval</th><th class="r">Total</th></tr></thead><tbody>'
+      + recent.map(function(x){
+          return '<tr><td>' + x.day + '</td><td class="r">' + x.runs + '</td><td class="r">'
+            + tok(x.tok) + '</td><td class="r">' + usd(x.reasoning) + '</td><td class="r">'
+            + usd(x.retrieval) + '</td><td class="r">' + usd(x.total) + '</td></tr>';
+        }).join("") + '</tbody></table>';
+  }
+}
+
+function openSpend(){
+  var sh = document.getElementById("spendsheet");
+  if(!sh) return;
+  sh.classList.add("on");
+  var c = document.getElementById("spClose"); if(c) c.focus();
+}
+function closeSpend(){
+  var sh = document.getElementById("spendsheet");
+  if(!sh) return;
+  sh.classList.remove("on");
+  var b = document.getElementById("spendbtn"); if(b) b.focus();
+}
+
 function paint(d){
   LAST=d;
   /* rank, pulse, evidence and days are still in the file and no longer called.
@@ -3310,6 +3651,8 @@ function paint(d){
      just wrote. Both have to be current or the pills and the lamp answer for
      the render before this one. */
   opsPills();
+  /* The spend pill and its reader read one object, so they cannot disagree. */
+  spendPill(d); spendReader(d);
   if(STAGE!=null) openStage(STAGE);
   fitStage();
 }
@@ -3319,7 +3662,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260919.1016";
+var BUILD = "20260921.0118";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){
@@ -3415,7 +3758,13 @@ function load(){
           "POSTGRES_URL is not set, so nothing has been recorded yet. Run db/telemetry.sql "
           +"once the database is attached.", true);
         return showErr("The board could not load",
-          "Request failed: "+((res.j&&res.j.detail)||res.status), true);
+          /* The route no longer hands back the exception, because a database
+             error carries table and column names and the caller is not
+             entitled to them. What the board gets is the code and the status,
+             and the detail is in the deployment log where an operator can
+             read it. */
+          "Request failed: "+((res.j&&res.j.error)||"no code")+" ("+res.status+"). "
+          +"The reason is in the deployment log.", true);
       }
       hideErr(); booted(); paint(normalise(res.j));
     })

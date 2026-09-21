@@ -23,6 +23,20 @@
  */
 
 import { requireAdmin } from './_auth.js';
+import { logFault } from './_log.js';
+import { requireSchedule } from './_scheduled.js';
+
+/* The body exactly as it arrived, because that is what the signature covers.
+   Vercel parses JSON before a handler sees it, so a re-serialised object is
+   not always the bytes that were signed. Retention takes no body, and this
+   returns the empty string for the normal case rather than pretending to a
+   fidelity it does not have. */
+function rawBody(req) {
+  if (typeof req.body === 'string') return req.body;
+  if (req.body == null || (typeof req.body === 'object' && !Object.keys(req.body).length))
+    return '';
+  return JSON.stringify(req.body);
+}
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -32,8 +46,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
 
-  const auth = await requireAdmin(req);
-  if (!auth.ok) return res.status(auth.status).json({ error: auth.error, reason: auth.reason });
+  /* TWO WAYS IN, AND BOTH OF THEM PROVE SOMETHING.
+     A person signs in, or a scheduler signs the request. The second one is not
+     a secret in a header: a bearer secret is replayable by anything that ever
+     sees it, and this route deletes. It is a signature over the method, the
+     path, a timestamp and a nonce, good for a few minutes and usable once.
+
+     The signed door is tried first and only where the caller presented a
+     signature, so a human with a bad session still gets the answer about their
+     session rather than a message about a scheduler they know nothing about. */
+  let auth = null;
+  if (req.headers['x-4orm-signature']) {
+    const sched = await requireSchedule(req, rawBody(req));
+    if (!sched.ok) return res.status(sched.status).json({ error: sched.error });
+    auth = { ok: true, email: 'scheduler', subject: 'schedule' };
+  } else {
+    auth = await requireAdmin(req);
+    if (!auth.ok) return res.status(auth.status).json({ error: auth.error, reason: auth.reason });
+  }
 
   if (!process.env.POSTGRES_URL)
     return res.status(503).json({ error: 'no_database_configured' });
@@ -48,7 +78,10 @@ export default async function handler(req, res) {
     });
     client = await pool.connect();
   } catch (e) {
-    return res.status(503).json({ error: 'no_connection', reason: String(e.message || e).slice(0, 160) });
+    /* A connection error carries the host, the database name and sometimes the
+       user. None of it is the caller's. */
+    logFault('retain.connect', e);
+    return res.status(503).json({ error: 'no_connection' });
   }
 
   try {
@@ -67,7 +100,12 @@ export default async function handler(req, res) {
     /* The purge itself. One function, one transaction, and it reports what it
        removed table by table so a run that deleted nothing is distinguishable
        from a run that did not happen. */
-    const out = await client.query('select * from purge_expired()');
+    /* Named columns. A select * against a function signature means the shape
+       of this response is whatever the database was last migrated to, and a
+       column added there arrives here and goes out to the caller without
+       anybody deciding it should. */
+    const out = await client.query(
+      'select table_name, rows_deleted from purge_expired()');
     const result = out.rows.map(r => ({ table: r.table_name, rows: Number(r.rows_deleted) }));
     const total = result.reduce((a, b) => a + b.rows, 0);
 
@@ -77,7 +115,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true, total_rows: total, result });
   } catch (e) {
-    return res.status(500).json({ error: 'purge_failed', reason: String(e.message || e).slice(0, 200) });
+    /* The exception text is written where an operator can read it and is not
+       returned. A database error carries table names, column names and
+       sometimes the offending value, and none of that is the caller's. */
+    logFault('retain', e);
+    return res.status(500).json({ error: 'purge_failed' });
   } finally {
     try { client.release(); } catch (e) { }
   }

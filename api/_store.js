@@ -37,6 +37,7 @@
 
 import { node as gnode } from './_graph.js';
 import crypto from 'crypto';
+import { logFault } from './_log.js';
 
 /* The node types that carry a natural person. Refused on the write path, both
    as nodes and as either end of an edge. This list is checked by the build. */
@@ -213,7 +214,7 @@ async function writeAll(c, ctx) {
   } catch (e) {
     /* The pulse is a lookout, never a gate. A check must complete whether or
        not this table exists yet. */
-    try { console.warn('[store] pulse not written:', e.message); } catch {}
+    logFault('store.pulse', e);
   }
 
   /* No identifier and no payload. The hash recognises a repeat; the headline

@@ -16,6 +16,7 @@
 
 import { requireAdmin } from './_auth.js';
 import { verifyChain, verifyPolicyChain, policyHistory } from './_ops.js';
+import { logFault } from './_log.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -58,7 +59,8 @@ export default async function handler(req, res) {
       policy: { head: policyHead, history: rules.ok ? rules.rows : [], error: rules.ok ? null : rules.reason },
     });
   } catch (e) {
-    return res.status(500).json({ error: 'query_failed', detail: String(e.message || e).slice(0, 200) });
+    logFault('evidence', e);
+    return res.status(500).json({ error: 'query_failed' });
   } finally {
     if (client) { try { await client.end(); } catch {} }
   }

@@ -12,6 +12,8 @@
  * one Claude call afterwards, which is the only place judgment is paid for.
  */
 
+import { logNote } from './_log.js';
+
 /* ==================== THE SEARCHES LEAVE AT A RATE ======================
    Every search on a round used to be dispatched in one Promise.all, so a check
    opened with thirty four simultaneous requests. Exa's documented limit is ten
@@ -52,7 +54,7 @@ async function paced(fn, label) {
     last = r;
     await new Promise(z => setTimeout(z, 400 * Math.pow(2, attempt) + Math.random() * 200));
   }
-  try { console.warn('[retrieval] gave up after retries', label, last && last.http); } catch {}
+  logNote('retrieval', 'gave up after retries ' + label + ' http ' + (last && last.http));
   return last;
 }
 

@@ -111,6 +111,14 @@ create table if not exists ops_source_day (
   failed     int  not null default 0,
   timed_out  int  not null default 0,
   out_of_scope int not null default 0,
+  -- ASKED AND NOT REACHED IS NOT THE SAME AS NEVER ASKED.
+  -- A run plans a bounded number of searches, so most applicable registers are
+  -- never put a question to on any one run. Those were being written as failed,
+  -- which reported an outage every time the plan did its job. And a connector is
+  -- computed rather than asked, so it can never answer a question nobody put to
+  -- it, and every one of them was being written as failed on every run.
+  not_asked  int  not null default 0,
+  computed   int  not null default 0,
   p50_ms     int,
   primary key (day, source_id)
 );
@@ -185,3 +193,11 @@ create table if not exists ops_policy (
 );
 create index if not exists ops_policy_version_idx on ops_policy (version);
 create index if not exists ops_policy_seq_idx     on ops_policy (seq);
+
+
+-- 19 September 2026. Two columns added to ops_source_day so that a register
+-- nobody asked and a connector that was computed stop being written as
+-- failures. Existing rows keep their counts; the two new columns start at nought
+-- and fill from the next run.
+alter table ops_source_day add column if not exists not_asked int not null default 0;
+alter table ops_source_day add column if not exists computed  int not null default 0;

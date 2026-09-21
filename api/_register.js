@@ -178,10 +178,17 @@ export async function readRegister(limit = 60) {
         reply: named && x.reply ? String(x.reply) : null,
         replyAt: named && x.reply_at ? new Date(x.reply_at).toISOString().slice(0, 10) : null,
         tier: x.tier,
-        authority: x.authority,
-        authorityUrl: x.authority_url,
-        finding: x.finding,
-        foundAt: x.found_at ? String(x.found_at).slice(0, 10) : null,
+        /* THE AUTHORITY, ITS WORDS AND ITS DATE TRAVEL WITH THE NAME OR NOT AT
+           ALL. An official row is named the moment the authority named them, so
+           an unnamed row carrying a finding is a state that should not arise.
+           It is nulled here anyway, because "should not arise" is not a control:
+           a finding is free text taken from somebody else's record and it can
+           carry the party's own name inside it, which would publish through a
+           gate built to hold the name column. */
+        authority:    named ? x.authority : null,
+        authorityUrl: named ? x.authority_url : null,
+        finding:      named ? x.finding : null,
+        foundAt:      named && x.found_at ? String(x.found_at).slice(0, 10) : null,
         platforms: Number(x.platforms) || 0,
         reports: Number(x.reports) || 0,
         searches: Number(x.searches) || 0,

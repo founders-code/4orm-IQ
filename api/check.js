@@ -25,7 +25,12 @@ import { runConnectors, siblingCheck } from './_connectors.js';
 import { exa, parallel, plan, planRound2, extractSeeds, REVIEW_HOSTS, ALL_CATS } from './_retrieval.js';
 import { retrievedSources, reachedBoard, searchedBoard, applicabilityBoard, overlayBoard, reviewLedger } from './_registers.js';
 import { classify, jurisdictions } from './_classify.js';
-import { applicable, TOTAL_SOURCES, BY_NAME, LINK_OUT_ONLY } from './_catalogue.js';
+import { applicable, TOTAL_SOURCES, BY_NAME, LINK_OUT_ONLY, CATALOGUE } from './_catalogue.js';
+import { reserve, settle, estimateUsd, LIMITS } from './_budget.js';
+import { logNote } from './_log.js';
+import { mintNonce, fence, fenceOrder, fenceAsk } from './_untrusted.js';
+/* By id, for the one place that has an id and needs the row. */
+const CATALOGUE_BY_ID = Object.fromEntries(CATALOGUE.map(s => [s.source_id, s]));
 import { recordRun } from './_store.js';
 /* Two write sides, and the difference between them is the whole architecture.
    _store.js holds entity-level identifiers so the operator graph can say
@@ -72,7 +77,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260919.1016';
+const BUILD = '20260921.0118';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -82,28 +87,44 @@ const MAX_SEARCHES  = Math.max(3, Math.min(34, Number(process.env.KBYS_MAX_SEARC
 /* Round two is seeded by round one. Capped separately so a subject that surfaces
    many names cannot run the bill up without a deliberate change. */
 const MAX_ROUND2    = Math.max(0, Math.min(10, Number(process.env.KBYS_MAX_ROUND2) || 6));
-const WINDOW_MS = 60_000;
-const PER_WINDOW = 5;
-
-/* In-memory, per-instance, resets on cold start. Stops a stuck tab, not a
-   determined person. Move to Vercel KV before this URL is public. */
-const HITS = new Map();
-function overLimit(ip) {
-  const now = Date.now();
-  const hits = (HITS.get(ip) || []).filter(t => now - t < WINDOW_MS);
-  hits.push(now); HITS.set(ip, hits);
-  if (HITS.size > 5000) HITS.clear();
-  return hits.length > PER_WINDOW;
-}
+/* THE SPEND CEILING, SIZED FROM THE PLAN CLAMP.
+   A reservation is taken before the first vendor call, for the most a single
+   check is allowed to cost rather than the average, because the average is not
+   what has to be affordable. MAX_SEARCHES is the clamp the plan is cut to, half
+   of those ask for full text, and the Claude call is sized from max_tokens.
+   The actual spend is settled against this once the run ends. */
+const CEILING_PLAN = () => ({
+  searches:   MAX_SEARCHES + MAX_ROUND2,
+  pages:      Math.ceil((MAX_SEARCHES + MAX_ROUND2) / 2),
+  objectives: 4,
+  inTok:      90_000,
+  outTok:     16_000,
+});
 
 const isDomain = v => /^([\w-]+\.)+[a-z]{2,}$/i.test(v);
 const pct = (n, d) => (d > 0 ? Math.max(0, Math.min(100, Math.round((n / d) * 100))) : 0);
 
 /* ---------------- assemble the evidence brief for Claude ---------------- */
+/* The host a span came from, for the fence label. A label that says only
+   "untrusted" tells the model nothing it can weigh: it still has to tell a
+   securities commission from a review board. */
+function hostOf(url) {
+  try { return new URL(String(url)).hostname.replace(/^www\./, '').toLowerCase(); }
+  catch { return 'unknown host'; }
+}
+
 function brief(q, domain, conn, exaOut, parOut, siblings) {
   const L = [];
-  L.push(`IDENTIFIER: ${q}`);
-  if (domain) L.push(`DOMAIN: ${domain}`);
+  /* THE MARKER IS MINTED HERE AND NOWHERE ELSE, once per brief, so nothing
+     retrieved could have been written against it in advance. */
+  const N = mintNonce();
+  L.push(fenceOrder(N));
+  L.push('');
+  /* The identifier is a string a stranger typed. It is the shortest path from
+     the outside world into this prompt and it is fenced like everything else. */
+  L.push('IDENTIFIER, as typed:');
+  L.push(fenceAsk(q, N));
+  if (domain) L.push(`DOMAIN, as parsed by us: ${String(domain).slice(0, 253)}`);
   L.push(`DATE: ${new Date().toISOString().slice(0, 10)}`);
   L.push('');
   L.push('================ TIER 0 - DIRECT REGISTRY RECORDS ================');
@@ -117,7 +138,7 @@ function brief(q, domain, conn, exaOut, parOut, siblings) {
     L.push(`  registrar: ${r.registrar}`);
     L.push(`  nameservers: ${(r.nameservers || []).join(', ')}`);
     L.push(`  status: ${(r.statuses || []).join(', ')}`);
-    L.push(`  VERBATIM: ${r.raw_excerpt}`);
+    L.push(fence('ICANN RDAP, tier A, verbatim record', r.raw_excerpt, N, 1600));
   } else {
     L.push(`[ICANN RDAP] ${r?.status || 'not run'} - report this in coverage_gaps.`);
   }
@@ -125,7 +146,8 @@ function brief(q, domain, conn, exaOut, parOut, siblings) {
 
   const m = conn.records.mail;
   if (m?.status === 'found') {
-    L.push(`[Mail configuration] VERBATIM: ${m.raw_excerpt}`);
+    L.push('[Mail configuration] verbatim record:');
+    L.push(fence('DNS mail configuration, tier A, verbatim record', m.raw_excerpt, N, 1200));
     L.push(`  ${m.note}`);
   } else {
     L.push(`[Mail configuration] ${m?.status || 'not run'}`);
@@ -137,7 +159,7 @@ function brief(q, domain, conn, exaOut, parOut, siblings) {
     siblings.forEach(s => {
       L.push(`  ${s.domain} - shared nameservers: ${s.shared_nameservers.join(', ') || 'none'}` +
              `; same registrar: ${s.same_registrar}`);
-      L.push(`  VERBATIM: ${s.raw_excerpt}`);
+      L.push(fence('infrastructure record for ' + s.domain + ', tier A', s.raw_excerpt, N, 900));
     });
     L.push('');
   }
@@ -147,10 +169,17 @@ function brief(q, domain, conn, exaOut, parOut, siblings) {
     L.push(`--- ${b.label} [${b.status}] ---`);
     if (!b.results.length) { L.push('  nothing returned'); return; }
     b.results.forEach(x => {
+      const host = hostOf(x.url);
       L.push(`  URL: ${x.url}`);
-      L.push(`  TITLE: ${x.title || ''}${x.date ? '  (' + x.date + ')' : ''}`);
-      if (x.highlights?.length) L.push(`  HIGHLIGHT: ${x.highlights.join(' | ').slice(0, 700)}`);
-      if (x.text) L.push(`  TEXT: ${x.text.slice(0, 1600)}`);
+      /* The title is the page's own words as much as the body is, so it is
+         fenced too. A title is the one field that gets read closely on a page
+         nobody opens, which makes it the one worth writing an instruction
+         into. */
+      L.push(fence(host + ', page title' + (x.date ? ', dated ' + x.date : ''),
+                   x.title || '', N, 300));
+      if (x.highlights?.length)
+        L.push(fence(host + ', highlighted passage', x.highlights.join(' | '), N, 700));
+      if (x.text) L.push(fence(host + ', page text', x.text, N, 1600));
       L.push('');
     });
   });
@@ -160,9 +189,12 @@ function brief(q, domain, conn, exaOut, parOut, siblings) {
     L.push(`--- ${b.label} [${b.status}] ---`);
     if (!b.results.length) { L.push('  nothing returned'); return; }
     b.results.forEach(x => {
+      const host2 = hostOf(x.url);
       L.push(`  URL: ${x.url}`);
-      L.push(`  TITLE: ${x.title || ''}${x.date ? '  (' + x.date + ')' : ''}`);
-      (x.excerpts || []).forEach(e => L.push(`  EXCERPT: ${e.slice(0, 1200)}`));
+      L.push(fence(host2 + ', page title' + (x.date ? ', dated ' + x.date : ''),
+                   x.title || '', N, 300));
+      (x.excerpts || []).forEach(e =>
+        L.push(fence(host2 + ', cited excerpt', e, N, 1200)));
       L.push('');
     });
   });
@@ -171,6 +203,66 @@ function brief(q, domain, conn, exaOut, parOut, siblings) {
 }
 
 /* ---------------- semantic assessment -> console render shape ---------------- */
+/* ================================================== WHAT LEAVES THE SERVER
+   The payload above is built for three readers: the page, the evidence store,
+   and the operations row. Only one of them is the public, and the page is the
+   only one that renders anything.
+
+   Every field on a response is a field somebody can read. A field nobody
+   renders is therefore all cost and no benefit: it cannot help a reader, and
+   it can tell them something we did not decide to tell them. The vendor cost
+   of a check, the model we reason with, the build stamp of the deployment and
+   the count of seed identifiers extracted from a party's record were all
+   travelling to the browser inside the audit panel, and not one of them
+   appears on the screen.
+
+   So the shape is cut here, on the way out, at both exits. The server keeps
+   the whole object, because storage and the chain need it. The client is
+   handed what the interface draws.
+
+   tools/shapecheck.mjs fails the build if a field appears here that the page
+   does not read. */
+function forClient(payload) {
+  const d = { ...payload };
+
+  /* Computed for routing, stored on the run, drawn by nothing. */
+  delete d.notApplicable;
+  delete d.sourceCounts;
+  /* The page prints the date off the reference, not off this. */
+  delete d.checked_at;
+
+  const p = d.pipeline;
+  if (p) {
+    const q = { ...p };
+    /* WHAT A CHECK COSTS US IS OURS.
+       It is on the control room, behind the allowlist, which is where a
+       commercial figure belongs. On a public response it is a number a
+       competitor reads once and never has to ask for. */
+    if (q.exa) {
+      const { cost_usd, round1, round2, ...exa } = q.exa;
+      q.exa = exa;
+    }
+    /* How many names, case numbers and related entities were pulled out of
+       somebody's record. A count, not the values, and still nothing the page
+       draws: a reader learns only that we extracted things about them. */
+    delete q.seeds;
+    /* The model, and the build this came off. Neither is rendered, and both
+       narrow the guesswork for anybody probing the deployment. */
+    if (q.claude) { const { model, ...c } = q.claude; q.claude = c; }
+    delete q.build;
+    /* The page prints total time. The breakdown is an operator's number. */
+    if (q.ms) q.ms = { total: q.ms.total };
+    /* Every register applicable routing decided not to reach, by name. The
+       page draws the board, not this. */
+    if (q.connectors) {
+      const { unreached, ...conn } = q.connectors;
+      q.connectors = conn;
+    }
+    d.pipeline = q;
+  }
+  return d;
+}
+
 function toRenderShape(a, meta) {
   const s = a.scores || {};
   const checked = s.sources_checked || 0;
@@ -441,9 +533,19 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: 'not_configured',
       message: 'Live checking is not switched on. ANTHROPIC_API_KEY is not set on this deployment.' });
 
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
-  if (overLimit(ip))
-    return res.status(429).json({ error: 'rate_limited', message: 'Too many checks. Wait a minute and try again.' });
+  /* NOTHING PAID FOR IS REACHED ABOVE THIS LINE.
+     The ceiling is checked and the reservation recorded before Exa, Parallel or
+     Claude is called, so a refused request costs nothing. */
+  const budget = await reserve(req, estimateUsd(CEILING_PLAN()));
+  if (!budget.ok) {
+    res.setHeader('Retry-After', String(budget.retry_after_s));
+    return res.status(429).json({
+      error: budget.reason === 'rate' ? 'rate_limited' : 'budget_exceeded',
+      message: budget.message,
+      retry_after_s: budget.retry_after_s,
+      operator: 'the spend ceiling refused this run before any vendor was called'
+    });
+  }
 
   /* Streaming. The client asks for it with stream:true and reads newline
      delimited JSON as the work happens. Retrieval takes most of the wall clock
@@ -681,7 +783,7 @@ export default async function handler(req, res) {
             + calls.length + ' searches this check made';
         const detail = calls.slice(0, 6)
           .map(b => b.source + ':' + b.status + (b.http ? ' ' + b.http : '')).join(', ');
-        try { console.error('[check] retrieval dark', why, detail); } catch {}
+        logNote('check', 'retrieval dark: ' + why + ' [' + detail + ']');
         return fail(503, {
           error: 'retrieval_unavailable', build: BUILD,
           message: 'The check could not read any register. This is a fault on our side and '
@@ -785,6 +887,17 @@ export default async function handler(req, res) {
       stop_reason: msg.stop_reason });
 
     const exaCost = exaAll.reduce((n, b) => n + (b.cost || 0), 0);
+    /* Settle the reservation against what the run actually cost. This never
+       refuses anything, because the money is already spent. It exists so the
+       estimate above can be checked against the invoice. */
+    settle(budget, {
+      searches:   exaAll.length,
+      pages:      0,          /* not estimated: exaCostUsd below is the measured bill */
+      objectives: parOut.length,
+      inTok:      msg.usage?.input_tokens  || 0,
+      outTok:     msg.usage?.output_tokens || 0,
+      exaCostUsd: exaCost || null,
+    }).catch(() => {});
     /* Routing already decided which sources could hold a record here. Carry
        that onto the board so a register that was never going to apply reads as
        "does not apply here" rather than as a hole in our coverage. */
@@ -991,8 +1104,37 @@ export default async function handler(req, res) {
           done.add(row.source_id); srcWrites.push(recordSource(row.source_id, 'no_match', null));
         }
       }
-      for (const id of applicableIds)
-        if (!done.has(id)) { done.add(id); srcWrites.push(recordSource(id, 'failed', null)); }
+      /* PLANNED AND NOT REACHED IS A FAILURE. NEVER PLANNED IS NOT.
+         This wrote failed for every applicable register the board did not
+         name, and the board only ever names what was asked. A run plans a
+         bounded number of searches, twenty two by default, against a hundred
+         and twenty askable registers, so on every healthy run about a hundred
+         registers were written down as failures. The board then read those
+         rows back and reported an outage, which is how a healthy sweep came to
+         show every category red and every direct feed refused.
+         Three different things now say three different things:
+           failed      it was planned, and the run did not reach it
+           not_asked   the plan never included it. Not a fault, a bound
+           computed    it is a connector, worked out rather than asked */
+      const plannedIds = new Set();
+      try {
+        (sources || []).forEach(x => {
+          const row = BY_NAME[x.board || x.label || x.platform];
+          if (row && row.source_id) plannedIds.add(row.source_id);
+        });
+      } catch {}
+      for (const id of applicableIds) {
+        if (done.has(id)) continue;
+        done.add(id);
+        const row = CATALOGUE_BY_ID[id];
+        if (row && row.transport === 'connector') {
+          srcWrites.push(recordSource(id, 'computed', null));
+        } else if (plannedIds.has(id)) {
+          srcWrites.push(recordSource(id, 'failed', null));
+        } else {
+          srcWrites.push(recordSource(id, 'not_asked', null));
+        }
+      }
       for (const id of outOfScope)
         if (!done.has(id)) { done.add(id); srcWrites.push(recordSource(id, 'out_of_scope', null)); }
     } catch {}
@@ -1005,9 +1147,13 @@ export default async function handler(req, res) {
        recorded is an impossible pair, and the board says so in those words
        instead of printing a nought that reads like a measurement. */
 
-    if (stream) { emit('result', payload); try { res.end(); } catch {} return; }
+    /* BOTH EXITS GO THROUGH THE SAME CUT. A streamed response and a whole one
+       are the same payload, and a shaping applied to one of them is a shaping
+       that does not exist. */
+    const out = forClient(payload);
+    if (stream) { emit('result', out); try { res.end(); } catch {} return; }
     res.setHeader('Cache-Control', 'no-store');
-    return res.status(200).json(payload);
+    return res.status(200).json(out);
 
   } catch (err) {
     /* NOTHING A PROVIDER SAYS REACHES A READER.
@@ -1044,7 +1190,7 @@ export default async function handler(req, res) {
               + 'a finding about this party.';
 
     /* The real text, for us. Never sent to the page as prose. */
-    try { console.error('[check] upstream failure', status, raw.slice(0, 400)); } catch {}
+    logNote('check', 'upstream failure ' + status + ' ' + raw.slice(0, 400));
 
     return fail(status >= 400 && status < 600 ? status : 500, {
       error: 'upstream_error',

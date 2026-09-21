@@ -212,9 +212,30 @@ export async function recordRun(req, run) {
 export async function recordSource(sourceId, status, ms) {
   const p = await pool();
   if (!p) return { ok: false };
-  const col = { ok: 'ok', no_match: 'no_match', failed: 'failed',
-                timed_out: 'timed_out', out_of_scope: 'out_of_scope' }[status];
+  /* not_asked and computed are not failures and are counted apart from them.
+     A run plans a bounded number of searches, so most applicable registers are
+     never asked on any one run; a connector is computed and is never asked at
+     all. Both were being written as failed, which is how a board came to read
+     every direct feed as refused on a day when nothing had refused anything. */
+  /* THE COLUMN NAME IS THE ONE THING HERE THAT CANNOT BE A PARAMETER.
+     Postgres binds values, not identifiers, so this name is concatenated into
+     the statement and there is no way around that. What there is a way around
+     is trusting the caller: the name is not taken from `status`, it is LOOKED
+     UP by `status` in a list written here, and a status that is not in the
+     list is refused rather than passed through. The own-property check matters
+     as much as the map does: 'constructor' and '__proto__' are on every object
+     in this language and would otherwise return a value that is not a column
+     and is not undefined either. */
+  const COLUMN = Object.freeze(Object.assign(Object.create(null), {
+    ok: 'ok', no_match: 'no_match', failed: 'failed', timed_out: 'timed_out',
+    out_of_scope: 'out_of_scope', not_asked: 'not_asked', computed: 'computed',
+  }));
+  const col = Object.prototype.hasOwnProperty.call(COLUMN, String(status))
+    ? COLUMN[String(status)] : null;
   if (!col) return { ok: false, reason: 'bad_status' };
+  /* Belt and braces, and cheap. Whatever came out of the list above, it goes
+     into a statement only if it still looks like a column name. */
+  if (!/^[a-z_]{1,32}$/.test(col)) return { ok: false, reason: 'bad_column' };
   try {
     await p.query(
       `insert into ops_source_day (day, source_id, attempts, ${col}, p50_ms)
