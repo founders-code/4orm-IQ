@@ -326,23 +326,22 @@ if (order.already !== null)
 if (!(order.tonight < order.onward && order.onward < order.good
       && order.good < order.gap && order.gap <= order.act + 1))
   fail('the result screen reads in the wrong order: ' + JSON.stringify(order));
-/* AND THE CLOSE IS ONE ROW. What we could not answer sits under the reading
-   column at its width, and the door sits beside it under the report card. */
+/* AND THE CLOSE IS IN THE READING COLUMN. What we could not answer and the
+   way on sit under the records at the same width, beside the report card. */
 {
   const w = await p.evaluate(() => {
     const r = s => { const e = document.querySelector(s); return e ? e.getBoundingClientRect() : null; };
-    const f = r('#rpReport .rp-foundway'), g = r('#rpGapsBox'), a = r('#rpActWay'), c = r('#rpReport .rp-card') || r('#rpReport .rp-heroside');
-    return { found: f && Math.round(f.width), gap: g && Math.round(g.width), gapR: g && g.right,
-             actL: a && a.left, act: a && Math.round(a.width) };
+    const f = r('#rpReport .rp-foundway'), g = r('#rpGapsBox'), a = r('#rpActWay');
+    return { found: f && Math.round(f.width), gap: g && Math.round(g.width), act: a && Math.round(a.width),
+             below: !!(g && a && a.top >= g.bottom) };
   });
   if (w.found === null || w.gap === null || w.act === null) fail('a width could not be measured');
-  if (Math.abs(w.found - w.gap) > 2)
-    fail('the way in is ' + w.found + 'px and the gaps list is ' + w.gap + 'px; they should match');
-  if (!(w.actL >= w.gapR))
-    fail('the door is not beside the gaps list: ' + JSON.stringify(w));
+  if (Math.abs(w.found - w.gap) > 2 || Math.abs(w.found - w.act) > 2)
+    fail('the reading column blocks are not one width: ' + JSON.stringify(w));
+  if (!w.below) fail('the way on is not under what we could not answer');
 }
 
 if (errs.length) fail('page errors: ' + errs.join(' | '));
-console.log('screens walked, the result reads in the asked-for order, the close is one row');
+console.log('screens walked, the result reads in the asked-for order, the close sits in the reading column');
 console.log('PASSED');
 process.exit(0);

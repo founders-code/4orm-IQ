@@ -52,7 +52,7 @@ const src = fs.readFileSync('index.html', 'utf8');
   const blk = src.slice(i, i + 900);
   ok(/stage\)\|\|"BEFORE"\)==="SENT"/.test(blk),
      'the control does not turn on whether the reader told us money has gone');
-  ok(/else if\(sentNow_\)/.test(blk) && /Do this right now<\/button>/.test(blk),
+  ok(/if\(sentNow_\)\{/.test(blk) && /Do this right now<\/button>/.test(blk) && !/Open what to tell your bank/.test(src),
      'a reader whose money has gone is not told to do this right now');
   ok(/actBox\.hidden = true/.test(blk),
      'a reader who has sent nothing is still shown an imperative beside the verdict');
@@ -180,14 +180,20 @@ try {
   }
   const s = hook ? await drive('SENT') : {};
   console.log('  red, SENT  action ' + JSON.stringify(s.act) + '  beats: ' + s.beat + '  door ' + JSON.stringify(s.door));
-  ok(s.act && /right now|tell your bank/.test(s.act), 'a reader whose money has gone gets no action: ' + s.act);
-  ok(s.mode === 'sent' && s.door === 'Do this right now', 'the door is not the red act door for SENT');
+  ok(s.act === 'Do this right now', 'a reader whose money has gone is not given "Do this right now": ' + s.act);
+  ok(s.door === 'Next steps to protect you in the future', 'the door for SENT reads ' + JSON.stringify(s.door));
   /* The demo party has no attached authority record, so even SENT must not beat. */
   ok(s.beat === false, 'a verdict with no authority record about this party is still flashing');
   if (hook) {
-    const opened = await q.evaluate(() => { document.getElementById('rpToAct').click();
-      return !document.getElementById('rpAct').hidden; });
-    ok(opened, 'the red door does not open the act page for a reader whose money has gone');
+    const r = await q.evaluate(() => {
+      document.getElementById('rpToAct').click();
+      const next = !document.getElementById('rpNext').hidden;
+      document.getElementById('rpNextBack').click();
+      document.querySelector('#rpTonightA .rp-actb').click();
+      return { next, act: !document.getElementById('rpAct').hidden };
+    });
+    ok(r.next, 'the door does not open next steps for a reader whose money has gone');
+    ok(r.act, '"Do this right now" beside the verdict does not open the act page');
   }
 
   ok(e2.length === 0, 'page errors on the not-sent walk: ' + e2.join(' | '));

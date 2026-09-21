@@ -3036,6 +3036,17 @@ body[data-stage="report"] .foot{display:none}
 @media(max-width:1240px){#rpt .rp-heromain{grid-template-columns:minmax(0,1fr) 400px;gap:34px}}
 @media(max-width:1080px){#rpt .rp-heromain{grid-template-columns:minmax(0,1fr) 340px;gap:30px}}
 @media(max-width:680px){#rpt .rp-heromain{grid-template-columns:1fr;gap:34px}}
+/* ON A PHONE THE CARD SITS AFTER THE RECORDS, NOT AFTER THE WAY ON.
+   One column, so the reading column opens up and the card takes its place
+   after "What we found". The gaps and the way on stay last. */
+@media(max-width:680px){
+  #rpt .rp-heromain{display:flex;flex-direction:column;gap:0}
+  #rpt .rp-readcol{display:contents}
+  #rpt .rp-heromain > .rp-cardcol{order:5;margin-top:34px}
+  #rpt .rp-readcol > #rpGoodSec{order:6}
+  #rpt .rp-readcol > #rpAsk{order:7}
+  #rpt .rp-readcol > .rp-close{order:8}
+}
 /* The verdict is the one thing a frightened person has to read from across the
    room, so it is set to be seen before anything else on the page. The dot
    breathes, slowly, because a still red pill reads as decoration. */
@@ -3046,11 +3057,11 @@ body[data-stage="report"] .foot{display:none}
    is cannot act on it, so the body is named in full and the pill opens the
    record it is quoting. It wraps rather than shrinking: the sentence is the
    point, and a second line is cheaper than small type. */
-#rpt .rp-eyebrow{display:inline-flex;align-items:flex-start;gap:10px;border-radius:22px;
+#rpt .rp-eyebrow{align-items:flex-start;gap:10px;border-radius:22px;
   padding:11px 20px 11px 16px;background:var(--bad-bg2);border:1.5px solid var(--bad);
   font-family:var(--rmono);font-size:clamp(11px,.94vw,13.5px);font-weight:700;letter-spacing:.07em;
   text-transform:uppercase;color:var(--bad-dp);text-decoration:none;line-height:1.44;
-  max-width:min(100%,58ch);text-align:left;
+  display:flex;width:100%;box-sizing:border-box;max-width:none;text-align:left;
   box-shadow:0 8px 24px rgba(214,51,78,.20)}
 #rpt a.rp-eyebrow[href]{cursor:pointer}
 #rpt a.rp-eyebrow[href]:hover{background:#F8C8D1;border-color:var(--bad-dp)}
@@ -3058,6 +3069,7 @@ body[data-stage="report"] .foot{display:none}
 #rpt .rp-eyebrow .rp-ebgo{flex:none;align-self:center;font-size:1.05em;line-height:1;
   opacity:.72;margin-left:2px}
 #rpt a.rp-eyebrow[href]:hover .rp-ebgo{opacity:1}
+#rpt #rpEyebrowT{flex:1;min-width:0}
 #rpt .rp-eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--bad);flex:none;
   margin-top:.42em;
   box-shadow:0 0 0 0 rgba(214,51,78,.55);animation:rp-pulse 2.6s var(--ease) infinite}
@@ -3101,7 +3113,7 @@ body[data-stage="report"] .foot{display:none}
   word-break:break-all;max-width:64ch}
 #rpt .rp-dom + .rp-eyebrow{margin-top:20px}
 #rpt .rp-say{margin-top:24px;font-size:15px;font-weight:400;line-height:1.62;
-  color:var(--tx-2);max-width:56ch}
+  color:var(--tx-2);max-width:none}
 #rpt .rp-saylab{margin-top:26px;font-family:var(--rmono);font-size:9.5px;font-weight:800;
   letter-spacing:.17em;text-transform:uppercase;color:var(--tx-3)}
 
@@ -3648,6 +3660,7 @@ body.rp-fvup{overflow:hidden}
    matter: most fraud is never reported, so an empty record is not a clean one. */
 #rpt .rp-dyk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
 @media(max-width:720px){#rpt .rp-dyk{grid-template-columns:1fr}}
+#rpt .rp-nextsentx{margin:0 0 16px;font-size:15px;line-height:1.6;color:var(--tx-2);max-width:62ch}
 #rpt .rp-dykc{background:var(--surface-2);border:1px solid var(--border-strong);
   border-radius:var(--r-lg);padding:20px 22px}
 #rpt .rp-dykn{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--blue-dp);line-height:1.1}
@@ -3660,19 +3673,6 @@ body.rp-fvup{overflow:hidden}
 #rpt .rp-tips li b{color:var(--tx)}
 #rpt .rp-tips li::marker{color:var(--blue-dp);font-weight:800}
 #rpt .rp-tips a{color:var(--blue-dp)}
-#rpt .rp-nextsent{display:flex;align-items:center;gap:18px;width:100%;text-align:left;
-  font-family:inherit;padding:20px 22px;border-radius:var(--r-lg);cursor:pointer;
-  background:var(--bad-bg);border:1px solid var(--bad-br);
-  transition:border-color .3s var(--ease),box-shadow .45s var(--ease),transform .5s var(--spring)}
-#rpt .rp-nextsent:hover{border-color:var(--bad);box-shadow:0 12px 34px rgba(214,51,78,.16);
-  transform:translateY(-2px)}
-#rpt .rp-nextsent:focus-visible{outline:2px solid var(--bad);outline-offset:3px}
-#rpt .rp-nextsent .rp-b{flex:1;min-width:0;display:block}
-#rpt .rp-nextsent .rp-t{display:block;font-size:18px;font-weight:800;letter-spacing:-.03em;color:#8A1F31}
-#rpt .rp-nextsent .rp-x{display:block;margin-top:7px;font-size:13.5px;line-height:1.5;color:#7A2E3D}
-#rpt .rp-nextsent .rp-go{display:flex;align-items:center;justify-content:center;flex:none;
-  width:38px;height:38px;border-radius:50%;background:var(--bad);color:#fff}
-#rpt .rp-nextsent .rp-go svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none}
 
 /* ------------------------------------------------ the gaps, under the summary
    A list with a hairline above it, not a slab. It is the second half of the
@@ -3692,12 +3692,17 @@ body.rp-fvup{overflow:hidden}
    flashes is beside the verdict, and one moving thing on a page is enough. */
 /* One row on the same two columns as the summary and the card above it. On a
    phone it stacks, gaps first, because that is the reading order. */
-#rpt .rp-close{display:grid;grid-template-columns:var(--rp-half) var(--rp-card);
-  column-gap:var(--rp-gap);align-items:start;margin-top:44px}
-@media(max-width:860px){#rpt .rp-close{grid-template-columns:1fr;row-gap:26px}}
+/* ONE COLUMN, ONE WIDTH, ONE EDGE.
+   Everything in the reading column runs its full width, so the verdict, the
+   records, the gaps and the way on share a left and a right edge beside the
+   report card. */
+#rpt .rp-close{display:block;margin-top:30px}
 #rpt .rp-close .rp-gaps{margin-top:0}
-#rpt #rpActWay{margin-top:0}
-#rpt #rpActWay .rp-onbtn{align-items:flex-start}
+#rpt #rpActWay{margin-top:22px}
+#rpt .rp-heromain .rp-sec{padding-top:34px}
+#rpt .rp-heromain .rp-sec.rp-tight{padding-top:30px}
+#rpt .rp-heromain .rp-goods{margin-top:18px}
+#rpt #rpActWay .rp-onbtn{align-items:center;border-radius:var(--r)}
 #rpt #rpActWay .rp-onk{display:block;margin-bottom:6px;font-family:var(--rmono);font-size:10.5px;
   font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 #rpt #rpActWay .rp-go{margin-top:4px}
@@ -4182,7 +4187,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-vwhy{margin-top:16px;font-size:clamp(15.5px,1.45vw,18.5px);line-height:1.5;
   color:var(--tx);max-width:48ch;font-weight:600;letter-spacing:-.016em}
 #rpt .rp-tonight{margin-top:22px;padding:18px 20px;border-radius:var(--r);
-  background:var(--tx);color:#fff;max-width:47ch}
+  background:var(--tx);color:#fff;max-width:none}
 #rpt .rp-tonight .rp-t{font-size:clamp(17px,1.7vw,21px);font-weight:800;
   letter-spacing:-.026em;line-height:1.2}
 #rpt .rp-tonight .rp-x{margin-top:9px;font-size:14.5px;line-height:1.55;color:#B9C6D8}
@@ -4191,10 +4196,10 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-acta{margin-top:14px}
 #rpt .rp-acta[hidden]{display:none!important}
 #rpt .rp-actb{display:inline-block;padding:11px 18px;border-radius:999px;cursor:pointer;
-  background:#fff;color:var(--tx);border:1px solid #fff;
+  background:var(--bad);color:#fff;border:1px solid var(--bad);
   font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;transition:background .22s var(--ease),color .22s var(--ease)}
-#rpt .rp-actb:hover{background:var(--bad);color:#fff;border-color:var(--bad)}
+#rpt .rp-actb:hover{background:#B8243D;color:#fff;border-color:#B8243D}
 #rpt .rp-actb:focus-visible{outline:2px solid #fff;outline-offset:3px}
 /* ================================== IT BEATS WHERE A REGULATOR HAS NAMED THEM
    The hover state is the right red, so the pulse is the hover state arriving on
@@ -5023,7 +5028,7 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
     <div class="rp-hero">
       <div class="rp-heromain">
-        <div>
+        <div class="rp-readcol">
           <!-- THE NAME THEY TYPED COMES FIRST.
                A reader arrives here having searched for a company, and the
                first thing on the page has to be that company, so they know the
@@ -5046,6 +5051,9 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             <div class="rp-acta" id="rpTonightA" hidden></div>
           </div>
 
+          <div class="rp-saylab">In our own words</div>
+          <p class="rp-say" id="rpSay"></p>
+
           <!-- THE RECORDS, ONE PRESS UNDER THE VERDICT.
                A reader who has just been told not to send money asks one
                question and it is "what did you find". The answer used to be at
@@ -5066,8 +5074,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             </button>
           </div>
 
-          <div class="rp-saylab">In our own words</div>
-          <p class="rp-say" id="rpSay"></p>
 
 
           <!-- The only control a check that did not run can honestly offer.
@@ -5089,6 +5095,80 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
                number about other people, and this page is about one party and
                one decision. A statistic below the verdict is a second thing to
                weigh at the moment a reader is trying to act on the first. -->
+          <!-- The page could only ever say what was wrong. A registered firm with a
+               few bad reviews came out looking like an unregistered one, which is the
+               same failure as calling a complaint a finding, pointed the other way. -->
+          <div class="rp-sec" id="rpGoodSec">
+            <div class="rp-kick">In their favour</div>
+            <h2 class="rp-h2" id="rpGoodH"></h2>
+            <p class="rp-sub">These came off official registers. A registration is not a promise
+              that nothing will go wrong. It means a regulator knows who they are, they have rules
+              to follow, and there is somewhere to complain.</p>
+            <div class="rp-goods" id="rpGoods"></div>
+          </div>
+
+          <!-- THE ALREADY-SENT DOOR MOVED TO "DO THIS RIGHT NOW".
+               It sat here, between the verdict and the way on, where it asked a
+               reader who had NOT sent anything to read past a red panel about money
+               already gone. It is the first thing on the screen that exists to be
+               acted on, which is where a person who has already paid is heading
+               anyway, and it is the top of that screen so they meet it first. -->
+          <!-- WHAT WE COULD NOT ANSWER, AFTER THE RECORDS AND BEFORE THE ACTION.
+               It used to sit beside the verdict, which put the size of the hole in
+               front of a reader before they had seen a single record. Read here it
+               does the job it exists for: the reader has just been through what we
+               did find, and this is the honest edge of it. Grey, because an absence
+               takes no state colour: it is neither a finding nor a warning. -->
+          <!-- THE SECOND ATTEMPT.
+               Shown only where nothing could be attached to a party: the identifier
+               matched several organisations and the page has just said it could not
+               tell which one. Until now that was the end of the road, which is a
+               result that tells a reader they are on their own at the exact moment
+               they asked for help. One question, one box, and the check runs again. -->
+          <div class="rp-sec rp-tight" id="rpAsk" hidden>
+            <form class="rp-askbox" id="rpAskForm" autocomplete="off">
+              <div class="rp-t" id="rpAskT">Which one is it?</div>
+              <p class="rp-x" id="rpAskX"></p>
+              <div class="rp-askrow">
+                <input id="rpAskIn" type="text"
+                       placeholder="Full legal name, website, email or wallet"
+                       aria-label="The full legal name, website, email address or wallet address of the party you are checking">
+                <button class="rp-askgo" id="rpAskGo" type="submit">Check again</button>
+              </div>
+              <p class="rp-asknote" id="rpAskNote" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+          <!-- THE CLOSE OF THE RESULT, IN THE READING COLUMN.
+               Verdict, our own words, the records, what we could not answer,
+               then the way on, one column wide, beside the report card. The way
+               on is last because nothing may sit below it. -->
+          <div class="rp-close" id="rpClose">
+            <div class="rp-gaps" id="rpGapsBox">
+              <div class="rp-gapsk">What we could not answer</div>
+              <div class="rp-gapsx" id="rpGap1"></div>
+              <div class="rp-gapsx" id="rpGap2"></div>
+              <div class="rp-gapsx" id="rpGap3"></div>
+              <!-- The jurisdiction we hold nothing for, named. Hidden unless the run
+                   actually pointed at one, because a list of countries on every
+                   result is wallpaper. -->
+              <div class="rp-gapsx rp-gapj" id="rpGap4" hidden></div>
+            </div>
+            <!-- THE WAY ON IS THE ACTION, AND IT IS ON THE RESULT PAGE.
+                 It says what is behind it for the reader in front of it: next steps
+                 for somebody still deciding, the calls to make for somebody whose
+                 money has gone. -->
+            <div class="rp-onward" id="rpActWay" data-mode="next">
+              <button class="rp-onbtn" type="button" id="rpToAct">
+                <span class="rp-b">
+                  <span class="rp-onk" id="rpToActK">Before you decide</span>
+                  <span class="rp-t" id="rpToActT">Next steps to protect you</span>
+                  <span class="rp-x" id="rpToActX">How to check a business yourself, what to look for in
+                    reviews, and what to do if money has already gone.</span>
+                </span>
+                <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </button>
+            </div>
+          </div>
         </div>
         <!-- THE REPORT CARD.
              It used to be a list of what the record holds with the reference
@@ -5164,92 +5244,6 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
            hold three ratios in their head on the way to a decision the words
            had already made for them. The card and the summary are the page. -->
     </div>
-
-    <!-- The page could only ever say what was wrong. A registered firm with a
-         few bad reviews came out looking like an unregistered one, which is the
-         same failure as calling a complaint a finding, pointed the other way. -->
-    <div class="rp-sec" id="rpGoodSec">
-      <div class="rp-kick">In their favour</div>
-      <h2 class="rp-h2" id="rpGoodH"></h2>
-      <p class="rp-sub">These came off official registers. A registration is not a promise
-        that nothing will go wrong. It means a regulator knows who they are, they have rules
-        to follow, and there is somewhere to complain.</p>
-      <div class="rp-goods" id="rpGoods"></div>
-    </div>
-
-    <!-- THE ALREADY-SENT DOOR MOVED TO "DO THIS RIGHT NOW".
-         It sat here, between the verdict and the way on, where it asked a
-         reader who had NOT sent anything to read past a red panel about money
-         already gone. It is the first thing on the screen that exists to be
-         acted on, which is where a person who has already paid is heading
-         anyway, and it is the top of that screen so they meet it first. -->
-    <!-- WHAT WE COULD NOT ANSWER, AFTER THE RECORDS AND BEFORE THE ACTION.
-         It used to sit beside the verdict, which put the size of the hole in
-         front of a reader before they had seen a single record. Read here it
-         does the job it exists for: the reader has just been through what we
-         did find, and this is the honest edge of it. Grey, because an absence
-         takes no state colour: it is neither a finding nor a warning. -->
-    <!-- THE SECOND ATTEMPT.
-         Shown only where nothing could be attached to a party: the identifier
-         matched several organisations and the page has just said it could not
-         tell which one. Until now that was the end of the road, which is a
-         result that tells a reader they are on their own at the exact moment
-         they asked for help. One question, one box, and the check runs again. -->
-    <div class="rp-sec rp-tight" id="rpAsk" hidden>
-      <form class="rp-askbox" id="rpAskForm" autocomplete="off">
-        <div class="rp-t" id="rpAskT">Which one is it?</div>
-        <p class="rp-x" id="rpAskX"></p>
-        <div class="rp-askrow">
-          <input id="rpAskIn" type="text"
-                 placeholder="Full legal name, website, email or wallet"
-                 aria-label="The full legal name, website, email address or wallet address of the party you are checking">
-          <button class="rp-askgo" id="rpAskGo" type="submit">Check again</button>
-        </div>
-        <p class="rp-asknote" id="rpAskNote" role="status" aria-live="polite"></p>
-      </form>
-    </div>
-    <!-- THE CLOSE OF THE RESULT: WHAT WE COULD NOT ANSWER, THEN THE WAY ON.
-         This was a grey slab with a rule down its side, then a green band the
-         full width of the page, the same green as a good result on a page that
-         may be red. Two stacked blocks in two different colours, and the page
-         read as having two endings.
-         It is one row now, set on the same two columns as the summary and the
-         card above it: the words on the left, the one action on the right,
-         lined up under the report card. The order is unchanged and it matters:
-         the gaps are the honest edge of what the reader has just read, and they
-         come before the action, which is last because nothing may sit below it. -->
-    <div class="rp-close" id="rpClose">
-      <div class="rp-gaps" id="rpGapsBox">
-        <div class="rp-gapsk">What we could not answer</div>
-        <div class="rp-gapsx" id="rpGap1"></div>
-        <div class="rp-gapsx" id="rpGap2"></div>
-        <div class="rp-gapsx" id="rpGap3"></div>
-        <!-- The jurisdiction we hold nothing for, named. Hidden unless the run
-             actually pointed at one, because a list of countries on every
-             result is wallpaper. -->
-        <div class="rp-gapsx rp-gapj" id="rpGap4" hidden></div>
-      </div>
-      <!-- THE WAY ON IS THE ACTION, AND IT IS ON THE RESULT PAGE.
-           It says what is behind it for the reader in front of it: next steps
-           for somebody still deciding, the calls to make for somebody whose
-           money has gone. -->
-      <div class="rp-onward" id="rpActWay" data-mode="next">
-        <button class="rp-onbtn" type="button" id="rpToAct">
-          <span class="rp-b">
-            <span class="rp-onk" id="rpToActK">Before you decide</span>
-            <span class="rp-t" id="rpToActT">Next steps to protect you</span>
-            <span class="rp-x" id="rpToActX">How to check a business yourself, what to look for in
-              reviews, and what to do if money has already gone.</span>
-          </span>
-          <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </button>
-      </div>
-    </div>
-
-
-
-
-
 
     <div class="rp-behind">
       <p class="rp-spec" id="rpSpec"></p>
@@ -5625,14 +5619,9 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 
       <div class="rp-dsec">
         <h3><i>03</i>If you have already sent money</h3>
-        <button class="rp-nextsent" type="button" id="rpNextToAct">
-          <span class="rp-b">
-            <span class="rp-t">Do this right now if you&rsquo;ve sent money</span>
-            <span class="rp-x">What to do first, who to reach out to with a report card ready for
-              each of them, and the call that can still pull money back.</span>
-          </span>
-          <span class="rp-go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </button>
+        <p class="rp-nextsentx">What to do first, who to reach out to with a report card ready for
+          each of them, and the call that can still pull money back.</p>
+        <button class="rp-actb" type="button" id="rpNextToAct">Do this right now</button>
       </div>
 
       <div class="rp-foot">
@@ -13417,7 +13406,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260921.0550";
+var KBYS_BUILD = "20260921.0736";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -16328,11 +16317,7 @@ function renderReport(d){
        complaints. */
     var sentNow_ = ((RUN_CTX && RUN_CTX.stage)||"BEFORE")==="SENT";
     var beat_ = (sentNow_ && rpHasOfficial(d)) ? " rp-beat" : "";
-    if(sentNow_ && dl.act){
-      actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-pak="'+rpEsc(dl.act)+'">'
-        + 'Open what to tell your bank</button>';
-      actBox.hidden = false;
-    } else if(sentNow_){
+    if(sentNow_){
       actBox.innerHTML = '<button class="rp-actb'+beat_+'" type="button" data-act="1">'
         + 'Do this right now</button>';
       actBox.hidden = false;
@@ -16348,13 +16333,13 @@ function renderReport(d){
      can say "do this right now" to somebody who has not sent anything. */
   (function(){
     var sent = rpSentNow();
-    var w=id("rpActWay"); if(w) w.setAttribute("data-mode", sent ? "sent" : "next");
+    var w=id("rpActWay"); if(w) w.setAttribute("data-mode", "next");
     var set=function(k,v){ var e=id(k); if(e) e.textContent=v; };
     if(sent){
-      set("rpToActK","Your money has gone");
-      set("rpToActT","Do this right now");
-      set("rpToActX","What to do first, who to reach out to with a report card ready for "
-        +"each of them, and the call that can still pull money back.");
+      set("rpToActK","Once you have acted");
+      set("rpToActT","Next steps to protect you in the future");
+      set("rpToActX","How to check a business yourself next time, and what to look for in "
+        +"reviews before you send anything again.");
       set("rpPinT","Do this right now");
       set("rpPinX","What to do, and who to reach out to");
       set("rpFoundToAct","Do this right now");
@@ -16578,7 +16563,8 @@ function renderReport(d){
   id("rpPaks").innerHTML=rpPaks();
 
   id("rpGap1").textContent=(c.unreached
-      ? "There are "+c.unreached+" registers we could not open. Every one is named in our working, "
+      ? (c.unreached===1 ? "There is one register we could not open. It is named in our working, "
+                         : "There are "+rpWord(c.unreached)+" registers we could not open. Every one is named in our working, ")
         +"so you can see the size of the gap."
       : "We reached every register that could have held a record on them.")
     +(c.unsettled?" "+rpCap(rpWord(c.unsettled))+" check"+(c.unsettled===1?"":"s")
@@ -17278,7 +17264,7 @@ id("rpToFound").addEventListener("click", rpFound);
   }
   function onScroll(){ if(window.scrollY > 40) hide(); }
   el.addEventListener("click", function(){
-    var t = id("rpGoodSec") || document.querySelector("#rpReport .rp-gapnote");
+    var t = id("rpGapsBox") || id("rpActWay");
     if(t && t.scrollIntoView)
       t.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
     else window.scrollBy({ top: window.innerHeight * .82,
@@ -17288,9 +17274,10 @@ id("rpToFound").addEventListener("click", rpFound);
   window.rpCue = function(d){
     done = false; clearTimeout(timer);
     window.removeEventListener("scroll", onScroll);
-    /* Nothing below the fold is nothing to hint at. */
-    var below = document.documentElement.scrollHeight - window.innerHeight > 120;
-    if(!below || (d && d.failed)){ el.hidden = true; el.classList.remove("rp-on"); return; }
+    /* Nothing below the fold is nothing to hint at. The measure is the last
+       thing a reader needs, the way on at the foot of the reading column,
+       not the page: a footer and a terms line below the fold are not reading. */
+    if(!rpCueNeeded() || (d && d.failed)){ el.hidden = true; el.classList.remove("rp-on"); return; }
     /* What is actually down there, in its own words, so the cue is never a
        promise the page does not keep. */
     var x = id("rpMoreX");
@@ -17299,10 +17286,20 @@ id("rpToFound").addEventListener("click", rpFound);
       : "what we could not answer, and what to do next";
     el.hidden = false;
     window.addEventListener("scroll", onScroll, { passive: true });
-    timer = setTimeout(function(){ if(!done) el.classList.add("rp-on"); }, 900);
+    timer = setTimeout(function(){
+      if(done) return;
+      if(!rpCueNeeded()){ hide(); return; }
+      el.classList.add("rp-on");
+    }, 900);
   };
+  function rpCueNeeded(){
+    var w = id("rpActWay");
+    if(!w || !w.getBoundingClientRect) return false;
+    var r = w.getBoundingClientRect();
+    return r.height > 0 && r.bottom > window.innerHeight - 8;
+  }
 })();
-id("rpToAct").addEventListener("click", rpOnward);
+id("rpToAct").addEventListener("click", rpNext);
 id("rpNextBack").addEventListener("click", rpBackToReport);
 id("rpNextToAct").addEventListener("click", rpAct);
 /* The sheet closes on its own controls, on the scrim, and on escape. */

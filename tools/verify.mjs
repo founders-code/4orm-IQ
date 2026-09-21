@@ -1017,7 +1017,8 @@ if (/class="[^"]*\brp-rp-/.test(html))
    foot of the page. Decided 21 September 2026. */
 if (!/var sentNow_ = \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT";/.test(script))
   fails.push('the control beside the verdict no longer turns on whether money has gone');
-if (!/\} else if\(sentNow_\)\{[\s\S]{0,200}data-act="1">'\s*\+ 'Do this right now<\/button>/.test(script))
+if (!/if\(sentNow_\)\{[\s\S]{0,200}data-act="1">'\s*\+ 'Do this right now<\/button>/.test(script)
+    || /Open what to tell your bank/.test(script))
   fails.push('a reader whose money has gone is no longer given "Do this right now" beside the verdict');
 if (/d\.verdict==="RED" \|\| \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SENT"/.test(script))
   fails.push('a red verdict for a reader who has sent nothing is given a control beside it again');
@@ -1026,8 +1027,12 @@ if (/d\.verdict==="RED" \|\| \(\(RUN_CTX && RUN_CTX\.stage\)\|\|"BEFORE"\)==="SE
    has not sent anything. */
 if (!/function rpOnward\(\)\{ if\(rpSentNow\(\)\) rpAct\(\); else rpNext\(\); \}/.test(script))
   fails.push('the way on no longer sends a reader who has not sent money to next steps');
-for (const k of ['id("rpToAct").addEventListener("click", rpOnward)',
-                 'btn.addEventListener("click", rpOnward)',
+/* The door at the foot of the reading column is next steps for everyone:
+   "to protect you" before, "in the future" after. The red action for a reader
+   whose money has gone is the button beside the verdict. */
+if (!script.includes('id("rpToAct").addEventListener("click", rpNext)'))
+  fails.push('the door at the foot no longer opens next steps');
+for (const k of ['btn.addEventListener("click", rpOnward)',
                  'rpFoundHide(); rpOnward();'])
   if (!script.includes(k))
     fails.push('a "what now" control bypasses the answer about money: ' + k);
@@ -2109,8 +2114,10 @@ for (const x of PILLED_) {
   /* It goes on the first scroll and does not come back. */
   if (!/window\.removeEventListener\("scroll", onScroll\)/.test(script))
     fails.push('the scroll cue keeps listening after it has been dismissed, so it can come back');
-  /* And it is never shown when there is nothing below the fold to reach. */
-  if (!/scrollHeight - window\.innerHeight > 120/.test(script))
+  /* And it is never shown when the way on is already in view: the measure is
+     the last thing a reader needs, not the height of the page. */
+  if (!/function rpCueNeeded\(\)\{[\s\S]{0,200}id\("rpActWay"\)[\s\S]{0,200}r\.bottom > window\.innerHeight/.test(script)
+      || !/if\(!rpCueNeeded\(\) \|\| \(d && d\.failed\)\)/.test(script))
     fails.push('the scroll cue is shown without checking there is anything below the fold');
   if (!/#rpt \.rp-more\[hidden\]\{display:none\}/.test(styleBlock))
     fails.push('a hidden scroll cue has no rule taking it off the page');

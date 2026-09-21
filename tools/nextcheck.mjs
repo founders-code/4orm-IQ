@@ -27,7 +27,8 @@ ok(/review/i.test(page) && /social media/i.test(page) && /consumer protection/i.
    'the tips no longer cover review sites, social media and consumer protection sites');
 ok(/negative/i.test(page) && /bought/i.test(page),
    'the tips no longer say positive reviews can be bought and a run of negative ones is the signal');
-ok(/id="rpNextToAct"/.test(page), 'the page has no way to the act page for a reader who has sent money');
+ok(/<button class="rp-actb" type="button" id="rpNextToAct">Do this right now<\/button>/.test(page),
+   'the foot of the page is not the same red "Do this right now" pill as beside the verdict');
 ok(!/[–—]/.test(page), 'the page carries a long dash');
 ok(!/\bAI\b|\bproblem\b/i.test(page.replace(/<[^>]+>/g, ' ')), 'the page says AI or problem');
 
@@ -39,8 +40,11 @@ ok(/q:"Have you already sent money\?",\s*note:"This is the important one\./.test
 {
   const g = src.indexOf('id="rpGoodSec"'), c = src.indexOf('id="rpClose"'),
         gp = src.indexOf('id="rpGapsBox"'), w = src.indexOf('id="rpActWay"');
-  ok(g > -1 && c > g && gp > c && w > gp,
-     'the close band is out of order: good things, then gaps, then the door');
+  const say = src.indexOf('id="rpSay"'), fd = src.indexOf('id="rpToFound"'),
+        tn = src.indexOf('id="rpTonight"'), card = src.indexOf('class="rp-cardcol"');
+  ok(tn < say && say < fd && fd < g && g > -1 && c > g && gp > c && w > gp && w < card,
+     'the reading column is out of order: verdict, our own words, what we found, '
+   + 'in their favour, what we could not answer, next steps, then the card beside it');
   ok((src.match(/class="rp-gapnote"/g) || []).length <= 1,
      'the old grey gaps box is back beside the one for a run that found nothing');
 }
@@ -94,8 +98,40 @@ try {
     });
     ok(r.shown, 'the next steps page does not open from the door');
     ok(r.act, 'the red button on the next steps page does not open the act page');
+    /* One column, one width: every block in it shares both edges. */
+    const e = await p.evaluate(() => { document.getElementById('rpActBack') && document.getElementById('rpActBack').click();
+      return ['#rpEyebrow','#rpTonight','#rpSay','#rpReport .rp-foundway','#rpGapsBox','#rpActWay']
+        .map(s => { const r = document.querySelector(s).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.right)]; }); });
+    const [l0, r0] = e[0];
+    e.forEach((x, i) => ok(Math.abs(x[0] - l0) <= 1 && Math.abs(x[1] - r0) <= 1,
+      'block ' + (i + 1) + ' of the reading column does not share its edges: ' + JSON.stringify(e)));
     console.log('  next page ' + JSON.stringify(r) + '  cards ' + cards.length + '  tips ' + tips);
   }
+  /* ---- 6. Keep reading only when the way on is out of sight ---------- */
+  for (const [h, want] of [[1400, false], [620, true]]) {
+    const c = await b.newPage({ viewport: { width: 1440, height: h } });
+    await c.goto('file://' + process.cwd() + '/index.html?demo=1&debug=1');
+    await c.waitForTimeout(400);
+    const tp = re => c.evaluate(r => { const x = [...document.querySelectorAll('button')]
+      .find(y => y.offsetParent && new RegExp(r, 'i').test(y.innerText)); if (x) x.click(); }, re);
+    await c.fill('#kbInput', 'Meridian Yield Partners'); await c.click('#kbGo');
+    await c.waitForTimeout(2200); await tp('investment'); await c.waitForTimeout(1400); await tp('not yet');
+    for (let i = 0; i < 24; i++) {
+      await c.waitForTimeout(1100);
+      if (await c.evaluate(() => document.body.getAttribute('data-stage') === 'report')) break;
+      await c.evaluate(() => { const x = document.getElementById('primOk'); if (x && !x.disabled) x.click(); });
+    }
+    await c.evaluate(() => window.scrollTo(0, 0));
+    await c.waitForTimeout(1800);
+    const cue = await c.evaluate(() => { const m = document.getElementById('rpMore');
+      return !m.hidden && m.classList.contains('rp-on'); });
+    const seen = await c.evaluate(() => document.getElementById('rpActWay').getBoundingClientRect().bottom <= innerHeight);
+    console.log('  keep reading at ' + h + 'px: ' + cue + ' (way on in view: ' + seen + ')');
+    ok(cue === !seen, 'keep reading is ' + (cue ? 'shown' : 'hidden') + ' at ' + h
+       + 'px while the way on is ' + (seen ? 'in view' : 'out of sight'));
+    await c.close();
+  }
+
   ok(errs.length === 0, 'page errors: ' + errs.join(' | '));
 } finally { await b.close(); }
 

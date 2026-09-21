@@ -1,8 +1,8 @@
-# 4orm IQ, build 20260921.0550
+# 4orm IQ, build 20260921.0736
 
 Everything in this archive is the working tree as it stands, plus the two
 control documents under `reports/`. It is a git repository: `git log` carries
-six commits and the reason for each.
+eight commits and the reason for each.
 
 ## Run the gate
 
@@ -36,6 +36,19 @@ main. It needs no secret, because every check reads files.
 | The remote | The repository is committed locally and has no remote. `check` should be a required status check on main. |
 
 ## What changed in this build
+
+### The result page, one reading column beside the report card
+
+| Change | Where |
+|---|---|
+| The reading column runs in this order: the verdict, in our own words, what we found, what we could not answer, next steps. Every block is the full column width, with one left and one right edge, beside the report card. | `.rp-readcol` |
+| On a phone the report card follows what we found; what we could not answer and next steps stay last. | `@media(max-width:680px)` |
+| Money sent: the dark verdict box carries a red "Do this right now" that opens the act page. It beats three times and stays lit only where an authority has named the party. | `sentNow_` |
+| The door at the foot opens the Next steps page for everyone: "Next steps to protect you" before money has gone, "Next steps to protect you in the future" after. | `#rpActWay` |
+| The foot of the Next steps page carries the same red "Do this right now" pill, opening the same act page. | `#rpNextToAct` |
+| "There are two registers we could not open" is written in words. | `rpGap1` |
+| "Keep reading" shows only when the way on at the foot of the reading column is out of sight. | `rpCueNeeded` |
+| `doorcheck`, `nextcheck` and `smoke26` check the order, the shared edges and both routes. | `tools/` |
 
 ### The report, for the reader who has sent money and the one who has not
 
