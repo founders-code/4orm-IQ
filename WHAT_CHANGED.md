@@ -1,8 +1,8 @@
-# 4orm IQ, build 20260921.0736
+# 4orm IQ, build 20260929.2040
 
 Everything in this archive is the working tree as it stands, plus the two
 control documents under `reports/`. It is a git repository: `git log` carries
-eight commits and the reason for each.
+nine commits and the reason for each.
 
 ## Run the gate
 
@@ -36,6 +36,22 @@ main. It needs no secret, because every check reads files.
 | The remote | The repository is committed locally and has no remote. `check` should be a required status check on main. |
 
 ## What changed in this build
+
+### The words
+
+Every line of the copy register is on the site: the landing, the questions, the card people agree to, the run, the result and its states, reviews and complaints, what to do next, already sent money, find help, how 4ormIQ works, the important limits, and the compliance, privacy and terms documents. The slogan is now "Check before you send", on every screen, every document pack and the audit report.
+
+| Change | Where |
+|---|---|
+| Terms of use move to version 1.1, in force 29 September 2026. Every result stamps the version it was made under, so the stamp and the words agree. Counsel has not read this version yet. | `TERMS_VERSION` |
+| The statute block stays as it was, under its new heading. It names the acts each limit comes from. | How 4ormIQ works |
+| The two Competition Bureau lines are on the page with their sources: read the two, three and four star reviews, and $704 million lost in 2025 with only 5 to 10 per cent of fraud reported. | What to do next |
+| A complaint count now carries its context: ten complaints about a business with two hundred customers and ten about a business with two hundred thousand are not the same thing. | Reviews and complaints |
+| The landing carries the line about what this is for: this shows you what is not good, do your own diligence on what is good. | Landing |
+| The share of official sources reads from the check log rather than a typed number. | The dials |
+| Colour words stay in the legal sections and are off the result itself. | Result |
+| The report card gives the answer a floor of 150px, so a longer question can wrap without squeezing the answer into a ribbon. | `.rp-idv` |
+| Every gate that asserted the old wording now asserts the new wording, and the suite is green. | `tools/` |
 
 ### The result page, one reading column beside the report card
 

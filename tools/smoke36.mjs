@@ -98,7 +98,7 @@ if (!await vis('rpVerify')) fail('the impersonation screen did not show the veri
     fail('the first verify step is not call back on a number you found yourself, it is: ' + s1);
   /* The door on this screen may not send somebody to a number they were given. */
   const clock = (await p.textContent('#rpClockX')).toLowerCase();
-  if (!/not any number you were given|number on the back of your card/.test(clock))
+  if (!/never one the caller gave you|not any number you were given|number on the back of your card/.test(clock))
     fail('the impersonation clock does not tell the reader which number to ring');
 }
 

@@ -148,7 +148,7 @@ await p.waitForTimeout(400);
     if (n.lines) await fail(n.name + ' still asks the reader to fill in ' + n.lines + ' blank lines');
     if (!n.recs) await fail(n.name + ' carries no records at all');
     if (!n.say) await fail(n.name + ' has no note on what to put in the message');
-    if (!n.keys.some(k => /what the records say/i.test(k)))
+    if (!n.keys.some(k => /what the (public )?records say/i.test(k)))
       await fail(n.name + ' does not lead with the records: ' + n.keys.join(' / '));
     if (n.keys.some(k => /they will ask you|only you can answer/i.test(k)))
       await fail(n.name + ' still carries a section of questions for the reader');
@@ -163,9 +163,9 @@ await p.waitForTimeout(400);
   const h = await p.evaluate(() => window.__KBYS__.pack(0));
   if (/pk-line|pk-ask|What only you can answer/.test(h))
     await fail('the downloadable pack still carries the blank form');
-  if (!/What the records say about this name/.test(h))
+  if (!/What the (?:public )?records say about this name/.test(h))
     await fail('the downloadable pack does not lead with the records');
-  if (!/What to put in the message/.test(h))
+  if (!/What to (?:put in|include in) (?:the|your) message/.test(h))
     await fail('the downloadable pack has no note on what to say');
   if (!/pk-r"|pk-r /.test(h) && !/class="pk-r"/.test(h))
     await fail('the downloadable pack carries no record rows');
@@ -229,7 +229,7 @@ await p.waitForTimeout(400);
 {
   const w = await p.evaluate(() => {
     const e = [...document.querySelectorAll('#rpAct .rp-sub')]
-      .find(x => /report card/i.test(x.textContent));
+      .find(x => /report card|Each copy includes/i.test(x.textContent));
     return e ? e.textContent.replace(/\s+/g, ' ').trim().split(/\s+/).length : null;
   });
   if (w === null) await fail('the line over who to reach out to is gone');

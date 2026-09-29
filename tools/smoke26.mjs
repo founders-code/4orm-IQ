@@ -74,7 +74,7 @@ const pillPair = async where => {
     const t = [...s.querySelectorAll('.rp-nav .rp-pill')].map(e => e.textContent.trim());
     return t;
   });
-  if (!n.some(t => /How we decide/.test(t))) fail(where + ' has no how we decide pill');
+  if (!n.some(t => /How 4ormIQ works/.test(t))) fail(where + ' has no how 4ormIQ works pill');
   /* On what to do, support sits inside the reach-out row, which is a closed
      disclosure until the reader opens it, so it is present rather than drawn.
      Everywhere else it has to be on the screen without opening anything. */

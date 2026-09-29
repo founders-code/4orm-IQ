@@ -92,7 +92,7 @@ await p.waitForTimeout(5400);
 {
   const feet = await p.evaluate(() => ['rpAgainR', 'rpAgainA', 'rpAgainS']
     .map(i => { const e = document.getElementById(i); return e && e.textContent.trim(); }));
-  if (!feet.every(t => t === 'Check another name'))
+  if (!feet.every(t => t === 'Check another company'))
     await fail('a report screen has no way to check another name: ' + JSON.stringify(feet));
   console.log('every foot: check another name');
 }
@@ -127,7 +127,7 @@ await p.waitForTimeout(5400);
   if (Math.abs(mid.bottom - mid.vh) > 2) await fail('the pinned action is not pinned to the foot');
   if (mid.h < 44) await fail('the pinned action is ' + mid.h + 'px tall, under the target floor');
   /* Not sent: the pin names the next steps page. Sent: do this right now. */
-  if (!/Do this right now|Next steps to protect you/.test(mid.label)) await fail('the pinned action is mislabelled: ' + mid.label);
+  if (!/Do this right now|What to do next|How to protect yourself next time/.test(mid.label)) await fail('the pinned action is mislabelled: ' + mid.label);
 
   /* It stands down while the door itself is on screen. */
   await p.evaluate(() => {

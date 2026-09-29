@@ -180,7 +180,7 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
        the file. A typed 4 would be a redrawn logo by another name. The
        accessible name still reads "Check 4orm" because the mark carries
        alt="4". */
-    if (!/id="kbGo"[\s\S]{0,400}>Check\s*<span class="fourming"><img class="fourm4"/.test(src))
+    if (!/id="kbGo"[\s\S]{0,400}>Check(?:<span class="gomore"> a company<\/span>)?\s*<span class="fourming"><img class="fourm4"/.test(src))
       fails.push('the button no longer says Check, then the 4 mark');
     if (!/id="kbGo"[\s\S]{0,12000}alt="4"><span class="fourmw">orm<\/span>/.test(src))
       fails.push('the button lost the orm that follows the mark');
@@ -191,9 +191,9 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     if (/\.gobtn\{[^}]*background:var\(--blue/.test(styleBlock))
       fails.push('the button is blue again, which hides the blue 4 on it');
     /* AND THE PAGE SAYS WHOSE CHECK IT IS. */
-    if (!/4ormIQ is the trust layer of 4orm Finance/.test(src))
+    if (!/4ormIQ helps people check before they send/.test(src))
       fails.push('nothing on the landing ties 4ormIQ to 4orm Finance');
-    if (!/<title>[^<]*Know more\. Decide better\./.test(src))
+    if (!/<title>[^<]*Check before you send\./.test(src))
       fails.push('the page title no longer carries the slogan');
     /* And "a name" on its own reads as a person's name, which is the one search
        the product refuses. */
@@ -286,8 +286,9 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
     'high-risk individual', 'guaranteed safe', 'we checked everything',
     'no risk exists', 'you should invest'
   ];
+  const ownVoice25 = ownVoice2.replace(/(?:no|never give (?:you )?a|do not give (?:you )?a|not a|without a)\s+trust score/gi, ' ');
   for (const phrase of banned25)
-    if (new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(ownVoice2))
+    if (new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(ownVoice25))
       fails.push('OPS-001 s.25 prohibited copy in our own voice: "' + phrase + '"');
 
   /* A promise we cannot perform is a promise we do not make. */
@@ -798,7 +799,7 @@ if (evCount !== plainCount)
    used to end "Two brands, one operator", which is precisely the conclusion the
    published limit says we do not draw. A page that states a limit and then
    breaks it two screens later is worse than one that never stated it. */
-if (!/Reports a shared identifier\. Never a shared operator\./.test(html))
+if (!/A shared identifier is a fact\. A shared operator is a conclusion\./.test(html))
   fails.push('the published limit on the 4orm corpus is gone from the sources page');
 const operatorClaims = [...html.matchAll(/[^<>"]{0,80}one operator[^<>"]{0,40}/g)].map(m => m[0].trim());
 if (operatorClaims.length)
@@ -1036,7 +1037,7 @@ for (const k of ['btn.addEventListener("click", rpOnward)',
                  'rpFoundHide(); rpOnward();'])
   if (!script.includes(k))
     fails.push('a "what now" control bypasses the answer about money: ' + k);
-if (!/set\("rpToActT","Next steps to protect you"\)/.test(script))
+if (!/set\("rpToActT","What to do next"\)/.test(script))
   fails.push('the door at the foot no longer says "Next steps to protect you" to a reader still deciding');
 if (/verdict==="AMBER"[^\n]*data-act/.test(script))
   fails.push('amber is being handed a red button, and amber is not a fault');
@@ -1385,7 +1386,7 @@ const belongs_ = (needle, on, what) => {
   else if (where.length > 1) fails.push(what + ' is on more than one report screen: ' + where.join(', '));
   else if (where[0] !== on) fails.push(what + ' is on ' + where[0] + ', it belongs on ' + on);
 };
-belongs_('What we could not answer', 'rpReport', 'the gap note');
+belongs_('What we could not confirm', 'rpReport', 'the gap note');
 /* IT MOVED TO THE SCREEN THAT EXISTS TO BE ACTED ON.
    On the result screen it sat between the verdict and the way on, which asked
    everybody who had NOT sent anything to read past a red panel about money
@@ -1541,7 +1542,7 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
    "We could not confirm this party on a register" was set on a green ground,
    which reads as good news to anybody scanning, and it is the opposite. */
 {
-  const m = /t:"We could not confirm this party on a register\."/.exec(script);
+  const m = /t:"We could not confirm this business on a relevant register\."/.exec(script);
   if (!m) fails.push('the unregistered sentence is gone');
   else {
     const before = script.slice(Math.max(0, m.index - 220), m.index);
@@ -1871,7 +1872,7 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
 /* And the paragraph over who to reach out to is one sentence, not four. */
 {
   const a = sheets_.rpAct || '';
-  const m = /<p class="rp-sub">Each one is a report card([\s\S]{0,400}?)<\/p>/.exec(a);
+  const m = /<p class="rp-sub">Each copy includes the public information([\s\S]{0,400}?)<\/p>/.exec(a);
   if (!m) fails.push('the line over who to reach out to is gone or back to its old length');
   else {
     const w = ('Each one is a report card' + m[1]).replace(/<[^>]*>/g, '')
@@ -1945,9 +1946,9 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
      Beside the verdict it put the size of the hole in front of a reader who
      had not seen a single record yet. Here it is the honest edge of what they
      have just read, and the last thing before they are asked to act. */
-  if (at('What we could not answer') < at('id="rpGoodSec"'))
+  if (at('What we could not confirm') < at('id="rpGoodSec"'))
     fails.push('what we could not answer sits above the records it qualifies');
-  if (at('What we could not answer') > at('id="rpActWay"'))
+  if (at('What we could not confirm') > at('id="rpActWay"'))
     fails.push('what we could not answer sits below the way on to what to do');
   /* AND ON THE SCREEN IT MOVED TO IT SITS DIRECTLY UNDER THE TITLE.
      The title and its one line say where the reader is; the door is the next
@@ -1992,11 +1993,11 @@ belongs_('id="rpClaimsSec"', 'rpReport', 'their words against the records');
     else if (door < accs) fails.push('the fraud door sits outside the list of three again');
     if (!/class="rp-accn rp-accn-red">01</.test(a))
       fails.push('the fraud door is not numbered as the first of the three');
-    for (const t of ['Who to reach out to', 'Tips and best practices'])
+    for (const t of ['Who to contact and what to send', 'Before you send money'])
       if (at(t) < 0) fails.push('what to do has lost: ' + t);
     /* The order, the forms and the summary all live inside the reach-out menu,
        because what you send is part of who you send it to. */
-    const reach = at('Who to reach out to');
+    const reach = at('Who to contact and what to send');
     for (const id of ['id="rpPaks"', 'id="rpDownloadSummary"', 'id="rpFindSupport"'])
       if (at(id) < reach) fails.push(id + ' is outside the reach out menu');
     /* And the fraud path carries its own order and its own list of what the
@@ -2054,10 +2055,10 @@ for (const x of PILLED_) {
      It was called Sources and method on a pill, How we decide in three feet,
      and a third thing in its own sections. A reader paid the recognition cost
      three times and could not tell they had already been there. */
-  if (!/How we decide/.test(sheets_[x])) fails.push(x + ' has lost the way to how we decide');
+  if (!/How 4ormIQ works/.test(sheets_[x])) fails.push(x + ' has lost the way to how 4ormIQ works');
   if (/Sources and method/.test(sheets_[x]))
     fails.push(x + ' calls how we decide by a second name');
-  if (!/Find support/.test(sheets_[x])) fails.push(x + ' has lost the find support pill');
+  if (!/Find support|Find help/.test(sheets_[x])) fails.push(x + ' has lost the find help pill');
 }
 {
   const r = sheets_.rpReport;
@@ -2083,7 +2084,7 @@ for (const x of PILLED_) {
     const fold = (r.match(/<details[^>]*id="rpCardFold"[^>]*>/) || [''])[0];
     if (!fold) fails.push('the report card fold is gone from the result screen');
     else if (/\bopen\b/.test(fold)) fails.push('the report card fold ships open');
-    if (!/Report card, 4orm info/.test(r))
+    if (!/Your report &middot; 4ormIQ|Your report \u00b7 4ormIQ/.test(r))
       fails.push('the report card fold does not say whose information it is');
     const foldAt = r.indexOf('id="rpCardFold"'), footAt = r.indexOf('class="rp-foot"');
     const heroAt = r.indexOf('class="rp-heromain"');
@@ -2201,11 +2202,11 @@ for (const x of ['rpAct', 'rpSources']) {
   /* One label for one destination. The page it opens is titled How we decide,
      so every door into it carries those three words and nothing else. Two
      names for one place makes a reader think there are two places. */
-  const a = nav.indexOf('How we decide'), b = nav.indexOf('Find support');
-  if (a < 0) fails.push('the landing has no how we decide pill');
-  else if (b < 0) fails.push('the landing has no find support pill');
+  const a = nav.indexOf('How 4ormIQ works'), b = nav.indexOf('Find help');
+  if (a < 0) fails.push('the landing has no how 4ormIQ works pill');
+  else if (b < 0) fails.push('the landing has no find help pill');
   else if (nav.slice(Math.min(a, b), Math.max(a, b)).split('<button').length > 2)
-    fails.push('how we decide and find support are not next to each other on the landing');
+    fails.push('how 4ormIQ works and find help are not next to each other on the landing');
   if (/>\s*Sources and method\s*</.test(html))
     fails.push('a door into how we decide is still labelled sources and method');
 }
@@ -2560,7 +2561,7 @@ if (!/waitShown=1; waitCeil=1; waitT0=Date\.now\(\)/.test(script))
     /* Both doors live inside the reach out menu, because what you send is part
        of who you send it to. The numbering itself is checked where the three
        things are checked. */
-    const order = ['Who to reach out to', 'Download report card', 'Find support']
+    const order = ['Who to contact and what to send', 'Download your report', 'Find support near you']
       .map(t => acc.indexOf(t));
     if (order.some(n => n < 0) || order[0] > order[1] || order[1] > order[2])
       fails.push('the forms and the summary are no longer inside the reach out menu, in that order');
@@ -2807,7 +2808,7 @@ if (!/id="waitForming"/.test(html))
      that must never happen, so the guard checks for the image, not the word. */
   if (!/<img class="fourm4" src="data:image\/png;base64,/.test(wf.slice(0, 400)))
     fails.push('the waiting line no longer uses the mark file, and something is standing in for it');
-  if (!/We are <span class="fourming">/.test(wf.slice(0, 400)))
+  if (!/Checking <span class="fourming">/.test(wf.slice(0, 400)))
     fails.push('the waiting line no longer says who is doing the work');
   /* The mark is inlined, so the estimate is thousands of characters past the
      opening tag. The window has to clear the data URI. */
@@ -3007,7 +3008,7 @@ if (!/id="waitForming"/.test(html))
         fails.push('a name can be written to the pulse before the tally crosses the bar');
       if (/search_pulse[\s\S]{0,400}visitor/.test(st))
         fails.push('the pulse write touches a visitor field, and section 04 promises it never can');
-      if (!/When one name is checked by a crowd/.test(html))
+      if (!/When many people check the same business/.test(html))
         fails.push('the pulse is being written and the privacy notice does not disclose it');
       const ret = fs.readFileSync(path.join(root, 'db/retention.neon.sql'), 'utf8');
       if (!/purge_pulse_labels/.test(ret))
@@ -3084,7 +3085,7 @@ if (!/id="waitForming"/.test(html))
       fails.push('the door does not say what the room is for');
     /* And it says the room changes nothing, because a reader who thinks the
        working can move the answer will read it looking for a different one. */
-    if (!/Nothing here changes the result/.test(card))
+    if (!/This is the detail behind your result/.test(card))
       fails.push('the door does not say the room is a reference rather than a second opinion');
   }
   if (!/ROOM_ASKED = true/.test(html))
@@ -3243,7 +3244,7 @@ if (/\.waitpills/.test(styleBlock))
   if (!/id="primBox"/.test(html))
     fails.push('the primer before the waiting screen is gone');
   const box = html.slice(html.indexOf('id="primBox"'), html.indexOf('</div>', html.indexOf('id="primOk"')));
-  if (!/two to three minutes/.test(box))
+  if (!/2 to 3 minutes/.test(box))
     fails.push('the primer does not say how long a check takes');
   if (!/id="primOk"/.test(box))
     fails.push('the primer has no way forward');
@@ -4027,7 +4028,7 @@ if (!/asked:\s+enabled\.filter/.test(metrics))
   if (!/rpAskPaint\(d\)/.test(html))
     fails.push('the second attempt block is never painted, so it can never appear');
   /* And the front door says it before the run, not only after it. */
-  if (!/Initials and short names match several organisations at once/.test(html))
+  if (!/Initials and short names can match several organizations/.test(html))
     fails.push('the search box no longer says a short name will not resolve');
 }
 
@@ -4244,7 +4245,7 @@ if (/[\u2014\u2013]/.test(eviPage))
   const adv = (html.match(/<p class="upnote upadv[^"]*"[^>]*>([\s\S]*?)<\/p>/) || [])[1] || '';
   if (!adv) fails.push('the landing page has no separate advice disclaimer under the search bar');
   else {
-    for (const phrase of ['not financial advice', 'do not advise', 'third party evidence'])
+    for (const phrase of ['not financial advice', 'do not recommend or endorse', 'the source and the date'])
       if (!new RegExp(phrase, 'i').test(adv))
         fails.push('the landing advice disclaimer no longer says "' + phrase + '"');
   }
@@ -4299,9 +4300,9 @@ if (/[\u2014\u2013]/.test(eviPage))
   const dis = (html.match(/<div class="rp-dis">[\s\S]*?<\/div>\s*\n\s*<div id="rpLaws">/) || [''])[0];
   if (!dis) fails.push('the compliance disclaimer is gone from the sources and method page');
   else for (const phrase of ['not financial, investment, tax or legal advice',
-                             'not a finding that any law has been broken',
-                             'Green is not clearance',
-                             'no fee from any party we report on']) {
+                             'does not mean a law has been broken',
+                             'Green does not mean cleared',
+                             'do not take payment from companies we report on']) {
     if (!dis.includes(phrase))
       fails.push('the disclaimer no longer says "' + phrase + '"');
   }
@@ -4345,14 +4346,14 @@ if (/[\u2014\u2013]/.test(eviPage))
      the code that each claim is about rather than only into the prose. */
   const priv = (html.match(/<div class="rp-sheet" id="rpPrivacy"[\s\S]*?\n<\/div>\n\n/) || [''])[0];
   for (const phrase of ['no accounts', 'do not keep what you typed',
-                        'rolled at midnight', 'run fresh against the registers',
-                        'No natural person is kept', 'one way hash',
-                        'Twelve\\s+months', 'Twenty\\s+four months'])
+                        'resets every day', 'runs fresh against the available sources',
+                        'Neither record stores a natural person', 'one-way code',
+                        '12\\s+months', '24\\s+months'])
     if (!new RegExp(phrase, 'i').test(priv))
       fails.push('the privacy notice no longer says "' + phrase.replace(/\\s\+/g, ' ') + '"');
   /* The corpus is disclosed. A store nobody is told about is the defect this
      section was written to close, so its own section has to stay on the page. */
-  if (!/What we keep about the party you checked/.test(priv))
+  if (!/What we keep about the business you checked/.test(priv))
     fails.push('the privacy notice no longer discloses the corpus');
   const ops = fs.readFileSync(path.join(root, 'api', '_ops.js'), 'utf8');
   if (!/never will be: the identifier itself/.test(ops))

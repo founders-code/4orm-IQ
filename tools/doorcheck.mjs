@@ -114,7 +114,7 @@ try {
        it must never be is empty, or a promise of "every record" on a run that
        returned two. */
     ok(d.sub.trim().length > 10, 'the door says nothing about what is behind it');
-    ok(/record|register/.test(d.sub),
+    ok(/record|register|source/.test(d.sub),
        'the door subline no longer names records or registers: ' + d.sub);
     console.log('  door   ' + d.bg + ' / ' + d.bd + ' / arrow ' + d.go);
     console.log('  sub    ' + d.sub);
@@ -169,7 +169,7 @@ try {
     ok(n.ctx === st, 'the ' + st + ' case did not take: ' + n.ctx);
     ok(!n.act, 'a reader who has sent nothing is shown an action beside the verdict: ' + n.act);
     ok(n.mode === 'next', 'the door is in ' + n.mode + ' mode for a reader who has sent nothing');
-    ok(n.door === 'Next steps to protect you', 'the door reads ' + JSON.stringify(n.door));
+    ok(n.door === 'What to do next', 'the door reads ' + JSON.stringify(n.door));
     /* The door opens the next steps page, not the act page. */
     if (hook) {
       const opened = await q.evaluate(() => { document.getElementById('rpToAct').click();
@@ -181,7 +181,7 @@ try {
   const s = hook ? await drive('SENT') : {};
   console.log('  red, SENT  action ' + JSON.stringify(s.act) + '  beats: ' + s.beat + '  door ' + JSON.stringify(s.door));
   ok(s.act === 'Do this right now', 'a reader whose money has gone is not given "Do this right now": ' + s.act);
-  ok(s.door === 'Next steps to protect you in the future', 'the door for SENT reads ' + JSON.stringify(s.door));
+  ok(s.door === 'How to protect yourself next time', 'the door for SENT reads ' + JSON.stringify(s.door));
   /* The demo party has no attached authority record, so even SENT must not beat. */
   ok(s.beat === false, 'a verdict with no authority record about this party is still flashing');
   if (hook) {

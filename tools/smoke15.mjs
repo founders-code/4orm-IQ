@@ -27,7 +27,7 @@ console.log('summary opens:', doc.getElementById('sumBox').classList.contains('o
 const t=doc.getElementById('sumBody').textContent;
 const h=doc.getElementById('sumBody').innerHTML;
 console.log('\nsections present:');
-['Know before you send','The check, in numbers','The party, and the dates on the record',
+['Check before you send','The check, in numbers','The party, and the dates on the record',
  'Names found in the records','The main hits','Before you send anything, do these',
  'If money has already gone','Read this before you rely on any of it']
  .forEach(x=>{ const ok=t.includes(x); if(!ok) MISS.push(x);

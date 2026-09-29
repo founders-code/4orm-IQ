@@ -41,7 +41,7 @@ const read = await p.evaluate(() => {
 });
 
 if (!read.up) fail('the primer does not open when a check starts');
-if (!/two to three minutes/i.test(read.title))
+if (!/2 to 3 minutes|two to three minutes/i.test(read.title))
   fail('the primer does not say how long a check takes: ' + read.title);
 if (read.steps.length < 3) fail('the primer explains the check in ' + read.steps.length + ' steps');
 if (!/research tool, not advice/i.test(read.fine))

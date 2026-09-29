@@ -47,7 +47,7 @@ console.log('  state:', doc.getElementById('infoState').textContent);
 {
   const txt = doc.getElementById('infoBody').textContent;
   const want = [
-    ['the question this check asks',   /Could the story this party tells/],
+    ['the question this check asks',   /Do the dates in the company\u2019s story|Could the story this party tells/],
     ['what the record said',           /did not exist until/],
     ['how much was behind it',         /\d+ records? behind this, from \d+ registers? in scope/],
     ['the way through to the working', /Open the full check/],

@@ -15,7 +15,7 @@ const src = fs.readFileSync('index.html', 'utf8');
 const a = src.indexOf('<div class="rp-sheet" id="rpNext"');
 ok(a > -1, 'the next steps page is gone');
 const page = src.slice(a, src.indexOf('<div class="rp-sheet"', a + 10));
-ok(/Next steps to protect you\./.test(page), 'the page has lost its title');
+ok(/What to do next/.test(page), 'the page has lost its title');
 const cards = page.split('class="rp-dykc"').slice(1);
 ok(cards.length >= 4, 'fewer than four did you knows: ' + cards.length);
 for (const [i, c] of cards.entries())
@@ -23,18 +23,18 @@ for (const [i, c] of cards.entries())
      'did you know ' + (i + 1) + ' carries no public source');
 const tips = (page.match(/<li/g) || []).length;
 ok(tips >= 8, 'the tips list is short: ' + tips);
-ok(/review/i.test(page) && /social media/i.test(page) && /consumer protection/i.test(page),
-   'the tips no longer cover review sites, social media and consumer protection sites');
-ok(/negative/i.test(page) && /bought/i.test(page),
-   'the tips no longer say positive reviews can be bought and a run of negative ones is the signal');
-ok(/<button class="rp-actb" type="button" id="rpNextToAct">Do this right now<\/button>/.test(page),
-   'the foot of the page is not the same red "Do this right now" pill as beside the verdict');
+ok(/review/i.test(page) && /online presence/i.test(page) && /consumer protection/i.test(page),
+   'the tips no longer cover reviews, the online presence and consumer protection sites');
+ok(/manipulated/i.test(page) && /same issue appears independently/i.test(page),
+   'the tips no longer say positive reviews can be manipulated and the repeat is the signal');
+ok(/<button class="rp-actb" type="button" id="rpNextToAct">Get help now<\/button>/.test(page),
+   'the foot of the page is not the red pill into what to do');
 ok(!/[–—]/.test(page), 'the page carries a long dash');
 ok(!/\bAI\b|\bproblem\b/i.test(page.replace(/<[^>]+>/g, ' ')), 'the page says AI or problem');
 
 /* ---- 2. The money question is flagged ---------------------------------- */
-ok(/q:"Have you already sent money\?",\s*note:"This is the important one\./.test(src),
-   'the money question is no longer flagged as the important one');
+ok(/q:"Have you already sent money\?",\s*note:"If money has already gone, the first steps matter most/.test(src),
+   'the money question no longer carries its note');
 
 /* ---- 3. The close band keeps the reading order ------------------------- */
 {
@@ -76,8 +76,8 @@ try {
   await p.fill('#kbInput', 'Meridian Yield Partners'); await p.click('#kbGo');
   await p.waitForTimeout(2200);
   await tap('investment'); await p.waitForTimeout(1400);
-  const note = await p.evaluate(() => document.body.innerText.includes('This is the important one'));
-  ok(note, 'the flag does not show on the money question');
+  const note = await p.evaluate(() => document.body.innerText.includes('the first steps matter most'));
+  ok(note, 'the note does not show on the money question');
   await tap('not yet');
   for (let i = 0; i < 24; i++) {
     await p.waitForTimeout(1100);

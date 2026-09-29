@@ -108,7 +108,7 @@ else {
   if (bankish(sentNoise.t) || sentNoise.act)
     fails.push('money gone and NOTHING official, and the page still leads with the bank. '
       + 'That tells somebody they were defrauded when the record does not say so');
-  if (!/not the same as saying nothing is wrong/i.test(sentNoise.x))
+  if (!/does not mean nothing is wrong/i.test(sentNoise.x))
     fails.push('the money-gone-nothing-found case stopped saying what it does not know');
 
   const sentPattern = at('SENT', threeBoards);
