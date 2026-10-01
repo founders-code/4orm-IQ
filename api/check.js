@@ -29,6 +29,9 @@ import { applicable, TOTAL_SOURCES, BY_NAME, LINK_OUT_ONLY, CATALOGUE } from './
 import { reserve, settle, estimateUsd, LIMITS } from './_budget.js';
 import { logNote } from './_log.js';
 import { mintNonce, fence, fenceOrder, fenceAsk } from './_untrusted.js';
+import { ageBand, drivesResult, BAND_LABEL, BAND_NOTE,
+         WINDOW_CURRENT_DAYS, WINDOW_OLDER_DAYS } from './_recency.js';
+import { rankStanding, isSelfDescribed, STANDING_TIERS, TIER_POWERS } from './_standing.js';
 /* By id, for the one place that has an id and needs the row. */
 const CATALOGUE_BY_ID = Object.fromEntries(CATALOGUE.map(s => [s.source_id, s]));
 import { recordRun } from './_store.js';
@@ -77,7 +80,7 @@ export const config = { maxDuration: 300 };
 const MODEL     = process.env.KBYS_MODEL || 'claude-sonnet-5';
 /* Written by tools/stamp.mjs. Returned on every response so the function's
    build can be compared with the page's. */
-const BUILD = '20260929.2040';
+const BUILD = '20260930.2351';
 const MAX_INPUT = 200;
 /* The plan is now routed, so a crypto fund builds a longer sweep than a
    plumber. The clamp had to move with it, and the plan is priority ordered so
@@ -314,13 +317,23 @@ function toRenderShape(a, meta) {
   const demoted = [];
   const cats = {};
   (a.categories || []).forEach(c => {
-    const ev = (c.evidence || []).map(e => stripQuoted({
-      t: e.tier, src: e.source, when: e.retrieved,
-      find: e.finding, plain: e.plain || '', quote: e.quote || '', url: e.url || '',
-      /* Carried to the page so the reader can be told which party a record is
-         about, rather than being left to assume it is theirs. */
-      about: e.about || '', match: matchOf(e)
-    }));
+    const ev = (c.evidence || []).map(e => {
+      /* THE BAND IS COMPUTED HERE, NOT ASKED FOR.
+         The model carries the date. The arithmetic on it is ours, because a
+         model asked to weigh recency weighs it wrongly and confidently. */
+      const band = ageBand(e.published, { category: c.id, source: e.source, tier: e.tier,
+                                          finding: e.finding });
+      return stripQuoted({
+        t: e.tier, src: e.source, when: e.retrieved,
+        published: e.published || '',
+        band, drives: drivesResult(band),
+        bandLabel: BAND_LABEL[band] || '', bandNote: BAND_NOTE[band] || '',
+        find: e.finding, plain: e.plain || '', quote: e.quote || '', url: e.url || '',
+        /* Carried to the page so the reader can be told which party a record is
+           about, rather than being left to assume it is theirs. */
+        about: e.about || '', match: matchOf(e)
+      });
+    });
     let state = c.state;
     if (state === 'RED' && !ev.some(e => e.match === 'exact')) {
       /* Probable keeps the doubt visible at YELLOW. Nothing but unconnected
@@ -329,6 +342,27 @@ function toRenderShape(a, meta) {
       demoted.push({ cat: c.id, from: 'RED', to: next,
                      why: ev.length ? 'no record naming this party' : 'no evidence' });
       state = next;
+    }
+    /* ================================ AND THE TIME WINDOW, ENFORCED THE SAME WAY
+       Businesses make mistakes and fix them. A category held RED on nothing but
+       records older than a year is a fault this business has had time to put
+       right, and leaving the page red on it is how a good company gets stalled
+       for something it already corrected.
+       Standing is exempt by class and never reaches here: a register entry, a
+       licence, a regulator action, a sanction and a court record are banded
+       current whatever date they carry, because they describe what is true now
+       until the issuing body changes them. So what this rule catches is exactly
+       what it should catch, which is aged incident material.
+       An undated record cannot hold anything at all. We do not know when it
+       happened, and "we do not know" belongs in the gaps, not on the verdict. */
+    if (state === 'RED' && ev.length
+        && !ev.some(e => e.match === 'exact' && e.drives)) {
+      const hasOlder = ev.some(e => e.match === 'exact' && e.band !== 'undated');
+      demoted.push({ cat: c.id, from: 'RED', to: 'YELLOW',
+                     why: hasOlder
+                       ? 'every record naming this party is older than a year'
+                       : 'no record naming this party carries a date' });
+      state = 'YELLOW';
     }
     cats[c.id] = { state, sum: c.summary, ev };
   });
@@ -371,6 +405,56 @@ function toRenderShape(a, meta) {
      records right beside it named the company in full. Where the display name
      is nothing but the domain label dressed up, the legal entity the records
      DID establish is used instead. */
+  /* ============================================ THE FAVOURABLE SIDE, RANKED
+     Ranked by one question: how hard is this to buy. Rank 1 cannot be bought,
+     rank 2 is expensive to fake, rank 3 is purchasable and is shown without
+     being counted. The rank the model supplied is checked against the same
+     rules in code, and the LOWER of the two wins, so a model that promotes a
+     testimonial to rank 1 cannot promote it past this line.
+
+     None of this touches the verdict. It is computed after the verdict is
+     settled, it is never read back, and there is deliberately no code path
+     from here to `verdict`. That is the defence against bought reviews, and
+     it is cheaper and more reliable than any detector: once a purchased five
+     star page has nowhere to move the needle, buying one stops working. */
+  const domainForSelf = a.entity?.domain || '';
+  const standingRows = ((a.standing && a.standing.records) || [])
+    /* Same attachment rule, in the other direction. A favourable record about
+       a similarly named company would clear the wrong party, which is the more
+       dangerous of the two errors, so unconnected is dropped outright here
+       rather than shown with a caveat. */
+    .filter(r => ATTACH.has(r.match) ? r.match !== 'unconnected' : true)
+    .filter(r => !isSelfDescribed(r, domainForSelf))
+    .map(r => {
+      const asked = Number(r.rank) === 1 || Number(r.rank) === 2 ? Number(r.rank) : 3;
+      const computed = rankStanding({ tier: r.tier, source: r.source,
+                                      finding: r.label, quote: r.quote }).tier;
+      const rank = Math.max(asked, computed);
+      const band = ageBand(r.published, { source: r.source, finding: r.label });
+      return {
+        rank, tierLabel: STANDING_TIERS[rank].label, tierNote: STANDING_TIERS[rank].note,
+        counts: TIER_POWERS[rank].counts,
+        label: r.label || '', src: r.source || '', url: r.url || '',
+        quote: r.quote || '', published: r.published || '',
+        band, bandLabel: BAND_LABEL[band] || '',
+        about: r.about || '', match: ATTACH.has(r.match) ? r.match : 'probable'
+      };
+    })
+    .sort((x, y) => x.rank - y.rank);
+
+  const standing = {
+    rows: standingRows,
+    /* Their own words, kept apart. A party's own page is never evidence about
+       that party, and putting it in the same list as a register entry would
+       say it is. */
+    self: ((a.standing && a.standing.self_described) || [])
+      .map(x => ({ claim: x.claim || '', where: x.where || '', url: x.url || '' })),
+    note: (a.standing && a.standing.note) || '',
+    /* Printed on the page so a reader understands why a five star rating is
+       sitting below a registry entry rather than beside it. */
+    ladder: [1, 2, 3].map(n => ({ rank: n, label: STANDING_TIERS[n].label, note: STANDING_TIERS[n].note }))
+  };
+
   const label = (a.entity?.domain || '').split('.')[0].toLowerCase();
   let display = a.entity?.display_name || '';
   const legal = a.entity?.legal_entity || '';
@@ -439,8 +523,18 @@ function toRenderShape(a, meta) {
       .map(i => ({ t: i.title, x: i.explanation, sev: i.severity, tier: i.tier,
                    about: i.about || '', match: ATTACH.has(i.match) ? i.match : 'probable' })),
     bys: a.before_you_send || [],
-    gaps: (a.coverage_gaps || []).map(g => [g.source, g.reason]),
+    /* AN UNDATED RECORD IS SOMETHING WE COULD NOT CONFIRM.
+       We cannot tell a reader whether it is current, and a record whose date
+       we do not know is not evidence that anything is true today. It is named
+       here, where the reader can see exactly what was missing, rather than
+       being printed as a finding it cannot support. */
+    gaps: (a.coverage_gaps || []).map(g => [g.source, g.reason]).concat(
+      Object.values(cats).flatMap(c => (c.ev || [])
+        .filter(e => e.band === 'undated' && e.match !== 'unconnected')
+        .map(e => [e.src, 'no date on the record'])) ),
     unresolved: a.unresolved_questions || [],
+
+    standing,
 
     reviews: a.review_narratives ? {
       checked:  a.review_narratives.platforms_checked || 0,
@@ -448,6 +542,19 @@ function toRenderShape(a, meta) {
       reports:  a.review_narratives.negative_reports_read || 0,
       state:    a.review_narratives.corpus_state || 'absent',
       note:     a.review_narratives.note || '',
+      /* THE FAVOURABLE PILE, DESCRIBED RATHER THAN COUNTED.
+         Two or more signals is worth telling a consumer. One on its own is
+         noise, and the page is told so here rather than being left to decide. */
+      pos:      a.review_narratives.positive_reports_read || 0,
+      posPeriod: a.review_narratives.positive_period || '',
+      posQuote: a.review_narratives.positive_quote || '',
+      posNote:  a.review_narratives.positive_note || '',
+      shape: {
+        signals: (((a.review_narratives.shape || {}).signals) || [])
+                   .map(x => ({ id: x.id, observed: x.observed || '' })),
+        flagged: ((((a.review_narratives.shape || {}).signals) || []).length >= 2),
+        note: ((a.review_narratives.shape || {}).note) || ''
+      },
       rows: (a.review_narratives.narratives || []).map(n => ({
         id: n.id, label: n.label, pf: n.platforms || 0,
         names: n.platform_names || [], n: n.reports || 0,

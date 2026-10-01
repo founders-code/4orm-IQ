@@ -70,7 +70,7 @@ const HOST_MAP_HAND = {
   'iosco.org':                  ['IOSCO I-SCAN'],
   'bcsc.bc.ca':                 ['BCSC Caution List'],
   'asc.ca':                     ['ASC Caution List'],
-  'osc.ca':                     ['OSC Alerts'],
+  'osc.ca':                     ['OSC Alerts', 'OSC Registered Crypto Asset Trading Platforms'],
   'fca.org.uk':                 ['FCA Warning List'],
   'sanctionssearch.ofac.treas.gov': ['OFAC'],
   'treasury.gov':               ['OFAC'],
@@ -252,6 +252,14 @@ const PATH_MAP = [
                    ['CSA Alerts']],
   ['securities-administrators.ca', /nrs|registration|national-?registration/i,
                    ['CSA Registration']],
+  /* The OSC publishes two very different things on one host: a list of firms
+     it has WARNED about, and a list of platforms it has REGISTERED. Reading
+     the second as the first, or missing it entirely, is how a registered
+     dealer gets reported as unconfirmed. The path decides which one it is. */
+  ['osc.ca',       /crypto-?business|registered-crypto|trading-?platform|registration-and-compliance/i,
+                   ['OSC Registered Crypto Asset Trading Platforms']],
+  ['osc.ca',       /investor-?alert|warning|caution|unregistered/i,
+                   ['OSC Alerts']],
   ['dfpi.ca.gov',  /crypto-?scam/i, ['DFPI Crypto Scam Tracker']]
 ];
 

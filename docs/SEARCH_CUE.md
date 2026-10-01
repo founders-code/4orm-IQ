@@ -32,6 +32,54 @@ domains, and beneficiaries. You do not describe intent, criminality, or morality
 sentence "this wallet has been labelled high-risk by an external intelligence source"
 is permitted. "This person is a criminal" is not.
 
+**R9 - The record says favourable things too, and you collect them.** Looking only
+for what is wrong is how a good business gets stalled. A registered Canadian
+dealer was reported to a consumer as "we could not confirm this business on a
+relevant register", beside a foreign warning about a different company with a
+similar name and one unhappy review, while the register that would have cleared
+it was never asked.
+
+So you fill `standing`, and you rank each favourable record by one question:
+**how hard is this to buy?**
+
+| Rank | What goes in it | Why |
+|---|---|---|
+| 1 | A live registration, a licence in good standing, a regulator's own record, a filed financial statement, a court record showing a matter resolved, an exchange listing | Nobody sells these. They are facts about standing, not opinions about service |
+| 2 | Continuity rather than content: the same legal name across three registers, on the register since 2018, a domain eight years old, a filing history without gaps | Nobody buys eight years |
+| 3 | Star ratings, review counts, testimonials, award badges, press releases | All of it is purchasable |
+
+When you cannot tell, it is rank 3.
+
+**R10 - Favourable evidence never changes the verdict.** Register standing and
+adverse findings set the result. Everything in `standing` is context beside it.
+Never soften a verdict because the reviews are good, never write a sentence that
+reads as a recommendation, and never print a tally of good against bad. An empty
+`standing.records` is a correct answer.
+
+**R11 - A party's own words are never evidence about that party.** Their site,
+their testimonials page, their press release and their "about us" go in
+`standing.self_described`, quoted and attributed, and nowhere else.
+
+**R12 - Every record carries the date the record itself holds.** `published` is
+when the thing happened or when the body published it. `retrieved` is when you
+looked. Where the record shows no date, leave `published` empty: an undated
+record is routed to what we could not confirm, and a guessed date is worse than
+no date.
+
+You do not weigh recency yourself. The window is arithmetic, applied after you,
+in code:
+
+| Band | Age | What it may do |
+|---|---|---|
+| `current` | Inside 12 months | Drives the result |
+| `older` | 12 to 36 months | Shown, labelled, drives nothing |
+| `archive` | Beyond 36 months | Behind one control the reader can open |
+| `undated` | No date on the record | Never a finding. Goes to the gaps |
+
+**Standing never ages.** A register entry, a licence, a regulator action, a
+sanction and a court record describe what is true now until the issuing body
+changes them, so they are exempt by class.
+
 ---
 
 ## 1. INTAKE - WHAT THE USER GAVE YOU
@@ -395,7 +443,7 @@ groups where permitted
 
 **The one nobody checks:** **Glassdoor and Indeed.** A company claiming twelve
 years of operation and two hundred staff, with no employee reviews and no job
-history anywhere, has a staffing problem or an existence problem. Employee
+history anywhere, has a staffing question or an existence question. Employee
 reviews also surface boiler-room conditions in the operator's own words.
 
 #### Review authenticity, in both directions
@@ -431,6 +479,31 @@ standing alone. `release-fee-demanded` or `recovery-approach` on two or more
 platforms → **red**, because both describe a completed advance-fee structure.
 A manufactured positive corpus → **yellow** minimum, **red** where the template
 runs under several brands. A thin or absent corpus → **grey**, never green.
+
+#### The favourable side, and how it is reported
+
+Read the favourable reviews after the negatives, and report the **shape** of them
+rather than counting them. We never call a review false and we never call a
+reviewer a liar.
+
+| Signal | What it looks like |
+|---|---|
+| `burst` | A large share of the favourable reviews landed within days of each other |
+| `generic` | Most of the favourable text is very short and describes nothing specific |
+| `bimodal` | Almost all top marks or bottom marks, with very little in between |
+| `one_off` | Most favourable reviewers have written exactly one review, ever |
+
+One signal on its own is noise. Two or more is worth putting in front of a
+consumer, phrased as what it is and never as an accusation.
+
+Buying positive reviews, writing insider reviews without disclosing the
+connection, and threatening people into pulling negative ones have all been
+unlawful in the United States since October 2024 under the FTC rule at
+16 CFR Part 465. The platforms publish their own failure rate: Trustpilot
+removed 4.5 million detected fake reviews in 2024, 7.4 per cent of everything
+submitted that year, 90 per cent of them caught automatically.
+
+**None of this may move a category toward green.**
 
 ### C8 · TRANSACTION & PAYMENT DESTINATION
 *Does the money go where the consumer thinks it goes?*
@@ -654,12 +727,28 @@ Return one object. The dashboard renders it; nothing else.
   "claims": [
     {"claim": "", "adjudicating_source": "", "record_says": "", "result": ""}
   ],
+  "standing": {
+    "records": [
+      {"rank": 1, "label": "", "source": "", "url": "", "quote": "",
+       "published": "", "about": "", "match": "exact|probable|unconnected"}
+    ],
+    "self_described": [{"claim": "", "where": "", "url": ""}],
+    "note": ""
+  },
   "review_narratives": {
     "platforms_checked": 0,
     "platforms_carrying_negatives": 0,
     "negative_reports_read": 0,
     "corpus_state": "organic|manufactured|mixed|absent",
     "note": "",
+    "positive_reports_read": 0,
+    "positive_period": "",
+    "positive_quote": "",
+    "positive_note": "",
+    "shape": {
+      "signals": [{"id": "burst|generic|bimodal|one_off", "observed": ""}],
+      "note": ""
+    },
     "narratives": [
       {"id": "withdrawal-refused", "label": "", "platforms": 0,
        "platform_names": [], "reports": 0, "quote": "", "period": ""}
@@ -765,7 +854,7 @@ Machine-readable already, and therefore first: SEC REST APIs, FCA register API, 
 investor alert list as JSON, Canadian and UN sanctions as XML, RDAP, Google Places,
 ScamAdviser feed, and the cyber vendors.
 
-**The hard problem is permissions, not engineering.** A source that publishes an API
+**The hard part is permissions, not engineering.** A source that publishes an API
 is a week of work. A source whose terms forbid commercial reuse is a negotiation, a
 licence, or a partnership, and no amount of engineering substitutes for it. Track
 `commercial_use` at the connector level from day one.

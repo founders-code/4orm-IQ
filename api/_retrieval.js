@@ -131,6 +131,16 @@ export const DOMAINS = {
   people:        ['linkedin.com','crunchbase.com','youtube.com','x.com','twitter.com',
                   'instagram.com','facebook.com','muckrack.com','opencorporates.com'],
 
+  /* CANADIAN REGISTERS, PINNED, FOR THE ONE SEARCH THAT LOOKS FOR STANDING.
+     Rank 1 favourable evidence means a body nobody can pay published it, so
+     the search that goes looking for it is pinned to those bodies and to
+     nothing else. osc.ca carries both the alerts and the registered platform
+     list; _registers.js tells the two apart by path. */
+  registers_ca:  ['securities-administrators.ca','osc.ca','asc.ca','bcsc.bc.ca',
+                  'lautorite.qc.ca','fcaa.gov.sk.ca','mbsecurities.ca','ciro.ca',
+                  'fintrac-canafe.canada.ca','ised-isde.canada.ca','sedarplus.ca',
+                  'canlii.org'],
+
   /* State securities regulators and attorneys general. */
   us_states:     ['nasaa.org','myfloridalegal.com','flofr.gov','ag.ny.gov','oag.ca.gov',
                   'dfpi.ca.gov','dfi.wa.gov','dobs.pa.gov'],
@@ -309,6 +319,34 @@ export function plan(q, domain, enabled, ctx = {}) {
       { label:'C7 trading and workplace community', cats:['C7'],
         query:`${name} scam warning account manager pressure deposit`,
         includeDomains:D.reviews_community, numResults:6, fullText:true, maxChars:3000 },
+
+      /* ===================== AND THE OTHER HALF OF THE SAME LEDGER
+         Every query above asks what went wrong, which is defensible on its own
+         terms and is also how a good business gets stalled. A run on a
+         registered Canadian dealer returned a foreign warning about a
+         differently named company, one unhappy review, and "we could not
+         confirm this business on a relevant register", while the thread those
+         complaints sat under carried long-standing customers saying the
+         opposite and was never read.
+         These two go looking for the favourable side on the same platforms, so
+         the report card is built from the whole pile rather than one end of it.
+         What comes back is ranked by how hard it is to buy before any of it
+         reaches the page, and none of it may move the result. */
+      { label:'C7 the favourable side, same platforms', cats:['C7'],
+        query:`${name} long time customer years no issues withdrawal worked support resolved five star`,
+        includeDomains:D.reviews_major, numResults:5, fullText:true, maxChars:3000 },
+
+      { label:'C7 the favourable side, community', cats:['C7'],
+        query:`${name} reputable been using for years never had a problem recommend experience`,
+        includeDomains:D.reviews_community, numResults:5, fullText:true, maxChars:3000 },
+
+      /* STANDING, WHICH IS THE ONLY FAVOURABLE EVIDENCE THAT COUNTS.
+         A registration, a licence in good standing, a decision granting relief.
+         Pinned to registers rather than to the open web, because the whole
+         point of rank 1 is that it comes from a body nobody can pay. */
+      { label:'C2 standing, in their favour', cats:['C2','C1'],
+        query:`${name} ${d} registered restricted dealer investment dealer exemptive relief licence in good standing decision date`,
+        includeDomains:D.registers_ca || undefined, numResults:6, fullText:true, maxChars:3000 },
 
       /* Category 10. Two halves: what the party says about how long it has been
          doing this, and the independent record of when it first existed. The

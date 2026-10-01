@@ -14,7 +14,7 @@ as they were. This expanded what the system searches and what category 09 is.
 | | Count |
 |---|---|
 | Rows published | 151 |
-| Enabled and counted | 134 |
+| Enabled and counted | 135 |
 | Registers we ask | 120 |
 | Checks we compute, counted apart | 14 |
 | Declared gaps, named on the board | 4 |

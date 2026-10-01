@@ -402,6 +402,13 @@ export const REFERENCE = {
   look: "The date and the wording."
 },
 
+"OSC Registered Crypto Asset Trading Platforms": {
+  info: ["CA-ON","A","The crypto platforms the Ontario Securities Commission has granted relief to, with each one's registration category and decision date.","https://www.osc.ca/en/industry/registration-and-compliance/crypto-businesses"],
+  hit: "Ontario has registered this platform, and the entry names the category it was registered in.",
+  miss: "Not on Ontario's list of registered platforms. That is not the same as unregistered: the list covers Ontario, and a platform may be registered elsewhere in Canada.",
+  look: "The registration category and the date of the most recent decision."
+},
+
 "OSC Alerts": {
   info: ["CA-ON","A","Ontario Securities Commission investor warnings.","https://www.osc.ca/en/investors/investor-warnings"],
   hit: "Ontario has issued an investor warning about this party.",

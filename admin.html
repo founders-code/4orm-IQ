@@ -1068,6 +1068,7 @@ body:not(.pathfull) .fullhint{display:none}
     <div class="mctl">
       <a class="trig" href="index.html" id="homebtn">&#8592; Home</a>
       <button class="trig" type="button" id="regbtn">The registry</button>
+      <button class="trig" type="button" id="audbtn">Change register</button>
       <button class="trig" type="button" id="faultbtn" aria-pressed="false">Faults only</button>
       <select class="trig" id="win" aria-label="Window">
         <option value="7">7 days</option><option value="30" selected>30 days</option>
@@ -1271,7 +1272,7 @@ var CLEAR = {
   /* How wide we looked, counted once per register, against the catalogue. A
      different question from how often an ask came back, and they used to be
      one number. */
-  reach:{catalogue:134,asked:104,answered:101},
+  reach:{catalogue:135,asked:104,answered:101},
   /* All ten are written as of 6 September 2026, which is a real change: the
      shelf is no longer empty. None is signed off, so none is green, and the
      two that record a NO-GO on their own cover are red for that reason rather
@@ -1301,7 +1302,7 @@ TROUBLE.registers={down:{0:2,1:5,2:7,4:2,7:1},quiet:{0:1,3:3,5:2,6:2,8:1,9:5}};
    blocker on top of the two that already record a NO-GO. */
 TROUBLE.documents={hra:"bad",mg:"bad",lr:"warn",pub:"bad",sub:"bad",
                    vend:"warn",ret:"warn",ir:"warn",sec:"bad",cou:"warn"};
-TROUBLE.reach={catalogue:134,asked:52,answered:38};
+TROUBLE.reach={catalogue:135,asked:52,answered:38};
 TROUBLE.systems={search:"bad",reason:"bad",connectors:"warn",rdap:"ok",db:"ok",
                  chain:"bad",policy:"ok",retention:"bad",auth:"ok",deploy:"bad"};
 TROUBLE.pulse={label_at:25,named:2,adverse:1,unknown:1,rows:[
@@ -1340,7 +1341,7 @@ function machine(d){
   return [
     {k:"searching", plate:"Asking registers", s:S("search"), v:WORD[S("search")],
      name:"Reading the registers",
-     what:"The searches that go out and ask the 134 registers.",
+     what:"The searches that go out and ask the 135 registers.",
      amber:"No search has run yet in this window. Normal first thing in the morning.",
      red:"No register was reached. A check that reads nothing says so, and never draws a clean record out of silence.",
      go:"Look at the search provider first: its key, its credit, and its rate limit."},
@@ -1664,6 +1665,7 @@ var REGINFO = {
   "IOSCO I-SCAN": { k:"Watchlist", s:"Investor alerts gathered from securities regulators around the world into one searchable list.", e:"It carries what members chose to publish. An empty answer means no member has published an alert we could read.", u:"https://iosco.org" },
   "IRS-CI": { k:"Announcement", s:"Criminal investigation cases announced by the United States tax authority.", e:"Announcements only, and heavily weighted to cases already charged.", u:"https://irs.gov" },
   "OFAC": { k:"Sanctions", s:"The United States list of sanctioned people, entities and blocked property.", e:"A match is a hard stop. Absence is expected for almost every party.", u:"https://sanctionssearch.ofac.treas.gov" },
+  "OSC Registered Crypto Asset Trading Platforms": { k:"Licence", s:"The crypto platforms Ontario has granted relief to, with the category each was registered in and the date of the decision.", e:"Not being on it is not the same as unregistered. The list is Ontario's, and a platform may be registered elsewhere in Canada.", u:"https://osc.ca" },
   "OSC Alerts": { k:"Watchlist", s:"Ontario's investor warnings about firms and people it has concerns with.", e:"Absence means Ontario has not warned.", u:"https://osc.ca" },
   "SEC Trading Suspensions": { k:"Order", s:"Securities the United States regulator has suspended from trading, and why.", e:"A suspension is a serious signal. Absence is the normal state for almost every company.", u:"https://sec.gov" },
   "MAS Investor Alert List": { k:"Watchlist", s:"Singapore's list of firms that may be wrongly holding themselves out as regulated.", e:"Being on it is a warning, not a finding of wrongdoing. Absence is not clearance.", u:"https://mas.gov.sg" },
@@ -1747,7 +1749,7 @@ var REGINFO = {
    the console, so the board and the engine cannot drift apart. */
 var REGCATS=[
   ["01 Identity",["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama","Turks and Caicos, and Eastern Caribbean company registries"]],
-  ["02 Licensing",["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]],
+  ["02 Licensing",["CSA Registration","OSC Registered Crypto Asset Trading Platforms","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]],
   ["03 Enforcement",["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau Canada","Federal Trade Commission","Consumer Financial Protection Bureau","Internet Crime Complaint Center","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]],
   ["04 People",["Corporations Canada, Individuals with Significant Control","ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]],
   ["05 Legal",["CanLII","Supreme Court of Canada and Federal Court","Provincial court decisions","Capital Markets Tribunal","Competition Tribunal","Securities tribunals outside Ontario","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims","SEDAR+"]],
@@ -1757,7 +1759,7 @@ var REGCATS=[
   ["09 4orm",["Infrastructure Cluster","Identifier Reuse","Document Fingerprint","Analytics and Pixel Reuse","Site Technology","DNS and IP History","Host and Certificate Graph","Wallet Reuse","Beneficiary Reuse","People Cluster","Operator Graph"]],
   ["10 Claim dates",["ICANN RDAP Date","Wayback Machine","First Certificate","Trademark Filing","Domain History","Incorporation Date","Public Profile","Form D First Filing","Form D First Sale","EDGAR First Filing","SEDAR+ First Filing","SEDI First Insider Record","IAPD First Registration","App Store First Release","Google Play First Release","GitHub Repository Created","GitHub First Commit","First Press Release","First YouTube Video","First Social Post"]]
 ];
-/* The engraved label for every one of the 134 registers, written by hand. An
+/* The engraved label for every one of the 135 registers, written by hand. An
    auto-shortener turned "Registraire des entreprises du Quebec" into
    "REGISTRAIRE DES" and made SEC EDGAR and SEC IAPD read the same, which on a
    panel is worse than no label at all. The full name is on the tile. */
@@ -1842,7 +1844,7 @@ function gauges(d){
   /* THE TWO REGISTER NUMBERS, WHICH WERE ONE.
      Coverage and reliability are different questions and the old dial answered
      neither cleanly: "40.5% of 126" is a share of attempts, printed beside a
-     catalogue of 134, and a reader has to work out which number is which.
+     catalogue of 135, and a reader has to work out which number is which.
        Registers reached  how many of the catalogue we put a question to
        Answers back       how many of the times we asked came back with something
      A register nobody had cause to call is not a register that failed, so the
@@ -1870,7 +1872,7 @@ function gauges(d){
                       : "nothing has run in this window",
         secState,"pace",secFill)
     /* NOUGHT IS NOT ALWAYS A MEASUREMENT.
-       This printed "0 of the 134 in the catalogue were asked at all" beside a
+       This printed "0 of the 135 in the catalogue were asked at all" beside a
        healthy looking answering rate, and the two numbers were reading
        different tables. A finished run always asks something, so runs in the
        window with no register recorded is an impossible pair and means the
@@ -1961,7 +1963,7 @@ function openRegister(name,pct){
                      : "Red. Below 85 per cent of attempts answered.";
   var rows=[];
   if(d){ rows.push(["What it is",d[0]]); rows.push(["What it answers",d[1]]); }
-  else  { rows.push(["What it is","One of the 134 registers in the catalogue. Press a check in the flow chart to see which of them it belongs to."]); }
+  else  { rows.push(["What it is","One of the 135 registers in the catalogue. Press a check in the flow chart to see which of them it belongs to."]); }
   rows.push(["The number",pct+" per cent of the times we asked it in this window, it came back with something. "+band]);
   rows.push(["What a fall means","A register that starts failing quietly is the one hazard this product cannot survive, because a failure reported as a clean result is the only dishonest output it can make. A check that could not reach this register says so, and the run is marked incomplete rather than clean."]);
   rows.push(["What to do","Check whether the other registers from the same publisher are falling too. One register is usually the publisher. All of them is usually us."]);
@@ -2052,7 +2054,7 @@ var LANES=[
   {lab:"What is it",        sub:"suitability",            y:94,   h:88},
   {lab:"The gate",          sub:"who is let through",     y:182,  h:88},
   {lab:"Routing",           sub:"which registers apply",  y:270,  h:88},
-  {lab:"Retrieval",         sub:"134 registers",          y:358,  h:296},
+  {lab:"Retrieval",         sub:"135 registers",          y:358,  h:296},
   {lab:"Second pass",       sub:"what round one learned", y:654,  h:86},
   {lab:"The reading",       sub:"one call, no searching", y:740,  h:86},
   {lab:"What a reader sees",sub:"publication",            y:826,  h:86},
@@ -2404,7 +2406,7 @@ function openRegister2(nm, state, ci){
     rows.push(["What it is", R.k+". "+R.s]);
     rows.push(["What an empty answer means", R.e]);
   } else {
-    rows.push(["What it is","One of the 134 registers in the catalogue. No readout has been written for it yet."]);
+    rows.push(["What it is","One of the 135 registers in the catalogue. No readout has been written for it yet."]);
   }
   rows.push(["In this window", state==="answered" ? "It answered."
     : state==="not called today" ? "We had no cause to call it. That is not a fault."
@@ -2620,7 +2622,7 @@ var NODE_INFO = {
           ["What it turns away","Anything that reads as a person rather than a party to a transaction, and anything outside the jurisdictions this product operates in."],
           ["The number on it","Asks turned away in this window. A high count is the gate working, not an error."]]},
   route:{ t:"Routing",
-    rows:[["What it is","The step that decides which of the 134 registers apply to this particular ask, from its sector and its jurisdiction."],
+    rows:[["What it is","The step that decides which of the 135 registers apply to this particular ask, from its sector and its jurisdiction."],
           ["Why it matters","A check that asks every register of every subject is slower, more expensive and no more truthful. Routing is what keeps the scope honest."],
           ["When it fails","Nothing should run. A check with no rules is a check with no scope, and the rulebook lamp turns amber."]]},
   exa:{ t:"Search",
@@ -3163,10 +3165,52 @@ function drDocs(){
   out.push(DR_PIA);
   return out;
 }
+/* ==================================================== THE CHANGE REGISTER
+   Every main change to this product and to the documents that govern it, with
+   the reason beside it, each one opening to a report.
+
+   WHY IT EXISTS. This company sells the ability to prove a record went
+   unaltered. Running its own change history on memory would be a strange way
+   to do that. Until now the only account of what had changed was a build
+   number and whatever anybody remembered, which is exactly the shape of file a
+   regulator asks for and a company cannot produce.
+
+   WHERE THE TRUTH LIVES. docs/change-register.json, in the repository, reviewed
+   like code, embedded here by tools/audit-embed.mjs. Embedded rather than
+   fetched for the same two reasons the control documents are: this panel sits
+   behind the gate and these are internal records, and the panel has to read the
+   same when it is opened as a file.
+
+   WHAT IT MAY NOT HOLD. No identifier anybody searched, no party any check was
+   about, no result any check returned. Same rule as the telemetry tables and
+   for the same reason: a register that holds who was looked up rebuilds the
+   person level file the privacy assessment exists to prevent. */
+/* AUDIT-REGISTER-START */
+var AUDIT = {"register":"AUD-CR","title":"4orm IQ change register","updated":"2026-09-30","entries":[{"id":"CR-0001","at":"2026-09-29","kind":"document","area":"Site copy register","title":"The whole of the site copy rewritten and applied","why":"The language was stalling good companies. A reader who is told a business could not be confirmed hears that the business failed, and most of them had simply not been asked about.","detail":"1,999 lines extracted to a copy register, rewritten, and applied back by whole node matching: 815 pairs replaced by node, 20 JavaScript fragments repaired by hand, 28 matched by similarity. Twenty verification gates repointed to the new wording.","actor":"Chad Johnston","severity":"p1","report":[{"t":"h2","x":"What moved"},{"t":"p","x":"Every text node, attribute and string literal on the site was extracted to a register of 1,999 lines with a stable reference against each one. The register was rewritten and applied back against those references, matching whole nodes only."},{"t":"p","x":"An earlier pass matched on substrings and injected short lines inside longer sentences. It was caught in the fix log, reverted from backup, and rewritten to require whole node, whole attribute or whole literal boundaries."},{"t":"h2","x":"House rules applied on top"},{"t":"li","x":"Every em dash and en dash replaced with a comma, a colon or a full stop."},{"t":"li","x":"Ranges written with the word to, never a dash."},{"t":"li","x":"Eight rendered uses of the word problem replaced."},{"t":"li","x":"not just replaced with not only throughout."},{"t":"h2","x":"What could not be confirmed"},{"t":"p","x":"protocheck could not run: it loads a prototype file that is not in the repository. Reported as an environment gap, not a regression."}]},{"id":"CR-0002","at":"2026-09-29","kind":"document","area":"Landing and packs","title":"The line changed to Check before you send","why":"Know before you send promised knowledge. The product produces a check, and the two are not the same promise.","detail":"Renamed in the page title, the meta description, the panel label and both pack templates. Six verification gates repointed.","actor":"Chad Johnston","severity":"p2","report":[{"t":"p","x":"The wording appears in five places and all five moved together. A gate now fails the build if any one of them drifts from the others."}]},{"id":"CR-0003","at":"2026-09-29","kind":"policy","area":"Terms","title":"Terms moved to version 1.1, dated 29 September 2026","why":"The clickwrap has to name the version a reader agreed to, and the version had not moved with the copy.","detail":"TERMS_VERSION set to 1.1 and TERMS_DATE to 29 September 2026. Stamped on the agreement record.","actor":"Chad Johnston","severity":"p1","report":[{"t":"p","x":"The version and the date are printed on the agreement record, so a reader can be shown which text they accepted."},{"t":"p","x":"OPEN: counsel has not reviewed version 1.1. It is recorded here as outstanding."}]},{"id":"CR-0004","at":"2026-09-30","kind":"source","area":"OSC registered platform list","title":"A register that would have cleared a company, and was never asked","why":"A check on a Canadian crypto exchange told a consumer we could not confirm this business on a relevant register. The Ontario Securities Commission publishes the list of crypto asset trading platforms it has granted relief to, that company is on it as a Restricted Dealer, and the list was not in our catalogue, so it could not be asked.","detail":"OSC_CATP added to the catalogue at source tier A, category 02, marked link_out_only on the OSC's own terms. The register router now tells the OSC's two lists apart by path, so a registration list is never read as a warning list.","actor":"Chad Johnston","severity":"p0","report":[{"t":"h2","x":"What happened"},{"t":"p","x":"A consumer checking a registered Canadian dealer was shown three things: a foreign regulator's warning about a different company, one unhappy review, and the sentence that we could not confirm the business on a relevant register. Every one of the three was a separate fault and the sum of them was a false picture of a registered firm."},{"t":"h2","x":"The record"},{"t":"p","x":"The Ontario Securities Commission publishes, on its Crypto Businesses page, the platforms that have received exemptive relief to offer crypto products in Ontario, with each one's registration category and the date of its most recent decision. Newton Crypto Ltd. is listed there as a Restricted Dealer, dated 12 March 2025."},{"t":"h2","x":"Why it could not be read"},{"t":"p","x":"The list was not in the catalogue. A register that is not in the catalogue is never asked, and a register that is never asked returns nothing, and nothing was being reported to a consumer as an absence of registration rather than as a gap in our own reading."},{"t":"h2","x":"What was done"},{"t":"li","x":"OSC_CATP added at source tier A, in category 02 registration and licensing, also credited to category 01."},{"t":"li","x":"Marked link_out_only. The OSC's terms bar commercial use of their content, so the fact of an entry is ours to report in our own words with the date and the link, and their text is not ours to publish."},{"t":"li","x":"The register router now separates the OSC's registration pages from its alert pages by path, so the two can never be read as each other."},{"t":"h2","x":"What could not be confirmed"},{"t":"p","x":"Permission has not been requested from the OSC. Until it is, this register can be pointed at and not reproduced, which is a weaker check than it needs to be. Asking is the whole of the fix and it is open."}]},{"id":"CR-0005","at":"2026-09-30","kind":"code","area":"api/_standing.js","title":"The favourable side of the record, ranked by how hard it is to buy","why":"The engine only ever went looking for what was wrong. That is defensible on its own terms and it is also how a good business gets stalled, because a company with nothing against it and a great deal in its favour produced a page that said nothing at all.","detail":"New module ranking every favourable record into three: cannot be bought, expensive to fake, buyable. A new retrieval pass on the same platforms as the adverse one. A standing block in the output contract. Rank enforced in code against the model's own answer, lower of the two wins.","actor":"Chad Johnston","severity":"p1","report":[{"t":"h2","x":"The one question"},{"t":"p","x":"Favourable evidence is ranked by how hard it is to buy, and by nothing else."},{"t":"table","rows":[["Rank","What goes in it","Why"],["1. Cannot be bought","A live registration, a licence in good standing, a regulator's own record, a filed financial statement, a court record showing a matter resolved, an exchange listing","Nobody sells these. They are facts about standing, not opinions about service"],["2. Expensive to fake","Continuity rather than content: the same legal name across three registers, on the register since 2018, a domain eight years old, a filing history without gaps","Nobody buys eight years"],["3. Can be bought","Star ratings, review counts, testimonials, award badges, press releases","All of it is purchasable"]]},{"t":"h2","x":"The rule that holds it up"},{"t":"p","x":"Favourable evidence never changes the verdict. Register standing and adverse findings set the result. Everything else is context beside it. The standing block is computed after the verdict is settled and is never read back, and there is deliberately no code path from it to the verdict."},{"t":"p","x":"That is the defence against bought reviews, and it is cheaper and more reliable than any detector: once a purchased five star page has nowhere to move the needle, buying one stops working. It also has no false positives, which a detector would."},{"t":"h2","x":"What the platforms say about themselves"},{"t":"p","x":"Trustpilot removed 4.5 million reviews it had detected as fake in 2024. That is 7.4 per cent of everything submitted that year, up from 6.1 per cent in 2023, and it reports that 90 per cent of them were caught by its own automated detection."},{"t":"p","x":"Buying positive reviews, writing insider reviews without disclosing the connection, and using threats to get negative reviews taken down have all been unlawful in the United States since October 2024 under the Federal Trade Commission's final rule at 16 CFR Part 465."},{"t":"h2","x":"What could not be confirmed"},{"t":"p","x":"Trustpilot does not publish its weighting formula. Its public statement is that the score is weighted to reflect that newer reviews tend to be more relevant than older ones, with no thresholds given. We did not model it and we do not rely on it."}]},{"id":"CR-0006","at":"2026-09-30","kind":"code","area":"api/_recency.js","title":"The time window: a year drives the result, three years is the edge of the page","why":"Businesses make mistakes and then fix them. A fault from four years ago that was put right should not sit over a company for the rest of its life, and a consumer reading a result today is asking about today.","detail":"Four bands computed in code from the date the record carries: current inside 12 months drives the result, older at 12 to 36 months is shown and labelled, archive beyond 36 months sits behind one control, undated is routed to what we could not confirm. Standing is exempt by class and never ages.","actor":"Chad Johnston","severity":"p1","report":[{"t":"h2","x":"The bands"},{"t":"table","rows":[["Band","Age","What it may do"],["current","Inside 12 months","Drives the result"],["older","12 to 36 months","Shown, labelled, drives nothing"],["archive","Beyond 36 months","Behind one control the reader can open"],["undated","No date on the record","Never a finding. Goes to what we could not confirm"]]},{"t":"h2","x":"Standing never ages"},{"t":"p","x":"A register entry, a licence, a regulator action, a sanction and a court record describe what is true now until the issuing body changes them. A licence granted in 2019 is not stale, it is current. An enforcement order from 2021 that was never lifted is not history, it is the present state of that party's record. Ageing those out would be the single most dangerous thing this module could do, so they are exempt by class and can never fall into a band."},{"t":"h2","x":"Why the arithmetic is not the model's"},{"t":"p","x":"Published work on model based reranking found that injecting dates alone moved the mean publication year of the top ten forward by up to 4.78 years, moved single items as many as 95 ranks, and flipped pairwise preferences between equally relevant passages by up to 25 per cent. Larger models reduced the effect and none eliminated it."},{"t":"p","x":"So the model carries the date and does not weigh it. The band is computed from the date, in code, where it is arithmetic and does not have that failure."},{"t":"h2","x":"A date we cannot read"},{"t":"p","x":"An ambiguous numeric date is read as the later of its two possible readings, and a bare year as the last day of it. Reading a date as newer than it is can only make a record count more than it should, which is the conservative direction for a favourable record and the safe one for an adverse one."},{"t":"h2","x":"What could not be confirmed"},{"t":"p","x":"The window only works where the source carries a date. A source that publishes undated material produces undated records, and those are now named as gaps rather than counted. How large that population is has not been measured on live traffic."}]},{"id":"CR-0007","at":"2026-09-30","kind":"code","area":"api/check.js","title":"A category may no longer stay red on records older than a year","why":"The attachment rule reached the verdict and the time window did not. A page could be held red by a single aged incident about a business that had already fixed it.","detail":"A red category with no record that both names the party and falls inside the current band comes down to yellow, and the reason is written into the payload. Standing is exempt, so a live enforcement action still holds a page red whatever its date.","actor":"Chad Johnston","severity":"p1","report":[{"t":"p","x":"The demotion is recorded in the payload rather than applied silently, so the back office can count how often it fires and see what it fired on."},{"t":"p","x":"Two separate demotions now run in sequence. The first is the attachment rule: a red category with no record naming the party comes down. The second is the window: a red category whose only records naming the party are older than a year comes down."},{"t":"p","x":"Undated evidence about the party is appended to what we could not confirm, named by source, rather than being printed as a finding it cannot support."}]},{"id":"CR-0008","at":"2026-09-30","kind":"code","area":"index.html","title":"The consumer language for all of it","why":"None of the above is worth building if the page does not say it in words a consumer reads once and understands.","detail":"The favourable block now carries a rank chip on every record, a note on anything purchasable, a band label on anything older than a year, a separate quoted block for the business's own words, a shape note on the good reviews where two or more signals agree, and one control for records older than three years.","actor":"Chad Johnston","severity":"p1","report":[{"t":"h2","x":"What the reader now sees"},{"t":"li","x":"Every favourable record wears the rank it earned: Cannot be bought, Expensive to fake, or Can be bought."},{"t":"li","x":"Anything purchasable carries the line that ratings, testimonials and badges can be paid for, that we show them and do not count them."},{"t":"li","x":"The business's own words sit in their own block, quoted and attributed, under the line that a business saying something about itself is not evidence that it is true."},{"t":"li","x":"Where two or more shape signals agree, the page says what the pile looks like and says plainly that we are not calling any single review false."},{"t":"li","x":"One control opens everything older than three years, with the count on the button and the reason under it."},{"t":"h2","x":"What the page may never do"},{"t":"p","x":"There is no tally anywhere. A consumer shown nine positive against three negative will do arithmetic on evidence of wildly different quality, which is the exact mistake this product exists to stop."}]},{"id":"CR-0009","at":"2026-09-30","kind":"code","area":"admin.html","title":"The change register, and this page","why":"The only account of what had changed was a build number and whatever anybody remembered. That is the shape of file a regulator asks for and a company cannot produce.","detail":"docs/change-register.json is the source of truth, embedded into the control panel at build time. db/audit.sql is the runtime half. Every entry opens to a report.","actor":"Chad Johnston","severity":"p1","report":[{"t":"p","x":"The register is in the repository and reviewed like code. It is embedded rather than fetched, for the same two reasons the control documents are: this page is behind the gate and these are internal records, and the page has to read the same when it is opened as a file."},{"t":"p","x":"An entry with no reason is rejected. A change with no reason is not a record of anything."},{"t":"p","x":"Nothing in this register may carry an identifier anybody searched, a party a check was about, or a result a check returned. It is enforced on the write path, not asked for."}]},{"id":"CR-0010","at":"2026-09-30","kind":"code","area":"index.html","title":"Powered by 4orm Finance, on both screens","why":"The only route from the consumer product to the house was a bare domain sitting in the row of standing documents, where it read as a legal notice. The site footer carried no route at all.","detail":"A small Powered by 4orm Finance line on the landing screen and in the site footer. The name itself is the link and it opens in a new tab. The footer label moved to 4ormIQ so the house is not named twice on one screen, and the missing separator before Terms of use was restored in both rows.","actor":"Chad Johnston","severity":"p2","report":[{"t":"h2","x":"Where it sits"},{"t":"li","x":"Landing screen, centred, under the standing documents rather than inside them. A company link is not a legal notice and sitting in that row made it read as one."},{"t":"li","x":"Site footer, which until now carried no route to the house at all."},{"t":"h2","x":"The decisions behind it"},{"t":"p","x":"The name itself is the link. A name sitting beside a second control that repeats the name is the tell of an amateur page, and this line is far too small to carry one. The accessible label carries Check out 4orm Finance for anyone reading it with assistive technology, and the same words are the hover title."},{"t":"p","x":"It opens in a new tab on purpose. A consumer part way through a check who taps this and loses their page has been sent away by us at the one moment they came to us for help. That is a worse outcome than never carrying the link at all."},{"t":"p","x":"The footer named the house at the top and would now have named it again three rows down. The label reads 4ormIQ instead, which is the product a reader is actually standing in."},{"t":"h2","x":"Two gates it tripped, and what they caught"},{"t":"li","x":"The words Powered by at the faintest ink measured 3.94 against the page, under the 4.5 floor. They take the same ink the standing document row already uses. Size and tracking did not move."},{"t":"li","x":"The layout duplication scanner reads comment text as part of a selector, so a comma in a code comment above the rule produced a false clash. The comment was rewritten without it."},{"t":"h2","x":"What is deliberately not here"},{"t":"p","x":"Nothing was added to the result page. A consumer reading a result about a business they are worried about is not the audience for a company link, and putting one there would be the wrong thing at the wrong moment."}]}]};
+/* AUDIT-REGISTER-END */
+var AUD_KIND = {code:"Code", document:"Document", policy:"Policy", data:"Data", source:"Source"};
+var AUD_SEV  = {p0:"Blocking", p1:"Structural", p2:"Recorded"};
+/* A saved setting, because a reader who filters to the code changes is usually
+   back for the code changes. One key, one value, and a bad value falls back to
+   all rather than to an empty screen. */
+var AUD_FILTER = "all";
+try { AUD_FILTER = localStorage.getItem("iq.audit.filter") || "all"; } catch(e){}
+function audSetFilter(v){
+  AUD_FILTER = v;
+  try { localStorage.setItem("iq.audit.filter", v); } catch(e){}
+}
+function audRows(){
+  var all = (AUDIT && AUDIT.entries) || [];
+  if(AUD_FILTER === "all") return all;
+  return all.filter(function(e){ return e.kind === AUD_FILTER; });
+}
+
 var DR_WORD = {ok:"Signed off", warn:"Written, not signed", bad:"NO-GO on file"};
+var DR_MODE = "docs";
 var DR_VIEW = "list";
 
 function drRender(){
+  if(DR_MODE === "audit") return audRender();
   var el = document.getElementById("drIn");
   var back = document.getElementById("drBack");
   if(DR_VIEW === "list"){
@@ -3288,10 +3332,102 @@ function drRender(){
     + '</span><span>4orm IQ · control standard · internal</span></div></div>';
   document.getElementById("drBody").scrollTop = 0;
 }
+/* ------------------------------------------------------- THE AUDIT VIEW
+   Two screens. The list, newest first, filtered by kind and remembered. And
+   the report behind any row, which is the thing Chad asked for: a change you
+   can click into rather than a line you have to take on trust. */
+function audRender(){
+  var el = document.getElementById("drIn");
+  var back = document.getElementById("drBack");
+  var rows = audRows(), i;
+
+  if(DR_VIEW === "list"){
+    back.hidden = true;
+    document.getElementById("drK").textContent =
+      "AUD-CR \u00b7 updated " + (AUDIT.updated || "not set");
+    document.getElementById("drT").textContent = "Every main change, and why";
+    var all = (AUDIT.entries||[]).length;
+    var kinds = ["all","code","document","policy","data","source"];
+    var chips = kinds.map(function(k){
+      var n = k==="all" ? all : (AUDIT.entries||[]).filter(function(e){return e.kind===k;}).length;
+      if(!n && k!=="all") return "";
+      return '<button class="drb'+(AUD_FILTER===k?" pri":"")+'" type="button" data-kind="'+esc(k)+'">'
+           + esc(k==="all" ? "Everything" : AUD_KIND[k]) + ' &#183; ' + n + '</button>';
+    }).join("");
+
+    el.innerHTML =
+      '<p class="drpost">This register is the record of what changed and why. '
+    + 'It carries no identifier anybody searched, no party any check was about, and no result '
+    + 'any check returned, because the tables behind it have no column for any of them.</p>'
+    + '<div class="drc" style="margin:0 0 22px;flex-wrap:wrap">' + chips + '</div>'
+    + (rows.length ? rows.map(function(e){
+        return '<button class="drrow" type="button" data-aud="'+esc(e.id)+'">'
+          + '<div><div class="drid">'+esc(e.id)+'</div>'
+          + '<div class="drmeta">'+esc(e.at)+' &#183; '+esc(AUD_KIND[e.kind]||e.kind)+'</div></div>'
+          + '<div><div class="drname">'+esc(e.title)+'</div>'
+          + '<div class="drgov">'+esc(e.why||"")+'</div></div>'
+          + '<div><span class="drstate" data-s="'+esc(e.severity==="p0"?"bad":(e.severity==="p1"?"warn":"ok"))+'">'
+          + '<i></i>'+esc(AUD_SEV[e.severity]||e.severity)+'</span></div>'
+          + '<div class="drgo">Read it &#8594;</div></button>';
+      }).join("")
+      : '<p class="drgov">Nothing recorded under that kind yet.</p>');
+
+    el.querySelectorAll("[data-kind]").forEach(function(b){
+      b.addEventListener("click", function(){ audSetFilter(b.getAttribute("data-kind")); audRender(); });
+    });
+    el.querySelectorAll("[data-aud]").forEach(function(b){
+      b.addEventListener("click", function(){
+        DR_VIEW = "a:" + b.getAttribute("data-aud"); audRender();
+        document.getElementById("drBody").scrollTop = 0;
+      });
+    });
+    return;
+  }
+
+  var id0 = DR_VIEW.slice(2), e = null;
+  for(i=0;i<(AUDIT.entries||[]).length;i++) if(AUDIT.entries[i].id === id0) e = AUDIT.entries[i];
+  if(!e){ DR_VIEW = "list"; return audRender(); }
+  back.hidden = false;
+  document.getElementById("drK").textContent =
+    e.id + " \u00b7 " + e.at + " \u00b7 " + (AUD_KIND[e.kind]||e.kind);
+  document.getElementById("drT").textContent = e.title;
+
+  var html = "", inList = false;
+  (e.report||[]).forEach(function(b){
+    if(b.t === "li"){ if(!inList){ html += "<ul>"; inList = true; } html += "<li>"+esc(b.x)+"</li>"; return; }
+    if(inList){ html += "</ul>"; inList = false; }
+    if(b.t === "table"){
+      var r = b.rows || []; if(!r.length) return;
+      html += '<div class="drtw"><table'+(r[0].length<=2?' class="narrow"':'')+'><thead><tr>'
+        + r[0].map(function(c){ return "<th>"+esc(c)+"</th>"; }).join("")
+        + "</tr></thead><tbody>"
+        + r.slice(1).map(function(row){
+            return "<tr>"+row.map(function(c){ return "<td>"+esc(c)+"</td>"; }).join("")+"</tr>";
+          }).join("")
+        + "</tbody></table></div>";
+      return;
+    }
+    if(b.t === "h1" || b.t === "h2" || b.t === "h3") html += "<"+b.t+">"+esc(b.x)+"</"+b.t+">";
+    else html += "<p>"+esc(b.x)+"</p>";
+  });
+  if(inList) html += "</ul>";
+
+  el.innerHTML = '<div class="drdoc">'
+    + '<div class="drdec">' + esc(AUD_SEV[e.severity]||e.severity) + " &#183; " + esc(e.area) + '</div>'
+    + "<h2>Why this changed</h2><p>" + esc(e.why||"") + "</p>"
+    + "<h2>What moved</h2><p>" + esc(e.detail||"") + "</p>"
+    + html
+    + '<div class="drfoot"><span>' + esc(e.id) + " &#183; " + esc(e.at)
+    + (e.actor ? " &#183; " + esc(e.actor) : "")
+    + '</span><span>4orm IQ &#183; change register &#183; internal</span></div></div>';
+  document.getElementById("drBody").scrollTop = 0;
+}
+
 function drList(){ DR_VIEW = "list"; drRender(); }
 function drOpen(key, full){ DR_VIEW = (full ? "f:" : "c:") + key; drRender();
   document.getElementById("drBody").scrollTop = 0; }
 function drBackStep(){
+  if(DR_MODE === "audit"){ DR_VIEW = "list"; return audRender(); }
   if(DR_VIEW.charAt(0) === "f") drOpen(DR_VIEW.slice(2), false);
   else drList();
 }
@@ -3317,7 +3453,17 @@ openDocs(false);
    document stood, and a separate control holding the documents themselves.
    A reader had to know the second one existed to get past a description to
    the thing being described. There is one now, and it does both. */
-document.getElementById("regbtn").addEventListener("click", function(){ openDocs(true); });
+document.getElementById("regbtn").addEventListener("click", function(){
+  DR_MODE = "docs"; openDocs(true);
+});
+/* THE SAME READER, THE SAME FULL SCREEN, A DIFFERENT REGISTER.
+   A second drawer would have been a second thing to learn, a second close
+   button and a second set of key handlers that would drift from the first. It
+   is one reader in two modes, which is also why the back button and the escape
+   key already work here without being told about it. */
+document.getElementById("audbtn").addEventListener("click", function(){
+  DR_MODE = "audit"; openDocs(true);
+});
 document.getElementById("drClose").addEventListener("click", function(){ openDocs(false); });
 document.getElementById("drBack").addEventListener("click", drBackStep);
 
@@ -3662,7 +3808,7 @@ function paint(d){
    database. When it is used the board says so along the bottom edge, because a
    panel showing invented numbers without saying so is the one thing this
    product exists to refuse. */
-var BUILD = "20260929.2040";
+var BUILD = "20260930.2351";
 var DEMO  = /[?&]demo=1\b/.test(window.location.search);
 
 function showErr(title, msg, canRetry){

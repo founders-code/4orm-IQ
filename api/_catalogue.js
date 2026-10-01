@@ -125,6 +125,28 @@ export const CATALOGUE = [
   S({ source_id:'CSA_REGISTRATION', display_name:'CSA Registration', category:'02',
       jurisdictions:['CA'], domain:'securities-administrators.ca', supports_person_search:true,
       verticals:['PUBLIC_STOCK','BROKER_DEALER','INVESTMENT_ADVISER','PRIVATE_INVESTMENT','PRIVATE_FUND','FOREX_CFD','CRYPTO','COMMODITIES'] }),
+  /* ============ A REGISTER THAT WOULD HAVE CLEARED A COMPANY, AND WAS NEVER ASKED
+     A run on a Canadian crypto exchange told a consumer "we could not confirm
+     this business on a relevant register". The Ontario Securities Commission
+     publishes, on its own Crypto Businesses page, the list of crypto asset
+     trading platforms that have received exemptive relief to offer crypto
+     products in Ontario, with each platform's registration category and the
+     date of its most recent decision. That company was on it, as a Restricted
+     Dealer. The list was not in this catalogue, so it could not be asked, so
+     the answer was "could not confirm" about a registered dealer.
+     A register we could have read and did not is a coverage gap, and it is
+     reported as one rather than as an absence of registration. The OSC's terms
+     bar commercial use of their content, so this is link_out_only on the same
+     footing as OSC Alerts: the fact of an entry is ours to report in our own
+     words, with the date and the link. Their text is not ours to publish.
+     Asking them for permission is the whole of the fix and it is open. */
+  S({ source_id:'OSC_CATP', display_name:'OSC Registered Crypto Asset Trading Platforms',
+      category:'02', also:['01'],
+      jurisdictions:['CA-ON'], domain:'osc.ca',
+      verticals:['CRYPTO','BROKER_DEALER'],
+      terms:'link_out_only',
+      terms_why:'OSC terms bar commercial use outright. Permission not yet requested. '
+               +'Link and label only.' }),
   S({ source_id:'CIRO_ADVISORREPORT', display_name:'CIRO AdvisorReport', category:'02', also:['04'],
       jurisdictions:['CA'], domain:'ciro.ca', supports_person_search:true,
       verticals:['BROKER_DEALER','INVESTMENT_ADVISER','PUBLIC_STOCK','PRIVATE_INVESTMENT'] }),

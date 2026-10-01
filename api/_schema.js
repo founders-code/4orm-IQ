@@ -14,7 +14,7 @@ const TIER  = { type: 'string', enum: ['A', 'B', 'C', 'D', '4orm'] };
 export const PAYLOAD_SCHEMA = {
   type: 'object',
   required: ['entity', 'verdict', 'scores', 'categories', 'claims',
-             'material_issues', 'before_you_send', 'coverage_gaps'],
+             'material_issues', 'before_you_send', 'coverage_gaps', 'standing'],
   properties: {
 
     entity: {
@@ -112,6 +112,17 @@ export const PAYLOAD_SCHEMA = {
                 plain:     { type: 'string', description:
                   'One sentence in plain words telling the reader what THIS record means for them and what to do about it. Not a restatement of the finding. Where the record is ambiguous, say what it does not establish. Write it for somebody who has never seen a corporate registry.' },
                 retrieved: { type: 'string', description: 'Date the record was read, e.g. 26 Aug 2026.' },
+                /* THE DATE ON THE RECORD, WHICH IS NOT THE DATE WE READ IT.
+                   `retrieved` is when we looked. `published` is when the thing
+                   happened or when the body published it, and it is the only
+                   date the time window can be computed from. Without it every
+                   record read today looks like it happened today, and a fault
+                   from four years ago sits over a business that fixed it. Copy
+                   it from the record. Leave it empty where the record carries
+                   no date: an undated record is routed to the gaps, never to
+                   the findings, and guessing here is worse than leaving it. */
+                published: { type: 'string', description:
+                  'The date THE RECORD carries, copied from the record: when the entry was added, the action taken, the filing made, the review posted. Empty string where the record shows no date. Never the date you read it, and never a guess.' },
                 finding:   { type: 'string', description: 'What the record establishes, in plain words.' },
                 quote:     { type: 'string', description: 'VERBATIM text from the source. Never paraphrase into this field.' },
                 url:       { type: 'string', description: 'Resolvable URL to the record. Empty string if none.' }
@@ -187,9 +198,79 @@ export const PAYLOAD_SCHEMA = {
       }
     },
 
+    /* ------------------------------------------------------------------ *
+     * STANDING - THE FAVOURABLE EVIDENCE, RANKED BY HOW HARD IT IS TO BUY
+     *
+     * This product used to look only for what was wrong. That stalls good
+     * companies: a run on a registered Canadian dealer returned a foreign
+     * warning about a different company with a similar name, one unhappy
+     * review, and the sentence "we could not confirm this business on a
+     * relevant register", while the register that would have cleared them was
+     * never asked.
+     *
+     * So favourable evidence is collected, and ranked by one question only:
+     * how hard is this to buy?
+     *
+     *   1  Cannot be bought. A live registration, a licence in good standing,
+     *      a regulator's own record, a filed statement, a court record showing
+     *      a matter resolved, an exchange listing.
+     *   2  Expensive to fake. Continuity rather than content: the same legal
+     *      name across three registers, on the register since 2018, a domain
+     *      eight years old, a filing history without gaps.
+     *   3  Buyable. Ratings, review counts, testimonials, award badges, press
+     *      releases. Shown, labelled, never counted.
+     *
+     * AND THE RULE THAT HOLDS IT UP: nothing in here may change the verdict.
+     * Register standing and adverse findings set the result. Favourable
+     * evidence adds context and nothing else. Once a bought review has nowhere
+     * to move the needle, buying reviews stops being an attack on us.
+     * ------------------------------------------------------------------ */
+    standing: {
+      type: 'object',
+      description: 'What the record says in the party\'s favour. Never a recommendation, never a score, never a tally.',
+      required: ['records', 'note'],
+      properties: {
+        records: {
+          type: 'array',
+          description: 'One row per favourable record actually retrieved. Empty array is valid and correct when nothing favourable was found. Never fill it to balance the page.',
+          items: {
+            type: 'object',
+            required: ['rank', 'label', 'source', 'about', 'match'],
+            properties: {
+              rank:   { type: 'integer', enum: [1, 2, 3], description:
+                '1 cannot be bought, published by a public body. 2 expensive to fake, continuity over time. 3 buyable: ratings, testimonials, badges, press releases. When in doubt, 3.' },
+              label:  { type: 'string', description: 'What this record establishes, in plain words a consumer reads once.' },
+              source: { type: 'string', description: 'The organisation and the specific register or page.' },
+              url:    { type: 'string' },
+              quote:  { type: 'string', description: 'VERBATIM from the source.' },
+              published: { type: 'string', description: 'The date the record carries. Empty where it carries none.' },
+              about:  { type: 'string', description: 'The identifier THIS record names, copied from the record.' },
+              match:  { type: 'string', enum: ['exact', 'probable', 'unconnected'], description:
+                'Same rule as adverse records, in both directions. A favourable record about a similarly named company is unconnected, and saying otherwise would clear the wrong party.' }
+            }
+          }
+        },
+        self_described: {
+          type: 'array',
+          description: 'Claims the party makes about itself on its own pages, kept separate because a party\'s own words are never evidence about that party. Quoted, attributed, and never counted.',
+          items: {
+            type: 'object',
+            required: ['claim', 'where'],
+            properties: {
+              claim: { type: 'string', description: 'VERBATIM from their page.' },
+              where: { type: 'string' },
+              url:   { type: 'string' }
+            }
+          }
+        },
+        note: { type: 'string', description:
+          'Two or three sentences on what the favourable record actually consists of, and what it does not establish. Never reassuring. Never a count.' }
+      }
+    },
+
     review_narratives: {
       type: 'object',
-      description: 'The negative-review report card. Read one and two star reviews first; positives are unverified until the authenticity check clears them. Cluster by MECHANIC, not sentiment. Count PLATFORMS, not reviews.',
+      description: 'The review report card, both sides. Read one and two star reviews first, because nobody is paid to write one. Then read the favourable ones, and report the SHAPE of them rather than counting them. Cluster by MECHANIC, not sentiment. Count PLATFORMS, not reviews.',
       required: ['platforms_checked', 'platforms_carrying_negatives', 'negative_reports_read', 'corpus_state', 'narratives'],
       properties: {
         platforms_checked:            { type: 'integer', minimum: 0, description: 'How many review platforms were actually queried.' },
@@ -201,6 +282,43 @@ export const PAYLOAD_SCHEMA = {
           description: 'absent means no organic corpus exists yet, which on a young domain means complainants have not surfaced. It is NOT a clean record.'
         },
         note: { type: 'string', description: 'One or two sentences on what the corpus consists of and what it does not prove.' },
+
+        /* ---------------------------------------------- THE FAVOURABLE SIDE
+           Collected, and never counted. A five star page can be bought for the
+           price of a weekend, so what goes in here is the SHAPE of the pile,
+           which is a fact about the pile, not an accusation against anybody in
+           it. We never call a review false and we never call a reviewer a liar.
+           Scale, from the platform's own reporting: Trustpilot removed 4.5m
+           reviews it detected as fake in 2024, 7.4 per cent of all submitted,
+           90 per cent of them caught automatically. */
+        positive_reports_read: { type: 'integer', minimum: 0,
+          description: 'How many four and five star reviews were actually read.' },
+        positive_period: { type: 'string',
+          description: 'Date range the favourable reviews span, e.g. Mar 2024 to Aug 2026. Empty where undated.' },
+        positive_quote: { type: 'string',
+          description: 'VERBATIM from one favourable review that describes something SPECIFIC, in the writer\'s own words. Never a generic one. Empty where none of them said anything specific.' },
+        positive_note: { type: 'string',
+          description: 'One or two sentences on what the favourable reviews consist of. Never a count, never a score, never a recommendation.' },
+        shape: {
+          type: 'object',
+          description: 'The shape of the favourable corpus. Report only what the material shows. Empty signals is the correct answer when nothing stood out.',
+          properties: {
+            signals: {
+              type: 'array',
+              description: 'One row per shape observed. Two or more is worth telling a consumer. One on its own is noise.',
+              items: {
+                type: 'object',
+                required: ['id', 'observed'],
+                properties: {
+                  id: { type: 'string', enum: ['burst', 'generic', 'bimodal', 'one_off'], description:
+                    'burst: a large share posted within days of each other. generic: most are very short and say nothing specific. bimodal: almost all top marks or bottom marks with nothing between. one_off: most favourable reviewers have written only one review ever.' },
+                  observed: { type: 'string', description: 'What was actually seen, with the numbers behind it.' }
+                }
+              }
+            },
+            note: { type: 'string', description: 'Plain words on what the shape does and does not establish.' }
+          }
+        },
         narratives: {
           type: 'array',
           description: 'One row per named mechanic. Empty array when nothing converged.',
