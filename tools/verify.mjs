@@ -2351,9 +2351,24 @@ if (!/rpIdRow\(rpAgency\(off\[i\]\.src\)/.test(script))
     fails.push('the landing headline is held to one line on a phone, where it has to '
       + 'shrink below the body copy to fit');
   {
-    const sub = (styleBlock.match(/body\[data-stage="landing"\] \.cbsub\{[^}]*\}/) || [''])[0];
-    if (!/clamp\(16px,1\.5vw,19px\)/.test(sub))
-      fails.push('the landing lead is no longer set to the size the site sets its hero lead');
+    /* THE NOTE UNDER THE FIELD IS A NOTE, NOT A LEAD.
+       It carried the hero lead size while it sat above the search box as the
+       fourth stacked paragraph a reader had to pass to reach the one thing
+       they came to do. It is below the field now, at the size of help, and
+       what the build protects is that it stays there and stays small. */
+    /* All of them, not the first: the rule that sets the size is not the only
+       one that names this selector, and taking the first match read a phone
+       breakpoint's margin and reported the size as missing. */
+    const sub = (styleBlock.match(/body\[data-stage="landing"\] \.cbsub\{[^}]*\}/g) || []).join('\n');
+    if (!/font-size:clamp\(13px,1\.05vw,13\.5px\)/.test(sub))
+      fails.push('the note under the search field is no longer set at the size of help');
+    if (!/color:var\(--tx-3\)/.test(sub))
+      fails.push('the note under the search field is no longer set in the quiet ink');
+    const form = html.indexOf('id="kbForm"');
+    const note = html.indexOf('id="kbAccepts"');
+    if (form < 0 || note < 0 || note < form)
+      fails.push('the note that says how to type an identifier is back above the search box, '
+        + 'where it is a paragraph between a reader and the thing they came to do');
   }
   if (!/\.iqmark\{[^}]*height:1\.356em/.test(styleBlock))
     fails.push('the 4ormIQ mark is no longer sized in em off its lockup, so the mark and the IQ can drift apart');
