@@ -206,7 +206,14 @@ body[data-stage="landing"] .cbar{
    above it, so the block travels as one piece and this is the only value that
    moves it. Changing anything else changes the rhythm inside it, which is not
    what was asked for. */
-body[data-stage="landing"] .cbmain{padding:228px 0 64px;text-align:center}
+/* THE ROOM ABOVE THE HEADLINE IS MEASURED AGAINST THE SCREEN, NOT FIXED.
+   A flat 228 points is a quarter of a 997 point window spent on nothing, and
+   it pushed the numbers under the block off the bottom edge so a reader got
+   half a row of figures cut by the fold. Tied to viewport height instead: the
+   full gap on a tall screen, and on a short one the whole hero comes up by
+   the amount the screen is short. Nothing above or below it moves, and the
+   headline and the search bar keep every one of their own measurements. */
+body[data-stage="landing"] .cbmain{padding:clamp(120px,19vh,228px) 0 64px;text-align:center}
 /* AND ON A PHONE IT STARTS MUCH HIGHER.
    Two hundred and twenty eight points of air is right on a desktop and absurd
    on a screen six hundred points tall: it put the search bar ninety five
@@ -860,7 +867,7 @@ body[data-stage="landing"] .noteg{
      it: at this measure the group reaches the edge of the same column the bar
      sits in, so the two read as one stack instead of two objects of different
      widths. It clamps to the column on anything narrower. */
-  margin:40px auto 0;max-width:92ch;
+  margin:30px auto 0;max-width:92ch;
   /* Stretch, not start. The two sentences are different lengths and at this
      size one wraps a line further than the other, so left to their natural
      heights the pair sits with one frame ending short of its neighbour. */
@@ -886,7 +893,7 @@ body[data-stage="landing"][data-chat="on"] .noteg{display:none}
    It inherited nothing and sat hard against the bottom edge of the two panels,
    reading as a third line of the right-hand one. The air above it is what tells
    a reader it is a separate thought about a different subject. */
-.tielink{margin:30px auto 0;max-width:66ch;text-align:center;
+.tielink{margin:22px auto 0;max-width:66ch;text-align:center;
   font-size:13px;line-height:1.6;color:var(--tx-3)}
 .tielink b{color:var(--tx-2)}
 body[data-stage="landing"][data-chat="on"] .tielink{display:none}
@@ -901,7 +908,7 @@ body[data-stage="landing"][data-chat="on"] .tielink{display:none}
 /* TALLER, DOWNWARDS ONLY. The line sits under a block whose spacing is
    already settled, so the room is taken below it rather than pushing what is
    above it up the page. */
-.tick{margin:26px auto 0;max-width:1120px;padding:11px 0 18.4px;
+.tick{margin:20px auto 0;max-width:1120px;padding:11px 0 18.4px;
   border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .tickmask{overflow:hidden;position:relative;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
@@ -13393,7 +13400,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20261001.0613";
+var KBYS_BUILD = "20261001.0717";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one

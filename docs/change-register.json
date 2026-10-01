@@ -552,6 +552,92 @@
      "x": "On a phone the promise still runs to four lines and the question to three. That is sentence length rather than layout, and shortening either one is a copy decision that has not been taken."
     }
    ]
+  },
+  {
+   "id": "CR-0012",
+   "at": "2026-10-01",
+   "kind": "code",
+   "area": "index.html",
+   "title": "The hero comes up, so the row of figures is not cut by the fold",
+   "why": "On a 997 point window the fold landed halfway through the row of fraud figures under the hero. Half a row of numbers sliced by the bottom edge reads as a rendering fault rather than as content continuing below.",
+   "detail": "The room above the headline is measured against the screen now rather than fixed at 228 points, and three gaps below the search box come in. Nothing inside the hero changed size, and the headline, the search box and the body block above it keep every one of their own measurements.",
+   "actor": "Chad Johnston",
+   "severity": "p2",
+   "report": [
+    {
+     "t": "h2",
+     "x": "What was happening"
+    },
+    {
+     "t": "p",
+     "x": "The space above the headline was a flat 228 points whatever the window. On a 997 point window that is nearly a quarter of the screen spent on nothing, and it pushed the figures under the block down far enough that the bottom edge cut through the middle of the row."
+    },
+    {
+     "t": "h2",
+     "x": "What changed"
+    },
+    {
+     "t": "li",
+     "x": "The room above the headline is now clamp(120px, 19vh, 228px). The full gap on a tall screen, and on a short one the whole hero comes up by the amount the screen is short."
+    },
+    {
+     "t": "li",
+     "x": "The gap above the pair of notes came in from 40 to 30."
+    },
+    {
+     "t": "li",
+     "x": "The gap above the line naming the product came in from 30 to 22."
+    },
+    {
+     "t": "li",
+     "x": "The gap above the figures came in from 26 to 20."
+    },
+    {
+     "t": "h2",
+     "x": "Measured"
+    },
+    {
+     "t": "table",
+     "rows": [
+      [
+       "Window",
+       "Row of figures",
+       "State"
+      ],
+      [
+       "1920 x 997",
+       "907 to 963",
+       "Whole, with 34 points clear beneath it"
+      ],
+      [
+       "1440 x 900",
+       "886 to 942",
+       "Top of the row visible, rest below the fold"
+      ],
+      [
+       "1512 x 860",
+       "881 to 937",
+       "Entirely below the fold, which is clean"
+      ]
+     ]
+    },
+    {
+     "t": "h2",
+     "x": "What was tried and reverted"
+    },
+    {
+     "t": "p",
+     "x": "Making the hero a column one screen tall with the row pushed to its floor, so the row would be whole at every window height. It does not hold: the content is genuinely taller than one screen at these sizes, so the automatic margin collapses and the row simply moved up against the line above it. Reverted rather than kept as a partial."
+    },
+    {
+     "t": "h2",
+     "x": "What is still open"
+    },
+    {
+     "t": "p",
+     "x": "At 900 points tall the fold still lands inside the row. Clearing it there means taking roughly another 45 points out of the block, which would start closing the air that was deliberately opened above the search box. Not taken."
+    }
+   ]
   }
  ]
 }
