@@ -3691,8 +3691,13 @@ if (!/id="faultbtn"/.test(admin))
   fails.push('the faults only button is gone from the back office');
 if (!/id="faultbtn"[^>]*aria-pressed/.test(admin))
   fails.push('the faults only button does not report its pressed state');
-if (!/id="regbtn">The registry<\/button>\s*\n?\s*<button class="trig" type="button" id="faultbtn"/.test(admin))
-  fails.push('the faults only button is not beside the registry button');
+/* THREE CONTROLS IN ONE ROW, AND THE ORDER IS THE ORDER.
+   The registry, then the change register, then faults only. The change
+   register sits between them because it is the other half of the same
+   question: the registry says what the standards are, the change register says
+   what moved and why. Faults only filters the board and belongs at the end. */
+if (!/id="regbtn">The registry<\/button>\s*\n?\s*<button class="trig" type="button" id="audbtn">Change register<\/button>\s*\n?\s*<button class="trig" type="button" id="faultbtn"/.test(admin))
+  fails.push('the registry, change register and faults only controls are not in one row in that order');
 /* The panel lamps moved in between the live pill and the address. Both are
    still in the masthead, which is what the guard is protecting. */
 if (!/<span class="live">[\s\S]{0,420}?<span class="who" id="who">/.test(admin))
@@ -3898,8 +3903,58 @@ for (const h of ['<h2 class="ck">The path a check takes</h2>',
    white screen, which carries the list, the summary and the full text. */
 if (/id="registry"|class="registry"|function openRegistry/.test(admin))
   fails.push('the dark registry is back, so the board has two registries answering the same question');
-if (!/document\.getElementById\("regbtn"\)\.addEventListener\("click", function\(\)\{ openDocs\(true\); \}\);/.test(admin))
+if (!/getElementById\("regbtn"\)\.addEventListener\("click", function\(\)\{\s*DR_MODE = "docs"; openDocs\(true\);/.test(admin))
   fails.push('the registry pill no longer opens the registry');
+
+/* ===================================================== THE CHANGE REGISTER
+   One reader in two modes rather than two drawers, so the close button, the
+   back step and the escape key are the same ones in both. And the register
+   itself has to be IN the page: an empty embed would render a control that
+   opens onto nothing, which is worse than no control at all. */
+if (!/id="audbtn"/.test(admin))
+  fails.push('the change register control is gone from the back office');
+if (!/getElementById\("audbtn"\)\.addEventListener\("click", function\(\)\{\s*DR_MODE = "audit"; openDocs\(true\);/.test(admin))
+  fails.push('the change register control does not open the change register');
+if (!/AUDIT-REGISTER-START/.test(admin) || !/AUDIT-REGISTER-END/.test(admin))
+  fails.push('the change register embed markers are gone, so tools/audit-embed.mjs cannot write to this page');
+{
+  const m = admin.match(/\/\* AUDIT-REGISTER-START \*\/\s*var AUDIT = ([\s\S]*?);\s*\/\* AUDIT-REGISTER-END/);
+  if (!m) fails.push('the change register is not embedded in the back office');
+  else {
+    let reg = null;
+    try { reg = JSON.parse(m[1]); } catch { fails.push('the embedded change register is not valid JSON'); }
+    if (reg) {
+      if (!Array.isArray(reg.entries) || !reg.entries.length)
+        fails.push('the change register is embedded empty, so the control opens onto nothing. Run node tools/audit-embed.mjs');
+      /* THE ONE THING THIS REGISTER MAY NEVER CARRY.
+         A table that holds who was looked up rebuilds the person level file
+         PIA-001 s.20 and s.21 exist to prevent, and it would do it inside the
+         system built to refuse it. Checked here rather than trusted, because
+         this is the register somebody would reach for when they wanted to know
+         what changed after a particular run. */
+      const banned = ['query', 'identifier', 'subject', 'party', 'domain_checked',
+                      'search', 'result', 'verdict', 'entity'];
+      (reg.entries || []).forEach(e => {
+        Object.keys(e).forEach(k => {
+          if (banned.includes(k))
+            fails.push('change register entry ' + e.id + ' carries a field that may never be in it: ' + k);
+        });
+        if (!e.why) fails.push('change register entry ' + e.id + ' has no reason. A change with no reason is not a record');
+        if (!Array.isArray(e.report) || !e.report.length)
+          fails.push('change register entry ' + e.id + ' has no report to click into');
+      });
+      /* The file on disk is the source of truth and the embed is a copy of it.
+         Two copies of the same fact drift, so the build checks they have not. */
+      try {
+        const disk = JSON.parse(fs.readFileSync(path.join(root, 'docs/change-register.json'), 'utf8'));
+        if (disk.entries.length !== reg.entries.length)
+          fails.push('docs/change-register.json holds ' + disk.entries.length
+                   + ' entries and admin.html has ' + reg.entries.length
+                   + ' embedded. Run node tools/audit-embed.mjs');
+      } catch { fails.push('docs/change-register.json is missing or unreadable'); }
+    }
+  }
+}
 if (/id="docbtn"/.test(admin))
   fails.push('the second registry control is back beside the first');
 /* And nothing that was on the panel that went may be lost in the move. */

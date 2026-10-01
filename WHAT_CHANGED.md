@@ -1,8 +1,8 @@
-# 4orm IQ, build 20260929.2040
+# 4orm IQ, build 20260930.2200
 
 Everything in this archive is the working tree as it stands, plus the two
 control documents under `reports/`. It is a git repository: `git log` carries
-nine commits and the reason for each.
+eight commits and the reason for each.
 
 ## Run the gate
 
@@ -37,105 +37,78 @@ main. It needs no secret, because every check reads files.
 
 ## What changed in this build
 
-### The words
+Nine entries, and every one of them is in the change register at
+`docs/change-register.json`, with its reason and a report behind it. The control
+panel reads the same register: **Change register** in the masthead, beside **The
+registry**.
 
-Every line of the copy register is on the site: the landing, the questions, the card people agree to, the run, the result and its states, reviews and complaints, what to do next, already sent money, find help, how 4ormIQ works, the important limits, and the compliance, privacy and terms documents. The slogan is now "Check before you send", on every screen, every document pack and the audit report.
+### The defect this build exists to close
 
-| Change | Where |
+A consumer checking a registered Canadian dealer was shown a foreign regulator's
+warning about a differently named company, one unhappy review, and the sentence
+that we could not confirm the business on a relevant register. The register that
+would have cleared them was not in the catalogue, so it was never asked, and an
+absence in our own reading reached a reader as a fact about a business.
+
+Three faults, three fixes. `CR-0004` has the whole account.
+
+### The favourable side of the record
+
+The engine only ever went looking for what was wrong. It now collects what the
+record says in a party's favour, and ranks every piece of it by one question:
+**how hard is this to buy?**
+
+| Rank | What goes in it | May it move the result? |
+|---|---|---|
+| 1 Cannot be bought | A live registration, a licence in good standing, a regulator's own record, a filed statement, a court record showing a matter resolved | No |
+| 2 Expensive to fake | Continuity: the same legal name across three registers, on the register since 2018, a domain eight years old | No |
+| 3 Can be bought | Star ratings, review counts, testimonials, award badges, press releases | No |
+
+The third column is the design. Register standing and adverse findings set the
+result. Favourable evidence is context beside it and there is no code path from
+one to the other. Once a purchased five-star page has nowhere to move the
+needle, buying one stops working, and unlike a detector that defence has no
+false positives.
+
+A party's own words go in their own block, quoted and attributed, and are never
+a record. There is no tally anywhere.
+
+### The time window
+
+Businesses make mistakes and then fix them.
+
+| Band | Age | What it may do |
+|---|---|---|
+| `current` | Inside 12 months | Drives the result |
+| `older` | 12 to 36 months | Shown, labelled, drives nothing |
+| `archive` | Beyond 36 months | Behind one control the reader can open |
+| `undated` | No date on the record | Never a finding. Goes to the gaps |
+
+**Standing never ages.** A register entry, a licence, a regulator action, a
+sanction and a court record say what is true now until the issuing body changes
+them, so they are exempt by class and can never fall into a band.
+
+The band is computed in `api/_recency.js`, in code, from the date the record
+carries. The model carries the date and never weighs it: published work on
+model based reranking found that injecting dates alone moved the mean
+publication year of the top ten forward by up to 4.78 years and flipped
+pairwise preferences by up to 25 per cent with no change in relevance.
+
+### New files
+
+| File | What it is |
 |---|---|
-| Terms of use move to version 1.1, in force 29 September 2026. Every result stamps the version it was made under, so the stamp and the words agree. Counsel has not read this version yet. | `TERMS_VERSION` |
-| The statute block stays as it was, under its new heading. It names the acts each limit comes from. | How 4ormIQ works |
-| The two Competition Bureau lines are on the page with their sources: read the two, three and four star reviews, and $704 million lost in 2025 with only 5 to 10 per cent of fraud reported. | What to do next |
-| A complaint count now carries its context: ten complaints about a business with two hundred customers and ten about a business with two hundred thousand are not the same thing. | Reviews and complaints |
-| The landing carries the line about what this is for: this shows you what is not good, do your own diligence on what is good. | Landing |
-| The share of official sources reads from the check log rather than a typed number. | The dials |
-| Colour words stay in the legal sections and are off the result itself. | Result |
-| The report card gives the answer a floor of 150px, so a longer question can wrap without squeezing the answer into a ribbon. | `.rp-idv` |
-| Every gate that asserted the old wording now asserts the new wording, and the suite is green. | `tools/` |
+| `api/_recency.js` | The four bands, the standing exemption, and a date parser for the shapes real sources print |
+| `api/_standing.js` | The three ranks, the self-description test, and the four review shape signals |
+| `api/_audit.js` | The change register: validation, merge, and the fields it may never carry |
+| `api/audit.js` | `GET /api/audit`, the register merged with its runtime half |
+| `db/audit.sql` | `audit_changes`. No column for who was looked up, same rule as the telemetry tables |
+| `docs/change-register.json` | The register itself. Source of truth, reviewed like code |
+| `tools/audit-embed.mjs` | Embeds it into `admin.html` between the two markers |
 
-### The result page, one reading column beside the report card
+### New gates
 
-| Change | Where |
-|---|---|
-| The reading column runs in this order: the verdict, in our own words, what we found, what we could not answer, next steps. Every block is the full column width, with one left and one right edge, beside the report card. | `.rp-readcol` |
-| On a phone the report card follows what we found; what we could not answer and next steps stay last. | `@media(max-width:680px)` |
-| Money sent: the dark verdict box carries a red "Do this right now" that opens the act page. It beats three times and stays lit only where an authority has named the party. | `sentNow_` |
-| The door at the foot opens the Next steps page for everyone: "Next steps to protect you" before money has gone, "Next steps to protect you in the future" after. | `#rpActWay` |
-| The foot of the Next steps page carries the same red "Do this right now" pill, opening the same act page. | `#rpNextToAct` |
-| "There are two registers we could not open" is written in words. | `rpGap1` |
-| "Keep reading" shows only when the way on at the foot of the reading column is out of sight. | `rpCueNeeded` |
-| `doorcheck`, `nextcheck` and `smoke26` check the order, the shared edges and both routes. | `tools/` |
-
-### The report, for the reader who has sent money and the one who has not
-
-| Change | Where |
-|---|---|
-| The red button beats three times, then stays lit red. No more continuous flashing. | `index.html`, `.rp-beat` |
-| The button beside the verdict shows only when the reader said money has gone. It beats only when a regulator, court or registry has published something about this party by name. | `index.html`, `sentNow_` |
-| The money question carries a note: this is the important one. | the `stage` question |
-| The bottom of the report is one row: what we could not answer on the left under the reading column, the way on beside it under the report card. The grey box and the full width green bar are gone. | `#rpClose` |
-| Not sent, or just researching: the way on is blue, "Next steps to protect you". Sent: it is red, "Do this right now". The pinned phone bar and the button inside the records follow the same answer. | `rpOnward` |
-| New page, Next steps to protect you: four did you knows, each with its public source; nine tips on checking a business yourself (registers, review sites, consumer protection sites, social media, what a run of negative reviews means); and a red "Do this right now if you've sent money" at the foot. | `#rpNext` |
-| The records count uses one unit: "Two findings, one of them from a regulator, court or registry." It can no longer print a part larger than the whole. | door subline |
-| "What they present as" keeps capitals: VC startup, NFT, DeFi. | `rpKind` |
-| New gate `tools/nextcheck.mjs`; `doorcheck`, `smoke26/36/39/40`, `frames`, `packpdf`, `contactsheet` walk the new route. | `tools/` |
-
-### Earlier in this build
-
-### The security pass, steps 1 to 8
-
-* **The spend ceiling.** `api/_budget.js`. A reservation is taken before the
-  first vendor call and recorded as it decides, so concurrent requests cannot
-  all read the same low count and pass. Runs, dollars per minute, dollars per
-  day, per client, plus a house ceiling for the day. Volume throttles; repeat
-  behaviour blocks, doubling to a six hour cap. One oversized request is
-  refused and never blocked, because size is not behaviour.
-* **The spend reader.** A third pill on the control room's operations row, and
-  five bands behind it. It never goes red for spending money.
-* **Response shaping.** `forClient()` cuts the payload at both exits. The
-  vendor cost of a check, the model, the build stamp and the seed counts no
-  longer travel to a browser that never drew them.
-* **Evidence is not instruction.** `api/_untrusted.js`. Every retrieved span is
-  fenced with a marker minted per run, labelled with its host, and scrubbed of
-  anything that could imitate the fence. Standing order R8 tells the model to
-  report an injection attempt as a finding rather than skip it.
-* **The scheduled door.** `api/_scheduled.js`. A signature over method, path,
-  timestamp, nonce and body hash, compared in constant time on digests, valid
-  five minutes either way, usable once.
-* **The database.** Every value bound. One identifier is concatenated, and it is
-  looked up in an allowlist with an own-property check and a shape test. No
-  star selects. No exception reaches a caller.
-* **The log.** One writer, `api/_log.js`, which scrubs an email, an address, a
-  key, a token, a connection string and a URL out of a line before it is
-  written.
-* **The scan.** `tools/scanner.mjs` reads what is served, not the repository.
-
-### The pages
-
-* **Terms of use.** A page of their own, linked from every footer. "I understand"
-  on the card before each check is the agreement: the notice sits above the
-  button and names the version, the terms open inside the card, and the version
-  and time agreed are printed on the result and on every pack. Liability is
-  limited as far as the law allows and no further, because Quebec prohibits the
-  rest and a struck clause protects nothing.
-* **A fast check opened its result before the reader agreed.** It now waits for
-  the click.
-* **The answer pills** rose from fully transparent while holding focus, so a
-  keyboard reader sat on an invisible control for four tenths of a second. That
-  was the intermittent failure on the waiting screen.
-
-* **The search bar** carried three blue marks at once while somebody was
-  typing: a halo outside the pill, a focus ring outside that, and an underline
-  beneath the text. It now has one line, and it is the oval: the focus ring laid
-  along the pill's own edge. Nothing moves when it appears.
-
-* A modal marked the page behind it inert, except for whatever held focus. The
-  conversation focuses its own answer pills, so a reader who reached the wait
-  could tab back into a question already answered.
-* **What we found** was green. A colour on that door is a verdict about what is
-  behind it before anybody has opened it. It is neutral now, and the count does
-  the work.
-* **Do this right now** said the same thing to two different readers. It now
-  reads "Do this right now if you've sent money" wherever we have not been told
-  the money has gone. The flashing is unchanged, and is still earned only by an
-  authority having published something about this party by name.
+`tools/verify.mjs` now fails the build if the change register is embedded empty,
+if the embed and the file on disk disagree on how many entries there are, if an
+entry has no reason, if an entry has no report to open, or if any entry carries
+a field naming what a check was about.
