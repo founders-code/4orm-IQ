@@ -1,7 +1,7 @@
 {
  "register": "AUD-CR",
  "title": "4orm IQ change register",
- "updated": "2026-09-30",
+ "updated": "2026-10-01",
  "entries": [
   {
    "id": "CR-0001",
@@ -469,6 +469,87 @@
     {
      "t": "p",
      "x": "Nothing was added to the result page. A consumer reading a result about a business they are worried about is not the audience for a company link, and putting one there would be the wrong thing at the wrong moment."
+    }
+   ]
+  },
+  {
+   "id": "CR-0011",
+   "at": "2026-10-01",
+   "kind": "code",
+   "area": "index.html",
+   "title": "The landing body, three weights instead of four paragraphs",
+   "why": "Between the headline and the search box sat four stacked paragraphs, nine lines, nearly all of it at the same size, weight and ink. A reader got four headlines in a row and no way to tell which to read first, and the one thing they came to do was underneath all of it.",
+   "detail": "The question leads, the promise drops to body copy, the limit is quieter again. The note that says how to type an identifier moved from above the box to under the field. More air above the box. No words cut, no type sizes reduced, headline and search box untouched.",
+   "actor": "Chad Johnston",
+   "severity": "p1",
+   "report": [
+    {
+     "t": "h2",
+     "x": "What was wrong"
+    },
+    {
+     "t": "p",
+     "x": "The question, the promise and the limit were all set at the same size, the same weight and the same ink, so the hierarchy that should have been doing the work was being asked of the words instead. Under them sat a third paragraph at the site's hero lead size whose actual job is telling somebody how to type an identifier."
+    },
+    {
+     "t": "h2",
+     "x": "What changed"
+    },
+    {
+     "t": "li",
+     "x": "The question keeps the lead size and weight. It is the line that tells a reader whether this page is for them."
+    },
+    {
+     "t": "li",
+     "x": "The promise becomes body copy under it: lighter weight, the body ink, a 62 character measure."
+    },
+    {
+     "t": "li",
+     "x": "The limit is quieter again, at the size of a qualification rather than a claim, balanced so it does not drop its last word onto a row of its own."
+    },
+    {
+     "t": "li",
+     "x": "The note about how to type an identifier moved below the search field and took the size of help. Help for a control belongs with the control."
+    },
+    {
+     "t": "li",
+     "x": "The gap above the search box went from 26 to 40, so the box reads as the action rather than as a fifth paragraph."
+    },
+    {
+     "t": "li",
+     "x": "On a phone the three gaps close, because the change in size and ink already separates them in a column that narrow."
+    },
+    {
+     "t": "h2",
+     "x": "What did not change"
+    },
+    {
+     "t": "p",
+     "x": "The headline, the search box, every word on the screen and every type size in the block above it. The crowding was hierarchy, not volume, and the fix is hierarchy."
+    },
+    {
+     "t": "h2",
+     "x": "Measured"
+    },
+    {
+     "t": "p",
+     "x": "At 1440 the search box now sits at 548 of 900 and the note at 655. At 390 the box sits at 448 of 844. Both are clear of the fold, which is the measurement that governs this block."
+    },
+    {
+     "t": "h2",
+     "x": "A gate that was reading the wrong rule"
+    },
+    {
+     "t": "p",
+     "x": "The build check for this note took the first rule naming its selector, which after the change was a phone breakpoint setting only a margin, and reported the size as missing. It reads every rule naming the selector now."
+    },
+    {
+     "t": "h2",
+     "x": "What is still open"
+    },
+    {
+     "t": "p",
+     "x": "On a phone the promise still runs to four lines and the question to three. That is sentence length rather than layout, and shortening either one is a copy decision that has not been taken."
     }
    ]
   }
