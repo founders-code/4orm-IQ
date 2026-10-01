@@ -2585,6 +2585,29 @@ body[data-stage="console"] .verdictwrap.on{display:block}
 .docrow span{color:var(--tx-4);font-size:10px}
 .foot .docrow{justify-content:flex-start;margin:20px 0 0}
 
+/* ================================================ POWERED BY 4ORM FINANCE
+   Small and on both screens. The house is named once and the name itself is
+   the link. A name sitting beside a second control that repeats the name is
+   the tell of an amateur page and this line is far too small to carry one.
+   It opens in a new tab on purpose. A consumer part way through a check who
+   taps this and loses their page has been sent away by us at the one moment
+   they came to us for help. That is a worse outcome than never carrying the
+   link at all. */
+/* tx-4 puts these two words at 3.94 against the page and the floor is 4.5.
+   The same correction the standing-document row above it already carries: the
+   size and the tracking do not move, only the ink. */
+.powered{margin:18px 0 0;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3);
+  display:flex;align-items:center;gap:7px}
+.powered a{color:var(--tx-2);text-decoration:none;padding:6px 2px;
+  display:inline-flex;align-items:center;min-height:24px;
+  border-bottom:1px solid transparent}
+.powered a:hover{color:var(--tx);border-bottom-color:var(--border-strong)}
+.powered a:focus-visible{outline:2px solid var(--focus,#2E6BF2);outline-offset:3px}
+.powered svg{width:9px;height:9px;stroke:currentColor;stroke-width:2.4;fill:none;
+  opacity:.6;margin-left:5px}
+body[data-stage="landing"] .powered{justify-content:center;margin-top:14px}
+
 /* ------------------------------------------------------------- the report stage
    The answer comes first and the working sits behind it. Both are built from one
    payload, so the report can never say something the board does not support. */
@@ -4498,6 +4521,77 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 #rpt .rp-good .rp-x{display:block;margin-top:6px;font-size:13px;line-height:1.5;color:var(--tx-3)}
 #rpt .rp-good .rp-lk{display:block;margin-top:12px}
 
+/* ================== HOW HARD IS THIS TO BUY
+   The one question that ranks favourable evidence, printed on the record it
+   ranks. A register entry cannot be bought. A five star rating can, and a
+   reader who is not told the difference will weigh them the same.
+   Rank 3 is deliberately NOT styled as a warning: buying reviews is common and
+   a rating is not an accusation. It is styled as what it is, which is a weaker
+   kind of evidence sitting in its proper place below a stronger kind. */
+#rpt .rp-good[data-rank="3"]{border-color:var(--border);background:var(--surface-2);
+  box-shadow:none}
+#rpt .rp-good[data-rank="3"]>i{background:var(--surface);color:var(--tx-3);
+  border:1px solid var(--border)}
+#rpt .rp-good[data-rank="2"]{box-shadow:none}
+#rpt .rp-rank{display:inline-flex;align-items:center;gap:7px;margin-bottom:9px;
+  font-family:var(--rmono);font-size:9.5px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ok)}
+#rpt .rp-good[data-rank="2"] .rp-rank{color:var(--tx-2)}
+#rpt .rp-good[data-rank="3"] .rp-rank{color:var(--tx-3)}
+#rpt .rp-rank i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+#rpt .rp-ranknote{display:block;margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--border);font-size:12.5px;line-height:1.5;color:var(--tx-3)}
+/* A record the window has aged out of the result still shows, and says so. */
+#rpt .rp-band{display:inline-block;margin-top:8px;padding:3px 9px;border-radius:99px;
+  background:var(--surface-2);border:1px solid var(--border);
+  font-family:var(--rmono);font-size:9.5px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tx-3)}
+
+/* THEIR OWN WORDS, AND THE LINE BETWEEN THEM AND EVERYTHING ELSE.
+   A business describing itself is not evidence about that business, so it is
+   not allowed to look like the blocks that are. No tick, no green, no card
+   shadow: a quotation with an attribution, which is all it is. */
+#rpt .rp-says{margin-top:26px;display:grid;gap:12px}
+#rpt .rp-say{padding:16px 20px;border-left:3px solid var(--border-strong);
+  background:var(--surface-2);border-radius:0 var(--r) var(--r) 0}
+#rpt .rp-say q{display:block;font-size:15px;line-height:1.6;color:var(--tx-2);quotes:none}
+#rpt .rp-say q:before,#rpt .rp-say q:after{content:""}
+#rpt .rp-say cite{display:block;margin-top:8px;font-style:normal;
+  font-family:var(--rmono);font-size:10.5px;letter-spacing:.1em;color:var(--tx-3)}
+
+/* THE SHAPE OF THE FAVOURABLE PILE. Not a warning, a description. */
+#rpt .rp-shape{margin-top:26px;padding:20px 22px;background:var(--surface-2);
+  border:1px solid var(--border-strong);border-radius:var(--r)}
+#rpt .rp-shape .rp-t{display:block;font-size:15.5px;font-weight:650;
+  letter-spacing:-.016em;color:var(--tx);line-height:1.45}
+#rpt .rp-shape .rp-x{display:block;margin-top:9px;font-size:13.5px;line-height:1.6;
+  color:var(--tx-2);max-width:62ch}
+#rpt .rp-shape ul{margin:13px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+#rpt .rp-shape li{position:relative;padding-left:17px;font-size:13.5px;line-height:1.55;
+  color:var(--tx-2)}
+#rpt .rp-shape li:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;
+  border-radius:50%;background:var(--tx-3)}
+
+/* ONE CONTROL, NOT A SETTING.
+   Records older than three years are kept out of the way because a fault that
+   old says very little about a business today, and hiding them outright would
+   cost us the only thing this product sells. So: one button, the count on it,
+   and the reason beside it. */
+#rpt .rp-older{margin-top:22px}
+#rpt .rp-olderb{appearance:none;cursor:pointer;width:100%;text-align:left;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;
+  padding:15px 20px;background:var(--surface);border:1px dashed var(--border-strong);
+  border-radius:var(--r);color:var(--tx)}
+#rpt .rp-olderb:hover{border-color:var(--tx-3)}
+#rpt .rp-olderb:focus-visible{outline:2px solid var(--focus,#2E6BF2);outline-offset:2px}
+#rpt .rp-olderb .rp-t{display:block;font-size:14.5px;font-weight:650;letter-spacing:-.014em}
+#rpt .rp-olderb .rp-x{display:block;margin-top:5px;font-size:12.5px;line-height:1.5;
+  color:var(--tx-3);max-width:58ch}
+#rpt .rp-olderb .rp-go{font-family:var(--rmono);font-size:10px;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);white-space:nowrap}
+#rpt .rp-olderlist{margin-top:12px;display:grid;gap:10px}
+#rpt .rp-olderlist[hidden]{display:none}
+
 /* A CHECK THAT DID NOT RUN IS NOT A CALM ONE.
    "calm" is the tone for a real result with nothing against it, and it is green
    because green is earned. A run that reached no register wore the same green,
@@ -4946,9 +5040,15 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
           <button type="button" data-doc="compliance">Compliance statement</button>
           <span aria-hidden="true">&middot;</span>
           <button type="button" data-doc="privacy">Privacy notice</button>
-        <button type="button" data-doc="terms">Terms of use</button>
           <span aria-hidden="true">&middot;</span>
-          <a href="https://4ormfinance.com" rel="noopener">4ormfinance.com</a>
+          <button type="button" data-doc="terms">Terms of use</button>
+        </p>
+        <!-- The house, named once, under the standing documents rather than
+             inside them. A company link is not a legal notice and sitting in
+             that row made it read as one. -->
+        <p class="powered landing-only">Powered by
+          <a href="https://4ormfinance.com" target="_blank" rel="noopener noreferrer"
+             title="Check out 4orm Finance" aria-label="Check out 4orm Finance, opens in a new tab">4orm Finance<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </p>
 
 
@@ -5108,6 +5208,46 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
             <h2 class="rp-h2" id="rpGoodH"></h2>
             <p class="rp-sub">These records support what the company says. That does not guarantee the company is safe or that nothing will go wrong. It means these details matched the official records we checked.</p>
             <div class="rp-goods" id="rpGoods"></div>
+
+            <!-- THE SHAPE OF THE GOOD REVIEWS, WHERE THERE IS ONE WORTH SAYING.
+                 We never call a review false and we never call a reviewer a liar.
+                 We do not know, and saying so would be the same mistake as the one
+                 this product exists to prevent, pointed the other way. What we can
+                 do is describe the pile, which is a fact about the pile. Hidden
+                 unless two or more signals agree, because one on its own is noise. -->
+            <div class="rp-shape" id="rpShape" hidden>
+              <span class="rp-t" id="rpShapeT">About the good reviews</span>
+              <span class="rp-x" id="rpShapeX"></span>
+              <ul id="rpShapeL"></ul>
+            </div>
+
+            <!-- WHAT THEY SAY ABOUT THEMSELVES, KEPT APART FROM THE RECORD.
+                 A business describing itself is not evidence about that business.
+                 Putting it in the list above would say that it is. -->
+            <div id="rpSaysSec" hidden>
+              <div class="rp-kick" style="margin-top:34px">What the business says about itself</div>
+              <p class="rp-sub">These are their own words, from their own pages. We have not checked them, and a business saying something about itself is not evidence that it is true.</p>
+              <div class="rp-says" id="rpSays"></div>
+            </div>
+
+            <!-- THE OLDER RECORDS, BEHIND ONE CONTROL.
+                 Businesses make mistakes and then fix them. A fault from four years
+                 ago that was put right should not sit over a company forever, and a
+                 reader asking today is asking about today. So it is out of the way,
+                 and it is one button away, because hiding it would cost us the only
+                 thing this product sells. A register entry, a licence, a regulator
+                 action and a court record are never in here: they say what is true
+                 now until the body that issued them changes it. -->
+            <div class="rp-older" id="rpOlder" hidden>
+              <button class="rp-olderb" type="button" id="rpOlderB" aria-expanded="false" aria-controls="rpOlderL">
+                <span class="rp-b">
+                  <span class="rp-t" id="rpOlderT">Show older records</span>
+                  <span class="rp-x" id="rpOlderX"></span>
+                </span>
+                <span class="rp-go" id="rpOlderG">Show</span>
+              </button>
+              <div class="rp-olderlist" id="rpOlderL" hidden></div>
+            </div>
           </div>
 
           <!-- THE ALREADY-SENT DOOR MOVED TO "DO THIS RIGHT NOW".
@@ -6528,16 +6668,25 @@ body[data-stage="console"] .navbtn[data-when="console"]{display:inline-flex}
 <footer class="foot">
   <div class="wrap">
     <div class="footin">
-      <div><div class="lbl gold">4orm Finance</div><div class="fl" style="margin-top:9px">Check before you send</div></div>
+      <!-- THE PAGE IS THE PRODUCT AND THE HOUSE IS THE LINE UNDER IT.
+           This read "4orm Finance" over the product's own line, and with the
+           house now named again three rows down it said the same name twice on
+           one screen. The product is what a reader is standing in. -->
+      <div><div class="lbl gold">4ormIQ</div><div class="fl" style="margin-top:9px">Check before you send</div></div>
 
     </div>
     <p class="docrow">
       <button type="button" data-doc="compliance">Compliance statement</button>
       <span aria-hidden="true">&middot;</span>
       <button type="button" data-doc="privacy">Privacy notice</button>
-        <button type="button" data-doc="terms">Terms of use</button>
+      <span aria-hidden="true">&middot;</span>
+      <button type="button" data-doc="terms">Terms of use</button>
       <span aria-hidden="true">&middot;</span>
       <button type="button" data-doc="sources">How 4ormIQ works</button>
+    </p>
+    <p class="powered">Powered by
+      <a href="https://4ormfinance.com" target="_blank" rel="noopener noreferrer"
+         title="Check out 4orm Finance" aria-label="Check out 4orm Finance, opens in a new tab">4orm Finance<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </p>
     <p class="note">4ormIQ shows what public records say. A red result means we found an important warning or conflict in the records we checked. It is not an accusation, a legal finding, or proof of wrongdoing.</p>
   </div>
@@ -7086,7 +7235,18 @@ var SPECIMEN = {
   barFoot:"Seventy-three sources returned a clear answer across eleven jurisdictions. The main issues are a licence mismatch, a website much newer than the claimed operating history, payment going to a different company name, and repeated withdrawal complaints across independent platforms.",
   cats:{
     C1:{state:"GREEN",sum:"Company record found, and the legal entity matches the register.",
-      ev:[{t:"A", match:"exact",src:"UK Companies House, company register",when:"26 Aug 2026",
+      ev:[
+        /* SPECIMEN ONLY. An aged record, so the control that opens everything
+           older than three years has something to open. It is invented, and
+           the point it demonstrates is real: this record is shown, it is kept
+           out of the reader's way, and it is not part of the result. */
+        {t:"C", match:"exact",src:"A consumer affairs column",when:"26 Aug 2026",
+         published:"12 Feb 2021", band:"archive", drives:false,
+         find:"A newspaper column in 2021 described a delayed payout that the firm later settled.",
+         plain:"This is more than three years old and the matter was settled. It is here because it happened, and it is not part of the result above.",
+         quote:"", url:""},
+        {t:"A", match:"exact",src:"UK Companies House, company register",when:"26 Aug 2026",
+        published:"11 Jun 2026", band:"current", drives:true,
         find:"Atlantic Global Wealth Ltd is registered and active. Incorporated 11 June 2026.",
         plain:"The company exists and is active on the UK register. That confirms the legal entity. It does not confirm that the company is allowed to sell you the product being offered.",
         quote:"Company number 15482207. Incorporated on 11 June 2026. Company type: Private limited company. Company status: Active.",url:""}]},
@@ -7173,8 +7333,50 @@ var SPECIMEN = {
     "Beneficiary Match":"adverse","IBAN and SWIFT":"adverse","Chainabuse":"unreached","Chain Analytics":"unreached",
     "Infrastructure Cluster":"caution","Identifier Reuse":"unreached","Document Fingerprint":"unreached"
   },
+  /* SPECIMEN ONLY. THE FAVOURABLE SIDE, RANKED BY HOW HARD IT IS TO BUY.
+     Invented like everything else here, and shaped to show all three ranks,
+     because a specimen that only ever shows rank 1 teaches a reader that this
+     product treats a registry entry and a five star rating the same way. */
+  standing:{
+    rows:[
+      {rank:1, tierLabel:"Cannot be bought", counts:true,
+       label:"Registered as a money services business, and the registration is live.",
+       src:"FinCEN MSB registrant search", url:"", quote:"", published:"14 Mar 2024",
+       band:"current", bandLabel:"", about:"atlanticglobalwealth.com", match:"exact"},
+      {rank:2, tierLabel:"Expensive to fake", counts:false,
+       tierNote:"This is continuity rather than praise. Nobody buys eight years of filing history.",
+       label:"The same legal name appears on three separate registers, with no gap in the filing history.",
+       src:"Florida Sunbiz, OpenCorporates and SEC Form D, read together", url:"", quote:"",
+       published:"2019", band:"current", bandLabel:"", about:"Atlantic Global Wealth LLC", match:"exact"},
+      {rank:3, tierLabel:"Can be bought", counts:false,
+       tierNote:"Ratings, testimonials and badges can be paid for. We show them and we do not count them.",
+       label:"Rated 4.6 out of 5 on the largest review platform, from 1,880 reviews.",
+       src:"Trustpilot", url:"", quote:"", published:"Aug 2026",
+       band:"current", bandLabel:"", about:"atlanticglobalwealth.com", match:"exact"}
+    ],
+    self:[
+      {claim:"Trusted by over 40,000 investors across 12 countries since 2011.",
+       where:"Their own home page", url:""},
+      {claim:"Fully authorised and regulated, with segregated client accounts held at tier one banks.",
+       where:"Their own about page", url:""}
+    ],
+    note:"One record here comes from a public body and the other two do not. The rating can be "
+        +"purchased and the filing history cannot, which is why they are not sitting beside each other.",
+    ladder:[{rank:1,label:"Cannot be bought"},{rank:2,label:"Expensive to fake"},{rank:3,label:"Can be bought"}]
+  },
+
   reviews:{
     checked:11, carrying:5, reports:43, state:"organic",
+    pos:38, posPeriod:"Jul 2026 to Aug 2026", posQuote:"",
+    posNote:"Thirty-eight favourable reviews were read. Almost all of them arrived inside one week.",
+    /* Two signals, which is the threshold. One on its own is noise and the page
+       is told so rather than left to work it out. */
+    shape:{ flagged:true, note:"",
+      signals:[
+        {id:"burst",   observed:"31 of the 38 favourable reviews were posted in the same week."},
+        {id:"generic", observed:"29 of the 38 are under twelve words and describe nothing specific."},
+        {id:"one_off", observed:"33 of the 38 come from accounts with one review."}
+      ]},
     note:"Eleven platforms swept, five carrying negative reports, forty-three accounts read. Positive reviews on the two largest platforms cluster in a single week and are treated as unverified. The negative records does not: it spans five months and five platforms that do not share a user base.",
     rows:[
       {id:"withdrawal-refused",label:"Deposits clear instantly. Withdrawals never complete.",pf:5,names:["Trustpilot","Sitejabber","Forex Peace Army","Reddit r/Scams","ComplaintsBoard"],n:31,quote:"Depositing took four seconds. I have been waiting nine weeks for a withdrawal and every time I ask it goes back to processing.",period:"Apr to Aug 2026"},
@@ -7210,7 +7412,7 @@ var GREY = {
 /* GENERATED:SOURCES - do not edit by hand. Source: api/_catalogue.js + api/_reference.js. Run tools/sync-catalogue.mjs. */
 var SOURCES = [
  {c:"01 Identity", w:1, items:["Corporations Canada","Ontario Registry","BC Registry","Alberta Registry","SEC EDGAR","Companies House","Florida Sunbiz","OpenCorporates","Registraire des entreprises du Quebec","ACRA","Hong Kong Companies Registry","New Zealand Companies Office","Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama","Turks and Caicos, and Eastern Caribbean company registries"]},
- {c:"02 Licensing", w:2, items:["CSA Registration","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]},
+ {c:"02 Licensing", w:2, items:["CSA Registration","OSC Registered Crypto Asset Trading Platforms","CIRO AdvisorReport","FINTRAC MSB","Bank of Canada PSP","FCA Register","BrokerCheck","NFA BASIC","FinCEN MSB","SEC IAPD, Form ADV","SEC Form D","ASIC Professional Register","SFC Public Register","ESMA MiCA CASP","RECO real estate register","FSRA Ontario, mortgage and insurance licences","BC Financial Services Authority","Real Estate Council of Alberta","Autorite des marches financiers","Financial and Consumer Affairs Authority of Saskatchewan","Manitoba Securities Commission","Financial and Consumer Services Commission of New Brunswick","Nova Scotia Securities Commission","Prince Edward Island and Newfoundland and Labrador regulators","NMLS Consumer Access","MAS Financial Institutions Directory"]},
  {c:"03 Enforcement", w:3, items:["IOSCO I-SCAN","Canadian Consolidated Autonomous Sanctions List","Competition Bureau Canada","Federal Trade Commission","Consumer Financial Protection Bureau","Internet Crime Complaint Center","MAS Investor Alert List","BCSC Caution List","ASC Caution List","OSC Alerts","CSA Alerts","FCA Warning List","OFAC","UN Consolidated","DOJ Press","IRS-CI","State AG","SEC Trading Suspensions","CFTC RED List","CFTC Enforcement","DFPI Crypto Scam Tracker","CIRO Discipline","ASIC Investor Alerts","SFC Alert List"]},
  {c:"04 People", w:1, items:["Corporations Canada, Individuals with Significant Control","ISC Ownership","UK PSC Register","ASIC Banned","CSA Disciplined","CSA Disciplined Persons","SEDI Insider Reports"]},
  {c:"05 Legal", w:2, items:["CanLII","Supreme Court of Canada and Federal Court","Provincial court decisions","Capital Markets Tribunal","Competition Tribunal","Securities tribunals outside Ontario","OSB Bankruptcy","CourtListener","UK Insolvency","PACER","Justia Dockets","Bankruptcy Claims","SEDAR+"]},
@@ -7249,6 +7451,7 @@ var REGINFO = {
 "New Zealand Companies Office":["NZ","A","New Zealand's companies register. Confirms incorporation, standing and directors.","https://companies-register.companiesoffice.govt.nz/"],
 "Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama":["INTL","B","The company registers of seven jurisdictions often used to hold a fund or an operating entity offshore. Coverage differs by jurisdiction: some publish a searchable register, some publish almost nothing.","https://www.opencorporates.com/"],
 "CSA Registration":["CA","A","The Canadian Securities Administrators National Registration Search. Answers whether a party may lawfully sell investments anywhere in Canada.","https://www.securities-administrators.ca/nrs/"],
+"OSC Registered Crypto Asset Trading Platforms":["CA-ON","A","The crypto platforms the Ontario Securities Commission has granted relief to, with each one's registration category and decision date.","https://www.osc.ca/en/industry/registration-and-compliance/crypto-businesses"],
 "CIRO AdvisorReport":["CA","A","Registration and disciplinary history for an individual adviser or dealer.","https://www.ciro.ca/investors/advisorreport"],
 "FINTRAC MSB":["CA","A","Canada's money services business register. Required for anyone exchanging or transmitting value as a business.","https://fintrac-canafe.canada.ca/msb-esm/msb-search-recherche-eng"],
 "Bank of Canada PSP":["CA","A","The payment service provider register under the Retail Payment Activities Act.","https://www.bankofcanada.ca/core-functions/retail-payments-supervision/"],
@@ -7256,7 +7459,7 @@ var REGINFO = {
 "BrokerCheck":["US","A","FINRA's record of brokers and firms, including disclosures and disciplinary events.","https://brokercheck.finra.org/"],
 "NFA BASIC":["US","A","National Futures Association background affiliation status. Covers futures and forex.","https://www.nfa.futures.org/basicnet/"],
 "FinCEN MSB":["US","A","The United States money services business register. The decisive check for anyone pooling funds and paying distributions.","https://www.fincen.gov/msb-registrant-search"],
-"SEC IAPD, Form ADV":["US","A","The Securities and Exchange Commission's public file on investment advisers. Every sourceed adviser files a Form ADV describing who it is, who controls it, what it manages and every disciplinary event it has to disclose.","https://adviserinfo.sec.gov/"],
+"SEC IAPD, Form ADV":["US","A","The Securities and Exchange Commission's public file on investment advisers. Every registered adviser files a Form ADV describing who it is, who controls it, what it manages and every disciplinary event it has to disclose.","https://adviserinfo.sec.gov/"],
 "SEC Form D":["US","A","The notice a company files when it raises money privately without registering the offering. It carries the first filing date, the first sale date, how much was offered, how much was sold, and who is named on it.","https://www.sec.gov/edgar/search/"],
 "ASIC Professional Register":["AU","A","The Australian Securities and Investments Commission's register of financial services and credit licensees, authorised representatives and the people responsible for them.","https://asic.gov.au/online-services/search-asics-registers/"],
 "SFC Public Register":["HK","A","Hong Kong's Securities and Futures Commission register of licensed corporations, licensed people and responsible officers, with the regulated activities each is licensed for.","https://www.sfc.hk/en/Regulatory-functions/Intermediaries/Licensing/"],
@@ -7286,7 +7489,7 @@ var REGINFO = {
 "OSC Alerts":["CA-ON","A","Ontario Securities Commission investor warnings.","https://www.osc.ca/en/investors/investor-warnings"],
 "CSA Alerts":["CA","A","Every province's investor alerts, collected.","https://www.securities-administrators.ca/investor-alerts/"],
 "FCA Warning List":["UK","A","Firms the Financial Conduct Authority has warned about.","https://www.fca.org.uk/consumers/warning-list-unauthorised-firms"],
-"OFAC":["US","A","The United States sanctions list. A match here stops the result being advisory.","https://sanctionssearch.ofac.treas.gov/"],
+"OFAC":["US","A","The United States sanctions list. A match here stops the assessment being advisory.","https://sanctionssearch.ofac.treas.gov/"],
 "UN Consolidated":["GLOBAL","A","The United Nations Security Council consolidated sanctions list.","https://www.un.org/securitycouncil/content/un-sc-consolidated-list"],
 "DOJ Press":["US","A","Department of Justice announcements. Arrests, indictments, pleas and forfeitures are published here before anywhere else.","https://www.justice.gov/news"],
 "IRS-CI":["US","A","IRS Criminal Investigation. Publishes its own releases on financial crime cases it worked.","https://www.irs.gov/compliance/criminal-investigation"],
@@ -7320,7 +7523,7 @@ var REGINFO = {
 "SEDAR+":["CA","A","The filing system for Canadian public companies and investment funds. Prospectuses, financial statements, management discussion and analysis, material change reports and cease trade documents.","https://www.sedarplus.ca/"],
 "ICANN RDAP":["GLOBAL","A","The registry record for a domain. Registrar, nameservers, status and the creation date.","https://rdap.org/"],
 "Certificate Log":["GLOBAL","B","Certificate transparency. Every certificate ever issued for a host, with its date.","https://crt.sh/"],
-"Google Web Risk":["GLOBAL","B","Google's result of whether a site is known to be unsafe.","https://transparencyreport.google.com/safe-browsing/search"],
+"Google Web Risk":["GLOBAL","B","Google's assessment of whether a site is known to be unsafe.","https://transparencyreport.google.com/safe-browsing/search"],
 "VirusTotal":["GLOBAL","B","Aggregated reputation across many security vendors.","https://www.virustotal.com/"],
 "urlscan.io":["GLOBAL","B","A recorded scan of what a page actually loads and where it sends data.","https://urlscan.io/"],
 "Mail Config":["GLOBAL","A","The domain's mail routing and sender policy. Shows whether a real mailbox exists on the domain.",""],
@@ -7328,9 +7531,9 @@ var REGINFO = {
 "Sitejabber":["GLOBAL","C","A consumer review platform with a different user base from Trustpilot.","https://www.sitejabber.com/"],
 "BBB Scam Tracker":["US-CA","C","Better Business Bureau complaints and scam reports.","https://www.bbb.org/scamtracker"],
 "Forex Peace Army":["GLOBAL","C","Trading community reviews. Strong on withdrawal complaints specifically.","https://www.forexpeacearmy.com/"],
-"Reddit":["GLOBAL","D","Unverified community information. Never verified fact, and never a finding on its own.","https://www.reddit.com/r/CryptoScams/"],
+"Reddit":["GLOBAL","D","Community intelligence. Never verified fact, and never a finding on its own.","https://www.reddit.com/r/CryptoScams/"],
 "Glassdoor":["GLOBAL","C","Employee accounts. Sometimes the earliest signal that an operation is not what it says.","https://www.glassdoor.com/"],
-"Beneficiary Match":["4orm","A","Does the name on the receiving account match the business you are dealing with. Needs a payment instruction from you.",""],
+"Beneficiary Match":["4orm","A","Does the name on the receiving account match the party you are dealing with. Needs a payment instruction from you.",""],
 "IBAN and SWIFT":["GLOBAL","B","Validates the account and identifies the receiving institution and country.",""],
 "Chainabuse":["GLOBAL","C","Community reported wallet addresses.","https://www.chainabuse.com/"],
 "Chain Analytics":["GLOBAL","B","On chain tracing of a wallet address and its counterparties.",""],
@@ -7342,23 +7545,23 @@ var REGINFO = {
 "Identifier Reuse":["4orm","4orm","The same phone, email, address or wallet appearing under a different brand name.",""],
 "Document Fingerprint":["4orm","4orm","A document matching one submitted under another party's name.",""],
 "Analytics and Pixel Reuse":["4orm","B","A search of website source code for exact identifiers: Google Analytics properties, Tag Manager containers, Meta pixels, unique scripts, phone numbers and code fragments. Finds other sites carrying the same ones.","https://publicwww.com/"],
-"Site Technology":["4orm","B","What a website is built from: analytics, pixels, hosting, embedded services and payment technology. Used to extract identifiers and to support them.","https://builtwith.com/"],
+"Site Technology":["4orm","B","What a website is built from: analytics, pixels, hosting, embedded services and payment technology. Used to extract identifiers and to corroborate them.","https://builtwith.com/"],
 "DNS and IP History":["4orm","B","The history of a domain's DNS records: which addresses it has resolved to, which nameservers it has used, and which other domains have shared them.","https://securitytrails.com/"],
 "Host and Certificate Graph":["4orm","B","Internet wide scan data: hosts, TLS certificates and the relationships between them, including historical infrastructure.","https://censys.io/"],
 "Wallet Reuse":["4orm","4orm","Our own record of payment addresses supplied by parties we have checked before. Answers one question: has this address been given to somebody else, by somebody else.",""],
 "Beneficiary Reuse":["4orm","4orm","Our own record of receiving account names, IBANs and bank references taken from payment instructions supplied to us. Answers whether the money goes where somebody else's money went.",""],
 "People Cluster":["4orm","4orm","Our own record of the people found in previous checks: directors, officers, promoters and advisers, and the entities each of them was attached to.",""],
-"Operator Graph":["4orm","4orm","The whole of it: every identifier this business controls, every edge between them, and every other party sharing one. Each edge carries how specific the identifier is and the record it was read from.",""],
+"Operator Graph":["4orm","4orm","The whole of it: every identifier this party controls, every edge between them, and every other party sharing one. Each edge carries how specific the identifier is and the record it was read from.",""],
 "ICANN RDAP Date":["GLOBAL","A","The domain creation date, from the registry record. The single most decisive date in the check, and never inferred from anything else.","https://rdap.org/"],
 "Wayback Machine":["GLOBAL","B","The first archived capture of the site. Establishes the earliest date the site was demonstrably being published.","https://web.archive.org/"],
-"First Certificate":["GLOBAL","B","The first certificate ever issued for this host. A certificate can post-date a site, so this is supporting rather than decisive.","https://crt.sh/"],
+"First Certificate":["GLOBAL","B","The first certificate ever issued for this host. A certificate can post-date a site, so this is corroborating rather than decisive.","https://crt.sh/"],
 "Trademark Filing":["US","A","The filing date of the mark. A brand claiming a long history usually filed early.","https://tsdr.uspto.gov/"],
 "Domain History":["GLOBAL","B","Passive DNS and historical records for the domain, including previous owners and configurations.",""],
 "Incorporation Date":["VARIES","A","When the legal entity itself first existed, from its home registry. Nothing the company did can predate this.",""],
 "Public Profile":["GLOBAL","D","Stated tenure and history on public professional profiles. Self reported, and treated as such.",""],
 "Form D First Filing":["US","A","The date the first exempt offering notice was filed with the SEC. An independent record of when a private raise was first notified.","https://www.sec.gov/edgar/search/"],
 "Form D First Sale":["US","A","The date of first sale as stated on the Form D. An independent record of when money actually started coming in.","https://www.sec.gov/edgar/search/"],
-"EDGAR First Filing":["US","A","The earliest filing of any kind made to the SEC under this name. The first date the business appears in the federal securities record.","https://www.sec.gov/edgar/search/"],
+"EDGAR First Filing":["US","A","The earliest filing of any kind made to the SEC under this name. The first date the party appears in the federal securities record.","https://www.sec.gov/edgar/search/"],
 "SEDAR+ First Filing":["CA","A","The earliest filing on SEDAR+. When the issuer first appears in the Canadian securities record.","https://www.sedarplus.ca/"],
 "SEDI First Insider Record":["CA","A","The earliest insider report filed against the issuer. When the issuer first had reportable insiders.","https://www.sedi.ca/"],
 "IAPD First Registration":["US","A","The date an adviser first registered with the SEC or a state, from the Form ADV history.","https://adviserinfo.sec.gov/"],
@@ -7367,8 +7570,8 @@ var REGINFO = {
 "GitHub Repository Created":["Build","B","The creation date of a public code repository. For anything claiming to have built technology, an independent record of when the work started.","https://github.com/"],
 "GitHub First Commit":["Build","B","The date of the earliest commit in a repository. Harder to backdate convincingly than a website.","https://github.com/"],
 "First Press Release":["Wire","D","The earliest press release issued under this name on a commercial wire service.",""],
-"First YouTube Video":["Social","D","The earliest video published on the business's channel.","https://www.youtube.com/"],
-"First Social Post":["Social","D","The earliest post on the business's own social account, and when the account was created.",""]
+"First YouTube Video":["Social","D","The earliest video published on the party's channel.","https://www.youtube.com/"],
+"First Social Post":["Social","D","The earliest post on the party's own social account, and when the account was created.",""]
 };
 /* END GENERATED:REGINFO */
 
@@ -7478,9 +7681,12 @@ var REGREAD = {
 "Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama":["A company of that name exists in one of these jurisdictions, and the register says what it is and whether it is in good standing.",
   "Nothing found. These are the registers we have not pinned a host for yet, so an empty answer here is our gap and not the jurisdiction's.",
   "Where the entity is registered against where the money is going. An offshore holding company is ordinary. An offshore company taking deposits from you is not the same thing at all."],
-"CSA Registration":["The business is registered to sell investments somewhere in Canada, and the categories say what it may sell.",
+"CSA Registration":["The party is registered to sell investments somewhere in Canada, and the categories say what it may sell.",
   "No matching registration was found. That is not proof they are unregistered, and it is the single most important question to put to them.",
   "Match the exact legal name and the category. A firm registered as an exempt market dealer may not sell you what a portfolio manager can."],
+"OSC Registered Crypto Asset Trading Platforms":["Ontario has registered this platform, and the entry names the category it was registered in.",
+  "Not on Ontario's list of registered platforms. That is not the same as unregistered: the list covers Ontario, and a platform may be registered elsewhere in Canada.",
+  "The registration category and the date of the most recent decision."],
 "CIRO AdvisorReport":["A registration and disciplinary history for a named individual adviser.",
   "No record for that person.",
   "Read the disciplinary section before the credentials section."],
@@ -7504,7 +7710,7 @@ var REGREAD = {
   "Registration here is a filing, not an approval. It means they told the government what they do. It is a floor, not a seal."],
 "SEC IAPD, Form ADV":["A Form ADV exists. You get the exact registered legal name, the CRD number, the SEC file number, the control persons, the funds it runs, and every disciplinary disclosure the firm was required to make.",
   "No adviser registration was located under the names searched. For a firm that advises on or manages other people's money in the United States, that is a serious question. For a firm that does neither, it means nothing.",
-  "Match the legal name and the CRD number against what the business told you. A registration number that belongs to a different legal entity is the single most common way this claim is faked. And read the disclosure section: a current registration is not an endorsement."],
+  "Match the legal name and the CRD number against what the party told you. A registration number that belongs to a different legal entity is the single most common way this claim is faked. And read the disclosure section: a current registration is not an endorsement."],
 "SEC Form D":["The offering was notified to the SEC. The first sale date is the most useful figure on it, because it is an independent record of when money actually started moving.",
   "No exempt offering notice was located. A private raise into United States investors normally leaves one. Its absence is a question to put to them, not a finding on its own.",
   "Compare the date of first sale with whatever they told you about how long they have been raising. A gap is a discrepancy to ask about. It is not, by itself, evidence of wrongdoing."],
@@ -7556,37 +7762,37 @@ var REGREAD = {
 "MAS Financial Institutions Directory":["The firm is regulated in Singapore, with the activities it is licensed for.",
   "Not regulated by MAS. A firm claiming a Singapore licence with no directory entry is claiming something the regulator does not confirm.",
   "The licence type against what they are actually offering you."],
-"IOSCO I-SCAN":["An entry from a national securities authority warning about this business.",
+"IOSCO I-SCAN":["An entry from a national securities authority warning about this party.",
   "No entry across the contributing authorities.",
   "Which authority posted it, and when. A warning from the regulator in your own country matters most to you."],
 "Canadian Consolidated Autonomous Sanctions List":["A name on this list is a legal prohibition, not a warning. Do not send anything and speak to your bank.",
   "Not on Canada's sanctions list. That is the floor, not a clearance.",
   "Match the full legal name and any listed alias. Sanctions lists carry aliases precisely because names get changed."],
-"Competition Bureau Canada":["The Bureau has published something naming this business, or a warning describing this approach.",
+"Competition Bureau Canada":["The Bureau has published something naming this party, or a warning describing this approach.",
   "No Canadian competition action found. The Bureau publishes only what it has acted on, so silence is weak evidence.",
-  "Whether the item names the business or describes a pattern. Both are worth knowing and they are not the same thing."],
-"Federal Trade Commission":["The FTC has sued, settled with, or published an alert naming this business.",
+  "Whether the item names the party or describes a pattern. Both are worth knowing and they are not the same thing."],
+"Federal Trade Commission":["The FTC has sued, settled with, or published an alert naming this party.",
   "No federal consumer case found. The FTC brings a small number of cases against a very large market.",
-  "Whether a refund programme exists. If the business has been sued and money was returned, there may be a claim you can still make."],
-"Consumer Financial Protection Bureau":["The Bureau has an enforcement action or a body of complaints naming this business.",
+  "Whether a refund programme exists. If the party has been sued and money was returned, there may be a claim you can still make."],
+"Consumer Financial Protection Bureau":["The Bureau has an enforcement action or a body of complaints naming this party.",
   "No CFPB record found. A firm outside consumer lending and payments is expected to be absent.",
   "Complaint volume is not a finding. Read the enforcement record separately from the complaint database."],
 "Internet Crime Complaint Center":["An IC3 alert describes the pattern the approach you received matches.",
   "No matching alert found. IC3 publishes patterns and rarely names a firm, so silence here says almost nothing about one business.",
-  "This is where a loss is reported in the United States. Whatever it says about the business, the reporting route is the useful part."],
+  "This is where a loss is reported in the United States. Whatever it says about the party, the reporting route is the useful part."],
 "MAS Investor Alert List":["MAS has published this name as one that may be mistaken for a regulated firm.",
   "Not on the MAS list. The list only covers what has been reported to MAS.",
   "The exact entity name and the website beside it. These entries usually name the site as well as the brand."],
-"BCSC Caution List":["British Columbia has publicly cautioned about this business.",
+"BCSC Caution List":["British Columbia has publicly cautioned about this party.",
   "No BC entry.",
   "The date and the wording. These lists say exactly why."],
-"ASC Caution List":["Alberta has publicly cautioned about this business.",
+"ASC Caution List":["Alberta has publicly cautioned about this party.",
   "No Alberta entry.",
   "The date and the wording."],
-"OSC Alerts":["Ontario has issued an investor warning about this business.",
+"OSC Alerts":["Ontario has issued an investor warning about this party.",
   "No Ontario entry.",
   "The date and the wording."],
-"CSA Alerts":["At least one Canadian province has warned about this business.",
+"CSA Alerts":["At least one Canadian province has warned about this party.",
   "No entry in any province's alerts.",
   "A listing here is a finding. It is a regulator saying, in public and in its own name, that something is wrong."],
 "FCA Warning List":["The United Kingdom regulator has warned about this firm.",
@@ -7598,10 +7804,10 @@ var REGREAD = {
 "UN Consolidated":["A match against the United Nations sanctions list.",
   "No match.",
   "Same as OFAC. Confirm identifiers, not names."],
-"DOJ Press":["The Department of Justice has published something naming this business. Arrests, indictments, pleas and forfeitures appear here first.",
+"DOJ Press":["The Department of Justice has published something naming this party. Arrests, indictments, pleas and forfeitures appear here first.",
   "Nothing published. Most cases are charged long after the money is gone, so this absence proves very little.",
   "Read the verb. Charged is an allegation. Pleaded guilty is an admission. They are not the same and the difference is the whole story."],
-"IRS-CI":["IRS Criminal Investigation has published on a case involving this business.",
+"IRS-CI":["IRS Criminal Investigation has published on a case involving this party.",
   "Nothing published.",
   "These releases carry dollar figures and dates that no other source has."],
 "State AG":["A state attorney general or securities regulator has acted.",
@@ -7610,22 +7816,22 @@ var REGREAD = {
 "SEC Trading Suspensions":["This is as serious as this board gets. The regulator stopped trading in the security. Read the release: it states what the concern was.",
   "No suspension was located for the names or tickers searched. Most securities are never suspended, so this is the expected result and it clears nothing.",
   "The date and the release number, then open the release itself. A suspension is temporary; what it says about the reason is not."],
-"CFTC RED List":["The regulator has publicly named this business as apparently soliciting Americans without the registration that would require. For a retail trading offer this is close to decisive.",
+"CFTC RED List":["The regulator has publicly named this party as apparently soliciting Americans without the registration that would require. For a retail trading offer this is close to decisive.",
   "Not on the RED list. The list only covers entities the CFTC has looked at and only covers its own remit, so absence is weak.",
   "Check the website and the aliases as well as the name. These operations rebrand constantly and the list records the domains."],
 "CFTC Enforcement":["There is a proceeding. Read whether it is a complaint or an order: a complaint contains allegations that have not been proven, an order or consent judgment contains findings. They are not the same thing and this board keeps them apart.",
   "No CFTC action was located against the entity or the people named.",
   "The names of the individuals, not only the company. People carry their history into the next company; a shell does not."],
-"DFPI Crypto Scam Tracker":["A consumer reported this business, or this website, to a state regulator. That is meaningful and it is still a complaint, not a finding. It is recorded here as a government published consumer report and it is treated as consumer evidence, not as an adjudicated result.",
+"DFPI Crypto Scam Tracker":["A consumer reported this party, or this website, to a state regulator. That is meaningful and it is still a complaint, not a finding. It is recorded here as a government published consumer report and it is treated as consumer evidence, not as an adjudicated result.",
   "No entry located. The tracker only holds what Californians reported, so absence says very little.",
-  "The narrative and the date. Read what was actually done to the person, and whether the same pattern appears in the reviews check."],
+  "The narrative and the date. Read what was actually done to the person, and whether the same mechanic appears in the reviews check."],
 "CIRO Discipline":["A firm or a person has been disciplined. You get the allegations, the decision, any settlement and the sanctions.",
   "No disciplinary record located. Kept separate from AdvisorReport deliberately, because a clean current registration and a clean disciplinary history are two different questions.",
   "Whether the person was registered at the time and through which firm. That is how a disciplinary history connects to the entity you are actually being asked to pay."],
-"ASIC Investor Alerts":["An Australian regulator has published a warning naming this business or its website. Read the exact wording: it says what the concern is.",
+"ASIC Investor Alerts":["An Australian regulator has published a warning naming this party or its website. Read the exact wording: it says what the concern is.",
   "Not on the list. It carries what ASIC has published, which is a fraction of what exists.",
   "The website and the aliases. The same operation appears on these lists repeatedly under new names."],
-"SFC Alert List":["The SFC has classified this business or its website. The classification itself is the finding: impersonation of a licensed firm is a different fault from operating unlicensed.",
+"SFC Alert List":["The SFC has classified this party or its website. The classification itself is the finding: impersonation of a licensed firm is a different fault from operating unlicensed.",
   "Not listed.",
   "The classification the SFC used, and whether the entry names a firm being impersonated. If it does, the real firm is not the one you are dealing with."],
 "Corporations Canada, Individuals with Significant Control":["The people with real control over the company are on the record.",
@@ -7643,27 +7849,27 @@ var REGREAD = {
 "CSA Disciplined":["A Canadian securities regulator has disciplined this person.",
   "No entry.",
   "What they were disciplined for, and when."],
-"CSA Disciplined Persons":["A person connected to this business has been disciplined by a Canadian securities regulator. Person level history follows the person into every company they are involved with.",
+"CSA Disciplined Persons":["A person connected to this party has been disciplined by a Canadian securities regulator. Person level history follows the person into every company they are involved with.",
   "No disciplined person record located under the names searched. Only works if you have the right names and the right spellings.",
   "Match the full name and the province, then read what the person actually did. A name collision is common and the record itself will settle it."],
 "SEDI Insider Reports":["Insider filings exist. You get who the insiders are, their relationship to the issuer, what they hold and every acquisition and disposition with dates.",
   "No insider filings located. Expected for a private company; a real question for one claiming to be a Canadian reporting issuer.",
   "The relationship field, which tells you who actually controls the issuer, and the earliest filing date, which is an independent record of when this became a reporting issuer."],
-"CanLII":["A Canadian court or tribunal decision involving this business.",
+"CanLII":["A Canadian court or tribunal decision involving this party.",
   "Nothing found.",
   "Check which side they are on. A defendant and a plaintiff are not the same thing."],
-"Supreme Court of Canada and Federal Court":["The business has been before one of these courts. Read what the case was about before drawing anything from it.",
+"Supreme Court of Canada and Federal Court":["The party has been before one of these courts. Read what the case was about before drawing anything from it.",
   "Nothing at this level. Most disputes never reach these courts, so this proves very little on its own.",
-  "What the business was doing in the case. Being sued, suing somebody, and being prosecuted are three different facts."],
-"Provincial court decisions":["A decision names the business. Most commercial disputes end up here rather than in a federal court.",
+  "What the party was doing in the case. Being sued, suing somebody, and being prosecuted are three different facts."],
+"Provincial court decisions":["A decision names the party. Most commercial disputes end up here rather than in a federal court.",
   "No published decision found. Many proceedings are settled or never published, so an absence is not a clean record.",
   "The date and the outcome. An old settled dispute and a current unsatisfied judgment are not the same thing at all."],
-"Capital Markets Tribunal":["The tribunal has made a finding, an order or approved a settlement naming this business.",
+"Capital Markets Tribunal":["The tribunal has made a finding, an order or approved a settlement naming this party.",
   "Nothing heard in Ontario. A matter can be under investigation for years and never reach a hearing.",
-  "Whether it is a finding, an order or a settlement, and what the business agreed to. A settlement without an admission is still a fact and it is not a finding of wrongdoing."],
-"Competition Tribunal":["The Tribunal has decided a matter naming this business.",
+  "Whether it is a finding, an order or a settlement, and what the party agreed to. A settlement without an admission is still a fact and it is not a finding of wrongdoing."],
+"Competition Tribunal":["The Tribunal has decided a matter naming this party.",
   "No Tribunal decision found. Very few matters reach it, so absence is the normal state for almost every business.",
-  "The remedy, not only the finding. What the business was ordered to stop doing tells you what it was doing."],
+  "The remedy, not only the finding. What the party was ordered to stop doing tells you what it was doing."],
 "Securities tribunals outside Ontario":["Not asked yet. Nothing can be found here until a host is pinned for each province.",
   "We do not ask these, so an empty answer is our gap and not the tribunal's. A provincial regulator can have decided something we did not see.",
   "That this row is a declared gap, not a clean result. Check the commission for the province the money is going to."],
@@ -7720,11 +7926,11 @@ var REGREAD = {
   "This community is unusually good on withdrawal complaints specifically."],
 "Reddit":["Community discussion exists.",
   "None found.",
-  "Unverified community information, never verified fact. Useful for the pattern being described, not for the conclusion being drawn."],
+  "Community intelligence, never verified fact. Useful for the mechanic being described, not for the conclusion being drawn."],
 "Glassdoor":["Employee accounts exist.",
   "No profile.",
   "Sometimes the earliest signal. Employees describe how an operation actually works before customers can."],
-"Beneficiary Match":["The name on the receiving account was compared to the business.",
+"Beneficiary Match":["The name on the receiving account was compared to the party.",
   "No payment instruction was supplied, so nothing could be compared.",
   "This is the check that most often stops a payment in time, and it needs the instruction from you."],
 "IBAN and SWIFT":["The account and receiving institution were validated.",
@@ -7750,7 +7956,7 @@ var REGREAD = {
   "First and last activity, and the amounts. A brand new address given to you as an established company's payment address is a contradiction."],
 "Infrastructure Cluster":["Other domains share nameservers, registrar or hosting with this one.",
   "No cluster found.",
-  "Shared infrastructure alone is common and innocent. Shared infrastructure with a business already found adverse is not."],
+  "Shared infrastructure alone is common and innocent. Shared infrastructure with a party already found adverse is not."],
 "Identifier Reuse":["The same phone, email, address or wallet appears under another brand name.",
   "No reuse found.",
   "One operator running several brands is the pattern this looks for."],
@@ -7770,16 +7976,16 @@ var REGREAD = {
   "No scan data retrieved. Often a missing key, and it is published as a gap.",
   "Certificates covering several unrelated brand names at once. One certificate naming four brands is a question about who runs them, and it is a question rather than an answer."],
 "Wallet Reuse":["This payment address has appeared in a previous check under a different name. Of everything on this board, this is the hardest to explain innocently.",
-  "This address has not appeared in our records before. On a young records that mostly means we have not seen it, not that it is new.",
+  "This address has not appeared in our records before. On a young corpus that mostly means we have not seen it, not that it is new.",
   "The other name it appeared under, and the date. Both are shown."],
 "Beneficiary Reuse":["The receiving party on this payment instruction has received money on behalf of a different named company before. The name on the account is the thing to look at, not the company on the invoice.",
   "This beneficiary has not appeared in our records before.",
   "Whether the account name matches the company you are being asked to pay. A mismatch is the single most reliable signal on this entire board."],
-"People Cluster":["A person connected to this business appears in our records against another entity. The connection is shown with the record that established it, in both directions.",
-  "No person connected to this business appears elsewhere in our records.",
+"People Cluster":["A person connected to this party appears in our records against another entity. The connection is shown with the record that established it, in both directions.",
+  "No person connected to this party appears elsewhere in our records.",
   "Whether the earlier entity attracted a regulator warning. That is the connection worth the most, and it is stated separately when it exists."],
-"Operator Graph":["Identifiers connect this business to others. One connection is interesting. Two independent connections are material. Three or more high specificity connections are strong, and every one is listed with its source.",
-  "No identifier connects this business to any other party in our records. That is not evidence of anything either way.",
+"Operator Graph":["Identifiers connect this party to others. One connection is interesting. Two independent connections are material. Three or more high specificity connections are strong, and every one is listed with its source.",
+  "No identifier connects this party to any other party in our records. That is not evidence of anything either way.",
   "The specificity column. A shared wallet and a shared web host are both connections and they are not remotely the same claim."],
 "ICANN RDAP Date":["The registry creation date for the domain.",
   "The registry did not answer.",
@@ -7805,11 +8011,11 @@ var REGREAD = {
 "Form D First Filing":["There is a first filing date on the record, filed by them.",
   "No Form D located, so this comparison cannot be made and it is published as a gap.",
   "The gap between this date and any claimed fundraising history. A gap is a discrepancy to explain, not proof of anything."],
-"Form D First Sale":["The business stated to the SEC when its first sale occurred. That is a strong date because they filed it themselves.",
+"Form D First Sale":["The party stated to the SEC when its first sale occurred. That is a strong date because they filed it themselves.",
   "No first sale date located.",
   "This against the marketing. A fund claiming to have been raising since 2019 with a first sale in 2025 has two accounts of itself and owes you the reconciliation."],
 "EDGAR First Filing":["There is a first appearance date in the federal record.",
-  "The business has never filed with the SEC under the names searched.",
+  "The party has never filed with the SEC under the names searched.",
   "Whether the first appearance is consistent with the history claimed on the website."],
 "SEDAR+ First Filing":["There is a first filing date, and the filings around it describe what stage the business was actually at.",
   "No SEDAR+ record, so this date is unavailable and published as a gap.",
@@ -7832,7 +8038,7 @@ var REGREAD = {
 "GitHub First Commit":["There is a first commit date.",
   "No commit history retrieved.",
   "Whether the entire history was committed on one day. A project with three years of claimed development and one commit is a copy, not a history."],
-"First Press Release":["There is an earliest dated announcement. It is the business's own promotional material, so it is weak evidence of anything except the date.",
+"First Press Release":["There is an earliest dated announcement. It is the party's own promotional material, so it is weak evidence of anything except the date.",
   "No press release located.",
   "The date only. The contents are marketing."],
 "First YouTube Video":["There is an earliest publication date on the channel.",
@@ -7846,7 +8052,7 @@ var REGREAD = {
 
 /* THE GENERATED CATALOGUE METADATA IS GONE, AND THIS NOTE IS WHY.
    tools/sync-catalogue.mjs wrote sixteen kilobytes of per-source metadata into
-   this file for all 134 registers, and nothing in the page ever read one field
+   this file for all 135 registers, and nothing in the page ever read one field
    of it. The board draws from SOURCES and REGINFO; the register drawer draws
    from SR001. If a screen ever needs the transport, tier or vertical of a named
    source, regenerate it with that tool rather than hand-writing a copy. */
@@ -13143,7 +13349,7 @@ var RP = null;
 var RP_OPENING = false;
 /* Written by tools/stamp.mjs at build time. Ask the live page for it before
    spending an hour on a bug that a deploy already fixed. */
-var KBYS_BUILD = "20260929.2040";
+var KBYS_BUILD = "20260930.2351";
 try { window.KBYS_BUILD = KBYS_BUILD; } catch(e){}
 var RP_LABEL = "";
 /* Set once from the address, because an operator diagnostic must never be one
@@ -14017,20 +14223,128 @@ function rpGoodsHtml(d){
   var g=rpGoods(d), out="", i;
   for(i=0;i<g.length;i++){
     var src=rpSrcOf(g[i].tier);
-    out+='<div class="rp-good"><i>'
+    var rk = g[i].rank || 1;
+    out+='<div class="rp-good" data-rank="'+rk+'"><i>'
       +'<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" '
       +'stroke-linejoin="round"/></svg></i><span class="rp-gb">'
+      +(g[i].rankw?'<span class="rp-rank"><i></i>'+rpEsc(g[i].rankw)+'</span>':'')
       +'<span class="rp-t">'+rpEsc(g[i].t)+'</span>'
       +(g[i].src?'<span class="rp-x">'+rpEsc(g[i].src)
-        +(g[i].when?", read "+rpEsc(g[i].when):"")+'</span>':'')
+        +(g[i].when?", dated "+rpEsc(g[i].when):"")+'</span>':'')
+      +(g[i].band==="older"?'<span class="rp-band">Older than a year</span>':"")
       +'<span class="rp-from rp-str"><i></i><span class="rp-fb">'
       +'<span class="w">'+rpEsc(src[0])+'</span>'
       +'<span class="c">'+rpEsc(src[1])+'</span></span></span>'
       +(g[i].url?'<span class="rp-lk">'+rpOut(g[i].url,"Open the register")+'</span>':'')
+      +(g[i].note?'<span class="rp-ranknote">'+rpEsc(g[i].note)+'</span>':'')
       +'</span></div>';
   }
   return out;
 }
+/* =============================== THE SHAPE OF THE FAVOURABLE PILE
+   Shown only where two or more signals agree. One on its own is noise, and a
+   product that cries manufactured on every business with a quiet month has
+   taught its readers to ignore it by the third check.
+   The wording is fixed here rather than taken from the payload, because this
+   is the paragraph most likely to be read as an accusation and it may not
+   drift. It describes a pile. It never describes a person. */
+var RP_SHAPE_SAY = {
+  burst:   "A large share of the good reviews were posted within a few days of each other.",
+  generic: "Most of the good reviews are very short and do not describe anything that actually happened.",
+  bimodal: "The ratings are almost all top marks or bottom marks, with very little in between.",
+  one_off: "Most of the good reviews come from accounts that have written only one review."
+};
+function rpShapeDraw(d){
+  var sh = d.reviews && d.reviews.shape, box = id("rpShape");
+  if(!box) return;
+  var sig = (sh && sh.signals) || [];
+  if(sig.length < 2){ box.hidden = true; return; }
+  box.hidden = false;
+  id("rpShapeX").textContent =
+    "We are not saying any single review is false. We are telling you what the pile looks like, "
+  + "so you can decide how much of it to lean on. A real customer base usually leaves reviews "
+  + "spread over time, and its customers describe specific things.";
+  var out="", i;
+  for(i=0;i<sig.length;i++){
+    var say = RP_SHAPE_SAY[sig[i].id] || sig[i].observed || "";
+    if(say) out += "<li>"+rpEsc(say)+"</li>";
+  }
+  id("rpShapeL").innerHTML = out;
+}
+
+/* ================================ THEIR OWN WORDS, ATTRIBUTED AND UNCHECKED */
+function rpSaysDraw(d){
+  var sec = id("rpSaysSec"); if(!sec) return;
+  var rows = (d.standing && d.standing.self) || [];
+  if(!rows.length){ sec.hidden = true; return; }
+  sec.hidden = false;
+  var out="", i;
+  for(i=0;i<rows.length;i++){
+    var r=rows[i]; if(!r.claim) continue;
+    out += '<div class="rp-say"><q>'+rpEsc(r.claim)+'</q>'
+         + '<cite>'+rpEsc(r.where||"Their own website")
+         + (r.url?' &#183; '+rpOut(r.url,"Open the page"):"")+'</cite></div>';
+  }
+  id("rpSays").innerHTML = out;
+}
+
+/* ============================================ EVERYTHING OLDER THAN THREE YEARS
+   One control. Not a setting, not a filter, not a preference somebody has to
+   understand before the page is usable. The count is on the button and the
+   reason is under it, so a reader knows what they are opening and why it was
+   not already open. Standing never lands in here: a licence, a register entry,
+   a regulator action and a court record describe what is true now until the
+   body that issued them changes it, so they are banded current whatever date
+   they carry, and they are on the page above with everything else. */
+function rpArchive(d){
+  var out=[], k, i;
+  for(k in (d.cats||{})){
+    var ev=(d.cats[k].ev)||[];
+    for(i=0;i<ev.length;i++)
+      if(ev[i].band==="archive" && ev[i].match!=="unconnected") out.push(ev[i]);
+  }
+  return out;
+}
+function rpOlderDraw(d){
+  var box=id("rpOlder"); if(!box) return;
+  var rows=rpArchive(d);
+  if(!rows.length){ box.hidden=true; return; }
+  box.hidden=false;
+  var n=rows.length;
+  id("rpOlderT").textContent = n===1
+    ? "Show one record older than three years"
+    : "Show "+rpWord(n)+" records older than three years";
+  id("rpOlderX").textContent =
+    "A business has had time to put an old fault right, so we keep these out of your way "
+  + "unless you ask for them. They are not part of the result above. Anything a regulator, "
+  + "a court or a register still has on file is shown above whatever its date, because that "
+  + "is what is true today.";
+  var out="", i;
+  for(i=0;i<rows.length;i++){
+    var e=rows[i];
+    out += '<div class="rp-good" data-rank="3"><i>'
+        +  '<svg viewBox="0 0 24 24"><path d="M12 7v6l4 2" stroke-linecap="round" '
+        +  'stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg></i>'
+        +  '<span class="rp-gb">'
+        +  '<span class="rp-rank"><i></i>Older than three years</span>'
+        +  '<span class="rp-t">'+rpEsc(e.find||"")+'</span>'
+        +  (e.src?'<span class="rp-x">'+rpEsc(e.src)
+             +(e.published?", dated "+rpEsc(e.published):"")+'</span>':"")
+        +  (e.url?'<span class="rp-lk">'+rpOut(e.url,"Open the record")+'</span>':"")
+        +  '</span></div>';
+  }
+  id("rpOlderL").innerHTML = out;
+}
+(function(){
+  var b=id("rpOlderB"); if(!b) return;
+  b.addEventListener("click", function(){
+    var l=id("rpOlderL"), on=l.hidden;
+    l.hidden=!on;
+    b.setAttribute("aria-expanded", on?"true":"false");
+    id("rpOlderG").textContent = on ? "Hide" : "Show";
+  });
+})();
+
 var RP_LAST_DROPPED = [], RP_LAST_ELSEWHERE = [];
 function rpFinds(d){
   /* The sieve runs before anything is chosen, not after, so a barred item can
@@ -15262,12 +15576,38 @@ function rpGoods(d){
     var ev=c.ev||[];
     for(i=0;i<ev.length;i++){
       if(ev[i].t!=="A" && ev[i].t!=="B") continue;
+      /* NO RANK CHIP ON A CHECK RESULT.
+         These rows are what the sweep returned, and a good share of them are
+         absences: no warning found, no insolvency recorded. "Cannot be bought"
+         on an absence is a category error, because nobody was ever selling it.
+         The rank belongs only to a record somebody published in this party's
+         favour, which is what `standing` carries. */
       out.push({t:ev[i].find||c.sum||"", src:ev[i].src||"", url:ev[i].url||"",
-                when:ev[i].when||"", tier:ev[i].t});
+                when:ev[i].when||"", tier:ev[i].t,
+                rank:1, rankw:"", note:"", band:ev[i].band||"current"});
       break;
     }
-    if(!ev.length && c.sum) out.push({t:c.sum, src:"", url:"", when:"", tier:"B"});
+    if(!ev.length && c.sum) out.push({t:c.sum, src:"", url:"", when:"", tier:"B",
+                rank:1, rankw:"", note:"", band:"current"});
   }
+  /* ================== AND THE FAVOURABLE RECORD, RANKED BY HOW HARD IT IS TO BUY
+     Until now this page only ever showed what the CHECKS returned, which meant
+     a company could be registered, long established and well regarded and the
+     screen would still say nothing in its favour, because no category happened
+     to land on green. That is how a good business gets stalled.
+     The rows arrive already ranked and already stripped: anything about a
+     similarly named party is dropped at the boundary, because clearing the
+     wrong company is the more dangerous of the two mistakes, and the party's
+     own words never reach this list at all. Nothing here moves the result. */
+  var st = (d.standing && d.standing.rows) || [];
+  for(i=0;i<st.length;i++){
+    var r=st[i];
+    out.push({t:r.label||"", src:r.src||"", url:r.url||"", when:r.published||"",
+              tier:(r.rank===1?"A":(r.rank===2?"B":"D")),
+              rank:r.rank, rankw:r.tierLabel||"", note:(r.counts?"":r.tierNote||""),
+              band:r.band||"current"});
+  }
+  out.sort(function(x,y){ return (x.rank||3)-(y.rank||3); });
   return out;
 }
 function rpRegistered(d){
@@ -16176,6 +16516,7 @@ function renderReport(d){
     ? (gn===1 ? "One thing checks out." : rpCap(rpWord(gn))+" things check out.")
     : "";
   id("rpGoodSec").style.display=g?"":"none";
+  rpShapeDraw(d); rpSaysDraw(d); rpOlderDraw(d);
 
   var f=rpFinds(d);
   id("rpFinds").innerHTML=f;

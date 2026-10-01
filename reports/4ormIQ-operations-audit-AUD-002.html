@@ -1,0 +1,215 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ operations audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;--ink-3:#8B9296;
+  --rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+  --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink-2);
+  font:16px/1.6 "IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;padding:44px 16px 80px}
+.w{max-width:940px;margin:0 auto}
+.mast{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}
+.kick{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+h1{font:600 33px/1.15 Spectral,Georgia,serif;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+.dek{max-width:64ch;margin:0;color:var(--ink-2)}
+h2{font:600 19px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:38px 0 10px}
+h3{font:600 15px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);margin:22px 0 6px}
+p{margin:0 0 12px;max-width:74ch}
+.sechead{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--rule);padding-top:22px;margin-top:34px}
+.sechead .n{font:500 12px/1 "IBM Plex Mono",monospace;color:var(--ink-3)}
+.sechead h2{margin:0}
+ol,ul{margin:8px 0 0;padding-left:20px} li{margin:0 0 10px;max-width:74ch}
+b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;table-layout:fixed}
+th{font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  text-align:left;border-bottom:1px solid var(--rule);padding:8px 10px}
+td{padding:10px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+td.k{color:var(--ink);font-weight:500;width:32%}
+.chip{display:inline-block;font:500 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 8px;border-radius:3px;white-space:nowrap}
+.p0{background:var(--p0w);color:var(--p0)} .p1{background:var(--p1w);color:var(--p1)} .p2{background:var(--p2w);color:var(--p2)}
+.quote{border-left:3px solid var(--p2);background:var(--surface);padding:14px 18px;margin:14px 0}
+.quote.hot{border-left-color:var(--p0)}
+.src{font:400 11px/1.5 "IBM Plex Mono",monospace;color:var(--ink-3);margin:8px 0 0}
+a{color:var(--p2)}
+.foot{margin-top:52px;border-top:1px solid var(--rule);padding-top:14px;
+  font:400 11px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:640px){h1{font-size:27px}td.k{width:42%}}
+
+@media print{
+  html,body{background:#111416 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding:14mm 14mm 4mm;font-size:10.5pt;line-height:1.5}
+  .w{max-width:none}
+  .mast{padding-bottom:10pt;margin-bottom:16pt}
+  h1{font-size:20pt}
+  h2{font-size:13pt}
+  h3{font-size:11pt;break-after:avoid}
+  p,li{max-width:none}
+  table{font-size:9pt}
+  pre{font-size:8.6pt}
+  .sechead{break-after:avoid;margin-top:18pt;padding-top:12pt}
+  tr,li,.quote,pre{break-inside:avoid}
+  .foot{margin-top:20pt}
+}
+
+.heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:26px 0 8px}
+.heads>div{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:14px 16px}
+.hl{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.heads h3{font:600 15px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:9px 0 6px}
+.heads p{font-size:13px;line-height:1.5;margin:0;color:var(--ink-3)}
+pre.code{background:var(--sunk);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;
+  font:400 13px/1.7 "IBM Plex Mono",monospace;color:var(--ink-2);overflow-x:auto;margin:14px 0}
+code{font:400 .92em/1 "IBM Plex Mono",monospace;color:var(--ink)}
+@media print{ .heads{break-inside:avoid} pre.code{font-size:8.6pt} }
+</style></head><body><body><div class="w">
+<header class="mast">
+<div class="kick"><span>4orm IQ</span><span>Operations audit</span><span>AUD-002 &middot; v1.0</span><span>30 September 2026</span><span>Internal</span></div>
+<h1>What is running, what is broken, and what is being counted wrongly</h1>
+<p class="dek">A full audit of the 4orm IQ engine, its operations board and the registers behind it, taken on 30 September 2026. It records one defect that put a false picture of a registered dealer in front of a consumer, three faults that make a healthy system read as a broken one, and the controls that exist and are not being exercised.</p>
+</header>
+<div class="heads">
+<div><div class="hl">Worst outcome</div><h3>A registered dealer read as unconfirmed</h3><p>Three separate faults combined to tell a consumer a registered Canadian firm could not be confirmed on any register, beside a foreign warning about a different company.</p></div>
+<div><div class="hl">Worst exposure</div><h3>Domain lookups are down</h3><p>Every RDAP attempt in the window failed. The age of a domain is the single most predictive cheap signal this product has, and no run is getting it.</p></div>
+<div><div class="hl">Most underrated</div><h3>Nothing verifies the log on a schedule</h3><p>The chain walk exists, is correct, and runs only when somebody asks for it by hand. The control is real and it is not being exercised.</p></div>
+<div><div class="hl">Gate</div><h3>The public site still says test build</h3><p>The banner is accurate and it is the correct state. Clearing it needs SR-001 revised and the eight unsigned control documents signed.</p></div>
+</div>
+<div class="sechead"><span class="n">01</span><h2>The defect that matters most</h2></div>
+<p>A consumer checking a Canadian crypto exchange was shown a result headed <b>we could not check enough to give you a reliable answer</b>, carrying the sentence <b>we could not confirm this business on a relevant register</b>, with a foreign regulator's warning at the top of the record card and a single one-star review below it.</p>
+<p>The company is registered. The Ontario Securities Commission publishes, on its own Crypto Businesses page, the crypto asset trading platforms that have received exemptive relief to offer crypto products in Ontario, with each platform's registration category and the date of its most recent decision.</p>
+<div class="quote hot"><p>Newton Crypto Ltd. &middot; Restricted Dealer (Dealer) &middot; March 12, 2025</p><p class="src">Ontario Securities Commission, Registered Crypto Asset Trading Platforms. https://www.osc.ca/en/industry/registration-and-compliance/crypto-businesses &middot; read 30 September 2026</p></div>
+<p>Three independent faults produced that page. Each one is a defect on its own and each one is now closed or recorded.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Fault</th><th>What it did</th><th>State</th></tr></thead><tbody>
+<tr><td class="k">The register was not in the catalogue</td><td>A register that is not in the catalogue is never asked. A register that is never asked returns nothing. Nothing was being reported to a consumer as an absence of registration rather than as a gap in our own reading.</td><td><span class="chip p0">Closed</span> OSC_CATP added, link_out_only</td></tr>
+<tr><td class="k">A warning about a different company attached</td><td>The FCA warning names newton-corp.com and identifies it as a clone of Newton Investment Management Limited, firm reference 119331, at 160 Queen Victoria Street, London. It has no connection to the Toronto exchange at newton.co beyond six letters.</td><td><span class="chip p0">Enforced</span> the attachment rule now also gates the time window</td></tr>
+<tr><td class="k">One review carried the weight of a regulator</td><td>A single one-star review was set out in the record card in the same shape and at the same size as a regulator's entry.</td><td><span class="chip p1">Changed</span> the favourable side is now collected and both sides are ranked</td></tr>
+</tbody></table></div>
+<p>The underlying error is one error, and it is worth naming plainly, because it is the error this company exists to prevent and we committed it: <b>an absence in our own reading was published as a finding about somebody else.</b></p>
+<div class="sechead"><span class="n">02</span><h2>What is running</h2></div>
+<p>Taken from the operations log over the window, not from anybody's recollection.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Part</th><th>State</th><th>Evidence</th></tr></thead><tbody>
+<tr><td class="k">The reasoning step</td><td><span class="chip ok">Running</span></td><td>Written assessments are present on completed runs, and the assessment step is not named among the faults.</td></tr>
+<tr><td class="k">Search</td><td><span class="chip ok">Running</span></td><td>351 of 511 asks answered in the window.</td></tr>
+<tr><td class="k">The database</td><td><span class="chip ok">Running</span></td><td>108 checks recorded, 108 chain rows written. One row per completed run, which is the contract.</td></tr>
+<tr><td class="k">Domain lookups</td><td><span class="chip p0">Down</span></td><td>Attempted and zero successful. Section 03.</td></tr>
+<tr><td class="k">Connector health</td><td><span class="chip p1">Reads wrong</span></td><td>Healthy sweeps report as refused. Section 04.</td></tr>
+<tr><td class="k">Spend</td><td><span class="chip p1">Not recorded</span></td><td>$0.000 across 108 checks, which is not what those checks cost. Section 04.</td></tr>
+<tr><td class="k">Chain verification</td><td><span class="chip p1">Never scheduled</span></td><td>Correct, and only ever run by hand. Section 05.</td></tr>
+</tbody></table></div>
+<div class="sechead"><span class="n">03</span><h2>Broken: the domain lookups</h2></div>
+<p>The health rule is deliberately narrow, and it is worth reading before the finding, because it is the reason this one is a real fault and not a display artefact.</p>
+<pre class="code">function health(asked, answered){ if(!asked) return &#x27;warn&#x27;; return answered&gt;0 ? &#x27;ok&#x27; : &#x27;bad&#x27;; }</pre>
+<p>A lamp goes red only where the thing was tried and every attempt failed. Never on silence. The domain lamp is red, so RDAP was attempted on every applicable run in the window and returned nothing on all of them.</p>
+<p>What that costs, specifically: the age of a domain is the cheapest strong signal in this product. A company claiming twelve years of operation on a domain registered six months ago is the finding that category 10 exists to produce, and category 10 cannot produce it without this lookup. Every run in the window has been running without it and no run said so on its face.</p>
+<h3>The fix, in two parts</h3>
+<p>First, restore the lookup. Second, and this is the part that outlives the outage: <b>a run whose strongest check did not run must say so on the result.</b> A degraded run that reads like a complete one is the same class of error as section 01, which is a gap in our reading reaching a consumer as a fact about a business.</p>
+<div class="sechead"><span class="n">04</span><h2>Counted wrongly, and not counted at all</h2></div>
+<h3>Every connector reads as refused on a healthy sweep</h3>
+<pre class="code">const connectorHealth = () =&gt; {
+  ids.forEach(id =&gt; { const x = seen[id]; if(!x) return;
+    tried += x.attempts || 0;
+    ran   += (x.computed || 0) + (x.ok || 0); });
+  if(!tried) return &#x27;warn&#x27;;
+  return ran &gt; 0 ? &#x27;ok&#x27; : &#x27;bad&#x27;;
+};</pre>
+<p>The reader adds <b>computed</b> to <b>ok</b>. The <b>computed</b> column is created by <b>db/telemetry.sql</b>, and that file has not been run against the production database. The column does not exist, the read yields nothing, <b>ran</b> stays at zero while <b>tried</b> climbs, and the rule returns bad on a sweep where nothing went wrong.</p>
+<p>That is why every connector and all nine category tiles are red at once. A board that is entirely red is not reporting a system in trouble, it is reporting a board that cannot see. This is one <b>psql</b> run and no code change.</p>
+<h3>Spend prints zero across 108 checks</h3>
+<p>Same shape, different file. <b>spend_run</b> and <b>spend_client</b> come from <b>db/spend.sql</b>, which has also not been run. The rate variables <b>KBYS_RATE_CLAUDE_IN_M</b> and <b>KBYS_RATE_CLAUDE_OUT_M</b> are unset in the environment, so even with the tables present every row would price at nothing.</p>
+<p>A cost control that reports zero is not a conservative cost control. It is an absent one, and the budget ceiling it is supposed to defend has never been tested against a real number.</p>
+<div class="sechead"><span class="n">05</span><h2>The control that exists and is not exercised</h2></div>
+<p>The operations log is chained: every row carries the hash of the row before it and its own hash over that plus its content. Change any row after the fact and every hash after it stops matching. The walk that checks this is <b>verifyChain</b>, it is correct, and it has exactly one caller.</p>
+<pre class="code">if (req.query.run === &#x27;1&#x27;) { ... verifyChain(limit || null) }</pre>
+<p>Nothing schedules it. The gauge that reads <b>Runs we can prove</b> is not measuring the integrity of the log, it is measuring how much of the log somebody last walked by hand, which is why it reads 25 per cent. Three runs in four write a proof row and are never verified, because no verification has been run over them.</p>
+<div class="quote"><p>The number is not wrong. It is answering a different question from the one the label asks, which is the more dangerous of the two failures, because it looks like an answer.</p></div>
+<p><b>The fix.</b> A nightly walk through <b>api/_scheduled.js</b> behind <b>KBYS_SCHEDULE_SECRET</b>, an alert on any break, and a gauge whose label says what it measures. Competition Act s.74.01(1)(b) puts the onus of substantiating a performance claim on the party making it, and a chain head plus a scheduled verification is what discharging that looks like.</p>
+<div class="sechead"><span class="n">06</span><h2>What shipped today, and why</h2></div>
+<p>Three changes went in against the section 01 defect and against the broader failure it is an instance of, which is that the engine only ever went looking for what was wrong.</p>
+<h3>The favourable side of the record, ranked by how hard it is to buy</h3>
+<div class="tablewrap"><table><thead><tr><th class="k">Rank</th><th>What goes in it</th><th>May it move the result?</th></tr></thead><tbody>
+<tr><td class="k">1 &middot; Cannot be bought</td><td>A live registration, a licence in good standing, a regulator's own record, a filed financial statement, a court record showing a matter resolved, an exchange listing.</td><td>No</td></tr>
+<tr><td class="k">2 &middot; Expensive to fake</td><td>Continuity rather than content: the same legal name across three registers, on the register since 2018, a domain eight years old, a filing history without gaps.</td><td>No</td></tr>
+<tr><td class="k">3 &middot; Can be bought</td><td>Star ratings, review counts, testimonials, award badges, press releases.</td><td>No</td></tr>
+</tbody></table></div>
+<p>The third column is the whole design. <b>Favourable evidence never changes the verdict.</b> Register standing and adverse findings set the result and everything else is context beside it. The standing block is computed after the verdict is settled, it is never read back, and there is deliberately no code path from it to the verdict.</p>
+<p>That is the defence against purchased reviews, and it is cheaper and more reliable than any detector: once a bought five-star page has nowhere to move the needle, buying one stops working. It also has no false positives, which a detector would, and a false positive here means calling a real customer a liar.</p>
+<div class="quote"><p>In 2024, of the 4.5 million detected fake reviews we removed from the platform, 90% were automatically detected by our fake review detection models.</p><p class="src">Trustpilot Trust Report 2025. 4.5 million removals represent 7.4 per cent of all reviews submitted in 2024, against 6.1 per cent in 2023. https://corporate.trustpilot.com/trust/trust-report-2025 &middot; read 30 September 2026</p></div>
+<div class="quote"><p>The final rule addresses reviews and testimonials that misrepresent that they are by someone who does not exist &hellip; The final rule prohibits certain reviews and testimonials written by company insiders that fail to clearly and conspicuously disclose the giver's material connection to the business.</p><p class="src">Federal Trade Commission, final rule banning fake reviews and testimonials, 16 CFR Part 465, published 14 August 2024 and effective 60 days later. https://www.ftc.gov/news-events/news/press-releases/2024/08/federal-trade-commission-announces-final-rule-banning-fake-reviews-testimonials &middot; read 30 September 2026</p></div>
+<h3>The time window</h3>
+<p>Businesses make mistakes and then fix them. A fault from four years ago that was put right should not sit over a company for the rest of its life.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Band</th><th>Age</th><th>What it may do</th></tr></thead><tbody>
+<tr><td class="k">current</td><td>Inside 12 months</td><td>Drives the result</td></tr>
+<tr><td class="k">older</td><td>12 to 36 months</td><td>Shown and labelled. Drives nothing</td></tr>
+<tr><td class="k">archive</td><td>Beyond 36 months</td><td>Behind one control the reader can open</td></tr>
+<tr><td class="k">undated</td><td>No date on the record</td><td>Never a finding. Goes to what we could not confirm</td></tr>
+</tbody></table></div>
+<p><b>Standing never ages.</b> A register entry, a licence, a regulator action, a sanction and a court record describe what is true now until the issuing body changes them. A licence granted in 2019 is current. An enforcement order from 2021 that was never lifted is the present state of that party's record, not history. Ageing those out would be the single most dangerous thing this module could do, so they are exempt by class and can never fall into a band.</p>
+<h3>Why the window is arithmetic and not a judgement</h3>
+<div class="quote"><p>&ldquo;fresh&rdquo; passages are consistently promoted, shifting the Top-10's mean publication year forward by up to 4.78 years &hellip; Although larger models attenuate the effect, none eliminate it.</p><p class="src">Do Large Language Models Favor Recent Content? A Study on Recency Bias in LLM-Based Reranking, arXiv:2509.11353. Single passages moved as many as 95 ranks, and pairwise preferences between equally relevant passages flipped by up to 25 per cent after date injection. https://arxiv.org/html/2509.11353v1 &middot; read 30 September 2026</p></div>
+<p>So the model carries the date and does not weigh it. The band is computed in code from the date the record itself holds, where it is arithmetic and does not have that failure mode.</p>
+<h3>The change register</h3>
+<p>Every main change to this product and to the documents that govern it now has an entry, a reason, and a report behind it, at <b>docs/change-register.json</b> and in the control panel. An entry with no reason is rejected by the build. Nothing in it may carry an identifier anybody searched, a party a check was about, or a result a check returned, and that is enforced on the write path and checked again by the build.</p>
+<div class="sechead"><span class="n">07</span><h2>SR-001, and the registers nobody has cleared</h2></div>
+<p>The source register workbook was generated on 1 September 2026. It clears 175 names. The catalogue now holds 135 registers. Those two lists do not agree, in both directions.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Count</th><th>What it means</th></tr></thead><tbody>
+<tr><td class="k">55</td><td>Registers the engine asks on every applicable run that SR-001 does not clear. Every run counts them out of scope, so the coverage figure a consumer reads is lower than the work actually done.</td></tr>
+<tr><td class="k">95</td><td>Names the workbook clears that the catalogue has no row for. Nothing asks them, so clearing them buys nothing.</td></tr>
+<tr><td class="k">17</td><td>Registers that are published and enabled in the catalogue and waiting on a signature. Nothing asks them at all.</td></tr>
+</tbody></table></div>
+<p>None of the 55 is blocked. The run asks them and the log records them as out of scope. What they need is a revision of the workbook, which is a signature and not a commit.</p>
+<h3>The 55, by category</h3>
+<h3>01 &middot; Identity and existence &middot; 4</h3>
+<p>Florida Sunbiz &middot; OpenCorporates &middot; Offshore registries: Bermuda, Jersey, Guernsey, Isle of Man, Malta, Cyprus, Panama &middot; Turks and Caicos, and Eastern Caribbean company registries</p>
+<h3>02 &middot; Registration and licensing &middot; 12</h3>
+<p>OSC Registered Crypto Asset Trading Platforms &middot; SEC Form D &middot; SFC Public Register &middot; ESMA MiCA CASP &middot; BC Financial Services Authority &middot; Real Estate Council of Alberta &middot; Autorite des marches financiers &middot; Financial and Consumer Affairs Authority of Saskatchewan &middot; Manitoba Securities Commission &middot; Financial and Consumer Services Commission of New Brunswick &middot; Nova Scotia Securities Commission &middot; Prince Edward Island and Newfoundland and Labrador regulators</p>
+<h3>03 &middot; Regulatory and enforcement &middot; 8</h3>
+<p>Competition Bureau Canada &middot; Federal Trade Commission &middot; Consumer Financial Protection Bureau &middot; Internet Crime Complaint Center &middot; DOJ Press &middot; IRS-CI &middot; SEC Trading Suspensions &middot; ASIC Investor Alerts</p>
+<h3>04 &middot; People and ownership &middot; 2</h3>
+<p>UK PSC Register &middot; SEDI Insider Reports</p>
+<h3>05 &middot; Legal and financial &middot; 6</h3>
+<p>Provincial court decisions &middot; Capital Markets Tribunal &middot; Competition Tribunal &middot; Securities tribunals outside Ontario &middot; Justia Dockets &middot; SEDAR+</p>
+<h3>06 &middot; Web and digital identity &middot; 1</h3>
+<p>Mail Config</p>
+<h3>08 &middot; Transaction and payment &middot; 3</h3>
+<p>Solscan &middot; Tronscan &middot; Bitcoin Explorer</p>
+<h3>09 &middot; 4orm intelligence &middot; 5</h3>
+<p>Analytics and Pixel Reuse &middot; Site Technology &middot; Host and Certificate Graph &middot; People Cluster &middot; Operator Graph</p>
+<h3>10 &middot; Claim dates against the record &middot; 14</h3>
+<p>Public Profile &middot; Form D First Filing &middot; Form D First Sale &middot; EDGAR First Filing &middot; SEDAR+ First Filing &middot; SEDI First Insider Record &middot; IAPD First Registration &middot; App Store First Release &middot; Google Play First Release &middot; GitHub Repository Created &middot; GitHub First Commit &middot; First Press Release &middot; First YouTube Video &middot; First Social Post</p>
+<h3>The 17 waiting on a signature</h3>
+<p>GLEIF, the Global LEI Index &middot; Cayman Islands Monetary Authority &middot; BVI Financial Services Commission &middot; Securities Commission of The Bahamas &middot; Financial Services Commission of Barbados &middot; Financial Services Authority of St Vincent and the Grenadines &middot; Financial Services Commission of Belize &middot; Financial Services Authority Seychelles &middot; Financial Services Commission Mauritius &middot; Eastern Caribbean Securities Regulatory Commission &middot; SEC Thailand &middot; Securities Commission Malaysia &middot; SEC Philippines &middot; UAE Capital Market Authority &middot; Dubai Financial Services Authority &middot; Virtual Assets Regulatory Authority, Dubai &middot; ADGM Financial Services Regulatory Authority</p>
+<div class="sechead"><span class="n">08</span><h2>Monitoring the nuance of the faults</h2></div>
+<p>The board today answers one question per lamp, which is whether the thing is working. That is the right question and it is not enough: every fault in this document was visible as a red lamp for some time before anybody could say what had actually failed, and two of them were not faults in the system at all.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Change</th><th>What it answers</th></tr></thead><tbody>
+<tr><td class="k">A reason on every failure</td><td>Surface the recorded reason per failed attempt from the fault log, so a red lamp opens onto what the source actually returned rather than onto a count.</td></tr>
+<tr><td class="k">Worst offenders per lamp</td><td>Which sources under this lamp are failing, ranked, so one dead connector stops presenting as nine dead categories.</td></tr>
+<tr><td class="k">Separate cannot see from is broken</td><td>A missing column, a missing environment variable and a refused request are three different states and the board paints all three the same colour. Sections 03 and 04 are two of each and they took a full audit to tell apart.</td></tr>
+<tr><td class="k">Alert on three conditions only</td><td>A lamp that was green and is now bad. A chain break. A budget ceiling reached. Anything more and the alerts get muted, which is worse than not having them.</td></tr>
+</tbody></table></div>
+<div class="sechead"><span class="n">09</span><h2>What could not be confirmed</h2></div>
+<p>This section is mandatory in a control document and it is not padding. Silence reads as verified.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Item</th><th>Why not</th></tr></thead><tbody>
+<tr><td class="k">The live RDAP failure reason</td><td>rdap.org returned 403 to this session. The lamp establishes that every attempt failed. It does not establish why, and no workaround was attempted.</td></tr>
+<tr><td class="k">The live values behind the board</td><td>/api/stats is disallowed to automated fetching by our own robots file. The figures in section 02 are read from the board and the log, not fetched independently.</td></tr>
+<tr><td class="k">The full OSC decision for Newton</td><td>The OSC order PDF at ord_20260311_newton-crypto.pdf returned 403. The registration entry quoted in section 01 is read from the OSC's own Crypto Businesses page, which is the controlling list.</td></tr>
+<tr><td class="k">Trustpilot's weighting formula</td><td>Not published. Their public statement is that the score is weighted to reflect that newer reviews tend to be more relevant than older ones, with no thresholds given. We did not model it and we do not rely on it.</td></tr>
+<tr><td class="k">How much evidence arrives undated</td><td>The window only works where the source carries a date. Undated records are now named as gaps rather than counted, and the size of that population has not been measured on live traffic.</td></tr>
+<tr><td class="k">Terms 1.1</td><td>Counsel has not reviewed it.</td></tr>
+<tr><td class="k">tools/protocheck</td><td>Cannot run in this environment: it loads a prototype file that is not in the repository. An environment gap, not a regression.</td></tr>
+</tbody></table></div>
+<div class="sechead"><span class="n">10</span><h2>The order of work</h2></div>
+<div class="tablewrap"><table><thead><tr><th class="k">Order</th><th>What</th><th>Owner</th></tr></thead><tbody>
+<tr><td class="k">1 <span class="chip p0">p0</span></td><td>Run db/telemetry.sql and db/spend.sql against the production database. This clears the all-red board and the zero spend in one step and changes no code.</td><td>Chad</td></tr>
+<tr><td class="k">2 <span class="chip p0">p0</span></td><td>Restore the domain lookups, and make a run whose strongest check did not run say so on the result.</td><td>Engineering</td></tr>
+<tr><td class="k">3 <span class="chip p1">p1</span></td><td>Set KBYS_RATE_CLAUDE_IN_M, KBYS_RATE_CLAUDE_OUT_M and KBYS_SCHEDULE_SECRET in the environment.</td><td>Chad</td></tr>
+<tr><td class="k">4 <span class="chip p1">p1</span></td><td>Schedule the chain walk nightly, alert on a break, and relabel the gauge to say what it measures.</td><td>Engineering</td></tr>
+<tr><td class="k">5 <span class="chip p1">p1</span></td><td>Write to the Ontario Securities Commission and the Alberta Securities Commission for permission to reproduce their lists. One letter each, and it is the difference between pointing at a register and reading it.</td><td>Chad</td></tr>
+<tr><td class="k">6 <span class="chip p1">p1</span></td><td>Revise SR-001: clear the 55, retire the 95, decide the 17, regenerate api/_sr001.json, and add SR-001 to the registry drawer so it opens like the other eleven.</td><td>Chad, with counsel</td></tr>
+<tr><td class="k">7 <span class="chip p2">p2</span></td><td>Build the fault nuance monitoring in section 08.</td><td>Engineering</td></tr>
+<tr><td class="k">8 <span class="chip p2">p2</span></td><td>Sign the eight outstanding control documents and put terms 1.1 to counsel. These are the two gates on clearing the test build banner.</td><td>Chad, with counsel</td></tr>
+</tbody></table></div>
+<div class="foot"><span>4orm Finance &middot; Control Standard &middot; Internal</span><span>AUD-002 &middot; v1.0 &middot; 30 September 2026</span></div>
+</div></body></html>
