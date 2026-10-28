@@ -11294,32 +11294,7 @@ function sumDownloadDoc(mode){
     '@media print{@page{size:auto;margin:12mm}body{background:#fff}'+
     '.wrapx{max-width:none;box-shadow:none}.sheet{padding:0;font-size:10.5pt}'+
     '.sh-h{break-after:avoid}.sh-item,.sh-row,.sh-do,.sh-help{break-inside:avoid}}'+
-    css+'</style></head><body><div class="wrapx">'+buildSummary(d,mode)+'</div><script>
-/* KBYS_PREFILL. The landing hands the typed identifier across in ?q= so the
-   consumer does not retype it. It fills the box and leaves the running to
-   them: a check costs real calls and is never started by a link. The query is
-   then wiped from the address bar, because what somebody looked up should not
-   sit in their history, their bookmarks or a shared URL. */
-(function(){
-  "use strict";
-  var u; try { u = new URL(window.location.href); } catch(e) { return; }
-  var q = u.searchParams.get("q");
-  if (!q) return;
-  u.searchParams.delete("q");
-  var rest = u.searchParams.toString();
-  try { history.replaceState(null, "", u.pathname + (rest ? "?" + rest : "") + u.hash); } catch(e) {}
-  function fill(){
-    var el = document.getElementById("kbInput");
-    if (!el) return;
-    el.value = q.slice(0, 200);
-    try { el.dispatchEvent(new Event("input", {bubbles:true})); } catch(e) {}
-    try { el.focus({preventScroll:true}); } catch(e) { el.focus(); }
-  }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fill);
-  else fill();
-})();
-</script>
-</body></html>';
+    css+'</style></head><body><div class="wrapx">'+buildSummary(d,mode)+'</div></body></html>';
   var blob=new Blob([doc],{type:"text/html;charset=utf-8"});
   var a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
@@ -17651,6 +17626,31 @@ document.addEventListener("keydown", function(e){
 document.body.setAttribute("data-stage","landing");
 toIdle();
 sweep();
+})();
+</script>
+<script>
+/* KBYS_PREFILL. The landing hands the typed identifier across in ?q= so the
+   consumer does not retype it. It fills the box and leaves the running to
+   them: a check costs real calls and is never started by a link. The query is
+   then wiped from the address bar, because what somebody looked up should not
+   sit in their history, their bookmarks or a shared URL. */
+(function(){
+  "use strict";
+  var u; try { u = new URL(window.location.href); } catch(e) { return; }
+  var q = u.searchParams.get("q");
+  if (!q) return;
+  u.searchParams.delete("q");
+  var rest = u.searchParams.toString();
+  try { history.replaceState(null, "", u.pathname + (rest ? "?" + rest : "") + u.hash); } catch(e) {}
+  function fill(){
+    var el = document.getElementById("kbInput");
+    if (!el) return;
+    el.value = q.slice(0, 200);
+    try { el.dispatchEvent(new Event("input", {bubbles:true})); } catch(e) {}
+    try { el.focus({preventScroll:true}); } catch(e) { el.focus(); }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fill);
+  else fill();
 })();
 </script>
 </body>
