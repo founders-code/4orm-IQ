@@ -1,0 +1,27 @@
+# Nothing in here is needed to serve the site, and everything in here was
+# being published at a public URL because Vercel deploys the whole repo.
+# It all stays in git. It just stops being downloadable from 4ormiq.com.
+
+# Build and verification tooling
+tools/
+
+# Internal documentation and the change register. admin.html embeds the
+# register at build time, so it is not fetched at runtime.
+docs/
+
+# Schema, applied by hand against the database
+db/
+
+# Internal reports and their PDFs
+reports/
+
+# Superseded pages, kept for history
+archive/
+
+# Decks and plans. These are not web pages.
+*.pptx
+*.pdf
+
+node_modules/
+.env
+.env.*

@@ -869,7 +869,7 @@ export default async function handler(req, res) {
        On a product whose first promise is that coverage is COUNTED from the
        retrieval log rather than asserted, that is the worst failure available:
        it is indistinguishable, on screen, from having checked and found a clean
-       record. A reader about to send money cannot tell "we asked 134 registers
+       record. A reader about to send money cannot tell "we asked 135 registers
        and none held anything" from "we never managed to ask".
 
        It also has a tell, which is the clock. A real sweep takes minutes. A
