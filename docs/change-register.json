@@ -1,7 +1,7 @@
 {
  "register": "AUD-CR",
  "title": "4orm IQ change register",
- "updated": "2026-10-01",
+ "updated": "2026-10-28",
  "entries": [
   {
    "id": "CR-0001",
@@ -636,6 +636,121 @@
     {
      "t": "p",
      "x": "At 900 points tall the fold still lands inside the row. Clearing it there means taking roughly another 45 points out of the block, which would start closing the air that was deliberately opened above the search box. Not taken."
+    }
+   ]
+  },
+  {
+   "id": "CR-0013",
+   "at": "2026-10-28",
+   "kind": "code",
+   "area": "Repository",
+   "title": "A second copy of the application was being served to the public",
+   "why": "Vercel deploys whatever is in the repository. A folder holding a stale snapshot of the whole application was therefore serving the Search Cue, the output contract and the authentication module as plain text from the live domain, and the same mechanism was publishing both investor decks, 92 build scripts, 12 internal reports and this register.",
+   "detail": "4orm-iq-site 3 removed in full, every file in it superseded by a larger root version. Seven unreferenced debug screenshots removed. Eight superseded pages moved to archive/, five loose Markdown files to docs/, three audits to audits/. .vercelignore and .gitignore added. README.md rewritten as one document replacing five. api/check.js comment corrected from 134 registers to 135. Deployed footprint 26M to 11M. Filed as AUD-003.",
+   "actor": "Chad Johnston",
+   "severity": "p0",
+   "report": [
+    {
+     "t": "h2",
+     "x": "What was sound, and should be said first"
+    },
+    {
+     "t": "p",
+     "x": "The instruction was to look for spaghetti in the backend before building on it. It is not there. No hardcoded credentials anywhere, including in the duplicate tree. All 17 configuration values read from the environment. Eight endpoints, with the other 22 modules underscore-prefixed so Vercel never routes them, applied consistently. All 30 modules parse. Every internal link in every served page resolves."
+    },
+    {
+     "t": "h2",
+     "x": "The exposure"
+    },
+    {
+     "t": "p",
+     "x": "A JavaScript file outside the project root api/ directory is not a function to Vercel, so it is served as a static asset. The duplicate tree's api/ was therefore readable in full by anyone who guessed the path."
+    },
+    {
+     "t": "table",
+     "rows": [
+      [
+       "File",
+       "Stale copy",
+       "Live copy"
+      ],
+      [
+       "api/check.js",
+       "26,998 bytes",
+       "69,328 bytes"
+      ],
+      [
+       "api/_cue.js",
+       "53,997 bytes",
+       "70,212 bytes"
+      ],
+      [
+       "index.html",
+       "803,723 bytes",
+       "1,323,445 bytes"
+      ],
+      [
+       "vercel.json",
+       "389 bytes",
+       "1,238 bytes"
+      ]
+     ]
+    },
+    {
+     "t": "p",
+     "x": "Every file in the duplicate was smaller than its root counterpart, which settles which copy was live and which was stale."
+    },
+    {
+     "t": "h2",
+     "x": "The near miss"
+    },
+    {
+     "t": "p",
+     "x": "Two pairs of files matched exactly on byte count and were queued for deletion as duplicates. A hash run before the deletion showed both differed. preview-evidence.html says 121 registers against the live 135. preview-control-room.html carries build stamp 20260917.1811 against 20260911.0619 on the file beside it, so the one that looked like a throwaway preview was the newer of the two. Both were moved to archive/ rather than deleted."
+    },
+    {
+     "t": "p",
+     "x": "The rule it produces: file size is not identity. Two files of the same length are a reason to run a hash, never a reason to skip one."
+    },
+    {
+     "t": "h2",
+     "x": "One number that disagreed with itself"
+    },
+    {
+     "t": "p",
+     "x": "Eleven consumer-facing places print 135 registers. A comment in api/check.js printed 134. The catalogue computes it rather than stating it: 152 entries, 17 disabled, 135 enabled. The comment was stale and is corrected. Low severity because it sat in prose rather than a code path, recorded because a product whose first promise is that coverage is counted rather than asserted cannot hold two numbers for the same thing."
+    },
+    {
+     "t": "h2",
+     "x": "What could not be confirmed"
+    },
+    {
+     "t": "li",
+     "x": "Whether any exposed file was ever fetched. Access logs for the period were not examined."
+    },
+    {
+     "t": "li",
+     "x": "Whether a secret ever sat in git history. The working tree is clean; full history was not walked and the clone is shallow."
+    },
+    {
+     "t": "li",
+     "x": "Runtime behaviour. No endpoint was called. This was a static audit."
+    },
+    {
+     "t": "h2",
+     "x": "Open, in order"
+    },
+    {
+     "t": "li",
+     "x": "Rotate any credential that could have been read from the duplicate tree, on the assumption the exposure was taken. The scan found none committed, so this is precautionary."
+    },
+    {
+     "t": "li",
+     "x": "Walk full git history for secrets. Needs an unshallowed clone."
+    },
+    {
+     "t": "li",
+     "x": "Add a build gate that fails when a deck, archive or document appears outside the ignored directories, because this fault returns the next time a folder is dragged in."
     }
    ]
   }

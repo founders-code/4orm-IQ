@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>4orm Decision Card</title>
+<meta name="description" content="The consumer side of 4ormIQ. Your decision, your risks, and what you did about them.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="app-css">
+html,body{margin:0;background:#F5F6F9;height:100%}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;color:inherit}
+.app{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:100vh;background-image:linear-gradient(90deg,#0B1530 0 244px,#F5F6F9 244px);font-family:Geist,Inter,system-ui,sans-serif;color:#0B1324;font-size:14px;-webkit-font-smoothing:antialiased;background:#F5F6F9}
+.side{background:#0B1530;color:#C7D0E4;padding:18px 14px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow:auto}
+.ws{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:rgba(255,255,255,.04);width:100%;border:0;text-align:left;cursor:pointer}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(140deg,#2E6BF2,#6A93F7);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.sec{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6C7896;font-weight:600;padding:0 10px;margin-bottom:6px}
+.nl{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:9px;font-size:14px;font-weight:500;color:#C7D0E4;width:100%;border:0;background:transparent;cursor:pointer;text-align:left}
+.nl:hover{background:rgba(255,255,255,.05);color:#fff}
+.nl.on{background:rgba(46,107,242,.2);color:#fff}
+.ct{font-size:12px;color:#8C97B2;font-family:'Geist Mono',monospace}
+.ct.r{background:#E0362C;color:#fff;border-radius:999px;padding:1px 7px;font-weight:600}
+.ct.a{background:#D9910B;color:#fff;border-radius:999px;padding:1px 7px;font-weight:600}
+.main{display:flex;flex-direction:column;min-width:0}
+.hdr{display:flex;align-items:center;gap:16px;padding:14px 28px;background:#F5F6F9;position:sticky;top:0;z-index:5}
+.title{font-size:15px;font-weight:600;white-space:nowrap}
+.title span{color:#8A93A8;font-weight:500}
+.search{flex:1;max-width:420px;display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 12px;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(11,19,36,.06);color:#8A93A8;font-size:13px;margin-left:12px;border:0;cursor:text;text-align:left}
+.kbd{font-family:'Geist Mono',monospace;font-size:11px;color:#6B7590;background:#F0F2F6;border-radius:5px;padding:2px 6px}
+.body{padding:6px 28px 40px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.mono{font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-feature-settings:"tnum"}
+.num{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;font-weight:600;background:#2E6BF2;color:#fff;border:0;cursor:pointer;box-shadow:0 1px 2px rgba(46,107,242,.3),inset 0 1px 0 rgba(255,255,255,.18);white-space:nowrap}
+.btn:hover{background:#2560E0}
+.btn:disabled{background:#B9CDF9;box-shadow:none;cursor:default}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;font-weight:600;background:#fff;color:#0B1324;border:0;cursor:pointer;box-shadow:0 1px 2px rgba(11,19,36,.08),0 0 0 1px rgba(11,19,36,.07);white-space:nowrap}
+.btn2:hover{background:#F7F8FB}
+.btn2:disabled{color:#9AA3B7;cursor:default}
+.btn.red{background:#E0362C;box-shadow:0 1px 2px rgba(224,54,44,.3)}
+.btn.dark{background:#0B1324;box-shadow:none}
+.sm{height:30px;padding:0 11px;font-size:12.5px;border-radius:8px}
+.card{background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(11,19,36,.04),0 6px 20px -10px rgba(11,19,36,.10);min-width:0}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px 0}
+.ct1{font-size:15px;font-weight:600;letter-spacing:-.005em}
+.sub{font-size:12.5px;color:#6B7590}
+.h1{font-size:26px;font-weight:600;letter-spacing:-.025em;line-height:1.2}
+.kpi{padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.kv{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1.1}
+.delta{display:inline-flex;align-items:center;font-size:12px;font-weight:600;border-radius:6px;padding:2px 7px}
+.up,.dn{background:#E6F6EF;color:#137A50}.bad{background:#FDECEB;color:#B42318}.warn{background:#FFF4DE;color:#995C00}.neu{background:#EEF1F6;color:#4A5570}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.pill i{width:6px;height:6px;border-radius:50%;display:block}
+.p-r{background:#FDECEB;color:#B42318}.p-r i{background:#E0362C}
+.p-a{background:#FFF4DE;color:#995C00}.p-a i{background:#D9910B}
+.p-g{background:#E6F6EF;color:#137A50}.p-g i{background:#1F9D6A}
+.p-b{background:#EAF0FE;color:#1F4FBF}.p-b i{background:#2E6BF2}
+.p-n{background:#EEF1F6;color:#4A5570}.p-n i{background:#8A93A8}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff;flex:none}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:0;background:transparent;height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;color:#4A5570;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.tab:hover{background:#EEF1F6}
+.tab .c{font-size:11.5px;background:#EEF1F6;color:#4A5570;border-radius:6px;padding:1px 6px;font-family:'Geist Mono',monospace}
+.tab.on{background:#0B1324;color:#fff}.tab.on .c{background:rgba(255,255,255,.16);color:#fff}
+.seg{display:inline-flex;background:#E9ECF2;border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;font-size:13px;font-weight:500;color:#4A5570;height:30px;padding:0 12px;border-radius:8px;cursor:pointer}
+.seg button.on{background:#fff;color:#0B1324;box-shadow:0 1px 2px rgba(11,19,36,.1)}
+.fchip{border:0;height:30px;padding:0 11px;border-radius:8px;background:#fff;color:#4A5570;font-size:12.5px;font-weight:500;cursor:pointer;box-shadow:0 0 0 1px rgba(11,19,36,.08);display:inline-flex;align-items:center;gap:7px}
+.fchip.on{background:#0B1324;color:#fff;box-shadow:none}
+.th{display:grid;gap:14px;align-items:center;padding:0 20px;height:34px;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7A849C;background:#F8F9FB}
+.tr{display:grid;gap:14px;align-items:center;padding:0 20px;min-height:56px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-size:14px;color:inherit}
+.tr:nth-child(even){background:#FBFCFD}
+.tr:hover{background:#F2F6FF}
+.tr.sel{background:#EAF0FE}
+.tr>*{min-width:0}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chain{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px}
+.chain i{height:14px;border-radius:3px;display:block}
+.s{background:#2E6BF2}.x{background:#E0362C}.w{background:#F2B544}.o{background:#E6EAF1}
+.stg{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:6px 12px;align-items:center}
+.trk{grid-column:1 / -1;height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden;display:flex}
+.trk i{display:block;height:100%}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#7A849C}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.d-r{background:#E0362C;box-shadow:0 0 0 3px rgba(224,54,44,.16)}.d-a{background:#D9910B;box-shadow:0 0 0 3px rgba(217,145,11,.16)}.d-g{background:#1F9D6A;box-shadow:0 0 0 3px rgba(31,157,106,.14)}.d-b{background:#2E6BF2}.d-n{background:#B5BCCB}.d-k{background:#B5BCCB}
+.toggle{width:36px;height:20px;border-radius:999px;background:#2E6BF2;position:relative;flex:none;border:0;cursor:pointer;padding:0}
+.toggle::after{content:"";position:absolute;top:2px;left:18px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+.toggle.off{background:#CBD2DF}.toggle.off::after{left:2px}
+.toggle.lock{opacity:.55;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:6px}
+.input{height:38px;border-radius:10px;background:#F5F6F9;padding:0 12px;display:flex;align-items:center;font-size:13.5px;color:#0B1324;border:0;width:100%;font-family:inherit;outline:none}
+.input:focus{box-shadow:0 0 0 2px #2E6BF2}
+textarea.input{height:auto;min-height:110px;padding:10px 12px;resize:vertical;line-height:1.5}
+.banner{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;background:linear-gradient(90deg,#FDECEB,#FFF6F5)}
+.banner.ok{background:linear-gradient(90deg,#E6F6EF,#F2FAF6)}
+.tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#0B1324;color:#fff;font-size:11.5px;font-weight:500;white-space:nowrap;padding:5px 8px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .12s}
+/* overview */
+.files{grid-template-columns:96px minmax(0,1.7fr) minmax(0,1.1fr) 104px 168px 116px 64px}
+.issues{grid-template-columns:84px minmax(0,2.2fr) 112px 56px 78px;gap:10px}
+.agents{grid-template-columns:minmax(0,1.6fr) 48px minmax(0,1.1fr) 62px;gap:10px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:190px;padding:0 2px;min-width:0}
+.bar{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;position:relative}
+.bar i{display:block;width:100%;border-radius:4px 4px 2px 2px;background:#B9CDF9;min-height:3px;transition:background .15s}
+.bar.last i{background:#2E6BF2}
+.bar:hover i{background:#2E6BF2}
+.bar:hover .tip{opacity:1}
+.grid-y{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.grid-y span{font-size:11px;color:#9AA3B7;font-family:'Geist Mono',monospace}
+.act{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;padding:9px 0}
+/* files */
+.ftab{grid-template-columns:76px minmax(0,1.8fr) 96px 104px 128px 96px 58px;gap:10px}
+.drawer{width:340px;flex:none;align-self:flex-start;position:sticky;top:70px}
+.flt{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.step{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 0}
+.node{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;font-family:'Geist Mono',monospace}
+.n-s{background:#2E6BF2;color:#fff}.n-x{background:#E0362C;color:#fff;box-shadow:0 0 0 4px rgba(224,54,44,.16)}.n-w{background:#FFF1D6;color:#995C00}.n-o{background:#EEF1F6;color:#9AA3B7}
+/* evidence */
+.fl{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;font-size:14px;color:inherit}
+.fl:hover{background:#F2F4F8}
+.fl.on{background:#EAF0FE}
+.link{display:grid;grid-template-columns:34px minmax(0,1fr);gap:16px}
+.rail{display:flex;flex-direction:column;align-items:center}
+.enode{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:12.5px;font-weight:600;flex:none}
+.wire{width:2px;flex:1;min-height:12px;border-radius:2px}
+.lk{border-radius:14px;padding:14px 16px;margin-bottom:12px;background:#fff;box-shadow:0 0 0 1px rgba(11,19,36,.06)}
+.lk.bad{background:#FFF7F6;box-shadow:0 0 0 1.5px rgba(224,54,44,.45)}
+.lk.wait{background:#FFFBF2}
+.lk.off{background:#FAFBFC;box-shadow:none}
+.kvr{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;font-size:13px;padding:6px 0}
+.alog{display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;padding:8px 0;font-size:13px}
+/* control map */
+.map{position:relative;margin:0 auto}
+.ln{position:absolute;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#2E6BF2;white-space:nowrap}
+.nd{text-align:left;position:absolute;width:116px;height:74px;border-radius:12px;background:#fff;border:0;box-shadow:0 0 0 1.5px #DCE3EF,0 6px 14px -10px rgba(11,19,36,.3);padding:9px 10px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:box-shadow .15s,transform .15s;font-family:inherit}
+.nd:hover{transform:translateY(-1px)}
+.nd .t{font-size:11.5px;overflow-wrap:break-word;font-weight:600;line-height:1.22;color:#0B1324}
+.nd .c{font-family:'Geist Mono',monospace;font-size:11px;color:#4A5570;padding-right:14px}
+.nd .dot{position:absolute;bottom:12px;right:10px}
+.nd.red{background:#FFF6F5;box-shadow:0 0 0 2px #E0362C,0 0 0 8px rgba(224,54,44,.1)}
+.nd.amb{background:#FFFBF2;box-shadow:0 0 0 2px #E5A93A}
+.nd.mine{background:#F3FBF7;box-shadow:0 0 0 1.5px #7CC4A3}
+.nd.sel{box-shadow:0 0 0 2px #2E6BF2,0 0 0 7px rgba(46,107,242,.18)}
+.nd.red.sel{box-shadow:0 0 0 2px #E0362C,0 0 0 7px rgba(46,107,242,.25)}
+.h{position:absolute;height:2px;background:#AFC2E6}
+.h::after{content:"";position:absolute;right:-1px;top:-4px;border-left:6px solid #AFC2E6;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.v{position:absolute;width:2px;background:#AFC2E6}
+.v::after{content:"";position:absolute;bottom:-1px;left:-4px;border-top:6px solid #AFC2E6;border-left:5px solid transparent;border-right:5px solid transparent}
+.mlog{grid-template-columns:56px 14px 84px minmax(0,1fr) 110px}
+/* reports */
+.ri{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:12px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;color:inherit;font-size:14px}
+.ri:hover{background:#F2F4F8}
+.ri.on{background:#EAF0FE}
+.doc{background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(11,19,36,.04),0 20px 50px -30px rgba(11,19,36,.35);padding:30px 34px}
+.m{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:12px;background:#F7F8FB}
+.m .mval{font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.vb{display:flex;align-items:flex-end;gap:6px;height:120px}
+.vb div{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
+.vb i{display:block;width:100%;border-radius:5px 5px 2px 2px;background:#B9CDF9;min-height:3px}
+.vb i.last{background:#2E6BF2}
+.rt{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:12px;padding:10px 0;font-size:13px}
+.rt.hd{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7A849C;padding-bottom:6px}
+.sch{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr) 90px 90px}
+/* ai */
+.tool{grid-template-columns:minmax(0,1.3fr) minmax(0,1.5fr) 80px 70px 100px 90px}
+.ev{display:grid;grid-template-columns:52px 10px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-radius:12px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;color:inherit;font-size:14px}
+.ev:hover{background:#F2F4F8}
+.ev.on{background:#EAF0FE}
+.quote{border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.55}
+.q-bad{background:#FFF6F5;box-shadow:inset 3px 0 0 #E0362C}
+.q-good{background:#F2FAF6;box-shadow:inset 3px 0 0 #1F9D6A}
+.gr{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:12px;align-items:center;padding:11px 0}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:stretch}
+.fs{border-radius:12px;padding:12px;background:#F7F8FB;display:flex;flex-direction:column;gap:4px;position:relative}
+.fs.hot{background:#0B1530;color:#fff}
+/* agents */
+.agc{padding:18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s;border:0;text-align:left;font-family:inherit;color:inherit;font-size:14px;width:100%}
+.agc.on{box-shadow:0 0 0 2px #2E6BF2,0 10px 30px -14px rgba(46,107,242,.45)}
+.af{grid-template-columns:86px minmax(0,1.6fr) 120px 150px 100px}
+.acc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;font-size:13px}
+/* connections */
+.cn{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.cnk{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;font-size:12.5px}
+.logo{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex:none}
+/* settings */
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0}
+.snav{display:flex;flex-direction:column;gap:2px}
+.snav button{text-align:left;border:0;background:transparent;height:34px;padding:0 12px;border-radius:8px;font-size:13.5px;font-weight:500;color:#4A5570;cursor:pointer}
+.snav button.on{background:#fff;color:#0B1324;box-shadow:0 1px 2px rgba(11,19,36,.08)}
+/* builder */
+.libh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#7A849C;margin:6px 0 2px}
+.li{text-align:left;font-size:13.5px;font-weight:600;min-height:42px;padding:6px 12px;border-radius:10px;border:1.5px solid #E1E7F1;background:#fff;color:#0B1324;width:100%;display:flex;align-items:center;gap:10px;cursor:grab;font-family:inherit}
+.li.armed{border-color:#2E6BF2;background:#EEF3FE}
+.li small{font-size:11.5px;font-weight:500;color:#6B7590;margin-left:auto}
+.sw{width:10px;height:10px;border-radius:3px;flex:none}
+.canvas{background-color:#fff;background-image:radial-gradient(#D3DCEB 1.2px,transparent 1.2px);background-size:22px 22px;border-radius:16px;min-width:0;box-shadow:0 1px 2px rgba(11,19,36,.04),0 6px 20px -10px rgba(11,19,36,.10)}
+.bmap{position:relative}
+.bnd{text-align:left;position:absolute;width:120px;height:86px;border-radius:14px;background:#fff;border:2px solid #DCE4F0;padding:8px 10px;display:flex;flex-direction:column;gap:3px;box-shadow:0 6px 16px -10px rgba(14,26,51,.25);cursor:pointer;font-family:inherit}
+.bnd.mine{background:#F3FBF7;border-color:#7CC4A3}
+.bnd.sel{box-shadow:0 0 0 4px rgba(46,107,242,.3);border-color:#2E6BF2}
+.bnd.over{border-color:#2E6BF2;background:#EEF3FE}
+.bnd .k{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.bnd .t{font-size:12px;font-weight:700;line-height:1.22;overflow-wrap:break-word}
+.bnd .p{font-family:'Geist Mono',monospace;font-size:9.5px;font-weight:600;background:#EEF2F8;border-radius:5px;padding:2px 5px;align-self:flex-start;margin-top:auto}
+.slot{position:absolute;width:120px;height:86px;border-radius:14px;border:2px dashed #AFC2E6;background:rgba(255,255,255,.7);color:#2E6BF2;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.slot.hot,.slot.over{background:#EEF3FE;border-color:#2E6BF2}
+.rm{font-size:13px;font-weight:700;border:0;background:#FDECEB;color:#B42318;border-radius:999px;min-height:36px;padding:0 14px;align-self:flex-start;cursor:pointer;font-family:inherit}
+.kv2{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;font-size:13.5px;line-height:1.4}
+.say{background:#F4F6FA;border-radius:14px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.sug{border-radius:14px;padding:11px 13px;display:flex;flex-direction:column;gap:5px;border:1.5px solid #D5DDEB}
+/* modal, toast, palette */
+.ovl{position:fixed;inset:0;background:rgba(11,19,36,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal{background:#fff;border-radius:18px;width:min(620px,100%);max-height:90vh;overflow:auto;box-shadow:0 30px 80px -30px rgba(0,0,0,.5);font-family:Geist,Inter,system-ui,sans-serif;color:#0B1324;font-size:14px}
+.modal .mh{padding:20px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.modal .mb{padding:16px 24px;display:flex;flex-direction:column;gap:14px;line-height:1.5}
+.modal .mf{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:60;align-items:center}
+.toast{background:#0B1324;color:#fff;border-radius:12px;padding:11px 14px;font-size:13.5px;display:flex;align-items:center;gap:14px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);font-family:Geist,Inter,system-ui,sans-serif}
+.toast button{background:transparent;border:0;color:#7FA4FA;font-weight:600;cursor:pointer;font-size:13.5px}
+.pal{position:fixed;inset:0;background:rgba(11,19,36,.4);z-index:55;display:flex;justify-content:center;padding-top:12vh}
+.palbox{width:min(640px,92%);background:#fff;border-radius:16px;align-self:flex-start;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.5);font-family:Geist,Inter,system-ui,sans-serif;color:#0B1324}
+.palbox input{width:100%;border:0;outline:0;font:inherit;font-size:16px;padding:16px 18px;background:#fff}
+.palr{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 18px;width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:inherit}
+.palr:hover,.palr.on{background:#F2F6FF}
+.opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#F5F6F9;cursor:pointer;border:0;width:100%;text-align:left;font-family:inherit;font-size:14px;color:inherit}
+.opt.on{background:#EAF0FE;box-shadow:0 0 0 1.5px #2E6BF2}
+@media print{.side,.hdr,.toasts,.ovl{display:none!important}.app{display:block}}
+
+.scrollx{position:relative}.scrollx::after{content:"";position:absolute;top:0;right:0;bottom:6px;width:48px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);pointer-events:none;border-radius:0 16px 16px 0}
+
+/* ===== consumer ===== */
+.side.warm{background:#10233F}
+.lead{font-size:17px;line-height:1.55;color:#33405C;max-width:72ch}
+.big{font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1.18}
+/* heat map */
+.hm{display:grid;grid-template-columns:118px repeat(5,minmax(0,1fr));grid-template-rows:auto repeat(5,minmax(0,1fr)) auto;gap:4px}
+.hm .cnr{grid-column:1;grid-row:1}
+.hm .cx{font-size:11.5px;font-weight:600;color:#4A5570;text-align:center;align-self:end;padding-bottom:4px;line-height:1.25}
+.hm .cy{font-size:11.5px;font-weight:600;color:#4A5570;text-align:right;align-self:center;padding-right:8px;line-height:1.25}
+.cell{position:relative;border-radius:8px;min-height:62px;border:0;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px;transition:box-shadow .12s,transform .12s}
+.cell:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(11,19,36,.45)}
+.cell.on{box-shadow:0 0 0 2.5px #0B1324}
+.b1{background:#E3F3EA}.b2{background:#FFF3D6}.b3{background:#FFE0C2}.b4{background:#FBCFCB}
+.cell .sc{position:absolute;top:5px;left:7px;font-family:'Geist Mono',monospace;font-size:10px;color:rgba(11,19,36,.4);font-weight:500}
+.pip{width:26px;height:26px;border-radius:50%;background:#0B1324;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(11,19,36,.35)}
+.pip.after{background:#fff;color:#0B1324;box-shadow:0 0 0 2px #0B1324 inset,0 2px 6px rgba(11,19,36,.2)}
+.axis{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#7A849C}
+.band{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px}
+.band i{width:9px;height:9px;border-radius:3px;display:block}
+.bd1{background:#E6F6EF;color:#137A50}.bd1 i{background:#4FBF8B}
+.bd2{background:#FFF7E6;color:#8A6200}.bd2 i{background:#F0C04A}
+.bd3{background:#FFF0E2;color:#9A4F00}.bd3 i{background:#F2944A}
+.bd4{background:#FDECEB;color:#B42318}.bd4 i{background:#E0362C}
+/* risk rows */
+.rk{display:grid;grid-template-columns:34px minmax(0,1fr) 128px 112px 96px;gap:12px;align-items:center;padding:14px 18px;width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:inherit}
+.rk:nth-child(even){background:#FBFCFD}
+.rk:hover{background:#F2F6FF}
+.rk.on{background:#EAF0FE}
+.arrow{display:inline-flex;align-items:center;gap:7px;font-family:'Geist Mono',monospace;font-size:13px;font-weight:600}
+.arrow b{font-weight:600}
+.n{width:28px;height:28px;border-radius:9px;background:#EEF1F6;color:#4A5570;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace}
+/* pickers */
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.scale5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.scale5 .sb{min-width:0;padding:9px 7px}
+.scale5 .sb .l{font-size:11.5px;overflow-wrap:break-word}
+.sb{flex:1 1 0;min-width:84px;border:0;border-radius:10px;background:#F5F6F9;padding:10px 10px;cursor:pointer;text-align:left;font-family:inherit;color:inherit;display:flex;flex-direction:column;gap:3px}
+.sb:hover{background:#EEF1F6}
+.sb.on{background:#0B1324;color:#fff}
+.sb .k{font-family:'Geist Mono',monospace;font-size:11px;opacity:.65;font-weight:600}
+.sb .l{font-size:12.5px;font-weight:600;line-height:1.3}
+/* protection */
+.po{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px;border-radius:12px;background:#F7F8FB;cursor:pointer;border:0;width:100%;text-align:left;font-family:inherit;font-size:14px;color:inherit}
+.po:hover{background:#EEF1F6}
+.po.on{background:#EAF0FE;box-shadow:0 0 0 1.5px #2E6BF2}
+.po .o{width:30px;height:30px;border-radius:50%;background:#fff;color:#2E6BF2;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;box-shadow:0 0 0 1.5px #D5DDEB}
+.po.on .o{background:#2E6BF2;color:#fff;box-shadow:none}
+.chip2{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:8px;padding:3px 8px;background:#EEF1F6;color:#4A5570;font-family:'Geist Mono',monospace}
+/* value tags */
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;border-radius:7px;padding:2px 8px;letter-spacing:.02em}
+.t-c{background:#E6F6EF;color:#137A50}.t-s{background:#EAF0FE;color:#1F4FBF}.t-e{background:#FFF4DE;color:#995C00}.t-u{background:#EEF1F6;color:#6B7590}
+.fact{display:grid;grid-template-columns:minmax(0,1.3fr) 120px 110px;gap:14px;align-items:center;padding:13px 18px;font-size:14px}
+.fact:nth-child(even){background:#FBFCFD}
+/* layers */
+.layer{padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.layer .no{font-family:'Geist Mono',monospace;font-size:11px;font-weight:600;color:#7A849C;letter-spacing:.08em}
+.lock{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#1F4FBF;background:#EAF0FE;border-radius:8px;padding:4px 10px}
+/* steps */
+.sstep{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px}
+.sstep:nth-child(even){background:#FBFCFD}
+/* phone */
+.phone{width:376px;flex:none;border-radius:34px;background:#0B1530;padding:12px;box-shadow:0 30px 70px -30px rgba(11,19,36,.7)}
+.scr{background:#FBFCFE;border-radius:24px;min-height:620px;display:flex;flex-direction:column;overflow:hidden}
+.ptop{padding:14px 18px 10px;display:flex;justify-content:space-between;align-items:center}
+.pbody{padding:6px 18px 14px;display:flex;flex-direction:column;gap:14px;flex:1}
+.earlier{font-size:12.5px;color:#8A93A8;background:#F2F4F8;border-radius:10px;padding:8px 12px;border:0;width:100%;text-align:left;cursor:pointer;font-family:inherit}
+.prev{font-size:13px;color:#6B7590;line-height:1.45}
+.resp{font-size:17px;line-height:1.5;color:#33405C}
+.q{font-size:21px;font-weight:600;line-height:1.35;letter-spacing:-.015em}
+.ans{min-height:48px;border-radius:12px;background:#fff;box-shadow:0 0 0 1.5px #DCE3EF;padding:13px 15px;font-size:15px;text-align:left;width:100%;border:0;cursor:pointer;font-family:inherit;color:#0B1324;line-height:1.4}
+.ans:hover{box-shadow:0 0 0 1.5px #2E6BF2;background:#F7FAFF}
+.ownway{min-height:48px;border-radius:12px;background:transparent;box-shadow:0 0 0 1.5px #E3E7EF;padding:13px 15px;font-size:14.5px;color:#6B7590;text-align:left;width:100%;border:0;cursor:pointer;font-family:inherit}
+.added{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#137A50;background:#E6F6EF;border-radius:10px;padding:10px 12px}
+.pfoot{padding:10px 18px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dots{display:flex;gap:5px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#DCE3EF;display:block}
+.dots i.done{background:#2E6BF2}
+.dots i.now{background:#0B1324}
+/* signoff */
+.sig{border-radius:14px;padding:16px 18px;background:#F7F8FB;display:flex;flex-direction:column;gap:10px}
+.sig.done{background:#F2FAF6}
+.trg{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:center;padding:9px 0;font-size:13.5px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;color:inherit}
+.box{width:20px;height:20px;border-radius:6px;background:#fff;box-shadow:0 0 0 1.5px #CBD2DF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.box.on{background:#2E6BF2;box-shadow:none}
+.pc{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:16px;align-items:center;padding:14px 18px;font-size:14px}
+.pc:nth-child(even){background:#FBFCFD}
+.yn{display:inline-flex;background:#EEF1F6;border-radius:9px;padding:3px}
+.yn button{border:0;background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:#4A5570;height:30px;padding:0 14px;border-radius:7px;cursor:pointer}
+.yn button.on{background:#fff;color:#0B1324;box-shadow:0 1px 2px rgba(11,19,36,.12)}
+.yn button.on.warn{background:#D9910B;color:#fff}
+
+/* ===== mortgage process ===== */
+.dr{display:grid;grid-template-columns:26px minmax(0,1fr) 150px 104px;gap:14px;align-items:center;padding:13px 18px;width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:inherit}
+.dr:nth-child(even){background:#FBFCFD}
+.dr:hover{background:#F2F6FF}
+.dr.on{background:#EAF0FE}
+.dr.got{opacity:.62}
+.tick{width:24px;height:24px;border-radius:8px;background:#fff;box-shadow:0 0 0 1.5px #CBD2DF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex:none}
+.tick.got{background:#1F9D6A;box-shadow:none}
+.tick.sent{background:#2E6BF2;box-shadow:none}
+.stg2{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:13px 15px;cursor:pointer;width:100%;border:0;background:#F7F8FB;text-align:left;font-family:inherit;font-size:14px;color:inherit;border-radius:12px}
+.stg2 .bar2{grid-column:2 / -1;height:5px;border-radius:3px;background:#E3E7EF;overflow:hidden}
+.stg2 .bar2 i{display:block;height:100%;border-radius:3px}
+.stg2.on .bar2{background:rgba(255,255,255,.16)}
+.stg2:hover{background:#EEF1F6}
+.stg2.on{background:#0B1324;color:#fff}
+.stg2.on .sub{color:#A9B4CE}
+.opt-b{font-size:11px;font-weight:600;color:#7A849C;background:#EEF1F6;border-radius:6px;padding:1px 7px}
+.ff{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:10px;align-items:center;padding:9px 0}
+.ff input{height:38px;border-radius:10px;background:#F5F6F9;padding:0 11px;font-size:14px;border:0;width:100%;font-family:'Geist Mono',monospace;text-align:right;outline:none;color:#0B1324}
+.ff input:focus{box-shadow:0 0 0 2px #2E6BF2;background:#fff}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 160px;gap:14px;align-items:start;padding:13px 0;font-size:13.5px}
+.work .wv{font-family:"Geist Mono",monospace;font-weight:600;text-align:right;font-size:14px;white-space:normal;line-height:1.35;min-width:0}
+.fl2{display:grid;grid-template-columns:8px minmax(0,1fr);gap:12px;align-items:start;padding:13px 15px;border-radius:12px}
+.fl2 i{width:8px;height:8px;border-radius:50%;margin-top:6px;display:block}
+.f-r{background:#FDECEB}.f-r i{background:#E0362C}
+.f-a{background:#FFF7E6}.f-a i{background:#D9910B}
+.f-g{background:#F2FAF6}.f-g i{background:#1F9D6A}
+.f-b{background:#F5F8FF}.f-b i{background:#2E6BF2}
+.lcard{padding:20px 22px;display:flex;flex-direction:column;gap:11px;cursor:pointer;border:0;text-align:left;font-family:inherit;font-size:14px;color:inherit;width:100%}
+.ltag{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:#2E6BF2}
+.worth{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:10px;background:#F2FAF6;font-size:13px;line-height:1.5;color:#176648}
+.srcline{font-size:12px;color:#7A849C}
+.srcline a{color:#2E6BF2;text-decoration:underline;text-underline-offset:2px}
+
+/* back to the main site. the apps are reached from the landing, so there
+   has to be a way home that is not the browser button. */
+.bk{display:block;padding:9px 10px;border-radius:9px;font-size:13px;font-weight:500;color:#C7D0E4;background:rgba(255,255,255,.05);text-align:center;border:0;cursor:pointer;width:100%;font-family:inherit}
+.bk:hover{background:rgba(255,255,255,.10);color:#fff}
+.bk:focus-visible{outline:2px solid #6A93F7;outline-offset:2px}
+
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<noscript>This demo needs JavaScript.</noscript>
+<script>
+/* BC mortgage process · documents, the maths, and the library
+   Every figure here traces to a primary source named in SOURCES. */
+
+const SOURCES = {
+  ptt: ['BC property transfer tax', 'https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax'],
+  fthb: ['BC first time home buyers program', 'https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/exemptions/first-time-home-buyers'],
+  newbuild: ['BC newly built home exemption', 'https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/exemptions/newly-built-home-exemption'],
+  mqr: ['OSFI minimum qualifying rate', 'https://www.osfi-bsif.gc.ca/en/supervision/financial-institutions/banks/minimum-qualifying-rate-uninsured-mortgages'],
+  reforms: ['Department of Finance, mortgage reforms', 'https://www.canada.ca/en/department-finance/news/2024/09/the-boldest-mortgage-reforms-in-decades.html'],
+  cmhc: ['CMHC mortgage loan insurance and premiums', 'https://cmhc-schl.gc.ca/en/finance-and-investing/mortgage-loan-insurance/the-resource/mortgage-loan-insurance-and-premiums'],
+  cmhcref: ['CMHC quick reference', 'https://assets.cmhc-schl.gc.ca/sf/project/cmhc/pdfs/factsheets/new/cmhc-quick-reference.pdf'],
+  penalty: ['FCAC, mortgage prepayment penalties', 'https://www.canada.ca/en/financial-consumer-agency/services/mortgages/reduce-prepayment-penalties.html'],
+  fcacren: ['FCAC, consumer behaviour in mortgage renewal', 'https://fcac-research-recherche-acfc.canada.ca/en/canada-finance/data-story-histoire-donnees/?id=c1daed30-f9ef-f011-8407-7ced8de0946a'],
+  s70: ['BCFSA, disclosure of suitability and material risks', 'https://www.bcfsa.ca/industry-resources/mortgage-broker-resources/msa-landing-page/mortgage-broker-knowledge-base/mortgage-services-regulatory-index/guideline-on-disclosure-suitability-and-material-risks'],
+  fintrac: ['FINTRAC mortgage sector obligations, in force 11 Oct 2024', 'https://www.canadianmortgagetrends.com/2024/10/mortgage-brokers-brace-for-fintracs-new-aml-rules-starting-tomorrow/'],
+  formb: ['BC Form B information certificate', 'https://www2.gov.bc.ca/gov/content/housing-tenancy/strata-housing/renting-buying-selling/buying-and-selling-strata/paperwork-for-buyers-and-sellers/form-b-information-certificate'],
+  code: ['Code of conduct, mortgage prepayment information', 'https://www.canada.ca/en/financial-consumer-agency/services/industry/laws-regulations/mortgage-prepayment-information-code.html']
+};
+
+/* ---------- the documents, in the order they are actually needed ---------- */
+const STAGES = [
+  { k: 's0', n: 'Before you talk to anyone', s: 'What you already have. Gather this and the rest goes faster.' },
+  { k: 's1', n: 'Who you are', s: 'Identity. Required by law before anyone can act for you.' },
+  { k: 's2', n: 'What you earn', s: 'Income. The single biggest cause of delay is an income file that is incomplete.' },
+  { k: 's3', n: 'Where the down payment came from', s: 'Source of funds. Ninety days of history, and an explanation for anything unusual.' },
+  { k: 's4', n: 'What you owe', s: 'Every payment that counts against you.' },
+  { k: 's5', n: 'The property', s: 'Once you have an accepted offer.' },
+  { k: 's6', n: 'What you must be given', s: 'Not what you hand over. What the professional owes you, in writing.' },
+  { k: 's7', n: 'Closing', s: 'Your lawyer or notary. The last two weeks.' },
+  { k: 's8', n: 'Kept', s: 'Five years, by law.' }
+];
+function seedDocs() {
+  const D = (id, stage, n, from, why, rule, who, opt) => ({ id, stage, n, from, why, rule: rule || '', who: who || 'you', opt: !!opt, status: 'todo' });
+  return [
+    D('d01', 's0', 'Your last mortgage statement', 'Your lender, or online banking', 'Balance, rate, payment and the exact term end date. Almost every later question depends on these four.', '', 'you'),
+    D('d02', 's0', 'Your mortgage contract or commitment letter', 'Your lender, from when you signed', 'This is where the penalty formula, your prepayment privileges, whether it ports, and the charge type are written down. Most people have never read it.', '', 'you'),
+    D('d03', 's0', 'Property tax notice', 'Your municipality', 'Lenders count property tax in what you can afford, and your lawyer adjusts it at closing.', '', 'you'),
+    D('d04', 's0', 'Your payout figure, in writing and dated', 'Your lender, on request', 'If you are breaking or switching. Verbal numbers change. Get it dated, because it is only good to a date.', '', 'you'),
+
+    D('d05', 's1', 'Government photo ID, every borrower', 'You', 'Your identity has to be verified before a broker can act for you. This is not a formality any more.', 'FINTRAC, since 11 Oct 2024', 'you'),
+    D('d06', 's1', 'Proof of current address', 'A bill or statement', 'Confirms where you live, separate from the ID itself.', '', 'you'),
+    D('d07', 's1', 'Social insurance number', 'You', 'For the credit check. You can decline, but most lenders will ask.', '', 'you', true),
+    D('d08', 's1', 'Third party declaration', 'You, through the broker', 'Says whether anyone other than you benefits from this mortgage. Required even when the answer is no.', 'FINTRAC', 'you'),
+    D('d09', 's1', 'Politically exposed person check', 'The broker', 'Done about you, not by you. If it applies, more questions follow about where the money came from.', 'FINTRAC', 'pro'),
+
+    D('d10', 's2', 'Letter of employment, dated recently', 'Your employer, on letterhead', 'Position, start date, salary, and whether you are permanent. A letter older than 30 days usually gets sent back.', '', 'you'),
+    D('d11', 's2', 'Two most recent pay stubs', 'Your employer or payroll portal', 'Proves the letter. Year to date earnings have to line up with the salary stated.', '', 'you'),
+    D('d12', 's2', 'T4s, last two years', 'Your employer or CRA My Account', 'Shows the history behind the current income.', '', 'you'),
+    D('d13', 's2', 'Notices of assessment, last two years', 'CRA My Account', 'Proves you filed and that you do not owe. Taxes owing can stop a file on its own.', '', 'you'),
+    D('d14', 's2', 'T1 Generals, last two years', 'Your accountant or CRA', 'Needed when any part of your income is commission, bonus, overtime or self-employed.', '', 'you', true),
+    D('d15', 's2', 'Business registration or incorporation', 'You', 'Self-employed only. Proves the business exists and how long it has.', '', 'you', true),
+    D('d16', 's2', 'Business financial statements, two years', 'Your accountant', 'Self-employed only.', '', 'you', true),
+    D('d17', 's2', 'Pension or investment income statements', 'Your provider', 'If any income comes from a pension, RRIF or investments.', '', 'you', true),
+    D('d18', 's2', 'Support payments: the agreement and proof of receipt', 'Your separation agreement and bank', 'Counts as income if you receive it, and against you if you pay it. Both need proof.', '', 'you', true),
+    D('d19', 's2', 'Leases and T776 for rental income', 'You', 'Only part of rental income counts, and lenders differ on how much.', '', 'you', true),
+
+    D('d20', 's3', 'Ninety days of statements for every account holding the down payment', 'Your bank', 'The rule is history, not balance. A big number that appeared last week raises more questions than a smaller one that has been there three months.', 'FINTRAC and the lender', 'you'),
+    D('d21', 's3', 'An explanation and a paper trail for any large deposit', 'You', 'Anything that does not look like pay. This is the single most common reason a file stalls late.', 'FINTRAC', 'you'),
+    D('d22', 's3', 'Gift letter, signed by the giver', 'The person giving it', 'It has to be a gift, not a loan, and it has to say so. A loan changes what you can borrow.', '', 'you', true),
+    D('d23', 's3', 'The giver\'s bank confirmation that the money is theirs', 'Their bank', 'Most people are surprised by this one. The gift letter alone is not enough any more.', 'FINTRAC', 'you', true),
+    D('d24', 's3', 'Firm sale agreement and payout statement on the home you are selling', 'Your agent and lender', 'When the down payment comes from a sale. The net proceeds figure has to be provable.', '', 'you', true),
+    D('d25', 's3', 'RRSP Home Buyers\' Plan or FHSA withdrawal confirmation', 'Your institution', 'If you are using registered money. Withdrawals take time, so start early.', '', 'you', true),
+
+    D('d26', 's4', 'Statements for every loan, line of credit and credit card', 'Your lenders', 'Minimum payments count against you whether or not you use the room.', '', 'you'),
+    D('d27', 's4', 'Car loan or lease agreement', 'Your lender or dealer', 'A lease payment counts the same as a loan payment.', '', 'you', true),
+    D('d28', 's4', 'Statements for any other property you own', 'Your lenders', 'Mortgage, taxes and strata fees on anything else you own.', '', 'you', true),
+
+    D('d29', 's5', 'Accepted contract of purchase and sale, with every addendum', 'Your agent', 'The whole thing, including the subject removal dates. The lender works to those dates.', '', 'you'),
+    D('d30', 's5', 'MLS listing', 'Your agent', 'Describes what is being bought. Square footage, age, taxes.', '', 'you'),
+    D('d31', 's5', 'Appraisal', 'Ordered by the lender', 'Confirms the home is worth what you are paying. You often pay for it, and it is not yours by default. Ask for a copy.', '', 'pro'),
+    D('d32', 's5', 'Form B information certificate, with attachments', 'The strata, through your agent', 'Strata only. Fees, the contingency fund, special levies coming, bylaws, and whether there is litigation. The attachments matter more than the form.', 'BC Strata Property Act', 'you', true),
+    D('d33', 's5', 'Depreciation report', 'The strata', 'Strata only. What the building needs and when. This is where future special levies show up before they are announced.', 'BC Strata Property Act', 'you', true),
+    D('d34', 's5', 'Two years of strata minutes, council and general meetings', 'The strata', 'Strata only. Problems get discussed in minutes long before they reach a Form B.', '', 'you', true),
+    D('d35', 's5', 'Fire insurance binder naming the lender', 'Your insurer', 'No lender advances money without it. Leave this to the last week and closing moves.', '', 'you'),
+    D('d36', 's5', 'Water potability and septic records', 'The seller', 'Rural property only.', '', 'you', true),
+
+    D('d37', 's6', 'Material risks, in writing, before any mortgage is recommended', 'Your broker', 'Not after. Before. This is a rule, not a courtesy, and it applies to renewals too.', 'BCFSA, MSA Rules s.70', 'pro'),
+    D('d38', 's6', 'Why this mortgage suits you', 'Your broker', 'They have to have assessed it and be able to explain it. Ask for it in writing even though the rule does not force that.', 'BCFSA, MSA Rules s.70', 'pro'),
+    D('d39', 's6', 'Who your broker works for and how they are paid', 'Your broker', 'Relationship and conflict of interest disclosure. Ask the amount, not just the fact.', 'BCFSA, MSA Rules', 'pro'),
+    D('d40', 's6', 'The commitment letter, with its information box', 'The lender', 'Rate, term, amortization, payment, prepayment privileges, the penalty formula, and the charge type. Read the penalty formula before you sign, not when you want out.', 'Code of conduct for federally regulated institutions', 'pro'),
+    D('d41', 's6', 'Cost of credit disclosure', 'The lender', 'The total cost in dollars, not just a rate.', '', 'pro'),
+    D('d42', 's6', 'Mortgage insurance premium, in writing', 'The lender', 'If you are putting less than 20% down. It is added to your loan and you pay interest on it for the whole amortization.', '', 'pro', true),
+
+    D('d43', 's7', 'Instructions to your lawyer or notary', 'The lender', 'Sent directly. Pick your lawyer early; the good ones are booked.', '', 'pro'),
+    D('d44', 's7', 'Property transfer tax return, with any exemption claimed', 'Your lawyer or notary', 'The first time buyer and newly built exemptions are claimed here. If nobody claims it, nobody tells you.', 'BC PTT', 'pro'),
+    D('d45', 's7', 'Statement of adjustments', 'Your lawyer or notary', 'Who owes what on the closing date: taxes, strata fees, utilities. Read it; errors happen.', '', 'pro'),
+    D('d46', 's7', 'Title search and registration', 'Your lawyer or notary, through the LTSA', 'Confirms what is on title before your money moves.', '', 'pro'),
+    D('d47', 's7', 'Certified funds for the balance', 'You', 'A draft or wire, not a cheque, usually a day or two before closing.', '', 'you'),
+
+    D('d48', 's8', 'Everything above, kept five years', '4ormIQ and your professional', 'Required. If it ever has to be reconstructed later from memory, somebody is already in trouble.', 'FINTRAC', 'pro')
+  ];
+}
+
+/* ---------- the maths, with the working shown ---------- */
+const MQR_FLOOR = 5.25, MQR_BUFFER = 2;
+const INSURED_MAX_PRICE = 1500000;
+const money = (n) => '$' + Math.round(n).toLocaleString('en-CA');
+const pct = (n) => (Math.round(n * 100) / 100) + '%';
+
+function minDown(price) {
+  if (price > INSURED_MAX_PRICE) return price * 0.20;
+  if (price <= 500000) return price * 0.05;
+  return 25000 + (price - 500000) * 0.10;
+}
+function premiumRate(ltv, amort) {
+  let r = 0;
+  if (ltv > 95) return null;
+  else if (ltv > 90) r = 4.00;
+  else if (ltv > 85) r = 3.10;
+  else if (ltv > 80) r = 2.80;
+  else return 0;
+  if (amort > 25) r += 0.20;
+  return r;
+}
+function monthlyPayment(principal, annualPct, years) {
+  if (principal <= 0) return 0;
+  const r = Math.pow(1 + (annualPct / 100) / 2, 1 / 6) - 1; // Canadian fixed, semi-annual compounding
+  const n = years * 12;
+  if (r === 0) return principal / n;
+  return principal * r / (1 - Math.pow(1 + r, -n));
+}
+function pttOn(value) {
+  let t = 0;
+  t += Math.min(value, 200000) * 0.01;
+  if (value > 200000) t += (Math.min(value, 2000000) - 200000) * 0.02;
+  if (value > 2000000) t += (value - 2000000) * 0.03;
+  if (value > 3000000) t += (value - 3000000) * 0.02; // further 2% on residential above $3M
+  return t;
+}
+function pttFor(price, firstTime, newBuild) {
+  const full = pttOn(price);
+  let ex = 0, note = '', band = '';
+  if (firstTime) {
+    if (price <= 835000) { ex = pttOn(Math.min(price, 500000)); band = 'First time buyer, full exemption'; note = 'Exempt on the first ' + money(500000) + ' of the price.'; }
+    else if (price < 860000) { const base = pttOn(500000); ex = base * (860000 - price) / 25000; band = 'First time buyer, partial'; note = 'The exemption tapers between ' + money(835000) + ' and ' + money(860000) + '.'; }
+    else { band = 'Over the first time buyer limit'; note = 'The exemption ends at ' + money(860000) + '.'; }
+  }
+  if (newBuild) {
+    let nex = 0, nband = '', nnote = '';
+    if (price <= 1100000) { nex = full; nband = 'Newly built, full exemption'; nnote = 'No property transfer tax at all.'; }
+    else if (price < 1150000) { nex = full * (1150000 - price) / 50000; nband = 'Newly built, partial'; nnote = 'The exemption tapers between ' + money(1100000) + ' and ' + money(1150000) + '.'; }
+    else { nband = 'Over the newly built limit'; nnote = 'The exemption ends at ' + money(1150000) + '.'; }
+    if (nex > ex) { ex = nex; band = nband; note = nnote; }
+  }
+  return { full, ex: Math.min(ex, full), net: Math.max(0, full - ex), band: band || 'No exemption claimed', note };
+}
+function runScenario(i) {
+  const price = +i.price || 0, down = +i.down || 0, rate = +i.rate || 0, amort = +i.amort || 25;
+  const income = +i.income || 0, debts = +i.debts || 0, tax = +i.tax || 0, heat = +i.heat || 100, strata = +i.strata || 0;
+  const out = { steps: [], flags: [] };
+  const req = minDown(price);
+  out.minDown = req;
+  out.downOk = down >= req - 0.5;
+  const ltv = price ? (price - down) / price * 100 : 0;
+  out.ltv = ltv;
+  out.insurable = price <= INSURED_MAX_PRICE && ltv > 80;
+  out.premiumRate = out.insurable ? premiumRate(ltv, amort) : 0;
+  const base = Math.max(0, price - down);
+  out.premium = out.insurable && out.premiumRate ? base * out.premiumRate / 100 : 0;
+  out.loan = base + out.premium;
+  out.payment = monthlyPayment(out.loan, rate, amort);
+  out.mqr = Math.max(rate + MQR_BUFFER, MQR_FLOOR);
+  out.stressPayment = monthlyPayment(out.loan, out.mqr, amort);
+  const housing = out.stressPayment + tax / 12 + heat + strata * 0.5;
+  out.gds = income ? housing / (income / 12) * 100 : 0;
+  out.tds = income ? (housing + debts) / (income / 12) * 100 : 0;
+  out.gdsLimit = 39; out.tdsLimit = 44;
+  out.gdsOk = out.gds <= out.gdsLimit; out.tdsOk = out.tds <= out.tdsLimit;
+  out.ptt = pttFor(price, i.firstTime, i.newBuild);
+  out.amortOk = amort <= 25 || !out.insurable || i.firstTime || i.newBuild;
+  out.closing = { ptt: out.ptt.net, legal: 1800, inspection: 600, appraisal: out.insurable ? 0 : 400, insurance: 150, moving: 1500 };
+  out.closingTotal = Object.values(out.closing).reduce((a, b) => a + b, 0);
+  out.cashNeeded = down + out.closingTotal;
+
+  out.steps.push({ t: 'Minimum down payment', w: price > INSURED_MAX_PRICE ? '20% of ' + money(price) + ', because insurance is not available above ' + money(INSURED_MAX_PRICE) : price <= 500000 ? '5% of ' + money(price) : '5% of the first ' + money(500000) + ' plus 10% of the remaining ' + money(price - 500000), v: money(req) });
+  out.steps.push({ t: 'Loan to value', w: '(' + money(price) + ' − ' + money(down) + ') ÷ ' + money(price), v: pct(ltv) });
+  if (out.insurable) out.steps.push({ t: 'Insurance premium', w: pct(out.premiumRate) + ' of ' + money(base) + (amort > 25 ? ', including the 0.20% surcharge for an amortization over 25 years' : '') + '. It is added to the loan, so you pay interest on it for the whole amortization.', v: money(out.premium) });
+  out.steps.push({ t: 'Payment at your rate', w: money(out.loan) + ' at ' + pct(rate) + ' over ' + amort + ' years, compounded semi-annually the way Canadian fixed mortgages are', v: money(out.payment) + ' a month' });
+  out.steps.push({ t: 'The rate you must qualify at', w: 'The greater of ' + pct(rate) + ' plus ' + MQR_BUFFER + '% and the ' + MQR_FLOOR + '% floor', v: pct(out.mqr) });
+  out.steps.push({ t: 'Payment they test you on', w: 'The same loan at ' + pct(out.mqr) + '. This is not the payment you make. It is the one you have to survive on paper.', v: money(out.stressPayment) + ' a month' });
+  out.steps.push({ t: 'GDS, housing against income', w: '(' + money(out.stressPayment) + ' + ' + money(tax / 12) + ' tax + ' + money(heat) + ' heat' + (strata ? ' + half the ' + money(strata) + ' strata fee' : '') + ') ÷ ' + money(income / 12) + ' a month', v: pct(out.gds) + ' against a ' + out.gdsLimit + '% limit' });
+  out.steps.push({ t: 'TDS, everything against income', w: 'GDS plus ' + money(debts) + ' of other monthly payments', v: pct(out.tds) + ' against a ' + out.tdsLimit + '% limit' });
+  out.steps.push({ t: 'Property transfer tax', w: out.ptt.ex ? 'Full tax ' + money(out.ptt.full) + ' less an exemption of ' + money(out.ptt.ex) + '. ' + out.ptt.note : '1% on the first ' + money(200000) + ', 2% above that to ' + money(2000000) + ', 3% above that. ' + (out.ptt.note || ''), v: money(out.ptt.net) });
+  out.steps.push({ t: 'Cash you need on closing day', w: money(down) + ' down plus about ' + money(out.closingTotal) + ' in closing costs', v: money(out.cashNeeded) });
+
+  if (!out.downOk) out.flags.push({ k: 'r', t: 'Your down payment is below the minimum', s: 'You need at least ' + money(req) + ' on a ' + money(price) + ' home. You are ' + money(req - down) + ' short.' });
+  if (price > INSURED_MAX_PRICE && down < price * 0.2) out.flags.push({ k: 'r', t: 'Insurance is not available above ' + money(INSURED_MAX_PRICE), s: 'Above that price, 20% down is the only way in.' });
+  if (!out.gdsOk) out.flags.push({ k: 'r', t: 'Housing costs are over the GDS limit', s: pct(out.gds) + ' against a ' + out.gdsLimit + '% limit. A lender may still look at it, but it will be a conversation, not a formality.' });
+  if (!out.tdsOk) out.flags.push({ k: 'r', t: 'Total debts are over the TDS limit', s: pct(out.tds) + ' against a ' + out.tdsLimit + '% limit. Paying down other debt moves this faster than a bigger down payment.' });
+  if (out.gdsOk && out.tdsOk && out.downOk) out.flags.push({ k: 'g', t: 'This passes the arithmetic', s: 'On these numbers. It is not an approval, and no lender has looked at it.' });
+  if (amort > 25 && out.insurable && !(i.firstTime || i.newBuild)) out.flags.push({ k: 'a', t: 'A 30 year amortization may not be available to you', s: 'With insurance, it is for first time buyers and buyers of new builds. Without insurance it is up to the lender.' });
+  if (out.insurable && amort > 25) out.flags.push({ k: 'a', t: 'The longer amortization costs you', s: 'It lowers the payment, raises the total interest, and adds 0.20% to the insurance premium.' });
+  if (ltv > 80 && ltv <= 81) out.flags.push({ k: 'a', t: 'You are just over 80%', s: 'A little more down and the insurance premium disappears entirely. Worth checking.' });
+  if (i.firstTime && price > 835000 && price < 860000) out.flags.push({ k: 'a', t: 'You are in the taper', s: 'The first time buyer exemption shrinks between ' + money(835000) + ' and ' + money(860000) + ' and is gone above it.' });
+  if (!i.firstTime && price <= 835000) out.flags.push({ k: 'b', t: 'Worth checking the first time buyer exemption', s: 'If nobody in your household has ever owned a principal residence anywhere, it is worth up to ' + money(8000) + ' at this price.' });
+  if (!i.newBuild && price <= 1100000) out.flags.push({ k: 'b', t: 'If this is a new build, say so', s: 'A newly built home at this price is exempt from property transfer tax entirely. Different rule, different threshold.' });
+  const diff = out.stressPayment - out.payment;
+  if (diff > 0) out.flags.push({ k: 'b', t: 'The gap between the two payments is ' + money(diff) + ' a month', s: 'That is the buffer the test builds in. It is also a fair question to ask yourself: could you carry it?' });
+  return out;
+}
+
+/* ---------- the library ---------- */
+const LIB = [
+  { id: 'l1', stage: 's6', tag: 'Rates', t: 'You can negotiate the rate you are offered', w: 'The first number is almost never the best one. In FCAC research published March 2026, 13% of mortgage holders did not know negotiating the rate or terms was even an option, and 20% did not compare lenders at all.', do: 'Ask directly: "Is that the best rate you can do for me?" Then ask the same of one other lender or a broker. The question costs nothing.', worth: 'A quarter point on $500,000 is roughly $65 a month and about $4,000 over a five year term.', src: 'fcacren' },
+  { id: 'l2', stage: 's0', tag: 'Renewal', t: 'The renewal letter is an offer, not a price', w: 'Lenders know most people sign and send it back. Renewal is the one moment in the whole mortgage when leaving costs you almost nothing, which is exactly why the first offer is rarely their best.', do: 'Start 120 days out. Get one competing quote in writing, then take it back to your lender before you sign anything.', worth: 'Often the largest single saving available to anyone who already owns a home.', src: 'fcacren' },
+  { id: 'l3', stage: 's0', tag: 'Penalties', t: 'Breaking a fixed mortgage is not three months interest', w: 'It is the greater of three months interest or the interest rate differential. FCAC\'s own worked example: $200,000 at 6% with 36 months left and a current posted rate of 4% gives about $3,000 three months interest and about $12,000 IRD. You pay the $12,000.', do: 'Before you commit to any plan that involves breaking, get the payout figure in writing, dated. Ask which of the two formulas applies and have them show the arithmetic.', worth: 'The difference between the two numbers is routinely four figures and sometimes five.', src: 'penalty' },
+  { id: 'l4', stage: 's6', tag: 'Penalties', t: 'The discount you negotiated gets used against you in the penalty', w: 'Some lenders calculate the IRD using their posted rate when you signed, minus the discount you negotiated. A bigger discount then produces a bigger penalty. The rate you never paid ends up in the formula.', do: 'Ask one question before you sign: "Is the IRD calculated on my contract rate or on your posted rate?" Write the answer down.', worth: 'On the same balance, the two methods can differ by thousands.', src: 'penalty' },
+  { id: 'l5', stage: 's6', tag: 'The contract', t: 'A collateral charge can quietly lock you in', w: 'A collateral charge is registered for more than you borrowed, so you can add to it later without re-registering. The part nobody mentions is the other direction: another lender usually cannot simply take it over at renewal, so switching means discharging and registering again, with legal costs.', do: 'Ask whether the mortgage is registered as a standard charge or a collateral charge, and what it would cost to switch at renewal.', worth: 'A few hundred to a couple of thousand in costs, and the loss of your best lever at renewal.', src: '' },
+  { id: 'l6', stage: 's6', tag: 'The contract', t: 'Pre-approval is not approval', w: 'A pre-approval holds a rate, usually 90 to 120 days, and tells you roughly what you can borrow. The lender has still not approved the property, re-checked your income, or seen where the down payment came from.', do: 'Keep your subject to financing condition in the offer until the lender confirms in writing on that specific property. Do not change jobs or take on new debt in between.', worth: 'The difference between a firm offer you can keep and a deposit you can lose.', src: '' },
+  { id: 'l7', stage: 's3', tag: 'Down payment', t: 'Your down payment has to have a history, not just a balance', w: 'Lenders and FINTRAC want ninety days of statements. A large deposit that appeared last week needs an explanation and a paper trail. This is the most common reason a file stalls in the last two weeks.', do: 'Move the money into one account ninety days before you plan to buy, and keep the paper for anything that is not pay.', worth: 'Weeks of delay, at the exact moment you cannot afford any.', src: 'fintrac' },
+  { id: 'l8', stage: 's3', tag: 'Down payment', t: 'A gift needs the giver\'s bank confirmation, not just a letter', w: 'The gift letter says it is a gift and not a loan. Separately, the giver has to show the money was theirs. Most families are surprised by the second part and it arrives late.', do: 'Ask the person giving it to pull their statement at the same time they sign the letter.', worth: 'Days, and an awkward conversation at the worst time.', src: 'fintrac' },
+  { id: 'l9', stage: 's7', tag: 'BC tax', t: 'The first time buyer exemption is worth up to $8,000, and you have to claim it', w: 'In BC, a first time buyer pays no property transfer tax on the first $500,000 if the home is $835,000 or less. Between $835,000 and $860,000 it tapers to nothing. Nobody claims it for you automatically.', do: 'Tell your lawyer or notary before closing. If you already closed and qualified, you can claim a refund from the first anniversary up to 18 months after registration.', worth: 'Up to $8,000.', src: 'fthb' },
+  { id: 'l10', stage: 's7', tag: 'BC tax', t: 'A newly built home has a completely different threshold', w: 'The newly built home exemption wipes out the property transfer tax entirely up to $1,100,000, tapering to nothing at $1,150,000. It is a separate rule from the first time buyer one, with its own limit, and plenty of people qualify for it without knowing.', do: 'If the home has never been lived in, ask whether it qualifies. You do not have to be a first time buyer.', worth: 'Up to about $20,000 at the top of the range.', src: 'newbuild' },
+  { id: 'l11', stage: 's2', tag: 'Qualifying', t: 'The rate you qualify at is not the rate you pay', w: 'You have to prove you could carry the payment at the greater of your rate plus two percent, or 5.25%. The payment you are approved on is therefore higher than the one you will actually make.', do: 'Ask for both numbers. Then ask yourself honestly whether the higher one is survivable, because that gap is the whole point of the test.', worth: 'Hundreds a month in the difference, and a realistic view of your own buffer.', src: 'mqr' },
+  { id: 'l12', stage: 's3', tag: 'Down payment', t: 'Above $1.5 million there is no insurance, so 20% down is the only way in', w: 'Insurance is capped at a $1.5 million purchase price. Below that, the minimum is 5% of the first $500,000 and 10% of the rest. People often discover the cliff after they have fallen in love with a house.', do: 'If you are near $1.5 million, check both sides of the line before you look at anything.', worth: 'At $1.5 million the difference between a 10% and a 20% down payment is $150,000 in cash.', src: 'reforms' },
+  { id: 'l13', stage: 's2', tag: 'Qualifying', t: 'The thirty year amortization is not for everyone', w: 'With mortgage insurance, thirty years is available to first time buyers and to anyone buying a new build. It lowers the payment, raises the total interest paid, and adds 0.20% to the insurance premium.', do: 'Ask for the payment and the total interest at both 25 and 30 years before choosing. See both numbers next to each other.', worth: 'Tens of thousands in interest over the life of the loan.', src: 'reforms' },
+  { id: 'l14', stage: 's6', tag: 'Insurance', t: 'Mortgage insurance protects the lender, not you', w: 'The premium you pay when you put less than 20% down insures the lender against your default. It does nothing for your family. It is also added to your loan, so you pay interest on it for the whole amortization.', do: 'Do not confuse it with life or disability insurance on the mortgage, which is a separate product and a separate decision.', worth: 'Clarity about what you actually bought.', src: 'cmhc' },
+  { id: 'l15', stage: 's6', tag: 'Your rights', t: 'You are owed the risks in writing before a mortgage is recommended', w: 'In BC, a broker has to assess whether a mortgage suits you and disclose material risks in writing before presenting it as an option. That includes renewals. A risk is material if it could reasonably change your decision.', do: 'If you were shown a product before you were shown the risks in writing, say so and ask for it. It is a rule, not a courtesy.', worth: 'The difference between a decision you made and one that was made around you.', src: 's70' },
+  { id: 'l16', stage: 's6', tag: 'Your rights', t: 'Ask how your broker is paid, and how much', w: 'Brokers are usually paid by the lender, and the amount can differ between lenders. Most people never ask, and most disclosure says there is compensation without saying how much or whether it varies.', do: 'Ask two questions: who pays you, and does it change depending on which lender I choose.', worth: 'Knowing whether the recommendation in front of you is neutral.', src: 's70' },
+  { id: 'l17', stage: 's6', tag: 'The contract', t: 'Cash back has a clawback', w: 'Cash back at signing is a loan dressed as a gift. Break or switch early and you usually repay all of it, not a pro-rated part.', do: 'If cash back is offered, ask what you repay if you leave in year two, and get the answer in writing.', worth: 'The full amount, exactly when you can least afford it.', src: '' },
+  { id: 'l18', stage: 's0', tag: 'Moving', t: 'Porting has a deadline, and you keep the old rate only until the original maturity', w: 'Porting carries your rate to the new home, but lenders set a window between selling and buying, often 30 to 120 days. The old rate applies only to the original maturity date, and any new money is blended at today\'s rate.', do: 'If a move is possible in the next two years, ask whether your mortgage ports, what the window is, and how a blend is calculated, before you sign anything.', worth: 'A full penalty if the dates miss by a week.', src: '' },
+  { id: 'l19', stage: 's6', tag: 'Variable', t: 'A variable rate has a trigger rate buried in it', w: 'If rates rise far enough, your fixed payment stops covering any principal. At that point the lender can require a bigger payment or a lump sum. Most variable borrowers have never been told the number.', do: 'Ask for your trigger rate in writing when you sign, and again any time rates move.', worth: 'Avoiding the single most unpleasant letter a lender sends.', src: '' },
+  { id: 'l20', stage: 's5', tag: 'Strata', t: 'The depreciation report tells you about special levies before they are announced', w: 'In a BC strata, the depreciation report sets out what the building needs and when. A roof due in three years with a thin contingency fund is a special levy that has not been voted on yet.', do: 'Read the depreciation report and two years of minutes, not just the Form B. Problems appear in minutes long before they reach a certificate.', worth: 'Special levies run from a few thousand to tens of thousands per unit.', src: 'formb' }
+];
+
+/* 4orm Decision Card · consumer side · store
+   One data store. Every page reads it, every control writes to it. */
+const STORE_KEY = '4orm.card.demo.v1';
+const NOW = { day: 'Mon 26 Oct', h: 9, m: 52 };
+
+/* 5x5, straight off the worksite card */
+const LIKELY = [
+  { n: 1, k: 'Rare', s: "It would surprise us" },
+  { n: 2, k: 'Unlikely', s: "We doubt it, but it could" },
+  { n: 3, k: 'Possible', s: "It could go either way" },
+  { n: 4, k: 'Likely', s: "We expect it" },
+  { n: 5, k: 'Almost certain', s: "It is going to happen" }
+];
+const SEVERE = [
+  { n: 1, k: 'Insignificant', s: "Absorbed this month" },
+  { n: 2, k: 'Minor', s: "Cut back a month or two" },
+  { n: 3, k: 'Moderate', s: "Dip into savings" },
+  { n: 4, k: 'Major', s: "Miss payments or borrow to cover" },
+  { n: 5, k: 'Severe', s: "Lose the home or become insolvent" }
+];
+const BANDS = [
+  { max: 4, key: 1, name: 'Low', rule: 'Accept it and carry on.', cls: 'bd1', cell: 'b1' },
+  { max: 9, key: 2, name: 'Medium', rule: 'Keep an eye on it.', cls: 'bd2', cell: 'b2' },
+  { max: 15, key: 3, name: 'High', rule: 'Needs a name and a date.', cls: 'bd3', cell: 'b3' },
+  { max: 25, key: 4, name: 'Extreme', rule: 'Stop. Do not go ahead as it stands.', cls: 'bd4', cell: 'b4' }
+];
+const band = (sc) => BANDS.find(b => sc <= b.max) || BANDS[3];
+
+/* order of protection, worksite order, consumer words */
+const ORDER = [
+  { k: 'remove', n: 1, name: 'Remove it', s: 'Take the risk out of the decision altogether.' },
+  { k: 'swap', n: 2, name: 'Swap it', s: 'Change the decision so the risk is smaller.' },
+  { k: 'safeguard', n: 3, name: 'Safeguard', s: 'Put something in place that catches it.' },
+  { k: 'check', n: 4, name: 'Check and confirm', s: 'Get the real number in writing, dated.' },
+  { k: 'plan', n: 5, name: 'Personal plan', s: 'What you will do if it happens anyway. The last line, not the first.' }
+];
+
+function seedRisks() {
+  return [
+    { id: 'r1', step: 1, what: 'The Calgary house sells for less than we are counting on', L: 3, S: 3, L2: 2, S2: 3,
+      prot: [{ k: 'check', t: 'Two independent price opinions before we list, in writing', owner: 'Ana', by: '3 Nov' }], owner: 'Ana', by: '3 Nov', note: '' },
+    { id: 'r2', step: 2, what: 'Breaking the mortgage costs more than we think', L: 3, S: 2, L2: 1, S2: 2,
+      prot: [{ k: 'check', t: 'Ask the lender for the exact payout figure in writing, dated', owner: 'Luis', by: '30 Oct' }], owner: 'Luis', by: '30 Oct', note: '' },
+    { id: 'r3', step: 3, what: 'The new payment does not work while I am on leave', L: 4, S: 4, L2: 3, S2: 4,
+      prot: [{ k: 'plan', t: 'Build the payment around one paycheque, not two', owner: 'Ana and Luis', by: '10 Nov' }, { k: 'safeguard', t: 'Four months of payments set aside before we close', owner: 'Ana', by: '20 Nov' }], owner: 'Ana and Luis', by: '10 Nov', note: 'This is the one that keeps me up.' },
+    { id: 'r4', step: 4, what: 'The closing dates do not line up and we carry both', L: 3, S: 4, L2: 2, S2: 3,
+      prot: [{ k: 'swap', t: 'Make the Kelowna offer conditional on the Calgary sale closing', owner: 'Luis', by: '7 Nov' }], owner: 'Luis', by: '7 Nov', note: '' },
+    { id: 'r5', step: 5, what: 'Moving costs land on top of the first payments', L: 4, S: 2, L2: 3, S2: 1,
+      prot: [{ k: 'safeguard', t: 'Moving budget kept separate from the buffer', owner: 'Ana', by: '15 Nov' }], owner: 'Ana', by: '15 Nov', note: '' }
+  ];
+}
+
+function seedState() {
+  return {
+    v: 1,
+    me: { name: 'Ana Ruiz', ini: 'AR', co: 'Luis Ruiz', coIni: 'LR', joint: true },
+    card: {
+      id: 'MB-2041', decision: 'Selling in Calgary, buying in Kelowna', opened: '24 Oct 2026',
+      deadline: 'Term ends 12 Apr 2027', valid: 'Valid until something changes',
+      quote: "We want a payment that still works while I'm on leave."
+    },
+    pre: [
+      { id: 'p1', q: 'Do you know when your term ends?', a: 'yes', hint: '12 April 2027' },
+      { id: 'p2', q: 'Do you know what breaking it would cost?', a: 'no', hint: 'Asking the lender in writing' },
+      { id: 'p3', q: 'Have you set money aside for the gap?', a: 'part', hint: 'Two months, going for four' },
+      { id: 'p4', q: 'Is your income changing in the next year?', a: 'yes', hint: 'Parental leave from March' },
+      { id: 'p5', q: 'Is anyone pushing you to decide quickly?', a: 'no', hint: '' },
+      { id: 'p6', q: 'Have you compared more than one option?', a: 'no', hint: 'Not yet' },
+      { id: 'p7', q: 'Is anyone else on title?', a: 'yes', hint: 'Luis, joint' }
+    ],
+    steps: [
+      { n: 1, t: 'Sell the Calgary house' },
+      { n: 2, t: 'Break or port the mortgage' },
+      { n: 3, t: 'Buy in Kelowna' },
+      { n: 4, t: 'Close both sides' },
+      { n: 5, t: 'Move' }
+    ],
+    risks: seedRisks(),
+    facts: [
+      { id: 'f1', k: 'Take-home pay, together', v: '$7,420 a month', tag: 'stated', src: 'You said it' },
+      { id: 'f2', k: 'Take-home pay, one paycheque', v: '$4,180 a month', tag: 'stated', src: 'You said it' },
+      { id: 'f3', k: 'Mortgage balance', v: '$412,480', tag: 'stated', src: 'Your last statement' },
+      { id: 'f4', k: 'Rate and term end', v: '2.89%, ends 12 Apr 2027', tag: 'stated', src: 'Your last statement' },
+      { id: 'f5', k: 'Payment today', v: '$1,946 a month', tag: 'stated', src: 'You said it' },
+      { id: 'f6', k: 'Fixed costs each month', v: 'About $2,900', tag: 'estimated', src: '4ormIQ worked it out from what you said' },
+      { id: 'f7', k: 'Months of buffer', v: 'About 2', tag: 'estimated', src: '4ormIQ worked it out from what you said' },
+      { id: 'f8', k: 'What the Calgary house sells for', v: 'Not known yet', tag: 'unknown', src: 'Two price opinions coming' },
+      { id: 'f9', k: 'Cost to break the mortgage', v: 'Not known yet', tag: 'unknown', src: 'Asked the lender in writing' }
+    ],
+    bank: { connected: false, consentMonths: 12 },
+    layers: [
+      { n: 1, name: 'What we worked out together', what: 'Your situation, your plans, your risks and what you did about them.', who: 'The professional you choose', on: true, phrase: '' },
+      { n: 2, name: 'Who you are, and your income', what: 'They see that it was checked and when. Never the documents, never your transactions.', who: 'The professional you choose', on: true, phrase: 'verified, not exposed' },
+      { n: 3, name: 'Your full file', what: 'Everything a lender needs. Held by 4ormIQ until you pick a lender, then released for that one application.', who: 'Only the lender you pick', on: false, phrase: 'sealed until selected' }
+    ],
+    shared: { with: 'Lakeshore Mortgage Group', agent: 'Marcus Leduc', at: 'Sat 14:35', link: true },
+    sign: { me: false, co: false, pro: 'Not yet' },
+    triggers: [
+      { id: 't1', t: 'Our income changes', on: true },
+      { id: 't2', t: 'The Calgary sale price comes in', on: true },
+      { id: 't3', t: 'Rates move more than half a point', on: true },
+      { id: 't4', t: 'A closing date moves', on: true },
+      { id: 't5', t: 'We change what we are buying', on: false }
+    ],
+    docs: seedDocs(),
+    sc: { price: 850000, down: 85000, rate: 4.29, amort: 25, income: 140000, debts: 650, tax: 3200, heat: 100, strata: 0, firstTime: true, newBuild: false },
+    chat: { i: 0, answers: [] },
+    log: [
+      { t: 'Sat 10:40', a: 'You ranked your risks.', d: 'Five risks, scored before protection.' },
+      { t: 'Sat 10:32', a: 'Capacity worked out.', d: 'From what you told us. Not a lender decision.' },
+      { t: 'Sat 10:21', a: 'Future plans added.', d: 'Parental leave from March.' },
+      { t: 'Sat 10:14', a: 'Card opened.', d: 'Selling in Calgary, buying in Kelowna.' }
+    ],
+    clock: 0
+  };
+}
+
+const Store = {
+  s: null, listeners: [],
+  load() { try { const raw = localStorage.getItem(STORE_KEY); if (raw) { const p = JSON.parse(raw); if (p && p.v === 1) { this.s = p; return; } } } catch (e) { } this.s = seedState(); },
+  save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(this.s)); } catch (e) { } },
+  reset() { this.s = seedState(); this.save(); this.emit(); },
+  emit() { this.listeners.forEach(fn => fn()); },
+  commit() { this.save(); this.emit(); },
+  stamp() { const m = NOW.m + 1 + this.s.clock; this.s.clock++; const hh = NOW.h + Math.floor(m / 60); return String(hh).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); },
+  snapshot() { return JSON.stringify(this.s); },
+  restore(snap) { this.s = JSON.parse(snap); this.commit(); }
+};
+
+const D = {
+  risk(id) { return Store.s.risks.find(r => r.id === id); },
+  before(r) { return r.L * r.S; },
+  after(r) { return r.prot.length ? r.L2 * r.S2 : r.L * r.S; },
+  protected(r) { return r.prot.length > 0; },
+  sorted() { return Store.s.risks.slice().sort((a, b) => this.after(b) - this.after(a) || this.before(b) - this.before(a)); },
+  top() { return Math.max(...Store.s.risks.map(r => this.after(r)), 0); },
+  topBefore() { return Math.max(...Store.s.risks.map(r => this.before(r)), 0); },
+  stops() { return Store.s.risks.filter(r => this.after(r) >= 16); },
+  needOwner() { return Store.s.risks.filter(r => { const a = this.after(r); return a >= 10 && a <= 15; }); },
+  missingOwner() { return this.needOwner().filter(r => !r.owner || !r.by); },
+  readinessFrom(fn) {
+    const rs = Store.s.risks; if (!rs.length) return 10;
+    const avg = rs.reduce((t, r) => t + fn(r), 0) / rs.length;
+    const ext = rs.filter(r => fn(r) >= 16).length, hi = rs.filter(r => fn(r) >= 10 && fn(r) <= 15).length;
+    return Math.max(1, Math.min(10, Math.round(10 * (1 - avg / 25) - 1.5 * ext - 0.5 * hi)));
+  },
+  readiness() { return this.readinessFrom(r => this.after(r)); },
+  readinessBefore() { return this.readinessFrom(r => this.before(r)); },
+  cellRisks(L, S, after) { return Store.s.risks.filter(r => after ? (this.protected(r) ? r.L2 === L && r.S2 === S : r.L === L && r.S === S) : r.L === L && r.S === S); },
+  done() {
+    const s = Store.s;
+    return [
+      { k: 'pre', name: 'Pre-check', ok: s.pre.every(p => p.a), sub: s.pre.filter(p => p.a).length + ' of ' + s.pre.length + ' answered' },
+      { k: 'steps', name: 'Steps', ok: s.steps.length > 0, sub: s.steps.length + ' steps' },
+      { k: 'risks', name: 'Risks', ok: s.risks.length > 0, sub: s.risks.length + ' ranked' },
+      { k: 'prot', name: 'Protection', ok: s.risks.every(r => this.protected(r)), sub: s.risks.filter(r => this.protected(r)).length + ' of ' + s.risks.length + ' covered' },
+      { k: 'long', name: 'Long-term risk', ok: this.stops().length === 0 && this.missingOwner().length === 0, sub: this.stops().length ? this.stops().length + ' stop point' + (this.stops().length > 1 ? 's' : '') : this.missingOwner().length ? this.missingOwner().length + ' need a name and a date' : 'clear' },
+      { k: 'sign', name: 'Sign-off', ok: s.sign.me && (!s.me.joint || s.sign.co), sub: s.sign.me && s.sign.co ? 'both signed' : s.sign.me ? 'waiting on ' + s.me.co.split(' ')[0] : 'not signed' }
+    ];
+  },
+  canSign() { return this.stops().length === 0 && this.missingOwner().length === 0 && Store.s.risks.every(r => this.protected(r)); },
+  tagged(t) { return Store.s.facts.filter(f => f.tag === t).length; }
+};
+
+const A = {
+  log(a, d) { Store.s.log.unshift({ t: Store.stamp(), a, d }); if (Store.s.log.length > 14) Store.s.log.pop(); },
+  pre(id, a) { const p = Store.s.pre.find(x => x.id === id); if (!p) return; p.a = a; A.log('Pre-check updated.', p.q); Store.commit(); },
+  score(id, which, n) {
+    const r = D.risk(id); if (!r) return;
+    if (which === 'L') { r.L = n; if (!r.prot.length) r.L2 = n; }
+    if (which === 'S') { r.S = n; if (!r.prot.length) r.S2 = n; }
+    if (which === 'L2') r.L2 = Math.min(n, r.L);
+    if (which === 'S2') r.S2 = Math.min(n, r.S);
+    A.log('Risk re-scored.', r.what); Store.commit();
+  },
+  addProt(id, k, t, owner, by) {
+    const r = D.risk(id); if (!r) return;
+    r.prot.push({ k, t, owner: owner || '', by: by || '' });
+    const o = ORDER.findIndex(x => x.k === k);
+    if (o <= 1) { r.L2 = Math.max(1, r.L2 - 2); r.S2 = Math.max(1, r.S2 - 1); }
+    else if (o === 2) { r.L2 = Math.max(1, r.L2 - 1); r.S2 = Math.max(1, r.S2 - 1); }
+    else { r.L2 = Math.max(1, r.L2 - 1); }
+    if (owner) r.owner = owner; if (by) r.by = by;
+    A.log('Protection added.', t); Store.commit();
+  },
+  removeProt(id, i) { const r = D.risk(id); if (!r) return; const p = r.prot.splice(i, 1)[0]; if (!r.prot.length) { r.L2 = r.L; r.S2 = r.S; } A.log('Protection removed.', p ? p.t : ''); Store.commit(); },
+  owner(id, owner, by) { const r = D.risk(id); if (!r) return; r.owner = owner; r.by = by; A.log('Owner and date set.', r.what); Store.commit(); },
+  addRisk(step, what, L, S) {
+    const id = 'r' + (Store.s.risks.length + 1) + Date.now().toString().slice(-3);
+    Store.s.risks.push({ id, step: step || 1, what, L: L || 3, S: S || 3, L2: L || 3, S2: S || 3, prot: [], owner: '', by: '', note: '' });
+    A.log('Risk added.', what); Store.commit(); return id;
+  },
+  note(id, t) { const r = D.risk(id); if (!r) return; r.note = t; Store.commit(); },
+  addStep(t) { Store.s.steps.push({ n: Store.s.steps.length + 1, t }); A.log('Step added.', t); Store.commit(); },
+  connectBank() {
+    const s = Store.s; s.bank.connected = true;
+    const up = { f1: '$7,386 a month', f2: '$4,153 a month', f3: '$412,480', f5: '$1,946 a month', f6: '$2,874 a month', f7: '2.1 months' };
+    s.facts.forEach(f => { if (up[f.id]) { f.v = up[f.id]; f.tag = 'confirmed'; f.src = 'Confirmed from your bank data, with your consent'; } });
+    A.log('Bank connected.', 'Six facts went from what you said to confirmed. Nothing was shared with anyone.');
+    Store.commit();
+  },
+  disconnectBank() { const s = Store.s; s.bank.connected = false; s.facts.forEach(f => { if (f.tag === 'confirmed') { f.tag = 'stated'; f.src = 'You said it'; } }); A.log('Bank disconnected.', 'Confirmed facts went back to what you said.'); Store.commit(); },
+  layer(n) { const l = Store.s.layers.find(x => x.n === n); if (!l) return; l.on = !l.on; A.log(l.on ? 'Access given.' : 'Access withdrawn.', l.name); Store.commit(); },
+  unshare() { Store.s.shared.link = false; Store.s.layers.forEach(l => l.on = false); A.log('Sharing stopped.', 'No professional can open your card. Anything already shared or lawfully kept may not be recoverable.'); Store.commit(); },
+  reshare(who, agent) { Store.s.shared = { with: who, agent: agent || '', at: 'just now', link: true }; Store.s.layers[0].on = true; Store.s.layers[1].on = true; A.log('Card shared.', who); Store.commit(); },
+  sign(who) {
+    const s = Store.s;
+    if (who === 'me') s.sign.me = !s.sign.me; else s.sign.co = !s.sign.co;
+    if (s.sign.me && s.sign.co) s.sign.pro = 'Waiting on Marcus Leduc';
+    else s.sign.pro = 'Not yet';
+    A.log(who === 'me' ? (s.sign.me ? 'You signed.' : 'You unsigned.') : (s.sign.co ? s.me.co.split(' ')[0] + ' signed.' : s.me.co.split(' ')[0] + ' unsigned.'), 'Sign-off');
+    Store.commit();
+  },
+  trigger(id) { const t = Store.s.triggers.find(x => x.id === id); if (!t) return; t.on = !t.on; Store.commit(); },
+  doc(id, status) { const d = Store.s.docs.find(x => x.id === id); if (!d) return; d.status = status; A.log(status === 'todo' ? 'Document unticked.' : status === 'sent' ? 'Document sent.' : 'Document gathered.', d.n); Store.commit(); },
+  docStageAll(k) { const ds = Store.s.docs.filter(d => d.stage === k && !d.opt); const allGot = ds.every(d => d.status !== 'todo'); ds.forEach(d => d.status = allGot ? 'todo' : 'got'); A.log(allGot ? 'Stage cleared.' : 'Stage marked gathered.', STAGES.find(x => x.k === k).n); Store.commit(); },
+  sc(k, v) { const n = String(v).replace(/[^0-9.]/g, ''); Store.s.sc[k] = n === '' ? 0 : +n; Store.commit(); },
+  scToggle(k) { Store.s.sc[k] = !Store.s.sc[k]; Store.commit(); },
+  scReset() { Store.s.sc = seedState().sc; Store.commit(); },
+  scSave() { const r = runScenario(Store.s.sc); A.log('Scenario saved to your record.', money(Store.s.sc.price) + ' at ' + Store.s.sc.rate + '%, payment ' + money(r.payment) + ', tested at ' + money(r.stressPayment) + '.'); Store.commit(); },
+  chatAnswer(text) { const c = Store.s.chat; c.answers.push(text); c.i++; Store.commit(); },
+  chatBack() { const c = Store.s.chat; if (c.i > 0) { c.i--; c.answers.pop(); Store.commit(); } },
+  chatReset() { Store.s.chat = { i: 0, answers: [] }; Store.commit(); }
+};
+
+/* views · pure functions of Store.s + U */
+const U = { route: 'card', hmAfter: true, hmCell: null, rSel: 'r3', pTab: 'all', fTab: 'all', sSec: 'layers', stepSel: 0, dStage: 's0', dSel: null, dOpt: true, kTag: 'All', kSel: null };
+const h = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const btn = (label, action, extra, cls) => `<button class="${cls || 'btn'}" data-a="${action}" ${extra || ''}>${h(label)}</button>`;
+const bandPill = (sc) => { const b = band(sc); return `<span class="band ${b.cls}"><i></i>${b.name} ${sc}</span>`; };
+const TAGS = { confirmed: ['t-c', 'Confirmed'], stated: ['t-s', 'You said it'], estimated: ['t-e', 'Estimated'], unknown: ['t-u', 'Not known yet'] };
+const tag = (t) => `<span class="tag ${TAGS[t][0]}">${TAGS[t][1]}</span>`;
+const NAV = [
+  ['Your card', [['card', 'The card'], ['risks', 'Risks'], ['protect', 'Protection'], ['long', 'Long-term risk'], ['sign', 'Sign-off']]],
+  ['The process', [['docs', 'What you need'], ['scenario', 'Run it for real'], ['know', 'Know this']]],
+  ['Behind it', [['money', 'Your money'], ['who', 'Who sees what'], ['record', 'Your record']]],
+  ['Keep going', [['talk', 'Talk it through']]]
+];
+const TITLES = { card: 'The card', docs: 'What you need', scenario: 'Run it for real', know: 'Know this', risks: 'Risks', protect: 'Protection', long: 'Long-term risk', sign: 'Sign-off', money: 'Your money', who: 'Who sees what', record: 'Your record', talk: 'Talk it through' };
+
+function sidebar() {
+  const s = Store.s, done = D.done(), ok = done.filter(d => d.ok).length;
+  const badge = (k) => k === 'risks' ? `<span class="ct">${s.risks.length}</span>` : k === 'long' && D.stops().length ? `<span class="ct r">${D.stops().length}</span>` : k === 'long' && D.missingOwner().length ? `<span class="ct a">${D.missingOwner().length}</span>` : k === 'protect' ? `<span class="ct">${s.risks.filter(r => D.protected(r)).length}/${s.risks.length}</span>` : k === 'money' && D.tagged('unknown') ? `<span class="ct">${D.tagged('unknown')}</span>` : k === 'docs' ? `<span class="ct">${s.docs.filter(d => d.status !== 'todo').length}/${s.docs.length}</span>` : k === 'know' ? `<span class="ct">${LIB.length}</span>` : '';
+  return `<aside class="side warm">
+  <button class="ws" data-a="nav" data-v="card"><div class="mark">${h(s.me.ini)}</div><div style="display:flex;flex-direction:column;min-width:0"><span style="color:#fff;font-weight:600;font-size:14px">${h(s.me.name)}</span><span style="font-size:12px;color:#8C97B2">${s.me.joint ? 'With ' + h(s.me.co.split(' ')[0]) : 'On your own'}</span></div></button>
+  ${NAV.map(([sec, items]) => `<div><div class="sec">${sec}</div>${items.map(([k, l]) => `<button class="nl${U.route === k ? ' on' : ''}" data-a="nav" data-v="${k}"><span>${l}</span>${badge(k)}</button>`).join('')}</div>`).join('')}
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
+    <button class="ws" data-a="nav" data-v="card" style="flex-direction:column;align-items:stretch;background:rgba(46,107,242,.12);padding:12px"><div style="font-size:12px;color:#fff;font-weight:600">${ok} of ${done.length} cards done</div><div style="font-size:12px;color:#A9B4CE;margin-top:3px">${h(done.find(d => !d.ok) ? 'Next: ' + done.find(d => !d.ok).name : 'Ready to sign')}</div><div style="display:flex;gap:4px;margin-top:9px">${done.map(d => `<i style="flex:1;height:5px;border-radius:3px;background:${d.ok ? '#6A93F7' : 'rgba(255,255,255,.14)'};display:block"></i>`).join('')}</div></button>
+    <a class="bk" href="/">Back to the main site</a>
+    <div class="mono" style="font-size:10.5px;letter-spacing:.1em;color:#5E6A88;padding:0 6px">4ORM<span style="color:#6A93F7">IQ</span> · YOUR RECORD</div>
+  </div></aside>`;
+}
+function header(crumb, actions) {
+  return `<div class="hdr"><span class="title">${crumb}</span><div style="flex:1"></div>${btn('Pause, it all keeps', 'pause', '', 'btn2')}${actions || ''}</div>`;
+}
+
+/* ---------- heat map ---------- */
+function heatmap(opts) {
+  opts = opts || {};
+  const after = U.hmAfter;
+  let out = '<div class="hm"><div class="cnr"></div>';
+  SEVERE.forEach(sv => { out += `<div class="cx"><div>${sv.n} ${h(sv.k)}</div><div style="font-weight:500;color:#8A93A8">${h(sv.s)}</div></div>`; });
+  LIKELY.slice().reverse().forEach(lk => {
+    out += `<div class="cy"><div>${lk.n} ${h(lk.k)}</div><div style="font-weight:500;color:#8A93A8">${h(lk.s)}</div></div>`;
+    SEVERE.forEach(sv => {
+      const sc = lk.n * sv.n, b = band(sc), key = lk.n + ':' + sv.n;
+      const here = D.cellRisks(lk.n, sv.n, after);
+      const moved = after ? Store.s.risks.filter(r => D.protected(r) && r.L === lk.n && r.S === sv.n && (r.L2 !== r.L || r.S2 !== r.S)) : [];
+      out += `<button class="cell ${b.cell}${U.hmCell === key ? ' on' : ''}" data-a="hm.cell" data-v="${key}" title="${lk.k} × ${sv.k} = ${sc}"><span class="sc">${sc}</span>${here.map(r => `<span class="pip${after && D.protected(r) ? ' after' : ''}">${Store.s.risks.indexOf(r) + 1}</span>`).join('')}${moved.map(() => `<span style="width:8px;height:8px;border-radius:50%;background:rgba(11,19,36,.18);display:block"></span>`).join('')}</button>`;
+    });
+  });
+  out += '</div>';
+  const sel = U.hmCell ? (() => { const [L, S] = U.hmCell.split(':').map(Number); const rs = D.cellRisks(L, S, after); const sc = L * S; return `<div style="margin-top:14px;padding:14px 16px;border-radius:12px;background:#F7F8FB"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><b style="font-weight:600">${h(LIKELY[L - 1].k)} × ${h(SEVERE[S - 1].k)} = ${sc}</b> <span class="sub">${h(band(sc).rule)}</span></div>${bandPill(sc)}</div>${rs.length ? rs.map(r => `<button class="opt" style="margin-top:8px" data-a="risk.open" data-id="${r.id}"><span class="n">${Store.s.risks.indexOf(r) + 1}</span><span style="flex:1;font-weight:500">${h(r.what)}</span><span class="sub">Step ${r.step}</span></button>`).join('') : `<div class="sub" style="margin-top:8px">Nothing of yours sits here.</div>`}</div>`; })() : '';
+  return `<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div><div class="ct1">${after ? 'After protection' : 'Before protection'}</div><div class="sub" style="margin-top:2px">How likely it is, across how much it would hurt. The number is the two multiplied.</div></div><div class="seg">${[['0', 'Before'], ['1', 'After']].map(([k, l]) => `<button class="${(after ? '1' : '0') === k ? 'on' : ''}" data-a="hm.when" data-v="${k}">${l}</button>`).join('')}</div></div>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px"><span class="axis">How much it would hurt</span></div>
+  <div style="display:flex;gap:12px"><div class="axis" style="writing-mode:vertical-rl;transform:rotate(180deg);padding:40px 0 60px">How likely</div><div style="flex:1;min-width:0">${out}</div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">${BANDS.map(b => `<span class="band ${b.cls}"><i></i>${b.name} ${b.key === 1 ? '1 to 4' : b.key === 2 ? '5 to 9' : b.key === 3 ? '10 to 15' : '16 to 25'} · ${b.rule}</span>`).join('')}</div>
+  <div style="display:flex;gap:16px;margin-top:12px;font-size:12.5px;color:#6B7590;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:7px"><span class="pip" style="width:18px;height:18px;font-size:9px">1</span>Where it started</span><span style="display:flex;align-items:center;gap:7px"><span class="pip after" style="width:18px;height:18px;font-size:9px">1</span>Where it sits now</span><span style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:rgba(11,19,36,.18);display:block"></span>Moved away from here</span></div>
+  ${sel}`;
+}
+
+/* ---------- The card ---------- */
+function vCard() {
+  const s = Store.s, done = D.done(), top = D.top(), tb = D.topBefore(), rd = D.readiness(), rb = D.readinessBefore();
+  const yn = (p) => `<div class="yn">${[['yes', 'Yes'], ['part', 'Partly'], ['no', 'No']].map(([k, l]) => `<button class="${p.a === k ? 'on' + ((k === 'no' && ['p1', 'p2', 'p6'].indexOf(p.id) >= 0) || (k === 'yes' && ['p5'].indexOf(p.id) >= 0) ? ' warn' : '') : ''}" data-a="pre" data-id="${p.id}" data-v="${k}">${l}</button>`).join('')}</div>`;
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+  <div><div class="mono sub">${s.card.id} · opened ${h(s.card.opened)} · ${h(s.card.valid)}</div><div class="big" style="margin-top:8px">${h(s.card.decision)}</div><div class="lead" style="margin-top:8px">${s.me.joint ? h(s.me.name) + ' and ' + h(s.me.co) + '. ' : ''}${h(s.card.deadline)}.</div></div>
+  <div style="display:flex;gap:8px">${btn('Talk it through', 'nav', 'data-v="talk"', 'btn2')}${btn('Print or save', 'print')}</div>
+</div>
+<div class="card" style="padding:20px 22px;background:#10233F;color:#fff"><div class="lbl" style="color:#8C97B2">In your words</div><div style="font-size:19px;line-height:1.45;margin-top:10px;max-width:60ch">${h(s.card.quote)}</div></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+  <div class="card kpi"><span class="sub">Your top risk</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${top}</span><span class="delta ${top < tb ? 'up' : 'neu'}">${top < tb ? 'was ' + tb : 'not protected yet'}</span></div><div style="margin-top:auto;padding-top:8px">${bandPill(top)}</div></div>
+  <div class="card kpi"><span class="sub">How ready you feel</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${rd}<span style="font-size:16px;color:#6B7590;font-weight:500"> of 10</span></span><span class="delta ${rd > rb ? 'up' : 'neu'}">${rd > rb ? 'was ' + rb : 'no change yet'}</span></div><div style="height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${rd * 10}%;background:#2E6BF2;border-radius:4px"></i></div></div>
+  <div class="card kpi"><span class="sub">Risks covered</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${s.risks.filter(r => D.protected(r)).length}<span style="font-size:16px;color:#6B7590;font-weight:500"> of ${s.risks.length}</span></span></div><span class="sub">Each one has something in place</span></div>
+  <div class="card kpi" style="${D.stops().length ? 'background:#FDECEB' : ''}"><span class="sub">${D.stops().length ? 'Stop points' : 'Needs a name and a date'}</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num" style="${D.stops().length ? 'color:#E0362C' : ''}">${D.stops().length || D.missingOwner().length}</span></div><span class="sub">${D.stops().length ? 'Do not go ahead until these come down' : D.missingOwner().length ? 'Who is doing it, and by when' : 'Nothing outstanding'}</span></div>
+</div>
+<div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:14px"><div><div class="ct1">Where you are</div><div class="sub" style="margin-top:2px">Six parts. You can stop after any of them and come back.</div></div><span class="sub">${done.filter(d => d.ok).length} of ${done.length} done</span></div>
+  ${done.map((d, i) => `<button class="tr" style="grid-template-columns:30px minmax(0,1fr) 180px 110px" data-a="nav" data-v="${({ pre: 'card', steps: 'card', risks: 'risks', prot: 'protect', long: 'long', sign: 'sign' })[d.k]}"><span class="n">${i + 1}</span><span style="font-weight:600">${d.name}</span><span class="sub">${h(d.sub)}</span><span>${d.ok ? `<span class="pill p-g"><i></i>Done</span>` : `<span class="pill p-b"><i></i>Open</span>`}</span></button>`).join('')}</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start">
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:10px"><div><div class="ct1">1 · Pre-check</div><div class="sub" style="margin-top:2px">Seven questions before anything else. There are no wrong answers.</div></div></div>
+    ${s.pre.map(p => `<div class="pc"><div><div style="font-weight:500">${h(p.q)}</div>${p.hint ? `<div class="sub">${h(p.hint)}</div>` : ''}</div>${yn(p)}</div>`).join('')}
+    <div style="padding:12px 18px" class="sub">A "no" is not a problem. It just tells us what to look at first.</div></div>
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:10px"><div><div class="ct1">2 · Steps</div><div class="sub" style="margin-top:2px">The decision broken down. Each one starts with something you do.</div></div>${btn('Add a step', 'step.add', '', 'btn2 sm')}</div>
+    ${s.steps.map(st => { const rs = s.risks.filter(r => r.step === st.n); const worst = rs.length ? Math.max(...rs.map(r => D.after(r))) : 0; return `<button class="sstep" style="width:100%;border:0;background:transparent;text-align:left;font-family:inherit;font-size:14px;color:inherit;cursor:pointer" data-a="step.open" data-v="${st.n}"><span class="n">${st.n}</span><div><div style="font-weight:600">${h(st.t)}</div><div class="sub">${rs.length ? rs.length + ' risk' + (rs.length > 1 ? 's' : '') : 'no risks on this step yet'}</div></div>${worst ? bandPill(worst) : '<span class="sub">—</span>'}</button>`; }).join('')}</div>
+</div>`;
+}
+
+/* ---------- Risks ---------- */
+function vRisks() {
+  const s = Store.s, list = D.sorted();
+  if (!D.risk(U.rSel)) U.rSel = list[0] ? list[0].id : null;
+  const r = D.risk(U.rSel);
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">3 · Risks</div><div class="lead" style="margin-top:6px">For each step, what could go wrong. You score two things: how likely it is, and how much it would hurt. Nobody else scores them for you.</div></div>${btn('Add a risk', 'risk.add')}</div>
+<div class="card" style="padding:22px 24px">${heatmap()}</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start">
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:12px"><div><div class="ct1">Your risks</div><div class="sub" style="margin-top:2px">Worst first, after protection</div></div><span class="sub">${s.risks.length} ranked</span></div>
+    <div class="th" style="grid-template-columns:36px minmax(0,1fr) 150px 108px 92px"><span></span><span>What could go wrong</span><span>Before and after</span><span>Owner</span><span>Band</span></div>
+    ${list.map(x => `<button class="rk${x.id === U.rSel ? ' on' : ''}" data-a="risk.sel" data-id="${x.id}"><span class="n">${s.risks.indexOf(x) + 1}</span><div style="min-width:0"><div style="font-weight:600" class="ell">${h(x.what)}</div><div class="sub">Step ${x.step} · ${h(s.steps[x.step - 1] ? s.steps[x.step - 1].t : '')}</div></div><span class="arrow"><b style="color:${band(D.before(x)).cls === 'bd4' ? '#B42318' : '#4A5570'}">${D.before(x)}</b>${D.protected(x) ? `<span style="color:#9AA3B7">→</span><b style="color:#0B1324">${D.after(x)}</b>` : `<span class="sub" style="font-family:Geist">not yet</span>`}</span><span class="sub">${x.owner ? h(x.owner) + (x.by ? ' · ' + h(x.by) : '') : '—'}</span><span>${bandPill(D.after(x))}</span></button>`).join('')}</div>
+  ${r ? riskPanel(r) : ''}
+</div>`;
+}
+function riskPanel(r) {
+  const s = Store.s, bf = D.before(r), af = D.after(r);
+  const scale = (which, arr, cur) => `<div class="scale5">${arr.map(x => `<button class="sb${cur === x.n ? ' on' : ''}" data-a="risk.score" data-id="${r.id}" data-w="${which}" data-v="${x.n}"><span class="k">${x.n}</span><span class="l">${h(x.k)}</span></button>`).join('')}</div>`;
+  return `<div class="card" style="padding:20px 22px;position:sticky;top:70px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div class="mono sub">Risk ${s.risks.indexOf(r) + 1} · step ${r.step}</div><div style="font-size:18px;font-weight:600;line-height:1.3;margin-top:6px">${h(r.what)}</div></div>${bandPill(af)}</div>
+  ${r.note ? `<div class="quote q-good" style="margin-top:12px;background:#F5F8FF;box-shadow:inset 3px 0 0 #2E6BF2">${h(r.note)}</div>` : ''}
+  <div class="lbl" style="margin-top:18px;margin-bottom:7px">How likely is it</div>${scale('L', LIKELY, r.L)}
+  <div class="sub" style="margin-top:6px">${h(LIKELY[r.L - 1].s)}</div>
+  <div class="lbl" style="margin-top:16px;margin-bottom:7px">How much would it hurt</div>${scale('S', SEVERE, r.S)}
+  <div class="sub" style="margin-top:6px">${h(SEVERE[r.S - 1].s)}</div>
+  <div style="display:flex;align-items:center;gap:14px;margin-top:18px;padding:14px 16px;border-radius:12px;background:#F7F8FB;flex-wrap:wrap">
+    <div><div class="sub">Before protection</div><div class="num" style="font-size:26px;font-weight:600">${r.L} × ${r.S} = ${bf}</div></div>
+    ${D.protected(r) ? `<div style="font-size:20px;color:#9AA3B7">→</div><div><div class="sub">After</div><div class="num" style="font-size:26px;font-weight:600">${r.L2} × ${r.S2} = ${af}</div></div>` : `<div class="sub" style="flex:1">Nothing in place yet. Add protection and score it again.</div>`}
+  </div>
+  <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${btn('Add protection', 'prot.add', `data-id="${r.id}"`)}${btn('Who owns it', 'risk.owner', `data-id="${r.id}"`, 'btn2')}${btn('Add a note', 'risk.note', `data-id="${r.id}"`, 'btn2')}</div>
+</div>`;
+}
+
+/* ---------- Protection ---------- */
+function vProtect() {
+  const s = Store.s, list = D.sorted();
+  const vis = U.pTab === 'all' ? list : U.pTab === 'open' ? list.filter(r => !D.protected(r)) : list.filter(r => D.protected(r));
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">4 · Protection</div><div class="lead" style="margin-top:6px">On a worksite you take the hazard out first and reach for the hard hat last. Money is the same. A plan for coping is the last line, not the first.</div></div><div class="tabs">${[['all', 'All', s.risks.length], ['open', 'Nothing yet', s.risks.filter(r => !D.protected(r)).length], ['done', 'Covered', s.risks.filter(r => D.protected(r)).length]].map(([k, l, n]) => `<button class="tab${U.pTab === k ? ' on' : ''}" data-a="p.tab" data-v="${k}">${l}<span class="c">${n}</span></button>`).join('')}</div></div>
+<div class="card" style="padding:20px 22px"><div class="ct1">The order to try them in</div><div class="sub" style="margin-top:2px">Work down the list. Only reach the bottom when the ones above it will not work.</div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px">${ORDER.map(o => { const n = s.risks.reduce((t, r) => t + r.prot.filter(p => p.k === o.k).length, 0); return `<div style="border-radius:12px;padding:14px;background:${o.n === 5 ? '#FFF7E6' : '#F7F8FB'};display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;align-items:center"><span class="o" style="width:26px;height:26px;border-radius:50%;background:#fff;color:#2E6BF2;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;box-shadow:0 0 0 1.5px #D5DDEB">${o.n}</span><span class="mono sub">${n} in use</span></div><div style="font-weight:600;font-size:14.5px">${h(o.name)}</div><div class="sub" style="line-height:1.45">${h(o.s)}</div></div>`; }).join('')}</div></div>
+<div style="display:flex;flex-direction:column;gap:16px">
+  ${vis.map(r => `<div class="card" style="padding:20px 22px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div style="display:flex;gap:12px;align-items:flex-start"><span class="n">${s.risks.indexOf(r) + 1}</span><div><div style="font-size:16px;font-weight:600;line-height:1.3">${h(r.what)}</div><div class="sub" style="margin-top:3px">Step ${r.step} · ${h(s.steps[r.step - 1] ? s.steps[r.step - 1].t : '')}</div></div></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="arrow"><b>${D.before(r)}</b>${D.protected(r) ? `<span style="color:#9AA3B7">→</span><b>${D.after(r)}</b>` : ''}</span>${bandPill(D.after(r))}</div></div>
+    ${r.prot.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">${r.prot.map((p, i) => { const o = ORDER.find(x => x.k === p.k); return `<div class="po on" style="cursor:default"><span class="o">${o.n}</span><div style="display:flex;flex-direction:column;gap:4px;min-width:0"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-weight:600">${h(p.t)}</span><span class="lbl">${h(o.name)}</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="chip2">${h(p.owner || 'no owner')}</span><span class="chip2">${h(p.by || 'no date')}</span>${btn('Remove', 'prot.remove', `data-id="${r.id}" data-i="${i}"`, 'btn2 sm')}</div></div></div>`; }).join('')}</div>` : `<div style="margin-top:14px;padding:14px 16px;border-radius:12px;background:#FFF7E6;font-size:13.5px;color:#8A6200">Nothing in place yet. Start at the top of the list: can you take it out altogether?</div>`}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${btn('Add protection', 'prot.add', `data-id="${r.id}"`, r.prot.length ? 'btn2' : 'btn')}${D.protected(r) ? btn('Score it again', 'risk.open', `data-id="${r.id}"`, 'btn2') : ''}</div>
+  </div>`).join('') || '<div class="card" style="padding:22px"><span class="sub">Nothing in this group.</span></div>'}
+</div>`;
+}
+
+/* ---------- Long-term risk ---------- */
+function vLong() {
+  const s = Store.s, stops = D.stops(), need = D.needOwner(), miss = D.missingOwner();
+  const rd = D.readiness(), rb = D.readinessBefore();
+  const list = D.sorted();
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">5 · Long-term risk</div><div class="lead" style="margin-top:6px">The same risks, scored again now that you have done something about them. What is left is what you are actually carrying.</div></div></div>
+${stops.length ? `<div class="banner"><span class="pill p-r"><i></i>Stop point</span><div style="flex:1;font-size:13.5px"><b style="font-weight:600">${stops.length} risk${stops.length > 1 ? 's are' : ' is'} still 16 or over.</b> <span style="color:#5A3A38">On a worksite that is a stop-work. Here it means do not go ahead as it stands. You can sign once it comes down.</span></div>${btn('Work on it', 'risk.open', `data-id="${stops[0].id}"`, 'btn sm')}</div>` : miss.length ? `<div class="banner" style="background:linear-gradient(90deg,#FFF4DE,#FFFBF2)"><span class="pill p-a"><i></i>Needs a name and a date</span><div style="flex:1;font-size:13.5px"><b style="font-weight:600">${miss.length} risk${miss.length > 1 ? 's sit' : ' sits'} between 10 and 15.</b> <span style="color:#5A3A38">That band is allowed to go ahead, but only with someone's name on it and a date.</span></div>${btn('Set it', 'risk.owner', `data-id="${miss[0].id}"`, 'btn sm')}</div>` : `<div class="banner ok"><span class="pill p-g"><i></i>Clear</span><div style="flex:1;font-size:13.5px"><b style="font-weight:600">Nothing is sitting in a band that blocks you.</b> <span style="color:#33405C">Every risk is 9 or under, or it has a name and a date on it.</span></div>${btn('Go to sign-off', 'nav', 'data-v="sign"', 'btn sm')}</div>`}
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+  <div class="card kpi"><span class="sub">Top risk now</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${D.top()}</span><span class="delta ${D.top() < D.topBefore() ? 'up' : 'neu'}">was ${D.topBefore()}</span></div><div style="margin-top:auto;padding-top:8px">${bandPill(D.top())}</div></div>
+  <div class="card kpi"><span class="sub">How ready you feel</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${rd}<span style="font-size:16px;color:#6B7590;font-weight:500"> of 10</span></span><span class="delta ${rd > rb ? 'up' : 'neu'}">was ${rb}</span></div><div style="height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${rd * 10}%;background:#2E6BF2;border-radius:4px"></i></div></div>
+  <div class="card kpi"><span class="sub">Stop points left</span><span class="kv num" style="${stops.length ? 'color:#E0362C' : ''}">${stops.length}</span><span class="sub">16 and over</span></div>
+  <div class="card kpi"><span class="sub">Carrying with a date</span><span class="kv num">${need.length}</span><span class="sub">10 to 15, owned</span></div>
+</div>
+<div class="card" style="padding:22px 24px">${heatmap()}</div>
+<div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:12px"><div><div class="ct1">What moved</div><div class="sub" style="margin-top:2px">Every risk, where it started and where it sits now</div></div></div>
+  <div class="th" style="grid-template-columns:36px minmax(0,1fr) 130px 130px 122px"><span></span><span>Risk</span><span>Before</span><span>Now</span><span>What that means</span></div>
+  ${list.map(r => `<button class="tr" style="grid-template-columns:36px minmax(0,1fr) 130px 130px 122px" data-a="risk.open" data-id="${r.id}"><span class="n">${s.risks.indexOf(r) + 1}</span><div style="min-width:0"><div style="font-weight:600" class="ell">${h(r.what)}</div><div class="sub">${r.owner ? h(r.owner) + (r.by ? ' · by ' + h(r.by) : '') : 'no owner yet'}</div></div><span>${bandPill(D.before(r))}</span><span>${bandPill(D.after(r))}</span><span class="sub">${h(band(D.after(r)).rule)}</span></button>`).join('')}</div>`;
+}
+
+/* ---------- Sign-off ---------- */
+function vSign() {
+  const s = Store.s, can = D.canSign(), done = D.done();
+  const blockers = [];
+  if (!s.risks.every(r => D.protected(r))) blockers.push(s.risks.filter(r => !D.protected(r)).length + ' risk' + (s.risks.filter(r => !D.protected(r)).length > 1 ? 's have' : ' has') + ' nothing in place');
+  if (D.stops().length) blockers.push(D.stops().length + ' risk' + (D.stops().length > 1 ? 's are' : ' is') + ' still 16 or over');
+  if (D.missingOwner().length) blockers.push(D.missingOwner().length + ' risk' + (D.missingOwner().length > 1 ? 's need' : ' needs') + ' a name and a date');
+  return `
+<div><div class="h1">6 · Sign-off</div><div class="lead" style="margin-top:6px">You sign that this is what you decided and what you understood. The professional signs that they read it. Nobody signs for you.</div></div>
+${can ? `<div class="banner ok"><span class="pill p-g"><i></i>Ready</span><div style="flex:1;font-size:13.5px"><b style="font-weight:600">Nothing is blocking the sign-off.</b> <span style="color:#33405C">Read it through, then sign.</span></div></div>` : `<div class="banner" style="background:linear-gradient(90deg,#FFF4DE,#FFFBF2)"><span class="pill p-a"><i></i>Not yet</span><div style="flex:1;font-size:13.5px"><b style="font-weight:600">${blockers.join(', and ')}.</b> <span style="color:#5A3A38">Sign-off opens once that is sorted.</span></div></div>`}
+<div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="padding:22px 24px">
+      <div class="ct1">What you are signing</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+        <div class="kvr"><span class="sub">The decision</span><span style="font-weight:500">${h(s.card.decision)}</span></div>
+        <div class="kvr"><span class="sub">Who is on it</span><span>${h(s.me.name)}${s.me.joint ? ' and ' + h(s.me.co) : ''}</span></div>
+        <div class="kvr"><span class="sub">Steps</span><span>${s.steps.length}</span></div>
+        <div class="kvr"><span class="sub">Risks ranked</span><span>${s.risks.length}, top risk ${D.topBefore()} before protection and ${D.top()} after</span></div>
+        <div class="kvr"><span class="sub">Protection</span><span>${s.risks.reduce((t, r) => t + r.prot.length, 0)} things in place, each with a name and a date</span></div>
+        <div class="kvr"><span class="sub">Still carrying</span><span>${D.needOwner().length ? D.needOwner().length + ' risk' + (D.needOwner().length > 1 ? 's' : '') + ' between 10 and 15, owned and dated' : 'nothing above 9'}</span></div>
+        <div class="kvr"><span class="sub">Valid until</span><span>${h(s.card.valid)}</span></div>
+      </div>
+    </div>
+    <div class="card" style="padding:22px 24px"><div class="ct1">Re-do the card when</div><div class="sub" style="margin-top:2px">A worksite card is good for one shift. Yours is good until one of these happens.</div>
+      <div style="margin-top:10px">${s.triggers.map(t => `<button class="trg" data-a="trigger" data-id="${t.id}"><span class="box${t.on ? ' on' : ''}">${t.on ? '✓' : ''}</span><span>${h(t.t)}</span></button>`).join('')}</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="padding:20px 22px;display:flex;flex-direction:column;gap:12px"><div class="ct1">Signatures</div>
+      <div class="sig${s.sign.me ? ' done' : ''}"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span class="av" style="background:#2E6BF2;width:30px;height:30px">${h(s.me.ini)}</span><div><div style="font-weight:600">${h(s.me.name)}</div><div class="sub">${s.sign.me ? 'Signed' : 'Not signed'}</div></div></div>${btn(s.sign.me ? 'Undo' : 'Sign', 'sign', 'data-v="me"', s.sign.me ? 'btn2 sm' : 'btn sm' + (can ? '' : ' '))}</div></div>
+      ${s.me.joint ? `<div class="sig${s.sign.co ? ' done' : ''}"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span class="av" style="background:#0F9F8F;width:30px;height:30px">${h(s.me.coIni)}</span><div><div style="font-weight:600">${h(s.me.co)}</div><div class="sub">${s.sign.co ? 'Signed' : 'Signs on their own phone'}</div></div></div>${btn(s.sign.co ? 'Undo' : 'Send to ' + s.me.co.split(' ')[0], 'sign', 'data-v="co"', s.sign.co ? 'btn2 sm' : 'btn2 sm')}</div></div>` : ''}
+      <div class="sig"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:10px"><span class="av" style="background:#8A93A8;width:30px;height:30px">ML</span><div><div style="font-weight:600">${h(s.shared.agent || 'Your professional')}</div><div class="sub">${h(s.sign.pro)}</div></div></div></div></div>
+      ${!can ? `<div class="sub">Signing is open now if you want it, but the card will show what was still outstanding when you signed.</div>` : ''}
+    </div>
+    <div class="card" style="padding:20px 22px"><div class="ct1">After you sign</div><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;font-size:13.5px;line-height:1.5;color:#33405C">
+      <div>The card is sealed and time-stamped. Nothing in it can be changed after that without it showing.</div>
+      <div>It is kept for five years, because that is what the record-keeping rules ask for.</div>
+      <div>You can still withdraw access at any time. Anything already shared, or that they have to keep by law, may not be recoverable.</div></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${btn('Print or save', 'print', '', 'btn2 sm')}${btn('Who sees what', 'nav', 'data-v="who"', 'btn2 sm')}</div></div>
+  </div>
+</div>`;
+}
+
+/* ---------- Your money ---------- */
+function vMoney() {
+  const s = Store.s, b = s.bank;
+  const vis = U.fTab === 'all' ? s.facts : s.facts.filter(f => f.tag === U.fTab);
+  const T = [['all', 'All', s.facts.length], ['confirmed', 'Confirmed', D.tagged('confirmed')], ['stated', 'You said it', D.tagged('stated')], ['estimated', 'Estimated', D.tagged('estimated')], ['unknown', 'Not known yet', D.tagged('unknown')]];
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Your money</div><div class="lead" style="margin-top:6px">Every figure carries a label saying where it came from. A number you guessed never reaches a professional looking like a number you checked.</div></div><div class="tabs">${T.map(([k, l, n]) => `<button class="tab${U.fTab === k ? ' on' : ''}" data-a="f.tab" data-v="${k}">${l}<span class="c">${n}</span></button>`).join('')}</div></div>
+<div class="card" style="padding:20px 22px;${b.connected ? '' : 'background:#10233F;color:#fff'}">
+  ${b.connected ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap"><div><div class="ct1">Your bank is connected</div><div class="sub" style="margin-top:3px">${D.tagged('confirmed')} figures are confirmed. Your consent runs out in ${b.consentMonths} months and then it stops on its own.</div></div><div style="display:flex;gap:8px">${btn('What was shared', 'bank.what', '', 'btn2')}${btn('Disconnect', 'bank.off', '', 'btn2')}</div></div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px">${[['Income', 'Confirmed by type'], ['Fixed costs', 'Found and totalled'], ['Buffer', '2.1 months'], ['Missed payments', 'None in 12 months']].map(([k, v]) => `<div class="m"><span class="sub">${k}</span><span style="font-size:15px;font-weight:600">${v}</span></div>`).join('')}</div>` :
+      `<div style="display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap"><div style="max-width:58ch"><div style="font-size:20px;font-weight:600;letter-spacing:-.015em">Want the money part checked rather than guessed?</div><div style="font-size:14.5px;line-height:1.55;color:#A9B4CE;margin-top:8px">You can connect your bank for read-only access. It confirms what you earn, what goes out each month and how much buffer you have. Nobody sees your transactions, not us and not your broker. They see that it was checked and when.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${btn('Connect my bank', 'bank.on')}${btn('What exactly happens', 'bank.what', '', 'btn2')}</div></div>
+  <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap">${['Read-only, never moves money', 'You can stop it any time', 'Expires on its own in 12 months', 'Your broker sees signals, never statements'].map(t => `<span style="font-size:12.5px;color:#A9B4CE;display:flex;align-items:center;gap:7px"><span style="width:6px;height:6px;border-radius:50%;background:#6A93F7;display:block"></span>${t}</span>`).join('')}</div>`}
+</div>
+<div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:12px"><div><div class="ct1">Your figures</div><div class="sub" style="margin-top:2px">Change anything that is wrong. It is your card.</div></div></div>
+  <div class="th" style="grid-template-columns:minmax(0,1.3fr) 120px 110px"><span>What</span><span>Value</span><span>Where from</span></div>
+  ${vis.map(f => `<div class="fact"><div><div style="font-weight:500">${h(f.k)}</div><div class="sub">${h(f.src)}</div></div><span class="num" style="font-weight:600">${h(f.v)}</span><span>${tag(f.tag)}</span></div>`).join('')}
+  <div style="padding:12px 18px" class="sub">The working for anything 4ormIQ calculated is shown wherever the figure is used. No figure is ever used in a scenario unless you gave it to us first.</div></div>`;
+}
+
+/* ---------- Who sees what ---------- */
+function vWho() {
+  const s = Store.s;
+  return `
+<div><div class="h1">Who sees what</div><div class="lead" style="margin-top:6px">Three layers, each one separate. You can switch any of them off whenever you like, and switching one off does not touch the others.</div></div>
+${s.shared.link ? `<div class="card" style="padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><div><div class="ct1">Shared with ${h(s.shared.with)}</div><div class="sub" style="margin-top:3px">${h(s.shared.agent)} · you sent the link ${h(s.shared.at)}. They asked for access, you did not get contacted first.</div></div><div style="display:flex;gap:8px">${btn('See what they see', 'who.preview', '', 'btn2')}${btn('Stop sharing', 'who.stop', '', 'btn2')}</div></div>` : `<div class="card" style="padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><div><div class="ct1">Not shared with anyone</div><div class="sub" style="margin-top:3px">Your card is yours alone. When you are ready, you send someone a link. 4ormIQ never contacts anyone for you.</div></div>${btn('Share with a professional', 'who.share')}</div>`}
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+  ${s.layers.map(l => `<div class="card layer" style="${l.on ? '' : 'opacity:.78'}"><div style="display:flex;justify-content:space-between;align-items:center"><span class="no">LAYER ${l.n}</span><button class="toggle${l.on ? '' : ' off'}" data-a="layer" data-v="${l.n}" aria-label="${h(l.name)}"></button></div>
+    <div style="font-size:16px;font-weight:600;line-height:1.3">${h(l.name)}</div>
+    <div class="sub" style="line-height:1.55">${h(l.what)}</div>
+    ${l.phrase ? `<span class="lock">${h(l.phrase)}</span>` : ''}
+    <div style="margin-top:auto;padding-top:8px" class="sub">${h(l.who)}</div>
+    <div>${l.on ? `<span class="pill p-g"><i></i>On</span>` : `<span class="pill p-n"><i></i>Off</span>`}</div></div>`).join('')}
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+  <div class="card" style="padding:20px 22px"><div class="ct1">What a professional can and cannot see</div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-top:12px;font-size:13.5px">
+      ${[['Your decision, steps and risks', true], ['What you did about each risk', true], ['That your identity was checked, and when', true], ['That your income was checked, and when', true], ['Your bank statements', false], ['Your individual transactions', false], ['Your full lender file', false], ['Anything after you switch a layer off', false]].map(([t, y]) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span>${t}</span>${y ? `<span class="pill p-g"><i></i>Yes</span>` : `<span class="pill p-n"><i></i>No</span>`}</div>`).join('')}
+    </div></div>
+  <div class="card" style="padding:20px 22px"><div class="ct1">Taking it back</div>
+    <div style="font-size:13.5px;line-height:1.6;color:#33405C;margin-top:10px;display:flex;flex-direction:column;gap:10px">
+      <div>Switching a layer off stops any new access from that moment.</div>
+      <div>Being straight with you: information already shared, or that they have to keep by law, may not be recoverable. We will not tell you otherwise.</div>
+      <div>If you connected your bank, that consent runs out on its own after 12 months whether you remember or not.</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${btn('Switch everything off', 'who.stop', '', 'btn2 sm')}${btn('Download my card', 'export', '', 'btn2 sm')}</div></div>
+</div>`;
+}
+
+/* ---------- Record ---------- */
+function vRecord() {
+  const s = Store.s;
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Your record</div><div class="lead" style="margin-top:6px">Everything that happened on this card, in order, with the time it happened. The professional sees the same list. So would a regulator.</div></div><div style="display:flex;gap:8px">${btn('Download my card', 'export', '', 'btn2')}${btn('Print or save', 'print')}</div></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+  <div class="card kpi"><span class="sub">Entries</span><span class="kv num">${s.log.length}</span><span class="sub">each one time-stamped</span></div>
+  <div class="card kpi"><span class="sub">Kept until</span><span class="kv num" style="font-size:24px">Oct 2031</span><span class="sub">five years, as the rules ask</span></div>
+  <div class="card kpi"><span class="sub">Who has opened it</span><span class="kv num">${s.shared.link ? 2 : 1}</span><span class="sub">you${s.shared.link ? ' and ' + h(s.shared.agent.split(' ')[0]) : ''}</span></div>
+  <div class="card kpi"><span class="sub">Changed after signing</span><span class="kv num">0</span><span class="sub">it would show if it had been</span></div>
+</div>
+<div class="card" style="padding:18px 22px">${s.log.map(g => `<div class="alog" style="grid-template-columns:86px minmax(0,1fr)"><span class="mono sub">${h(g.t)}</span><div><b style="font-weight:600">${h(g.a)}</b> <span style="color:#4A5570">${h(g.d)}</span></div></div>`).join('')}</div>
+<div class="card" style="padding:20px 22px"><div class="ct1">Why this is kept</div><div class="lead" style="margin-top:8px;font-size:14.5px">A professional has to be able to show that they understood your situation and your plans, that they told you the risks in writing, and that you said you understood. This card is that, in your words rather than theirs. It also means nobody has to reconstruct it later from memory.</div></div>`;
+}
+
+/* ---------- Talk it through ---------- */
+const TURNS = [
+  { resp: "That's a big move, and a lot to hold in your head at once.", q: "When does your mortgage term end?", a: ["In about six months", "Already ended", "Over a year away", "I'm not sure"], own: "Or tell me in your own words", adds: "Term end" },
+  { resp: "That's a really common spot to be in, and now is the right time to ask.", q: "Is anything changing with your income in the next year?", a: ["Yes, parental leave", "Yes, a job change", "No, steady", "Not sure yet"], own: "Or tell me in your own words", adds: "Future plans" },
+  { resp: "Thanks for telling me. That changes what we should be careful about.", q: "What would make this a good outcome for you?", a: [], own: "Say it however you like. There is no list here, because a list would be me deciding what good looks like for you.", adds: "What a good outcome looks like" },
+  { resp: "That's the thing to build everything else around, so let's hold onto it.", q: "Of the things that could go wrong, which one worries you most?", a: ["The payment while I'm on leave", "Selling for less than we need", "The two closings not lining up", "What breaking the mortgage costs"], own: "Or tell me in your own words", adds: "Your top risk" },
+  { resp: "So if that happened, you would be dipping into savings or worse. That is what we score as major.", q: "How likely does it feel, honestly?", a: ["It would surprise me", "I doubt it", "It could go either way", "I expect it"], own: "Or tell me in your own words", adds: "Likelihood, 4 of 5" },
+  { resp: "That puts it at 16 out of 25, which is a stop point. Not a disaster, a signal to deal with it before you go ahead.", q: "Would it be worth looking at what would bring that down?", a: ["Yes, let's look", "Not right now"], own: "Or tell me in your own words", adds: "Protection started" }
+];
+function vTalk() {
+  const c = Store.s.chat, i = Math.min(c.i, TURNS.length - 1), t = TURNS[i], done = c.i >= TURNS.length;
+  const prev = c.answers.length ? c.answers[c.answers.length - 1] : null;
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Talk it through</div><div class="lead" style="margin-top:6px">One question at a time, in the order that makes sense. You can stop whenever you want and everything stays. This is what it looks like on a phone.</div></div>${btn('Start again', 'chat.reset', '', 'btn2')}</div>
+<div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+  <div class="phone"><div class="scr">
+    <div class="ptop"><span class="mono" style="font-size:11px;color:#8A93A8">4ORM<span style="color:#2E6BF2">IQ</span></span><button class="btn2 sm" data-a="pause">Pause</button></div>
+    <div class="pbody">
+      ${c.answers.length > 1 ? `<button class="earlier" data-a="chat.earlier">Earlier: ${c.answers.length - 1} message${c.answers.length - 1 > 1 ? 's' : ''}</button>` : ''}
+      ${prev ? `<div class="prev">You said: ${h(prev)}</div>` : ''}
+      ${done ? `<div class="resp">That is enough to start your card. Five risks, scored, and the top one has something against it now.</div><div class="q">Shall we look at the whole card?</div><div style="display:flex;flex-direction:column;gap:10px"><button class="ans" data-a="nav" data-v="card">Yes, show me the card</button><button class="ans" data-a="chat.reset">Go back to the start</button></div>` :
+      `<div class="resp">${h(t.resp)}</div><div class="q">${h(t.q)}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">${t.a.map(a => `<button class="ans" data-a="chat.ans" data-v="${h(a)}">${h(a)}</button>`).join('')}<button class="ownway" data-a="chat.own">${h(t.own)}</button></div>
+      ${prev ? `<div class="added"><span style="width:7px;height:7px;border-radius:50%;background:#1F9D6A;display:block"></span>Added to your card: ${h(TURNS[i - 1] ? TURNS[i - 1].adds : '')}</div>` : ''}`}
+    </div>
+    <div class="pfoot"><button class="btn2 sm" data-a="chat.back" ${c.i ? '' : 'disabled'}>Back</button><div class="dots">${TURNS.map((x, k) => `<i class="${k < c.i ? 'done' : k === c.i ? 'now' : ''}"></i>`).join('')}</div></div>
+  </div></div>
+  <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="padding:20px 22px"><div class="ct1">Why it is built this way</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;font-size:13.5px;line-height:1.55;color:#33405C">
+        <div><b style="font-weight:600;color:#0B1324">One question per screen.</b> Money worry costs real thinking power. Research in Science put it at about thirteen IQ points, roughly a night without sleep. So we never put two decisions on one screen.</div>
+        <div><b style="font-weight:600;color:#0B1324">A pause button that always works.</b> You can stop the clock and nothing is lost. Guidance for vulnerable customers asks for exactly that.</div>
+        <div><b style="font-weight:600;color:#0B1324">Options, or a blank box, never both by accident.</b> For a fact about you, like a balance, you get an open box, because a list of ranges would anchor your answer. For a choice, you get options, including "I did not know I had a choice". For what a good outcome looks like, always a blank box, because a menu there would be us deciding for you.</div>
+        <div><b style="font-weight:600;color:#0B1324">You open, not us.</b> 4ormIQ never greets you with its own question first, and it never contacts anyone on your behalf.</div>
+      </div></div>
+    <div class="card" style="padding:20px 22px"><div class="ct1">What lands on the card</div><div class="sub" style="margin-top:2px">Shown the moment it happens, so you watch the record form</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">${TURNS.map((x, k) => `<div style="display:flex;align-items:center;gap:10px;font-size:13.5px"><span class="box${k < c.i ? ' on' : ''}">${k < c.i ? '✓' : ''}</span><span style="${k < c.i ? '' : 'color:#8A93A8'}">${h(x.adds)}</span></div>`).join('')}</div></div>
+  </div>
+</div>`;
+}
+
+
+/* ---------- Documents ---------- */
+function vDocs() {
+  const s = Store.s, docs = s.docs;
+  const show = (d) => U.dOpt || !d.opt;
+  const vis = docs.filter(show);
+  const cur = U.dStage;
+  const list = vis.filter(d => d.stage === cur);
+  const cnt = (k) => { const g = vis.filter(d => d.stage === k); return { n: g.length, got: g.filter(d => d.status !== 'todo').length }; };
+  const all = { n: vis.length, got: vis.filter(d => d.status !== 'todo').length };
+  const st = STAGES.find(x => x.k === cur);
+  const TICK = { todo: ['tick', ''], got: ['tick got', 'OK'], sent: ['tick sent', 'OK'] };
+  const LBL = { todo: 'Not yet', got: 'You have it', sent: 'Sent' };
+  const tips = LIB.filter(l => l.stage === cur);
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">What you need, in order</div><div class="lead" style="margin-top:6px">Every document a mortgage in British Columbia asks for, in the order it is actually needed. Tick them off as you get them. The ones marked only if it applies will not apply to everyone.</div></div>
+<div style="display:flex;gap:8px;align-items:center"><button class="fchip${U.dOpt ? ' on' : ''}" data-a="d.opt">Show the ones that only sometimes apply</button></div></div>
+<div class="card" style="padding:18px 20px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><div class="ct1">${all.got} of ${all.n} gathered</div><div class="sub" style="margin-top:2px">Nothing here is sent anywhere until you choose to send it.</div></div><div style="display:flex;gap:8px">${btn('Print the checklist', 'd.print', '', 'btn2 sm')}${btn('Mark this stage done', 'd.stage.all', 'data-v="' + cur + '"', 'btn2 sm')}</div></div>
+  <div style="height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden;margin-top:12px"><i style="display:block;height:100%;width:${Math.round(all.got / all.n * 100)}%;background:#2E6BF2;border-radius:4px"></i></div></div>
+<div style="display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;align-items:start">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    ${STAGES.map((x, i) => { const c = cnt(x.k); const full = c.got === c.n; return `<button class="stg2${cur === x.k ? ' on' : ''}" data-a="d.stage" data-v="${x.k}"><span class="n">${i + 1}</span><span style="font-weight:600">${h(x.n)}</span><span class="sub mono" style="white-space:nowrap">${full ? 'done' : c.got + '/' + c.n}</span><div class="bar2"><i style="width:${c.n ? Math.round(c.got / c.n * 100) : 0}%;background:${full ? '#1F9D6A' : '#6A93F7'}"></i></div></button>`; }).join('')}
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="overflow:hidden">
+      <div class="ch" style="padding-bottom:12px"><div><div class="ct1">${h(st.n)}</div><div class="sub" style="margin-top:2px">${h(st.s)}</div></div></div>
+      <div class="th" style="grid-template-columns:26px minmax(0,1fr) 150px 104px"><span></span><span>Document</span><span>Where it comes from</span><span>Status</span></div>
+      ${list.map(d => `<button class="dr${d.status !== 'todo' ? ' got' : ''}${U.dSel === d.id ? ' on' : ''}" data-a="d.sel" data-id="${d.id}"><span class="${TICK[d.status][0]}">${TICK[d.status][1]}</span><div style="min-width:0"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-weight:600">${h(d.n)}</span>${d.opt ? '<span class="opt-b">only if it applies</span>' : ''}${d.who === 'pro' ? '<span class="opt-b" style="background:#EAF0FE;color:#1F4FBF">they give you this</span>' : ''}</div><div class="sub">${h(d.why)}</div></div><span class="sub">${h(d.from)}</span><span class="sub">${LBL[d.status]}</span></button>`).join('')}
+      <div style="padding:12px 18px" class="sub">${list.length} item${list.length === 1 ? '' : 's'} at this stage.</div>
+    </div>
+    ${U.dSel && docs.find(d => d.id === U.dSel) ? (() => { const d = docs.find(x => x.id === U.dSel); return `<div class="card" style="padding:20px 22px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div class="lbl">${h(STAGES.find(x => x.k === d.stage).n)}</div><div style="font-size:18px;font-weight:600;margin-top:6px;line-height:1.3">${h(d.n)}</div></div><span class="pill ${d.status === 'todo' ? 'p-n' : d.status === 'got' ? 'p-g' : 'p-b'}"><i></i>${LBL[d.status]}</span></div>
+      <div style="font-size:14px;line-height:1.6;color:#33405C;margin-top:12px">${h(d.why)}</div>
+      <div class="kvr" style="margin-top:10px"><span class="sub">Where from</span><span>${h(d.from)}</span></div>
+      ${d.rule ? `<div class="kvr"><span class="sub">Asked for by</span><span>${h(d.rule)}</span></div>` : ''}
+      <div class="kvr"><span class="sub">Who produces it</span><span>${d.who === 'pro' ? 'Your professional gives this to you' : 'You provide it'}</span></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${btn(d.status === 'todo' ? 'I have this' : 'Not yet after all', 'd.got', 'data-id="' + d.id + '"')}${d.status !== 'todo' ? btn(d.status === 'sent' ? 'Mark as not sent' : 'Sent it', 'd.sent', 'data-id="' + d.id + '"', 'btn2') : ''}${btn('Turn this into a risk', 'd.risk', 'data-id="' + d.id + '"', 'btn2')}</div></div>`; })() : ''}
+    ${tips.length ? `<div class="card" style="padding:20px 22px"><div class="ct1">Worth knowing at this stage</div><div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">${tips.map(l => `<button class="opt" data-a="know.open" data-id="${l.id}"><span class="ltag">${h(l.tag)}</span><span style="flex:1;font-weight:500">${h(l.t)}</span><span class="sub">Read</span></button>`).join('')}</div></div>` : ''}
+  </div>
+</div>`;
+}
+
+/* ---------- Scenario ---------- */
+function vScenario() {
+  const i = Store.s.sc, r = runScenario(i);
+  const F = (k, label, hint) => `<label class="ff"><span><span style="font-weight:500">${label}</span>${hint ? `<span class="sub" style="display:block">${hint}</span>` : ''}</span><input data-f="sc.${k}" value="${h(i[k])}" inputmode="decimal"></label>`;
+  const T = (k, label, sub) => `<button class="opt${i[k] ? ' on' : ''}" data-a="sc.toggle" data-v="${k}"><span class="box${i[k] ? ' on' : ''}">${i[k] ? '✓' : ''}</span><div><div style="font-weight:500">${label}</div><div class="sub">${sub}</div></div></button>`;
+  const FC = { r: 'f-r', a: 'f-a', g: 'f-g', b: 'f-b' };
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Run it for real</div><div class="lead" style="margin-top:6px">Put your own numbers in. Every figure that comes back shows its working, and the rule behind it is named. This is arithmetic, not an approval, and no lender has seen it.</div></div><div style="display:flex;gap:8px">${btn('Start from my card', 'sc.mine', '', 'btn2')}${btn('Reset', 'sc.reset', '', 'btn2')}</div></div>
+<div style="display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;align-items:start">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="padding:20px 22px"><div class="ct1">The home</div>
+      ${F('price', 'Purchase price')}${F('down', 'Down payment')}${F('tax', 'Property tax a year')}${F('strata', 'Strata fee a month', 'Zero if it is not a strata')}
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">${T('firstTime', 'First time buyer', 'Nobody on title has owned a principal residence anywhere')}${T('newBuild', 'Newly built, never lived in', 'A different exemption, with a higher threshold')}</div></div>
+    <div class="card" style="padding:20px 22px"><div class="ct1">The mortgage</div>${F('rate', 'Rate you have been quoted', 'Per cent')}${F('amort', 'Amortization', 'Years')}</div>
+    <div class="card" style="padding:20px 22px"><div class="ct1">You</div>${F('income', 'Household income before tax', 'A year')}${F('debts', 'Other monthly payments', 'Cards, loans, car, support')}</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+      <div class="card kpi"><span class="sub">Your payment</span><span class="kv num" style="font-size:26px">${money(r.payment)}</span><span class="sub">a month, at ${pct(+i.rate)}</span></div>
+      <div class="card kpi"><span class="sub">Tested at</span><span class="kv num" style="font-size:26px">${money(r.stressPayment)}</span><span class="sub">${pct(r.mqr)}, the qualifying rate</span></div>
+      <div class="card kpi" style="${r.gdsOk && r.tdsOk ? '' : 'background:#FDECEB'}"><span class="sub">Housing against income</span><span class="kv num" style="font-size:26px;${r.gdsOk ? '' : 'color:#E0362C'}">${pct(r.gds)}</span><span class="sub">limit ${r.gdsLimit}%, all debts ${pct(r.tds)}</span></div>
+      <div class="card kpi"><span class="sub">Cash on closing day</span><span class="kv num" style="font-size:26px">${money(r.cashNeeded)}</span><span class="sub">down payment plus costs</span></div>
+    </div>
+    <div class="card" style="padding:20px 22px"><div class="ct1">What this tells you</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+      ${r.flags.map(f => `<div class="fl2 ${FC[f.k]}"><i></i><div><div style="font-weight:600">${h(f.t)}</div><div style="font-size:13px;line-height:1.5;margin-top:3px;color:#33405C">${h(f.s)}</div></div></div>`).join('')}</div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${btn('Turn a flag into a risk on my card', 'sc.torisk')}${btn('Save this scenario to my record', 'sc.save', '', 'btn2')}</div></div>
+    <div class="card" style="padding:20px 22px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="ct1">The working</span><span class="sub">every step, so you can check it or argue with it</span></div>
+      <div style="margin-top:8px">${r.steps.map(x => `<div class="work"><div><div style="font-weight:600">${h(x.t)}</div><div class="sub" style="line-height:1.5;margin-top:3px">${h(x.w)}</div></div><span class="wv">${h(x.v)}</span></div>`).join('')}</div>
+      <div style="margin-top:14px;padding:12px 14px;border-radius:12px;background:#F5F8FF;font-size:12.5px;color:#4A5570;line-height:1.55">Sources: the qualifying rate is OSFI's. The insurance premium bands and the $1.5 million cap are the insurer's and the Department of Finance's. The property transfer tax rates and both exemptions are the Province of BC's. Every one is linked on the Know this page.</div></div>
+    <div class="card" style="padding:20px 22px"><div class="ct1">Closing costs, roughly</div><div class="sub" style="margin-top:2px">The part people forget until the last fortnight</div>
+      <div style="margin-top:12px">${[['Property transfer tax', r.closing.ptt, r.ptt.band], ['Lawyer or notary', r.closing.legal, 'Varies, ask for a quote'], ['Home inspection', r.closing.inspection, 'Before you remove subjects'], ['Appraisal', r.closing.appraisal, r.insurable ? 'Usually covered when the mortgage is insured' : 'Often charged on an uninsured mortgage'], ['Fire insurance, first payment', r.closing.insurance, 'No lender funds without it'], ['Moving', r.closing.moving, 'Keep this out of your buffer']].map(([k, v, s]) => `<div class="fact" style="grid-template-columns:minmax(0,1fr) 110px"><div><div style="font-weight:500">${k}</div><div class="sub">${h(s)}</div></div><span class="num" style="font-weight:600;text-align:right">${money(v)}</span></div>`).join('')}
+      <div class="fact" style="grid-template-columns:minmax(0,1fr) 110px;background:#F7F8FB"><span style="font-weight:600">Total</span><span class="num" style="font-weight:600;text-align:right">${money(r.closingTotal)}</span></div></div></div>
+  </div>
+</div>`;
+}
+
+/* ---------- Know this ---------- */
+function vKnow() {
+  const tags = ['All'].concat(LIB.map(l => l.tag).filter((v, i, a) => a.indexOf(v) === i));
+  const vis = U.kTag === 'All' ? LIB : LIB.filter(l => l.tag === U.kTag);
+  const open = U.kSel ? LIB.find(l => l.id === U.kSel) : null;
+  const srcOf = (l) => l.src && SOURCES[l.src] ? `<div class="srcline">Source: <a href="${SOURCES[l.src][1]}" target="_blank" rel="noopener">${h(SOURCES[l.src][0])}</a></div>` : `<div class="srcline">Common practice. Ask your own lender to confirm it in writing.</div>`;
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Know this</div><div class="lead" style="margin-top:6px">The things that are true, that nobody tells you, and that cost money when you find out late. Every one has a source, or says plainly that it is common practice rather than a rule.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${tags.map(t => `<button class="fchip${U.kTag === t ? ' on' : ''}" data-a="k.tag" data-v="${h(t)}">${h(t)}</button>`).join('')}</div></div>
+${open ? `<div class="card" style="padding:26px 28px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px"><div style="max-width:72ch"><div class="ltag">${h(open.tag)}</div><div style="font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.25;margin-top:8px">${h(open.t)}</div></div>${btn('Close', 'k.close', '', 'btn2 sm')}</div>
+  <div style="font-size:15.5px;line-height:1.65;color:#33405C;margin-top:14px;max-width:76ch">${h(open.w)}</div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;margin-top:18px">
+    <div style="padding:14px 16px;border-radius:12px;background:#F5F8FF"><div class="lbl" style="color:#2E6BF2">What to do about it</div><div style="font-size:14px;line-height:1.6;margin-top:7px">${h(open.do)}</div></div>
+    <div class="worth"><div><div class="lbl" style="color:#176648">What it is worth</div><div style="margin-top:6px">${h(open.worth)}</div></div></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">${srcOf(open)}<div style="display:flex;gap:8px">${btn('Ask my broker about this', 'k.ask', 'data-id="' + open.id + '"', 'btn2 sm')}${btn('Add it as a risk on my card', 'k.torisk', 'data-id="' + open.id + '"', 'btn sm')}</div></div></div>` : ''}
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+  ${vis.map(l => `<button class="card lcard${U.kSel === l.id ? '' : ''}" data-a="know.open" data-id="${l.id}"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="ltag">${h(l.tag)}</span><span class="sub">${h(STAGES.find(x => x.k === l.stage) ? STAGES.find(x => x.k === l.stage).n : '')}</span></div><div style="font-size:16.5px;font-weight:600;line-height:1.35">${h(l.t)}</div><div style="font-size:13.5px;line-height:1.55;color:#5B606C">${h(l.w.slice(0, 150))}${l.w.length > 150 ? '…' : ''}</div><div class="srcline" style="margin-top:auto">${h(l.worth)}</div></button>`).join('')}
+</div>
+<div class="card" style="padding:20px 22px"><div class="ct1">Why this page exists</div><div class="lead" style="margin-top:8px;font-size:14.5px">None of this is secret. It is all written down somewhere, in a rule, a guideline or a contract clause. It is just written where nobody reads it, at a moment when nobody is looking. Gathering it in one place, before the decision rather than after, is most of the job.</div></div>`;
+}
+
+const PAGES = { card: vCard, docs: vDocs, scenario: vScenario, know: vKnow, risks: vRisks, protect: vProtect, long: vLong, sign: vSign, money: vMoney, who: vWho, record: vRecord, talk: vTalk };
+const HDR = {
+  card: () => btn('Who sees what', 'nav', 'data-v="who"', 'btn2'),
+  risks: () => btn('Add a risk', 'risk.add'),
+  protect: () => btn('Long-term risk', 'nav', 'data-v="long"', 'btn2'),
+  long: () => btn('Sign-off', 'nav', 'data-v="sign"', 'btn2'),
+  sign: () => btn('Print or save', 'print', '', 'btn2'),
+  money: () => btn('Who sees what', 'nav', 'data-v="who"', 'btn2'),
+  who: () => btn('Download my card', 'export', '', 'btn2'),
+  record: () => btn('Download my card', 'export', '', 'btn2'),
+  talk: () => btn('The card', 'nav', 'data-v="card"', 'btn2'),
+  docs: () => btn('Run it for real', 'nav', 'data-v="scenario"', 'btn2'),
+  scenario: () => btn('Know this', 'nav', 'data-v="know"', 'btn2'),
+  know: () => btn('What you need', 'nav', 'data-v="docs"', 'btn2')
+};
+
+/* app · router, events, modals, toasts */
+const ROOT = document.getElementById('app');
+function render() {
+  const page = (PAGES[U.route] || vCard)();
+  ROOT.innerHTML = sidebar() + `<main class="main">${header(TITLES[U.route], HDR[U.route] ? HDR[U.route]() : '')}<div class="body">${page}</div></main>`;
+  document.title = TITLES[U.route] + ' · 4ormIQ';
+}
+function go(r, keep) { if (!PAGES[r]) r = 'card'; U.route = r; if (location.hash !== '#/' + r) history.replaceState(null, '', '#/' + r); render(); if (!keep) window.scrollTo(0, 0); }
+Store.listeners.push(render);
+
+let toastWrap;
+function toast(msg, opts) {
+  opts = opts || {};
+  if (!toastWrap) { toastWrap = document.createElement('div'); toastWrap.className = 'toasts'; document.body.appendChild(toastWrap); }
+  const el = document.createElement('div'); el.className = 'toast';
+  el.innerHTML = `<span>${h(msg)}</span>${opts.undo ? '<button data-t="undo">Undo</button>' : ''}<button data-t="x">Dismiss</button>`;
+  el.querySelector('[data-t="x"]').onclick = () => el.remove();
+  if (opts.undo) el.querySelector('[data-t="undo"]').onclick = () => { opts.undo(); el.remove(); };
+  toastWrap.appendChild(el); setTimeout(() => el.remove(), opts.ms || 5200);
+}
+function withUndo(label, fn) { const snap = Store.snapshot(); fn(); toast(label, { undo: () => { Store.restore(snap); toast('Put back.'); } }); }
+
+let modalEl = null;
+function modal(o) {
+  closeModal();
+  modalEl = document.createElement('div'); modalEl.className = 'ovl';
+  modalEl.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="mh"><div><div style="font-size:18px;font-weight:600;letter-spacing:-.015em">${h(o.title)}</div>${o.sub ? `<div class="sub" style="margin-top:4px">${h(o.sub)}</div>` : ''}</div><button class="btn2 sm" data-m="close">Close</button></div><div class="mb">${o.body || ''}</div><div class="mf">${(o.actions || []).map((a, i) => `<button class="${a.cls || (i === 0 ? 'btn' : 'btn2')}" data-m="act" data-i="${i}">${h(a.label)}</button>`).join('')}</div></div>`;
+  document.body.appendChild(modalEl);
+  modalEl.addEventListener('click', (e) => {
+    if (e.target === modalEl || e.target.closest('[data-m="close"]')) return closeModal();
+    const pick = e.target.closest('[data-pick]');
+    if (pick) { modalEl.querySelectorAll('[data-pick]').forEach(x => x.classList.remove('on')); pick.classList.add('on'); const inp = modalEl.querySelector('input[data-fx="t"]'); if (inp && pick.dataset.text && !inp.value.trim()) inp.value = pick.dataset.text; return; }
+    const b = e.target.closest('[data-m="act"]'); if (b) { const a = o.actions[+b.dataset.i]; const r = a.run ? a.run(modalEl) : true; if (r !== false) closeModal(); }
+  });
+  const f = modalEl.querySelector('input,textarea'); if (f) f.focus();
+}
+function closeModal() { if (modalEl) { modalEl.remove(); modalEl = null; } }
+const val = (s) => { const e = modalEl && modalEl.querySelector(s); return e ? e.value.trim() : ''; };
+const picked = () => { const e = modalEl && modalEl.querySelector('[data-pick].on'); return e ? e.dataset.pick : null; };
+
+let dlCap;
+function download(name, text, type) {
+  const blob = new Blob([text], { type: type || 'text/plain' });
+  const direct = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
+  if (dlCap === undefined && window.claude && window.claude.use) dlCap = claude.use('downloads').catch(() => null);
+  if (dlCap && dlCap.then) { dlCap.then(d => { if (d && d.save) d.save({ filename: name, data: text }).catch(() => toast('Download declined.')); else direct(); }); return; }
+  direct();
+}
+function cardJSON() {
+  const s = Store.s;
+  return JSON.stringify({
+    card: s.card, who: s.me, preCheck: s.pre, steps: s.steps,
+    risks: s.risks.map(r => ({ step: r.step, what: r.what, before: { likelihood: r.L, severity: r.S, score: D.before(r), band: band(D.before(r)).name }, protection: r.prot, after: { likelihood: r.L2, severity: r.S2, score: D.after(r), band: band(D.after(r)).name }, owner: r.owner, by: r.by })),
+    figures: s.facts, longTermRisk: { topRisk: D.top(), readiness: D.readiness(), stopPoints: D.stops().length, carryingWithADate: D.needOwner().length },
+    signOff: s.sign, reassessWhen: s.triggers.filter(t => t.on).map(t => t.t),
+    whoSeesWhat: s.layers, sharedWith: s.shared, record: s.log, exported: NOW.day
+  }, null, 2);
+}
+function printDocs() {
+  const w = window.open('', '_blank'); if (!w) { toast('Allow pop-ups to print.'); return; }
+  const s = Store.s;
+  const body = STAGES.map((st, i) => { const ds = s.docs.filter(d => d.stage === st.k); return `<h2>${i + 1}. ${h(st.n)}</h2><p class="k">${h(st.s)}</p><table><tbody>${ds.map(d => `<tr><td style="width:22px">${d.status !== 'todo' ? '&#10003;' : '&#9744;'}</td><td><b>${h(d.n)}</b>${d.opt ? ' <i>(only if it applies)</i>' : ''}<br><span class="k">${h(d.why)}</span></td><td style="width:150px" class="k">${h(d.from)}</td></tr>`).join('')}</tbody></table>`; }).join('');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>What you need, in order</title><style>body{font-family:system-ui,sans-serif;color:#0B1324;padding:28px;line-height:1.5;max-width:900px}h1{font-size:24px;letter-spacing:-.02em;margin:0 0 4px}h2{font-size:15px;margin:22px 0 2px}table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}td{padding:7px 8px;vertical-align:top;border-top:1px solid #EEF1F6}.k{color:#6B7590;font-size:12px}</style></head><body><h1>What you need, in order</h1><div class="k">A mortgage in British Columbia &middot; ${h(s.card.decision)} &middot; ${h(s.me.name)}</div>${body}<p class="k">Sources for every rule named here are on the Know this page of your card.</p><script>setTimeout(function(){window.print()},500)<\/script></body></html>`);
+  w.document.close();
+}
+function printCard() {
+  const w = window.open('', '_blank');
+  if (!w) { toast('Allow pop-ups to print, or use Print from the browser menu.'); return; }
+  const s = Store.s;
+  const rows = D.sorted().map(r => `<tr><td>${s.risks.indexOf(r) + 1}</td><td>${h(r.what)}</td><td>${r.L}×${r.S}=${D.before(r)}</td><td>${r.prot.map(p => h(p.t)).join('; ') || '—'}</td><td>${r.L2}×${r.S2}=${D.after(r)}</td><td>${h(band(D.after(r)).name)}</td><td>${h(r.owner || '—')}${r.by ? ' · ' + h(r.by) : ''}</td></tr>`).join('');
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${h(s.card.id)} decision card</title><style>body{font-family:system-ui,sans-serif;color:#0B1324;padding:28px;line-height:1.5}h1{font-size:24px;letter-spacing:-.02em;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12.5px}th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:#7A849C;padding:6px 8px;background:#F8F9FB}td{padding:8px;vertical-align:top}tr:nth-child(even) td{background:#FBFCFD}.k{color:#6B7590;font-size:12.5px}</style></head><body><h1>${h(s.card.decision)}</h1><div class="k">${h(s.card.id)} · ${h(s.me.name)}${s.me.joint ? ' and ' + h(s.me.co) : ''} · opened ${h(s.card.opened)} · ${h(s.card.valid)}</div><p>"${h(s.card.quote)}"</p><p class="k">Top risk ${D.topBefore()} before protection, ${D.top()} after. Readiness ${D.readinessBefore()} to ${D.readiness()} out of 10. ${D.stops().length} stop point(s). Signed: ${s.sign.me ? 'yes' : 'no'}${s.me.joint ? ', co-borrower ' + (s.sign.co ? 'yes' : 'no') : ''}.</p><table><thead><tr><th>#</th><th>What could go wrong</th><th>Before</th><th>Protection</th><th>After</th><th>Band</th><th>Owner</th></tr></thead><tbody>${rows}</tbody></table><p class="k">Re-do this card when: ${s.triggers.filter(t => t.on).map(t => h(t.t)).join(', ')}.</p><script>setTimeout(function(){window.print()},500)<\/script></body></html>`);
+  w.document.close();
+}
+
+/* modals */
+function protModal(id) {
+  const r = D.risk(id); if (!r) return;
+  const SUG = { remove: 'Take this step out of the plan', swap: 'Change the plan so this cannot bite', safeguard: 'Put money or a condition in place that catches it', check: 'Get the real figure in writing, dated', plan: 'Agree now what we do if it happens anyway' };
+  modal({
+    title: 'Add protection', sub: r.what,
+    body: `<div class="sub">Work down the list. Only use the last one when the ones above it will not work.</div>
+    ${ORDER.map(o => `<button class="po" data-pick="${o.k}" data-text="${h(SUG[o.k])}"><span class="o">${o.n}</span><div><div style="font-weight:600">${h(o.name)}</div><div class="sub">${h(o.s)}</div></div></button>`).join('')}
+    <label class="field"><span class="sub">What exactly will be done</span><input class="input" data-fx="t" placeholder="Say it the way you would say it out loud"></label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label class="field"><span class="sub">Who is doing it</span><input class="input" data-fx="o" value="${h(Store.s.me.name.split(' ')[0])}"></label><label class="field"><span class="sub">By when</span><input class="input" data-fx="b" placeholder="e.g. 10 Nov"></label></div>`,
+    actions: [{ label: 'Add it', run: () => { const k = picked(); if (!k) { toast('Pick which kind of protection it is.'); return false; } const t = val('[data-fx="t"]'); if (!t) { toast('Say what will be done.'); return false; } withUndo('Protection added. Score it again to see where it lands.', () => A.addProt(id, k, t, val('[data-fx="o"]'), val('[data-fx="b"]'))); U.rSel = id; return true; } }, { label: 'Cancel' }]
+  });
+}
+function ownerModal(id) {
+  const r = D.risk(id); if (!r) return;
+  modal({ title: 'Who owns it, and by when', sub: r.what + ' · sitting at ' + D.after(r) + ', which needs a name and a date',
+    body: `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label class="field"><span class="sub">Who</span><input class="input" data-fx="o" value="${h(r.owner)}" placeholder="A name, not a role"></label><label class="field"><span class="sub">By when</span><input class="input" data-fx="b" value="${h(r.by)}" placeholder="e.g. 10 Nov"></label></div><div class="sub">A worksite card will not close without both. Neither will this one.</div>`,
+    actions: [{ label: 'Save', run: () => { const o = val('[data-fx="o"]'), b = val('[data-fx="b"]'); if (!o || !b) { toast('Both a name and a date.'); return false; } A.owner(id, o, b); toast('Saved. ' + o + ' owns it by ' + b + '.'); return true; } }, { label: 'Cancel' }] });
+}
+function riskModal() {
+  modal({ title: 'Add a risk', sub: 'What could go wrong, in your words',
+    body: `<label class="field"><span class="sub">Which step</span><div class="scale">${Store.s.steps.map(st => `<button class="sb" data-pick="${st.n}"><span class="k">${st.n}</span><span class="l">${h(st.t)}</span></button>`).join('')}</div></label>
+    <label class="field"><span class="sub">What could go wrong</span><input class="input" data-fx="t" placeholder="Start with what actually happens, not how it feels"></label>
+    <div class="sub">You will score it on the next screen. Nobody scores it for you.</div>`,
+    actions: [{ label: 'Add it', run: () => { const t = val('[data-fx="t"]'); if (!t) { toast('Say what could go wrong.'); return false; } const id = A.addRisk(+(picked() || 1), t, 3, 3); U.rSel = id; go('risks'); toast('Added. Now score it: how likely, and how much it would hurt.'); return true; } }, { label: 'Cancel' }] });
+}
+function stepModal() {
+  modal({ title: 'Add a step', sub: 'Each step starts with something you do', body: `<label class="field"><span class="sub">The step</span><input class="input" data-fx="t" placeholder="e.g. Hand in notice on the rental"></label>`,
+    actions: [{ label: 'Add it', run: () => { const t = val('[data-fx="t"]'); if (!t) return false; A.addStep(t); toast('Step added.'); return true; } }, { label: 'Cancel' }] });
+}
+function noteModal(id) {
+  const r = D.risk(id); if (!r) return;
+  modal({ title: 'Your note', sub: r.what, body: `<textarea class="input" data-fx="t" placeholder="Anything you want on the record in your own words">${h(r.note)}</textarea>`,
+    actions: [{ label: 'Save', run: () => { A.note(id, val('[data-fx="t"]')); toast('Saved to your card.'); return true; } }, { label: 'Cancel' }] });
+}
+function bankModal() {
+  modal({ title: 'What happens if you connect your bank', sub: 'Plainly, with nothing left out',
+    body: `<div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55">
+    <div><b style="font-weight:600">What it reads.</b> Money coming in and what type it is, your regular bills, loan payments, and whether anything bounced in the last year.</div>
+    <div><b style="font-weight:600">What it never does.</b> It cannot move money. It is read-only.</div>
+    <div><b style="font-weight:600">What your professional sees.</b> That your income was checked and when. Not your statements, not your transactions. We call that verified, not exposed.</div>
+    <div><b style="font-weight:600">What a lender gets.</b> Nothing from here. Your file goes to a lender only when you pick one, for that application, with your approval.</div>
+    <div><b style="font-weight:600">How long.</b> Twelve months, then it stops on its own. You can stop it sooner from this page at any time.</div>
+    <div class="sub">Connecting upgrades six of your figures from what you said to confirmed. Your card shows both, and when each one arrived.</div></div>`,
+    actions: Store.s.bank.connected ? [{ label: 'Done' }] : [{ label: 'Connect my bank', run: () => { withUndo('Bank connected. Six figures are now confirmed.', () => A.connectBank()); return true; } }, { label: 'Not now' }] });
+}
+function shareModal() {
+  modal({ title: 'Share your card', sub: 'You send the link. 4ormIQ never contacts anyone for you.',
+    body: `<label class="field"><span class="sub">Who are you sending it to</span><input class="input" data-fx="w" placeholder="The firm or the person"></label><label class="field"><span class="sub">Their name, if you have it</span><input class="input" data-fx="a" placeholder="Optional"></label>
+    <div class="sub">They will see layers 1 and 2. Your full file stays sealed until you pick a lender.</div>`,
+    actions: [{ label: 'Create the link', run: () => { const w = val('[data-fx="w"]'); if (!w) { toast('Who is it going to?'); return false; } A.reshare(w, val('[data-fx="a"]')); toast('Link ready. Nothing happens until you send it.'); return true; } }, { label: 'Cancel' }] });
+}
+function previewModal() {
+  const s = Store.s;
+  modal({ title: 'What ' + (s.shared.agent || 'they') + ' sees', sub: 'Exactly this, nothing more',
+    body: `<div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px">${[['Your decision and your five steps', true], ['Every risk, scored before and after', true], ['What you put in place, who owns it, by when', true], ['Identity checked ' + (s.bank.connected ? 'and income confirmed' : ''), true], ['Your bank statements', false], ['Your transactions', false], ['Your full lender file', false]].map(([t, y]) => `<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><span>${h(t)}</span><span class="pill ${y ? 'p-g' : 'p-n'}"><i></i>${y ? 'Yes' : 'No'}</span></div>`).join('')}</div>`,
+    actions: [{ label: 'Done' }] });
+}
+function pauseModal() {
+  modal({ title: 'Paused. Nothing is lost.', sub: 'Everything you have done stays exactly where it is.',
+    body: `<div style="font-size:14px;line-height:1.55">Come back whenever you want, from any device. Your card will be where you left it, and so will your place in the conversation.<div class="sub" style="margin-top:10px">There is no clock on this, and nothing expires except your bank consent, which runs out on its own after twelve months.</div></div>`,
+    actions: [{ label: 'Keep going' }, { label: 'Download my card', cls: 'btn2', run: () => { download('my-decision-card.json', cardJSON(), 'application/json'); toast('Downloaded.'); return true; } }] });
+}
+function ownModal() {
+  modal({ title: 'Say it your way', sub: 'However you would put it out loud', body: `<textarea class="input" data-fx="t" placeholder="Type it here"></textarea>`,
+    actions: [{ label: 'That is it', run: () => { const t = val('[data-fx="t"]'); if (!t) return false; A.chatAnswer(t); return true; } }, { label: 'Cancel' }] });
+}
+
+/* events */
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-a]'); if (!el || el.disabled) return;
+  const a = el.dataset.a, id = el.dataset.id, v = el.dataset.v;
+  switch (a) {
+    case 'nav': go(v); break;
+    case 'pause': pauseModal(); break;
+    case 'print': toast('Opening the print view. Choose Save as PDF if you want a copy.'); printCard(); break;
+    case 'export': download('my-decision-card.json', cardJSON(), 'application/json'); toast('Your whole card, downloaded.'); break;
+    /* card */
+    case 'pre': A.pre(id, v); break;
+    case 'step.add': stepModal(); break;
+    case 'step.open': { U.hmCell = null; go('risks'); const first = Store.s.risks.find(r => r.step === +v); if (first) { U.rSel = first.id; render(); toast('Showing the risks on step ' + v + '.'); } else toast('No risks on that step yet. Add one.'); break; }
+    /* risks */
+    case 'risk.sel': U.rSel = id; render(); break;
+    case 'risk.open': U.rSel = id; go('risks'); break;
+    case 'risk.add': riskModal(); break;
+    case 'risk.score': A.score(id, el.dataset.w, +v); break;
+    case 'risk.owner': ownerModal(id); break;
+    case 'risk.note': noteModal(id); break;
+    case 'hm.when': U.hmAfter = v === '1'; U.hmCell = null; render(); break;
+    case 'hm.cell': U.hmCell = U.hmCell === v ? null : v; render(); break;
+    /* protection */
+    case 'p.tab': U.pTab = v; render(); break;
+    case 'prot.add': protModal(id); break;
+    case 'prot.remove': withUndo('Protection removed.', () => A.removeProt(id, +el.dataset.i)); break;
+    /* money */
+    case 'f.tab': U.fTab = v; render(); break;
+    case 'bank.on': bankModal(); break;
+    case 'bank.off': withUndo('Disconnected. Those figures went back to what you said.', () => A.disconnectBank()); break;
+    case 'bank.what': bankModal(); break;
+    /* who */
+    case 'layer': { const l = Store.s.layers.find(x => x.n === +v); withUndo(l.on ? 'Layer ' + v + ' switched off.' : 'Layer ' + v + ' switched on.', () => A.layer(+v)); break; }
+    case 'who.share': shareModal(); break;
+    case 'who.preview': previewModal(); break;
+    case 'who.stop': modal({ title: 'Stop sharing with everyone?', sub: 'All three layers go off and the link stops working.', body: `<div style="font-size:14px;line-height:1.55">Being straight with you: anything already shared, or that they have to keep by law, may not be recoverable. Switching off stops anything new.</div>`, actions: [{ label: 'Stop sharing', cls: 'btn red', run: () => { withUndo('Sharing stopped. Nobody can open your card.', () => A.unshare()); return true; } }, { label: 'Cancel' }] }); break;
+    /* sign */
+    case 'sign': { const s = Store.s; const was = v === 'me' ? s.sign.me : s.sign.co; if (!was && !D.canSign()) { modal({ title: 'Sign with things still open?', sub: 'You can. The card will show what was outstanding at the moment you signed.', body: `<div style="font-size:14px;line-height:1.55">${D.stops().length ? D.stops().length + ' risk still sits at 16 or over. ' : ''}${D.missingOwner().length ? D.missingOwner().length + ' risk needs a name and a date. ' : ''}${Store.s.risks.some(r => !D.protected(r)) ? 'Some risks have nothing in place yet.' : ''}</div>`, actions: [{ label: 'Sign anyway', run: () => { A.sign(v); toast('Signed, with what was outstanding noted on the card.'); return true; } }, { label: 'Go back and fix it', cls: 'btn2', run: () => { go('long'); return true; } }] }); break; } A.sign(v); toast(was ? 'Signature removed.' : v === 'me' ? 'Signed. Your card is sealed and time-stamped.' : Store.s.me.co.split(' ')[0] + ' signed on their own phone.'); break; }
+    case 'trigger': A.trigger(id); break;
+    /* documents */
+    case 'd.stage': U.dStage = v; U.dSel = null; render(); break;
+    case 'd.sel': U.dSel = U.dSel === id ? null : id; render(); break;
+    case 'd.opt': U.dOpt = !U.dOpt; render(); break;
+    case 'd.got': { const d = Store.s.docs.find(x => x.id === id); A.doc(id, d.status === 'todo' ? 'got' : 'todo'); break; }
+    case 'd.sent': { const d = Store.s.docs.find(x => x.id === id); A.doc(id, d.status === 'sent' ? 'got' : 'sent'); break; }
+    case 'd.stage.all': withUndo('Stage updated.', () => A.docStageAll(v)); break;
+    case 'd.print': printDocs(); toast('Opening the checklist to print.'); break;
+    case 'd.risk': { const d = Store.s.docs.find(x => x.id === id); const rid = A.addRisk(1, 'We cannot get: ' + d.n, 3, 3); U.rSel = rid; go('risks'); toast('Added as a risk. Score it: how likely, and how much it would hurt.'); break; }
+    /* scenario */
+    case 'sc.toggle': A.scToggle(v); break;
+    case 'sc.reset': A.scReset(); toast('Back to the example numbers.'); break;
+    case 'sc.save': A.scSave(); toast('Saved to your record, with the working.'); break;
+    case 'sc.torisk': { const r = runScenario(Store.s.sc); const bad = r.flags.filter(f => f.k === 'r' || f.k === 'a'); if (!bad.length) { toast('Nothing here is flagging. Change a number and try again.'); break; } modal({ title: 'Turn a flag into a risk', sub: 'It goes on your card where you score it yourself', body: bad.map((f, k) => `<label class="opt"><input type="radio" name="fl" value="${k}" ${k === 0 ? 'checked' : ''}><div><div style="font-weight:500">${h(f.t)}</div><div class="sub">${h(f.s)}</div></div></label>`).join(''), actions: [{ label: 'Add it', run: () => { const k = +modalEl.querySelector('input[name="fl"]:checked').value; const id = A.addRisk(3, bad[k].t, 3, 3); U.rSel = id; go('risks'); toast('On your card. Score it for your own situation.'); return true; } }, { label: 'Cancel' }] }); break; }
+    case 'sc.mine': { const f = Store.s.facts; const num = (k) => { const x = f.find(y => y.k === k); if (!x) return null; const m = String(x.v).replace(/[^0-9.]/g, ''); return m ? +m : null; }; const bal = num('Mortgage balance'); if (bal) Store.s.sc.price = Math.round(bal * 1.35); const pay = num('Take-home pay, together'); if (pay) Store.s.sc.income = Math.round(pay * 12 * 1.35); Store.commit(); toast('Filled from the figures on your card. Change anything that is wrong.'); break; }
+    /* know this */
+    case 'k.tag': U.kTag = v; U.kSel = null; render(); break;
+    case 'know.open': U.kSel = id; go('know'); break;
+    case 'k.close': U.kSel = null; render(); break;
+    case 'k.ask': { const l = LIB.find(x => x.id === id); modal({ title: 'Ask your broker', sub: l.t, body: `<div class="sub">Copy this, or send it from here once your card is shared.</div><textarea class="input" data-fx="t" style="min-height:120px">${h(l.do)}</textarea>`, actions: [{ label: 'Add to my card as a question', run: () => { A.note('r3', val('[data-fx="t"]')); A.log('Question for the broker added.', l.t); Store.commit(); toast('On your card. They will see it when you share.'); return true; } }, { label: 'Close' }] }); break; }
+    case 'k.torisk': { const l = LIB.find(x => x.id === id); const rid = A.addRisk(2, l.t, 3, 3); U.rSel = rid; go('risks'); toast('Added as a risk. Score it for your own situation.'); break; }
+    /* chat */
+    case 'chat.ans': A.chatAnswer(v); break;
+    case 'chat.own': ownModal(); break;
+    case 'chat.back': A.chatBack(); break;
+    case 'chat.reset': A.chatReset(); toast('Back to the start. Your card is untouched.'); break;
+    case 'chat.earlier': modal({ title: 'Earlier', sub: 'Everything you have said so far', body: Store.s.chat.answers.map((x, i) => `<div class="alog" style="grid-template-columns:28px minmax(0,1fr)"><span class="mono sub">${i + 1}</span><span>${h(x)}</span></div>`).join('') || '<span class="sub">Nothing yet.</span>', actions: [{ label: 'Done' }] }); break;
+    default: toast('Coming soon: ' + a);
+  }
+});
+document.addEventListener('input', (e) => {
+  const el = e.target.closest('[data-f^="sc."]'); if (!el) return;
+  const k = el.dataset.f.slice(3); const pos = el.selectionStart;
+  A.sc(k, el.value);
+  const again = document.querySelector('[data-f="sc.' + k + '"]');
+  if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (x) {} }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+window.addEventListener('hashchange', () => { const r = location.hash.replace(/^#\/?/, '') || 'card'; if (r !== U.route) go(r, true); });
+Store.load();
+go(location.hash.replace(/^#\/?/, '') || 'card', true);
+
+</script>
+</body>
+</html>

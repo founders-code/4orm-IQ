@@ -25,3 +25,6 @@ archive/
 node_modules/
 .env
 .env.*
+
+# Audits. Internal.
+audits/

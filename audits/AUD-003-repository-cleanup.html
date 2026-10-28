@@ -1,0 +1,165 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ repository audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;--ink-3:#8B9296;
+  --rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+  --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink-2);
+  font:16px/1.6 "IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;padding:44px 16px 80px}
+.w{max-width:940px;margin:0 auto}
+.mast{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}
+.kick{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+h1{font:600 33px/1.15 Spectral,Georgia,serif;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+.dek{max-width:64ch;margin:0;color:var(--ink-2)}
+h2{font:600 19px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:38px 0 10px}
+h3{font:600 15px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);margin:22px 0 6px}
+p{margin:0 0 12px;max-width:74ch}
+.sechead{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--rule);padding-top:22px;margin-top:34px}
+.sechead .n{font:500 12px/1 "IBM Plex Mono",monospace;color:var(--ink-3)}
+.sechead h2{margin:0}
+ol,ul{margin:8px 0 0;padding-left:20px} li{margin:0 0 10px;max-width:74ch}
+b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;table-layout:fixed}
+th{font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  text-align:left;border-bottom:1px solid var(--rule);padding:8px 10px}
+td{padding:10px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+td.k{color:var(--ink);font-weight:500;width:32%}
+.chip{display:inline-block;font:500 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 8px;border-radius:3px;white-space:nowrap}
+.p0{background:var(--p0w);color:var(--p0)} .p1{background:var(--p1w);color:var(--p1)} .p2{background:var(--p2w);color:var(--p2)}
+.quote{border-left:3px solid var(--p2);background:var(--surface);padding:14px 18px;margin:14px 0}
+.quote.hot{border-left-color:var(--p0)}
+.src{font:400 11px/1.5 "IBM Plex Mono",monospace;color:var(--ink-3);margin:8px 0 0}
+a{color:var(--p2)}
+.foot{margin-top:52px;border-top:1px solid var(--rule);padding-top:14px;
+  font:400 11px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:640px){h1{font-size:27px}td.k{width:42%}}
+
+@media print{
+  html,body{background:#111416 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding:14mm 14mm 4mm;font-size:10.5pt;line-height:1.5}
+  .w{max-width:none}
+  .mast{padding-bottom:10pt;margin-bottom:16pt}
+  h1{font-size:20pt}
+  h2{font-size:13pt}
+  h3{font-size:11pt;break-after:avoid}
+  p,li{max-width:none}
+  table{font-size:9pt}
+  pre{font-size:8.6pt}
+  .sechead{break-after:avoid;margin-top:18pt;padding-top:12pt}
+  tr,li,.quote,pre{break-inside:avoid}
+  .foot{margin-top:20pt}
+}
+
+.heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:26px 0 8px}
+.heads>div{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:14px 16px}
+.hl{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.heads h3{font:600 15px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:9px 0 6px}
+.heads p{font-size:13px;line-height:1.5;margin:0;color:var(--ink-3)}
+pre.code{background:var(--sunk);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;
+  font:400 13px/1.7 "IBM Plex Mono",monospace;color:var(--ink-2);overflow-x:auto;margin:14px 0}
+code{font:400 .92em/1 "IBM Plex Mono",monospace;color:var(--ink)}
+@media print{ .heads{break-inside:avoid} pre.code{font-size:8.6pt} }
+</style>
+<style>.code{font:400 .92em/1.4 "IBM Plex Mono",monospace;color:var(--ink);background:var(--sunk);padding:1px 5px;border-radius:3px}</style></head><body>
+<div class="w">
+<header class="mast">
+<div class="kick"><span>4orm IQ</span><span>Repository audit</span><span>AUD-003 &middot; v1.0</span><span>28 October 2026</span><span>Internal</span></div>
+<h1>A second copy of the application was being served to the public</h1>
+<p class="dek">An audit of the <span class="code">founders-code/4orm-IQ</span> repository taken on 28 October 2026, before building the new landing page on top of it. The application code came out sound. The repository around it did not: it was publishing a stale duplicate of the whole engine, both investor decks and every internal document at public URLs, because Vercel deploys whatever is in the repository and nothing told it otherwise.</p>
+</header>
+
+<div class="heads">
+<div><div class="hl">Worst exposure</div><h3>The engine, twice</h3><p>A folder holding an older snapshot of the whole application, including the Search Cue and the authentication code, was reachable from 4ormiq.com as plain text.</p></div>
+<div><div class="hl">Second exposure</div><h3>Everything else</h3><p>Both decks, the UX plan, 92 build scripts, 12 internal reports and the change register were all downloadable from the live domain.</p></div>
+<div><div class="hl">What was sound</div><h3>The API layer</h3><p>No hardcoded secrets. Every key read from the environment. Helpers correctly underscore-prefixed so Vercel never routes them. 30 modules, all parsing.</p></div>
+<div><div class="hl">Near miss</div><h3>Two files that were not duplicates</h3><p>Two pairs matched on byte count and differed in content. Deleting on the byte count would have destroyed the newer of two control-room builds.</p></div>
+</div>
+
+<div class="sechead"><span class="n">01</span><h2>What was found sound, and should be said first</h2></div>
+<p>The instruction behind this audit was to look for spaghetti in the backend before building on it. It is not there, and saying so plainly matters more than the findings below, because the findings are all about the repository rather than the code.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Checked</th><th>Result</th><th>State</th></tr></thead><tbody>
+<tr><td class="k">Hardcoded credentials</td><td>None. Scanned for API key, token, connection-string and private-key patterns across every JavaScript, JSON, SQL, HTML and Markdown file in the repository, including the duplicate tree.</td><td><span class="chip ok">Clean</span></td></tr>
+<tr><td class="k">Secret handling</td><td>All 17 configuration values read from <span class="code">process.env</span>. No <span class="code">.env</span> file was ever committed.</td><td><span class="chip ok">Clean</span></td></tr>
+<tr><td class="k">Endpoint surface</td><td>8 endpoints. The other 22 modules are underscore-prefixed, which is how Vercel is told not to route a file. The convention is applied consistently and is load bearing.</td><td><span class="chip ok">Clean</span></td></tr>
+<tr><td class="k">Syntax</td><td>All 30 API modules parse. 29 of 30 import cleanly; the one failure is <span class="code">@anthropic-ai/sdk</span> not being installed in the audit environment, and it is declared in <span class="code">package.json</span>.</td><td><span class="chip ok">Clean</span></td></tr>
+<tr><td class="k">Internal links</td><td>Every relative link in every served page resolves to a file that exists.</td><td><span class="chip ok">Clean</span></td></tr>
+</tbody></table></div>
+<p>The separation of concerns in <span class="code">api/</span> is real rather than decorative: the catalogue, the cue, the output contract, the budget, the recency window and the standing ranker are each one file with one job, and the comments in them explain reasoning rather than restating the code.</p>
+
+<div class="sechead"><span class="n">02</span><h2>A stale copy of the whole application, at a public URL</h2></div>
+<p>A directory named <span class="code">4orm-iq-site 3</span> held an earlier snapshot of the entire application: its own <span class="code">api/</span>, its own <span class="code">index.html</span>, its own <span class="code">vercel.json</span>, its own test suite. The name is the shape of a third download from a browser, and it had been committed along with everything else in a single upload.</p>
+<div class="quote hot"><p>Vercel deploys the repository. A JavaScript file that is not under the project root <span class="code">api/</span> directory is not treated as a function, so it is served as a static asset. The Search Cue, the output contract and the authentication module were therefore readable, in full, by anyone who guessed the path.</p></div>
+<p>Every file in it was superseded by a larger version at the root, which settles which copy was live and which was stale.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">File</th><th>Stale copy</th><th>Live copy</th></tr></thead><tbody>
+<tr><td class="k">api/check.js</td><td>26,998 bytes</td><td>69,328 bytes</td></tr>
+<tr><td class="k">api/_cue.js</td><td>53,997 bytes</td><td>70,212 bytes</td></tr>
+<tr><td class="k">api/_retrieval.js</td><td>35,717 bytes</td><td>41,290 bytes</td></tr>
+<tr><td class="k">index.html</td><td>803,723 bytes</td><td>1,323,445 bytes</td></tr>
+<tr><td class="k">vercel.json</td><td>389 bytes</td><td>1,238 bytes</td></tr>
+</tbody></table></div>
+<p class="src">Removed in full. Nothing in it was unique.</p>
+
+<div class="sechead"><span class="n">03</span><h2>Everything internal was also public</h2></div>
+<p>The same mechanism published a great deal more. None of it was linked from anywhere, which is not a control: an unlinked file on a public domain is public.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">What</th><th>Size</th><th>Why it matters</th></tr></thead><tbody>
+<tr><td class="k">4ormIQ-Business-Slides.pptx</td><td>4.1M</td><td>An investor deck, downloadable from the consumer product's domain.</td></tr>
+<tr><td class="k">4ormIQ-Demo-Slides.pptx</td><td>3.4M</td><td>As above.</td></tr>
+<tr><td class="k">tools/</td><td>1.0M</td><td>92 build and verification scripts, including the gate thresholds.</td></tr>
+<tr><td class="k">docs/</td><td>1.1M</td><td>Internal documentation and the full change register.</td></tr>
+<tr><td class="k">reports/</td><td>4.6M</td><td>12 internal reports, including the previous operations audit.</td></tr>
+<tr><td class="k">db/</td><td>84K</td><td>The database schema.</td></tr>
+<tr><td class="k">Debug screenshots</td><td>2.6M</td><td>Seven loose PNGs at the web root, referenced by nothing.</td></tr>
+</tbody></table></div>
+<p>A <span class="code">.vercelignore</span> now holds all of it off the deployment. Every file stays in version control; it simply stops being downloadable from the live domain. The deployed footprint falls from 26M to 11M. The seven screenshots were deleted outright, being the only items with no further use.</p>
+
+<div class="sechead"><span class="n">04</span><h2>One number that disagreed with itself</h2></div>
+<p>Six places in the operations board, four in the evidence map and one on the landing screen print <span class="k">135 registers</span>. A comment in <span class="code">api/check.js</span> explaining the empty-sweep guard printed <span class="k">134</span>.</p>
+<p>The catalogue settles it, because the catalogue computes it rather than stating it:</p>
+<div class="quote"><p><span class="code">export const TOTAL_SOURCES = CATALOGUE.filter(s =&gt; s.enabled).length;</span></p><p class="src">152 entries, 17 disabled, 135 enabled. Run on 28 October 2026.</p></div>
+<p>135 is correct and the comment was stale. Corrected. The severity is low because the figure sat in prose rather than in a code path, but it is recorded because a product whose first promise is that coverage is counted rather than asserted cannot afford a second number for the same thing anywhere in its own source.</p>
+
+<div class="sechead"><span class="n">05</span><h2>The near miss, which is the finding worth keeping</h2></div>
+<p>Two pairs of files matched exactly on byte count and were queued for deletion as duplicates. A hash comparison run before the deletion showed both pairs differed.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Pair</th><th>What actually differed</th></tr></thead><tbody>
+<tr><td class="k">preview-evidence.html<br>evidence.html</td><td>The older file says <span class="k">121 registers</span> against the live <span class="k">135</span>. Same length, different content.</td></tr>
+<tr><td class="k">preview-control-room.html<br>4orm-iq-controlroom.html</td><td>Build stamps <span class="k">20260917.1811</span> and <span class="k">20260911.0619</span>. The file that looked like the throwaway preview was the <em>newer</em> of the two.</td></tr>
+</tbody></table></div>
+<p>Both were moved to <span class="code">archive/</span> rather than deleted. The live control room is <span class="code">admin.html</span>, stamped <span class="k">20261001.0717</span>, which is newer than either, so nothing stale is being served.</p>
+<div class="quote"><p>The rule this produces: file size is not identity. Two files of the same length are a reason to run a hash, never a reason to skip one.</p></div>
+
+<div class="sechead"><span class="n">06</span><h2>What was removed, moved and added</h2></div>
+<div class="tablewrap"><table><thead><tr><th class="k">Action</th><th>Items</th><th>Reasoning</th></tr></thead><tbody>
+<tr><td class="k">Removed</td><td><span class="code">4orm-iq-site 3/</span>, 7 debug screenshots</td><td>Superseded in full, or referenced by nothing and serving no purpose.</td></tr>
+<tr><td class="k">Moved</td><td>8 superseded pages to <span class="code">archive/</span></td><td>They differ from their live counterparts, so they are history rather than duplicates.</td></tr>
+<tr><td class="k">Moved</td><td>5 loose Markdown files to <span class="code">docs/</span>; 3 audits to <span class="code">audits/</span></td><td>One place to look for each kind of document.</td></tr>
+<tr><td class="k">Added</td><td><span class="code">.vercelignore</span>, <span class="code">.gitignore</span></td><td>Neither existed. The first is what ends the exposure in section 03.</td></tr>
+<tr><td class="k">Rewritten</td><td><span class="code">README.md</span></td><td>Replaces five overlapping documents with one, and records the conventions a future build would otherwise break, including the underscore-prefix rule.</td></tr>
+<tr><td class="k">Corrected</td><td><span class="code">api/check.js</span></td><td>134 to 135.</td></tr>
+</tbody></table></div>
+
+<div class="sechead"><span class="n">07</span><h2>What could not be confirmed</h2></div>
+<p>These are gaps in this audit, not clean results.</p>
+<div class="tablewrap"><table><thead><tr><th class="k">Gap</th><th>Why</th><th>State</th></tr></thead><tbody>
+<tr><td class="k">Whether the exposed files were ever fetched</td><td>Access logs for the period were not examined. The exposure is established; whether anybody took it is not.</td><td><span class="chip p1">Open</span></td></tr>
+<tr><td class="k">Whether any secret ever sat in git history</td><td>The working tree is clean. Full history was not walked, and the clone is shallow.</td><td><span class="chip p1">Open</span></td></tr>
+<tr><td class="k">Runtime behaviour of the API</td><td>No endpoint was called. This is a static audit: parsing, imports, structure and references only.</td><td><span class="chip p2">Out of scope</span></td></tr>
+<tr><td class="k">The full test suite</td><td><span class="code">npm test</span> runs 41 smoke files needing network and credentials. Not run here.</td><td><span class="chip p2">Not run</span></td></tr>
+</tbody></table></div>
+
+<div class="sechead"><span class="n">08</span><h2>The order of work</h2></div>
+<div class="tablewrap"><table><thead><tr><th class="k">Priority</th><th>Action</th></tr></thead><tbody>
+<tr><td><span class="chip p0">Now</span></td><td>Rotate any credential that could have been read from the duplicate tree, on the assumption the exposure was taken rather than the hope that it was not. The scan found none committed, so this is precautionary and cheap.</td></tr>
+<tr><td><span class="chip p1">Next</span></td><td>Walk the full git history for secrets, not only the working tree. Needs an unshallowed clone.</td></tr>
+<tr><td><span class="chip p1">Next</span></td><td>Add a build gate that fails when a file matching a deck, archive or document pattern appears outside the ignored directories. This fault reappears the next time somebody drags a folder in.</td></tr>
+<tr><td><span class="chip p2">Then</span></td><td>Pull the register count into the pages from <span class="code">TOTAL_SOURCES</span> at build time, so a human never types it again.</td></tr>
+</tbody></table></div>
+
+<div class="foot"><span>4orm Finance &middot; Control Standard &middot; Internal</span><span>AUD-003 &middot; v1.0 &middot; 28 October 2026</span></div>
+</div>
+</body></html>

@@ -1,0 +1,1330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>4orm Broker Dashboard</title>
+<meta name="description" content="4orm broker dashboard demo. Example brokerage, example data. Every click works and persists in this browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="app-css">
+html,body{margin:0;background:#F5F6F9;height:100%}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;color:inherit}
+.app{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:100vh;background-image:linear-gradient(90deg,#0B1530 0 244px,#F5F6F9 244px);font-family:Geist,Inter,system-ui,sans-serif;color:#0B1324;font-size:14px;-webkit-font-smoothing:antialiased;background:#F5F6F9}
+.side{background:#0B1530;color:#C7D0E4;padding:18px 14px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow:auto}
+.ws{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:rgba(255,255,255,.04);width:100%;border:0;text-align:left;cursor:pointer}
+.mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(140deg,#2E6BF2,#6A93F7);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.sec{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6C7896;font-weight:600;padding:0 10px;margin-bottom:6px}
+.nl{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:9px;font-size:14px;font-weight:500;color:#C7D0E4;width:100%;border:0;background:transparent;cursor:pointer;text-align:left}
+.nl:hover{background:rgba(255,255,255,.05);color:#fff}
+.nl.on{background:rgba(46,107,242,.2);color:#fff}
+.ct{font-size:12px;color:#8C97B2;font-family:'Geist Mono',monospace}
+.ct.r{background:#E0362C;color:#fff;border-radius:999px;padding:1px 7px;font-weight:600}
+.ct.a{background:#D9910B;color:#fff;border-radius:999px;padding:1px 7px;font-weight:600}
+.main{display:flex;flex-direction:column;min-width:0}
+.hdr{display:flex;align-items:center;gap:16px;padding:14px 28px;background:#F5F6F9;position:sticky;top:0;z-index:5}
+.title{font-size:15px;font-weight:600;white-space:nowrap}
+.title span{color:#8A93A8;font-weight:500}
+.search{flex:1;max-width:420px;display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 12px;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(11,19,36,.06);color:#8A93A8;font-size:13px;margin-left:12px;border:0;cursor:text;text-align:left}
+.kbd{font-family:'Geist Mono',monospace;font-size:11px;color:#6B7590;background:#F0F2F6;border-radius:5px;padding:2px 6px}
+.body{padding:6px 28px 40px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.mono{font-family:'Geist Mono',ui-monospace,Menlo,monospace;font-feature-settings:"tnum"}
+.num{font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;font-weight:600;background:#2E6BF2;color:#fff;border:0;cursor:pointer;box-shadow:0 1px 2px rgba(46,107,242,.3),inset 0 1px 0 rgba(255,255,255,.18);white-space:nowrap}
+.btn:hover{background:#2560E0}
+.btn:disabled{background:#B9CDF9;box-shadow:none;cursor:default}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;font-weight:600;background:#fff;color:#0B1324;border:0;cursor:pointer;box-shadow:0 1px 2px rgba(11,19,36,.08),0 0 0 1px rgba(11,19,36,.07);white-space:nowrap}
+.btn2:hover{background:#F7F8FB}
+.btn2:disabled{color:#9AA3B7;cursor:default}
+.btn.red{background:#E0362C;box-shadow:0 1px 2px rgba(224,54,44,.3)}
+.btn.dark{background:#0B1324;box-shadow:none}
+.sm{height:30px;padding:0 11px;font-size:12.5px;border-radius:8px}
+.card{background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(11,19,36,.04),0 6px 20px -10px rgba(11,19,36,.10);min-width:0}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px 0}
+.ct1{font-size:15px;font-weight:600;letter-spacing:-.005em}
+.sub{font-size:12.5px;color:#6B7590}
+.h1{font-size:26px;font-weight:600;letter-spacing:-.025em;line-height:1.2}
+.kpi{padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.kv{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1.1}
+.delta{display:inline-flex;align-items:center;font-size:12px;font-weight:600;border-radius:6px;padding:2px 7px}
+.up,.dn{background:#E6F6EF;color:#137A50}.bad{background:#FDECEB;color:#B42318}.warn{background:#FFF4DE;color:#995C00}.neu{background:#EEF1F6;color:#4A5570}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.pill i{width:6px;height:6px;border-radius:50%;display:block}
+.p-r{background:#FDECEB;color:#B42318}.p-r i{background:#E0362C}
+.p-a{background:#FFF4DE;color:#995C00}.p-a i{background:#D9910B}
+.p-g{background:#E6F6EF;color:#137A50}.p-g i{background:#1F9D6A}
+.p-b{background:#EAF0FE;color:#1F4FBF}.p-b i{background:#2E6BF2}
+.p-n{background:#EEF1F6;color:#4A5570}.p-n i{background:#8A93A8}
+.av{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff;flex:none}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{border:0;background:transparent;height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;color:#4A5570;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.tab:hover{background:#EEF1F6}
+.tab .c{font-size:11.5px;background:#EEF1F6;color:#4A5570;border-radius:6px;padding:1px 6px;font-family:'Geist Mono',monospace}
+.tab.on{background:#0B1324;color:#fff}.tab.on .c{background:rgba(255,255,255,.16);color:#fff}
+.seg{display:inline-flex;background:#E9ECF2;border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;font-size:13px;font-weight:500;color:#4A5570;height:30px;padding:0 12px;border-radius:8px;cursor:pointer}
+.seg button.on{background:#fff;color:#0B1324;box-shadow:0 1px 2px rgba(11,19,36,.1)}
+.fchip{border:0;height:30px;padding:0 11px;border-radius:8px;background:#fff;color:#4A5570;font-size:12.5px;font-weight:500;cursor:pointer;box-shadow:0 0 0 1px rgba(11,19,36,.08);display:inline-flex;align-items:center;gap:7px}
+.fchip.on{background:#0B1324;color:#fff;box-shadow:none}
+.th{display:grid;gap:14px;align-items:center;padding:0 20px;height:34px;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7A849C;background:#F8F9FB}
+.tr{display:grid;gap:14px;align-items:center;padding:0 20px;min-height:56px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-size:14px;color:inherit}
+.tr:nth-child(even){background:#FBFCFD}
+.tr:hover{background:#F2F6FF}
+.tr.sel{background:#EAF0FE}
+.tr>*{min-width:0}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chain{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px}
+.chain i{height:14px;border-radius:3px;display:block}
+.s{background:#2E6BF2}.x{background:#E0362C}.w{background:#F2B544}.o{background:#E6EAF1}
+.stg{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:6px 12px;align-items:center}
+.trk{grid-column:1 / -1;height:8px;border-radius:4px;background:#EEF1F6;overflow:hidden;display:flex}
+.trk i{display:block;height:100%}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#7A849C}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.d-r{background:#E0362C;box-shadow:0 0 0 3px rgba(224,54,44,.16)}.d-a{background:#D9910B;box-shadow:0 0 0 3px rgba(217,145,11,.16)}.d-g{background:#1F9D6A;box-shadow:0 0 0 3px rgba(31,157,106,.14)}.d-b{background:#2E6BF2}.d-n{background:#B5BCCB}.d-k{background:#B5BCCB}
+.toggle{width:36px;height:20px;border-radius:999px;background:#2E6BF2;position:relative;flex:none;border:0;cursor:pointer;padding:0}
+.toggle::after{content:"";position:absolute;top:2px;left:18px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+.toggle.off{background:#CBD2DF}.toggle.off::after{left:2px}
+.toggle.lock{opacity:.55;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:6px}
+.input{height:38px;border-radius:10px;background:#F5F6F9;padding:0 12px;display:flex;align-items:center;font-size:13.5px;color:#0B1324;border:0;width:100%;font-family:inherit;outline:none}
+.input:focus{box-shadow:0 0 0 2px #2E6BF2}
+textarea.input{height:auto;min-height:110px;padding:10px 12px;resize:vertical;line-height:1.5}
+.banner{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;background:linear-gradient(90deg,#FDECEB,#FFF6F5)}
+.banner.ok{background:linear-gradient(90deg,#E6F6EF,#F2FAF6)}
+.tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#0B1324;color:#fff;font-size:11.5px;font-weight:500;white-space:nowrap;padding:5px 8px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .12s}
+/* overview */
+.files{grid-template-columns:96px minmax(0,1.7fr) minmax(0,1.1fr) 104px 168px 116px 64px}
+.issues{grid-template-columns:84px minmax(0,2.2fr) 112px 56px 78px;gap:10px}
+.agents{grid-template-columns:minmax(0,1.6fr) 48px minmax(0,1.1fr) 62px;gap:10px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:190px;padding:0 2px;min-width:0}
+.bar{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;position:relative}
+.bar i{display:block;width:100%;border-radius:4px 4px 2px 2px;background:#B9CDF9;min-height:3px;transition:background .15s}
+.bar.last i{background:#2E6BF2}
+.bar:hover i{background:#2E6BF2}
+.bar:hover .tip{opacity:1}
+.grid-y{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.grid-y span{font-size:11px;color:#9AA3B7;font-family:'Geist Mono',monospace}
+.act{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;padding:9px 0}
+/* files */
+.ftab{grid-template-columns:76px minmax(0,1.8fr) 96px 104px 128px 96px 58px;gap:10px}
+.drawer{width:340px;flex:none;align-self:flex-start;position:sticky;top:70px}
+.flt{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.step{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 0}
+.node{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;font-family:'Geist Mono',monospace}
+.n-s{background:#2E6BF2;color:#fff}.n-x{background:#E0362C;color:#fff;box-shadow:0 0 0 4px rgba(224,54,44,.16)}.n-w{background:#FFF1D6;color:#995C00}.n-o{background:#EEF1F6;color:#9AA3B7}
+/* evidence */
+.fl{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;font-size:14px;color:inherit}
+.fl:hover{background:#F2F4F8}
+.fl.on{background:#EAF0FE}
+.link{display:grid;grid-template-columns:34px minmax(0,1fr);gap:16px}
+.rail{display:flex;flex-direction:column;align-items:center}
+.enode{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono',monospace;font-size:12.5px;font-weight:600;flex:none}
+.wire{width:2px;flex:1;min-height:12px;border-radius:2px}
+.lk{border-radius:14px;padding:14px 16px;margin-bottom:12px;background:#fff;box-shadow:0 0 0 1px rgba(11,19,36,.06)}
+.lk.bad{background:#FFF7F6;box-shadow:0 0 0 1.5px rgba(224,54,44,.45)}
+.lk.wait{background:#FFFBF2}
+.lk.off{background:#FAFBFC;box-shadow:none}
+.kvr{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;font-size:13px;padding:6px 0}
+.alog{display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;padding:8px 0;font-size:13px}
+/* control map */
+.map{position:relative;margin:0 auto}
+.ln{position:absolute;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#2E6BF2;white-space:nowrap}
+.nd{text-align:left;position:absolute;width:116px;height:74px;border-radius:12px;background:#fff;border:0;box-shadow:0 0 0 1.5px #DCE3EF,0 6px 14px -10px rgba(11,19,36,.3);padding:9px 10px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:box-shadow .15s,transform .15s;font-family:inherit}
+.nd:hover{transform:translateY(-1px)}
+.nd .t{font-size:11.5px;overflow-wrap:break-word;font-weight:600;line-height:1.22;color:#0B1324}
+.nd .c{font-family:'Geist Mono',monospace;font-size:11px;color:#4A5570;padding-right:14px}
+.nd .dot{position:absolute;bottom:12px;right:10px}
+.nd.red{background:#FFF6F5;box-shadow:0 0 0 2px #E0362C,0 0 0 8px rgba(224,54,44,.1)}
+.nd.amb{background:#FFFBF2;box-shadow:0 0 0 2px #E5A93A}
+.nd.mine{background:#F3FBF7;box-shadow:0 0 0 1.5px #7CC4A3}
+.nd.sel{box-shadow:0 0 0 2px #2E6BF2,0 0 0 7px rgba(46,107,242,.18)}
+.nd.red.sel{box-shadow:0 0 0 2px #E0362C,0 0 0 7px rgba(46,107,242,.25)}
+.h{position:absolute;height:2px;background:#AFC2E6}
+.h::after{content:"";position:absolute;right:-1px;top:-4px;border-left:6px solid #AFC2E6;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.v{position:absolute;width:2px;background:#AFC2E6}
+.v::after{content:"";position:absolute;bottom:-1px;left:-4px;border-top:6px solid #AFC2E6;border-left:5px solid transparent;border-right:5px solid transparent}
+.mlog{grid-template-columns:56px 14px 84px minmax(0,1fr) 110px}
+/* reports */
+.ri{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:12px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;color:inherit;font-size:14px}
+.ri:hover{background:#F2F4F8}
+.ri.on{background:#EAF0FE}
+.doc{background:#fff;border-radius:16px;box-shadow:0 1px 2px rgba(11,19,36,.04),0 20px 50px -30px rgba(11,19,36,.35);padding:30px 34px}
+.m{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:12px;background:#F7F8FB}
+.m .mval{font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.vb{display:flex;align-items:flex-end;gap:6px;height:120px}
+.vb div{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
+.vb i{display:block;width:100%;border-radius:5px 5px 2px 2px;background:#B9CDF9;min-height:3px}
+.vb i.last{background:#2E6BF2}
+.rt{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:12px;padding:10px 0;font-size:13px}
+.rt.hd{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7A849C;padding-bottom:6px}
+.sch{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr) 90px 90px}
+/* ai */
+.tool{grid-template-columns:minmax(0,1.3fr) minmax(0,1.5fr) 80px 70px 100px 90px}
+.ev{display:grid;grid-template-columns:52px 10px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-radius:12px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;font-family:inherit;color:inherit;font-size:14px}
+.ev:hover{background:#F2F4F8}
+.ev.on{background:#EAF0FE}
+.quote{border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.55}
+.q-bad{background:#FFF6F5;box-shadow:inset 3px 0 0 #E0362C}
+.q-good{background:#F2FAF6;box-shadow:inset 3px 0 0 #1F9D6A}
+.gr{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:12px;align-items:center;padding:11px 0}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:stretch}
+.fs{border-radius:12px;padding:12px;background:#F7F8FB;display:flex;flex-direction:column;gap:4px;position:relative}
+.fs.hot{background:#0B1530;color:#fff}
+/* agents */
+.agc{padding:18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:box-shadow .15s;border:0;text-align:left;font-family:inherit;color:inherit;font-size:14px;width:100%}
+.agc.on{box-shadow:0 0 0 2px #2E6BF2,0 10px 30px -14px rgba(46,107,242,.45)}
+.af{grid-template-columns:86px minmax(0,1.6fr) 120px 150px 100px}
+.acc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;font-size:13px}
+/* connections */
+.cn{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.cnk{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;font-size:12.5px}
+.logo{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex:none}
+/* settings */
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0}
+.snav{display:flex;flex-direction:column;gap:2px}
+.snav button{text-align:left;border:0;background:transparent;height:34px;padding:0 12px;border-radius:8px;font-size:13.5px;font-weight:500;color:#4A5570;cursor:pointer}
+.snav button.on{background:#fff;color:#0B1324;box-shadow:0 1px 2px rgba(11,19,36,.08)}
+/* builder */
+.libh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#7A849C;margin:6px 0 2px}
+.li{text-align:left;font-size:13.5px;font-weight:600;min-height:42px;padding:6px 12px;border-radius:10px;border:1.5px solid #E1E7F1;background:#fff;color:#0B1324;width:100%;display:flex;align-items:center;gap:10px;cursor:grab;font-family:inherit}
+.li.armed{border-color:#2E6BF2;background:#EEF3FE}
+.li small{font-size:11.5px;font-weight:500;color:#6B7590;margin-left:auto}
+.sw{width:10px;height:10px;border-radius:3px;flex:none}
+.canvas{background-color:#fff;background-image:radial-gradient(#D3DCEB 1.2px,transparent 1.2px);background-size:22px 22px;border-radius:16px;min-width:0;box-shadow:0 1px 2px rgba(11,19,36,.04),0 6px 20px -10px rgba(11,19,36,.10)}
+.bmap{position:relative}
+.bnd{text-align:left;position:absolute;width:120px;height:86px;border-radius:14px;background:#fff;border:2px solid #DCE4F0;padding:8px 10px;display:flex;flex-direction:column;gap:3px;box-shadow:0 6px 16px -10px rgba(14,26,51,.25);cursor:pointer;font-family:inherit}
+.bnd.mine{background:#F3FBF7;border-color:#7CC4A3}
+.bnd.sel{box-shadow:0 0 0 4px rgba(46,107,242,.3);border-color:#2E6BF2}
+.bnd.over{border-color:#2E6BF2;background:#EEF3FE}
+.bnd .k{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.bnd .t{font-size:12px;font-weight:700;line-height:1.22;overflow-wrap:break-word}
+.bnd .p{font-family:'Geist Mono',monospace;font-size:9.5px;font-weight:600;background:#EEF2F8;border-radius:5px;padding:2px 5px;align-self:flex-start;margin-top:auto}
+.slot{position:absolute;width:120px;height:86px;border-radius:14px;border:2px dashed #AFC2E6;background:rgba(255,255,255,.7);color:#2E6BF2;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.slot.hot,.slot.over{background:#EEF3FE;border-color:#2E6BF2}
+.rm{font-size:13px;font-weight:700;border:0;background:#FDECEB;color:#B42318;border-radius:999px;min-height:36px;padding:0 14px;align-self:flex-start;cursor:pointer;font-family:inherit}
+.kv2{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;font-size:13.5px;line-height:1.4}
+.say{background:#F4F6FA;border-radius:14px;padding:11px 13px;font-size:13.5px;line-height:1.5}
+.sug{border-radius:14px;padding:11px 13px;display:flex;flex-direction:column;gap:5px;border:1.5px solid #D5DDEB}
+/* modal, toast, palette */
+.ovl{position:fixed;inset:0;background:rgba(11,19,36,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal{background:#fff;border-radius:18px;width:min(620px,100%);max-height:90vh;overflow:auto;box-shadow:0 30px 80px -30px rgba(0,0,0,.5);font-family:Geist,Inter,system-ui,sans-serif;color:#0B1324;font-size:14px}
+.modal .mh{padding:20px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.modal .mb{padding:16px 24px;display:flex;flex-direction:column;gap:14px;line-height:1.5}
+.modal .mf{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:60;align-items:center}
+.toast{background:#0B1324;color:#fff;border-radius:12px;padding:11px 14px;font-size:13.5px;display:flex;align-items:center;gap:14px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);font-family:Geist,Inter,system-ui,sans-serif}
+.toast button{background:transparent;border:0;color:#7FA4FA;font-weight:600;cursor:pointer;font-size:13.5px}
+.pal{position:fixed;inset:0;background:rgba(11,19,36,.4);z-index:55;display:flex;justify-content:center;padding-top:12vh}
+.palbox{width:min(640px,92%);background:#fff;border-radius:16px;align-self:flex-start;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.5);font-family:Geist,Inter,system-ui,sans-serif;color:#0B1324}
+.palbox input{width:100%;border:0;outline:0;font:inherit;font-size:16px;padding:16px 18px;background:#fff}
+.palr{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 18px;width:100%;border:0;background:transparent;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:inherit}
+.palr:hover,.palr.on{background:#F2F6FF}
+.opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#F5F6F9;cursor:pointer;border:0;width:100%;text-align:left;font-family:inherit;font-size:14px;color:inherit}
+.opt.on{background:#EAF0FE;box-shadow:0 0 0 1.5px #2E6BF2}
+@media print{.side,.hdr,.toasts,.ovl{display:none!important}.app{display:block}}
+
+.scrollx{position:relative}.scrollx::after{content:"";position:absolute;top:0;right:0;bottom:6px;width:48px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);pointer-events:none;border-radius:0 16px 16px 0}
+
+/* back to the main site. the apps are reached from the landing, so there
+   has to be a way home that is not the browser button. */
+.bk{display:block;padding:9px 10px;border-radius:9px;font-size:13px;font-weight:500;color:#C7D0E4;background:rgba(255,255,255,.05);text-align:center;border:0;cursor:pointer;width:100%;font-family:inherit}
+.bk:hover{background:rgba(255,255,255,.10);color:#fff}
+.bk:focus-visible{outline:2px solid #6A93F7;outline-offset:2px}
+
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<noscript>This demo needs JavaScript.</noscript>
+<script>
+/* 4orm Broker Dashboard · store
+   One data store. Every page reads from it; every control writes to it. */
+const STORE_KEY = '4orm.broker.demo.v1';
+const NOW = { day: 'Mon 26 Oct', h: 9, m: 52 };
+
+const STEPS = [
+  { k: 'situation', name: 'Consumer situation', src: 'Consumer · Decision Card', stage: 'Intake', detail: "Household, income, home and timing, in the consumer's own words." },
+  { k: 'plans', name: 'Future plans', src: 'Consumer · Decision Card', stage: 'Intake', detail: 'What changes in the next 5 years and what must not break.' },
+  { k: 'capacity', name: 'Financial capacity', src: 'Bank data · with consent', stage: 'Intake', detail: 'Income and payments confirmed from bank data. Nothing stored outside the file.' },
+  { k: 'risks', name: 'Risks ranked', src: 'Consumer · risk matrix', stage: 'Suitability', detail: 'Each risk scored likelihood times severity, then ranked by the consumer.' },
+  { k: 'disclosed', name: 'Material risks disclosed', src: 'Agent · written disclosure', stage: 'Suitability', detail: 'The top risks written out before any recommendation is made.', rule: 'BC MSA s.70' },
+  { k: 'advice', name: 'Recommendation and reasons', src: 'Agent · recommendation', stage: 'Suitability', detail: 'Why this option fits, tied to the risks above.', rule: 'BC MSA s.70' },
+  { k: 'ack', name: 'Consumer acknowledgement', src: 'Consumer · on their phone', stage: 'Close and keep', detail: 'The consumer confirms they understood, on their own phone.', rule: 'BC MSA s.70' },
+  { k: 'lender', name: 'Lender submission', src: 'Agent · lender portal', stage: 'Close and keep', detail: 'Only the approved summary goes out. Consumer data never goes to the lender.' },
+  { k: 'kept', name: 'Kept 5 years', src: '4ormIQ · records vault', stage: 'Kept', detail: 'Sealed record kept for 5 years for FINTRAC and the regulator.', rule: 'FINTRAC' }
+];
+
+const AGENT_SEED = [
+  { id: 'marcus', name: 'Marcus Leduc', role: 'Senior agent', color: '#2E6BF2', ini: 'ML', review: 31 },
+  { id: 'dev', name: 'Dev Arora', role: 'Agent', color: '#0F9F8F', ini: 'DA', review: 34 },
+  { id: 'hannah', name: 'Hannah Cho', role: 'Agent', color: '#E0752C', ini: 'HC', review: 24 },
+  { id: 'priya', name: 'Priya Sandhu', role: 'Agent', color: '#B04FC9', ini: 'PS', review: 19 }
+];
+
+function seal(i, id) { let h = 2166136261; const s = id + '/' + i + '/4orm'; for (let k = 0; k < s.length; k++) { h ^= s.charCodeAt(k); h = Math.imul(h, 16777619) >>> 0; } return h.toString(16).toUpperCase().padStart(8, '0').slice(0, 4); }
+
+function seedFiles() {
+  const key = [
+    { id: 'MB-2041', what: 'Calgary to Kelowna', who: 'Joint', risks: 5, agent: 'marcus', chain: 'SSSSXWOOO', last: '09:41', nw: true, issue: 'Material risks not disclosed', quote: '"We want a payment that still works while I\'m on leave."', qmeta: 'Top risk 16 to 12 after protection · readiness 4 to 7', lenderAt: '27 Oct 14:00', names: 'Ana and Luis Ruiz' },
+    { id: 'MB-2033', what: 'Renewal, Kamloops', who: 'Single', risks: 3, agent: 'dev', chain: 'SSSSSSXOO', last: '09:12', nw: false, issue: 'Acknowledgement missing 48 h', quote: '"I just want to know renewing here isn\'t costing us."', qmeta: '3 risks ranked · top risk 12', names: 'Tom Brandt' },
+    { id: 'MB-2019', what: 'First home, Kamloops', who: 'Joint', risks: 6, agent: 'hannah', chain: 'SSWOOOOOO', last: '08:55', nw: true, issue: 'Bank consent ends in 9 days', quote: '"We don\'t want to be house poor in our first year."', qmeta: '6 risks ranked · top risk 15', names: 'Mei and Jordan Park' },
+    { id: 'MB-2044', what: 'Renewal and refinance, Penticton', who: 'Joint', risks: 4, agent: 'marcus', chain: 'SSWOOOOOO', last: '08:30', nw: false, issue: 'Co-borrower consent pending', quote: '"Combine the debts, but not if it costs us the house later."', qmeta: '4 risks ranked · top risk 12', names: 'Sam and Rae Olsen' },
+    { id: 'MB-2036', what: 'Purchase, Kelowna', who: 'Single', risks: 4, agent: 'dev', chain: 'SSWOOOOOO', last: 'Fri', nw: false, issue: 'Down payment source unconfirmed', quote: '"My parents are helping with the down payment."', qmeta: '4 risks ranked · gift involved', names: 'Nikhil Arora' },
+    { id: 'MB-2022', what: 'Refinance, Vernon', who: 'Single', risks: 3, agent: 'hannah', chain: 'SSWOOOOOO', last: 'Thu', nw: false, issue: 'Bank consent ends in 12 days', quote: '"Keep the payment where it is."', qmeta: '3 risks ranked · top risk 9', names: 'Grace Lee' },
+    { id: 'MB-2027', what: 'Move up, Lake Country', who: 'Joint', risks: 5, agent: 'dev', chain: 'SSSSSSWOO', last: 'Wed', nw: false, issue: 'Acknowledgement sent, not signed', quote: '"Sell first, then buy. We can\'t carry two."', qmeta: '5 risks ranked · top risk 15', names: 'Priya and Arjun Nair' },
+    { id: 'MB-2053', what: 'Renewal, Vernon', who: 'Single', risks: 4, agent: 'priya', chain: 'SSOOOOOOO', last: '09:31', nw: true, issue: 'Card received today', quote: '"Just tell me what could go wrong."', qmeta: '4 risks ranked · top risk 10', names: 'Dana Whitlock' },
+    { id: 'MB-2047', what: 'First home, West Kelowna', who: 'Joint', risks: 5, agent: 'marcus', chain: 'SSSSSOOOO', last: '09:18', nw: true, issue: 'Ready for recommendation', quote: '"We want room for a second child."', qmeta: '5 risks ranked · top risk 12', names: 'Kim and Alex Tran' }
+  ];
+  const used = key.map(k => k.id);
+  const ids = []; for (let n = 2015; n <= 2053; n++) { const id = 'MB-' + n; if (used.indexOf(id) < 0) ids.push(id); }
+  // 29 generated open files: Marcus 11, Dev 6, Hannah 6, Priya 6
+  const agents = [].concat(Array(11).fill('marcus'), Array(6).fill('dev'), Array(6).fill('hannah'), Array(6).fill('priya'));
+  const what = ['Renewal, Kelowna', 'First home, Vernon', 'Purchase, Penticton', 'Refinance, Kamloops', 'Switch at renewal, Salmon Arm', 'Move up, Lake Country', 'Renewal, Summerland', 'First home, Kelowna', 'Purchase, Vernon', 'Refinance, West Kelowna', 'Renewal, Armstrong'];
+  const chains = ['SSOOOOOOO', 'SSSOOOOOO', 'SSSSOOOOO', 'SSSSSOOOO', 'SSSSSSOOO', 'SSSSSSSOO', 'SSSSSSSSO'];
+  const days = ['Sun', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue', '19 Oct', '16 Oct', '14 Oct'];
+  const people = ['J. Moreau', 'A. Singh', 'R. Castillo', 'L. Nguyen', 'B. Fraser', 'S. Okafor', 'C. Dubois', 'E. Wong', 'M. Hassan', 'K. Baker', 'T. Ivanova'];
+  const gen = ids.slice(0, 29).map((id, i) => ({
+    id, what: what[i % what.length], who: i % 3 ? 'Single' : 'Joint', risks: 3 + (i % 4), agent: agents[(i * 7) % 29],
+    chain: chains[(i * 5) % chains.length], last: days[Math.floor(i / 4) % days.length], nw: i % 9 === 0,
+    issue: '', quote: '"Keep it simple and tell us what could go wrong."', qmeta: (3 + (i % 4)) + ' risks ranked', names: people[i % people.length]
+  }));
+  const kept = [];
+  const kd = ['14 Oct', '9 Oct', '7 Oct', '3 Oct', '2 Oct', '1 Oct'];
+  for (let i = 0; i < 17; i++) {
+    kept.push({ id: 'MB-' + (2014 - i), what: what[(i * 3) % what.length], who: i % 2 ? 'Single' : 'Joint', risks: 3 + (i % 3), agent: ['marcus', 'dev', 'hannah', 'priya'][i % 4], chain: 'SSSSSSSSS', last: kd[i % kd.length], nw: false, issue: 'Closed ' + kd[i % kd.length] + ' · kept 5 years', quote: '"Thank you for walking us through it."', qmeta: 'Readiness 4 to 7', names: people[(i * 2) % people.length], closed: kd[i % kd.length] });
+  }
+  return key.concat(gen, kept).map(f => Object.assign({ log: [], docs: defaultDocs(f), coConsent: f.who === 'Joint' ? (f.id === 'MB-2044' ? 'W' : 'S') : 'na', consentDays: f.id === 'MB-2019' ? 9 : f.id === 'MB-2022' ? 12 : 60, gift: f.id === 'MB-2036', held: f.id === 'MB-2041' }, f));
+}
+function defaultDocs(f) {
+  const d = [{ n: 'Decision Card', f: 'Consumer', t: 'Sat 10:14', s: seal(1, f.id) }, { n: 'Risk matrix, ranked', f: 'Consumer', t: 'Sat 10:40', s: seal(4, f.id) }];
+  if (f.chain[2] === 'S') d.push({ n: 'Bank data summary', f: 'Bank data · with consent', t: 'Sat 10:32', s: seal(3, f.id) });
+  if (f.who === 'Joint') d.push({ n: 'Co-borrower consent', f: 'Consumer 2', t: 'Sat 11:02', s: seal(12, f.id) });
+  d.push({ n: 'Photo ID check', f: 'Agent', t: 'Sun 09:15', s: seal(13, f.id) });
+  if (f.chain[5] !== 'O') d.push({ n: 'Recommendation', f: 'Agent', t: '09:38', s: f.chain[5] === 'S' ? seal(6, f.id) : 'not sealed' });
+  return d;
+}
+
+function baseProcess() {
+  const S = (id, kind, name, meta, rule, plug, key) => ({ id, kind, name, meta, rule: rule || null, plug: plug || null, mine: false, key: key || null });
+  return {
+    version: '1.0', published: 'base model from 4orm',
+    lanes: [
+      { num: '01', title: 'Consumer', steps: [S('c1', 'step', 'Decision Card signed', 'Consumer, in 4ormIQ', 'consent record', '4ormIQ', 'card'), S('c2', 'step', 'Shared with consent', 'Consumer sends the link', 'consent record', null, 'shared')] },
+      { num: '02', title: 'Intake', steps: [S('i1', 'step', 'Opened by the agent', 'Agent', null, null, 'opened'), S('i2', 'check', 'Financial capacity confirmed', 'Agent, from bank data', 'BC MSA s.70', 'Bank data · Flinks', 'capacity'), S('i3', 'check', 'Co-borrower consent', 'Each borrower, for themselves', 'privacy law', null, 'coconsent')] },
+      { num: '03', title: 'Suitability', steps: [S('s1', 'step', 'Situation and future plans', 'Agent, from the card', 'BC MSA s.70', null, 'situation'), S('s2', 'doc', 'Material risks disclosed', 'Agent, in writing', 'BC MSA s.70', null, 'disclosed'), S('s3', 'step', 'Recommendation and reasons', 'Agent', 'BC MSA s.70', null, 'advice')] },
+      { num: '04', title: 'Close and keep', steps: [S('k1', 'doc', 'Consumer acknowledgement', 'Every borrower signs', 'BC MSA s.70', 'E-signature · DocuSign', 'ack'), S('k2', 'step', 'Lender submission', 'Agent', null, 'Lender · Filogix', 'lender'), S('k3', 'check', 'Kept for 5 years', 'From closing', 'FINTRAC', null, 'kept')] }
+    ],
+    changes: [], n: 0
+  };
+}
+
+function seedAI() {
+  return {
+    tools: [
+      { id: 't1', name: 'Microsoft 365 Copilot', use: 'Email drafts', sees: 'File notes, tokens only. No IDs or bank data', checks: 412, flags: 2, status: 'g', st: 'Healthy', on: true },
+      { id: 't2', name: 'ChatGPT Team', use: 'Research, summaries', sees: 'Redacted prompts only', checks: 538, flags: 4, status: 'a', st: 'Watch', on: true },
+      { id: 't3', name: 'Website chat assistant', use: 'Talks to consumers', sees: 'Public rates page. No files', checks: 221, flags: 5, status: 'r', st: 'Tighten', on: true },
+      { id: 't4', name: 'Call notes summarizer', use: 'Agent calls', sees: 'Call audio, tokens only', checks: 113, flags: 1, status: 'g', st: 'Healthy', on: true }
+    ],
+    events: [
+      { id: 'e1', t: '09:44', k: 'mis', title: 'Promised approval and a rate', tool: 't3', who: 'to a consumer', file: 'MB-2053', action: 'Blocked', pc: 'p-r', dot: 'd-r', kind: 'Misleading', l1: 'What the AI wrote', l2: 'What the consumer saw instead', before: "Good news, you'll definitely qualify, and we can get you the best rate in BC.", after: "Your broker will look at your situation and walk you through the options and their risks. I'm an AI assistant, so I can't confirm approval or a rate.", why: 'Promises an approval and a rate before any review. Not allowed in consumer messages.', seal: 'AI-9C41 · added to MB-2053', cta: 'Tighten this tool', ctaAct: 'ai.tighten', open: true },
+      { id: 'e2', t: '09:20', k: 'leak', title: 'SIN and account number in a prompt', tool: 't2', who: 'Marcus Leduc', file: 'MB-2041', action: 'Redacted', pc: 'p-b', dot: 'd-b', kind: 'Data leak stopped', l1: 'What Marcus typed', l2: 'What the AI tool received', before: 'Summarize this for the lender: Ana Ruiz, SIN 4•• ••• •12, chequing 00•••7731, income $96k, on leave from March.', after: 'Summarize this for the lender: [CONSUMER_1], SIN [REMOVED], chequing [REMOVED], income [ROUNDED], on leave from [DATE].', why: 'Personal identifiers never leave the brokerage. The AI answer is put back together inside 4ormIQ.', seal: 'AI-71B2 · added to MB-2041', cta: 'Mark reviewed', ctaAct: 'ai.resolve', open: true },
+      { id: 'e3', t: '08:58', k: 'mis', title: 'Picked a product before risks were disclosed', tool: 't1', who: 'Marcus Leduc', file: 'MB-2044', action: 'Held', pc: 'p-a', dot: 'd-a', kind: 'Misleading', l1: 'Draft email', l2: 'Suggested instead', before: "Hi both, go with the 5 year fixed. It's the safest choice for you.", after: 'Hi both, before we talk options, here are the three risks you ranked highest and what each option does about them.', why: 'Recommends a product before risks are disclosed in writing. Held for the agent to fix.', seal: 'AI-55E0 · added to MB-2044', cta: 'Send suggested draft', ctaAct: 'ai.resolve', open: true },
+      { id: 'e4', t: 'Sun', k: 'mis', title: 'Summary dropped a risk the consumer raised', tool: 't4', who: 'Hannah Cho', file: 'MB-2019', action: 'Corrected', pc: 'p-g', dot: 'd-a', kind: 'Incomplete', l1: 'AI summary', l2: 'Corrected summary', before: 'Clients want a 25 year amortization and a low payment.', after: 'Clients want a 25 year amortization and a low payment. They are worried about income dropping during parental leave next year.', why: 'The consumer said it on the call. Leaving it out would weaken the suitability record.', seal: 'AI-3A9D · original kept', cta: 'View call notes', ctaAct: 'ai.view', open: false },
+      { id: 'e5', t: 'Sun', k: 'mis', title: 'Chat did not say it was AI', tool: 't3', who: 'to a consumer', file: 'new visitor', action: 'Fixed', pc: 'p-g', dot: 'd-a', kind: 'Missing disclosure', l1: 'First message', l2: 'Now sent', before: "Hi! I'm Sam from Lakeshore. How can I help with your mortgage today?", after: "Hi! I'm Lakeshore's AI assistant. I can answer general questions and connect you with a broker.", why: 'Consumers must know when they are talking to AI.', seal: 'AI-0F17 · rule updated', cta: 'View rule', ctaAct: 'ai.view', open: false },
+      { id: 'e6', t: 'Sat', k: 'leak', title: 'Bank statement pasted into a chat', tool: 't2', who: 'Dev Arora', file: 'MB-2036', action: 'Redacted', pc: 'p-b', dot: 'd-b', kind: 'Data leak stopped', l1: 'What was pasted', l2: 'What the AI tool received', before: 'Statement for 00•••4410: deposit $18,000 from J. Arora, 12 Oct.', after: 'Statement for [REMOVED]: deposit [AMOUNT] from [PERSON_2], [DATE].', why: 'Bank data stays in the sealed file. Only tokens go to the AI tool.', seal: 'AI-2D88 · added to MB-2036', cta: 'Mark reviewed', ctaAct: 'ai.resolve', open: true }
+    ],
+    rails: [
+      { id: 'r1', t: 'Remove personal data before any AI call', s: 'SIN, IDs, account numbers, names', on: true, lock: true },
+      { id: 'r2', t: 'Block promises of approval or rates', s: 'Consumer-facing messages', on: true, lock: false },
+      { id: 'r3', t: 'Hold product picks until risks are disclosed', s: 'Drafts, emails, chat', on: true, lock: true },
+      { id: 'r4', t: 'Label every AI message to consumers', s: 'Website chat, email, text', on: true, lock: false },
+      { id: 'r5', t: "Never send consumer data to a lender's AI", s: 'Lender portals and tools', on: true, lock: true },
+      { id: 'r6', t: 'Seal every prompt and answer to the file', s: 'Kept 5 years with the evidence', on: true, lock: true }
+    ]
+  };
+}
+
+function seedConnections() {
+  return [
+    { id: 'flinks', k: 'bank', name: 'Flinks', cat: 'Bank data', mono: 'FL', lc: '#0B1530', ps: '2 expiring', pc: 'p-a', gets: "Income and payments, with the consumer's consent", never: 'Logins, full statements outside the file', sync: '09:18', on: true },
+    { id: 'docusign', k: 'sign', name: 'DocuSign', cat: 'E-signature', mono: 'DS', lc: '#2E6BF2', ps: 'Healthy', pc: 'p-g', gets: 'Disclosures and acknowledgements to sign', never: 'Bank data, risk scores', sync: '09:12', on: true },
+    { id: 'filogix', k: 'lend', name: 'Filogix Expert', cat: 'Lender submission', mono: 'FX', lc: '#0F9F8F', ps: '1 held', pc: 'p-a', gets: 'The approved application only', never: 'Decision Card, risks, consumer notes', sync: '08:40', on: true },
+    { id: 'ai', k: 'ai', name: 'AI tools', cat: '4 tools via AI monitor', mono: 'AI', lc: '#7C5CE0', ps: '3 flags', pc: 'p-a', gets: 'Redacted prompts, tokens in place of data', never: 'SIN, IDs, account numbers', sync: 'live', on: true },
+    { id: 'm365', k: 'mail', name: 'Microsoft 365', cat: 'Email and calendar', mono: 'MS', lc: '#E0752C', ps: 'Healthy', pc: 'p-g', gets: 'Emails linked to a file, meeting times', never: 'Anything outside a file', sync: '09:50', on: true },
+    { id: 'crm', k: 'crm', name: 'Your CRM', cat: 'Leads and contacts', mono: 'CR', lc: '#B04FC9', ps: 'Healthy', pc: 'p-g', gets: 'New Decision Cards as leads', never: 'Evidence, bank data, risk details', sync: '09:31', on: true }
+  ];
+}
+
+function seedState() {
+  return {
+    v: 1,
+    brokerage: { name: 'Lakeshore Mortgage Group', short: 'Lakeshore Mortgage', mark: 'LM', province: 'British Columbia', regulator: 'BC Financial Services Authority', principal: 'Sana Nair', retention: '5 years, sealed (FINTRAC)' },
+    user: { name: 'Sana Nair', role: 'Principal broker', ini: 'SN' },
+    agents: AGENT_SEED.map(a => Object.assign({}, a)),
+    files: seedFiles(),
+    process: baseProcess(),
+    ai: seedAI(),
+    connections: seedConnections(),
+    rules: [
+      { id: 'a', t: 'Hold lender submission if risks are not disclosed', s: 'Required block · cannot be switched off', on: true, lock: true },
+      { id: 'b', t: 'Red light if acknowledgement is missing after 48 hours', s: 'Brokerage rule', on: true },
+      { id: 'c', t: 'Amber when bank consent ends within 14 days', s: 'Brokerage rule', on: true },
+      { id: 'f', t: 'Amber if first review takes over 1 hour', s: 'Brokerage rule', on: true }
+    ],
+    schedules: [
+      { id: 's1', r: 'weekly', when: 'Mon 07:00', to: 'Sana Nair', st: 'Sent', pc: 'p-g' },
+      { id: 's2', r: 'agents', when: 'Fri 16:00', to: 'Sana Nair, each agent (own only)', st: 'Next Fri', pc: 'p-b' },
+      { id: 's3', r: 'ai', when: '1st of month 07:00', to: 'Sana Nair, compliance officer', st: '1 Nov', pc: 'p-b' },
+      { id: 's4', r: 'reg', when: 'On request', to: 'Built when a regulator asks', st: 'Ready', pc: 'p-n' }
+    ],
+    activity: [
+      { t: '09:41', a: 'Red light on MB-2041.', d: 'Recommendation drafted before risks were disclosed.' },
+      { t: '09:31', a: 'Decision Card received.', d: 'Renewal, Vernon. Routed to Priya.' },
+      { t: '09:18', a: 'Capacity sealed on MB-2047.', d: "Bank data confirmed through the consumer's consent." },
+      { t: '09:12', a: 'Reminder sent on MB-2033.', d: 'Acknowledgement still waiting.' },
+      { t: '08:47', a: 'Decision Card received.', d: 'First home, Kamloops. Routed to Hannah.' },
+      { t: '08:02', a: 'Nightly audit passed.', d: '36 chains verified, 2 flagged.' }
+    ],
+    cards: { d30: [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 2, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1, 0, 1, 2, 2], w13: [2, 3, 2, 3, 2, 3, 4, 4, 6, 3, 5, 4, 9], review: [64, 58, 51, 47, 40, 36, 31, 27] },
+    clock: 0
+  };
+}
+
+/* ---------- store ---------- */
+const Store = {
+  s: null,
+  listeners: [],
+  load() {
+    try { const raw = localStorage.getItem(STORE_KEY); if (raw) { const p = JSON.parse(raw); if (p && p.v === 1) { this.s = p; return; } } } catch (e) { }
+    this.s = seedState();
+  },
+  save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(this.s)); } catch (e) { } },
+  reset() { this.s = seedState(); this.save(); this.emit(); },
+  emit() { this.listeners.forEach(fn => fn()); },
+  commit() { this.save(); this.emit(); },
+  stamp() { const m = NOW.m + 1 + this.s.clock; this.s.clock++; const h = NOW.h + Math.floor(m / 60); return String(h).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); },
+  snapshot() { return JSON.stringify(this.s); },
+  restore(snap) { this.s = JSON.parse(snap); this.commit(); }
+};
+
+/* ---------- derived ---------- */
+const D = {
+  agent(id) { return Store.s.agents.find(a => a.id === id) || { id, name: 'Unassigned', ini: '?', color: '#8A93A8', role: '' }; },
+  file(id) { return Store.s.files.find(f => f.id === id); },
+  open() { return Store.s.files.filter(f => f.chain !== 'SSSSSSSSS'); },
+  kept() { return Store.s.files.filter(f => f.chain === 'SSSSSSSSS'); },
+  sealed(f) { return f.chain.split('').filter(c => c === 'S').length; },
+  status(f) {
+    if (f.chain === 'SSSSSSSSS') return 'k';
+    if (f.chain.indexOf('X') >= 0) return 'r';
+    if (f.chain.indexOf('W') >= 0 || f.coConsent === 'W' || f.consentDays <= 14) return 'a';
+    return 'g';
+  },
+  stage(f) { if (f.chain === 'SSSSSSSSS') return 'Kept'; const first = f.chain.search(/[^S]/); if (first < 3) return 'Intake'; if (first < 6) return 'Suitability'; return 'Close and keep'; },
+  issue(f) {
+    if (f.issue && (this.status(f) !== 'g' || f.nw)) return f.issue;
+    const st = this.status(f);
+    if (st === 'k') return 'Closed ' + (f.closed || '') + ' · kept 5 years';
+    const first = f.chain.search(/[^S]/);
+    const names = ['Card received', 'Future plans next', 'Capacity check running', 'Risks being ranked', 'Disclosure due', 'Recommendation next', 'Waiting on acknowledgement', 'Waiting on lender', 'Closing'];
+    return names[first] || '';
+  },
+  ord(f) { const st = this.status(f); return st === 'r' ? 0 : st === 'a' ? 1 : st === 'g' ? 2 : 3; },
+  sortFiles(arr) { return arr.slice().sort((a, b) => this.ord(a) - this.ord(b) || (b.nw - a.nw) || a.id.localeCompare(b.id)); },
+  counts() {
+    const open = this.open();
+    const r = open.filter(f => this.status(f) === 'r').length, a = open.filter(f => this.status(f) === 'a').length;
+    const intact = open.filter(f => ['g', 'k'].indexOf(this.status(f)) >= 0).length;
+    return { open: open.length, r, a, intact, pct: Math.round(intact / Math.max(1, open.length) * 100), held: open.filter(f => f.held).length, nw: open.filter(f => f.nw).length, kept: this.kept().length };
+  },
+  byStage() { const o = this.open(); const g = { 'Intake': [], 'Suitability': [], 'Close and keep': [] }; o.forEach(f => g[this.stage(f)].push(f)); return g; },
+  stepCount(i) { const o = this.open(); return { pass: o.filter(f => f.chain[i] === 'S').length, x: o.filter(f => f.chain[i] === 'X').length, w: o.filter(f => f.chain[i] === 'W').length, total: o.length }; },
+  nodeCount(key) {
+    const o = this.open(), n = o.length;
+    switch (key) {
+      case 'card': case 'shared': case 'opened': return { pass: n, total: n, x: 0, w: 0, files: [] };
+      case 'situation': return { pass: o.filter(f => f.chain[0] === 'S' && f.chain[1] === 'S').length, total: n, x: 0, w: 0, files: [] };
+      case 'capacity': { const fs = o.filter(f => f.chain[2] !== 'S' && (f.chain[2] === 'W' || f.consentDays <= 14)); const amb = o.filter(f => f.consentDays <= 14 || f.chain[2] === 'W'); return { pass: o.filter(f => f.chain[2] === 'S').length, total: n, x: 0, w: amb.length, files: amb }; }
+      case 'coconsent': { const j = o.filter(f => f.who === 'Joint'); const w = j.filter(f => f.coConsent === 'W'); return { pass: j.filter(f => f.coConsent === 'S').length, total: j.length, x: 0, w: w.length, files: w }; }
+      case 'disclosed': return this.stepFiles(4);
+      case 'advice': return this.stepFiles(5);
+      case 'ack': { const r = this.stepFiles(6); r.total = o.filter(f => f.chain[5] === 'S').length; return r; }
+      case 'lender': { const held = o.filter(f => f.held); return { pass: o.filter(f => f.chain[7] === 'S').length, total: o.filter(f => f.chain[6] === 'S').length, x: 0, w: held.length, files: held, sent: true }; }
+      case 'kept': return { pass: this.kept().length, total: this.kept().length, x: 0, w: 0, files: [], keptLabel: true };
+      default: return null;
+    }
+  },
+  stepFiles(i) { const o = this.open(); const bad = o.filter(f => f.chain[i] === 'X' || f.chain[i] === 'W'); return { pass: o.filter(f => f.chain[i] === 'S').length, total: o.filter(f => f.chain.slice(0, i).indexOf('O') < 0).length, x: o.filter(f => f.chain[i] === 'X').length, w: o.filter(f => f.chain[i] === 'W').length, files: bad }; },
+  alerts() {
+    const o = this.open();
+    const out = [];
+    o.forEach(f => { const st = this.status(f); if (st === 'r' || st === 'a') out.push({ f, st, t: f.last, w: this.issue(f), agent: this.agent(f.agent) }); });
+    return out.sort((a, b) => (a.st === 'r' ? 0 : 1) - (b.st === 'r' ? 0 : 1));
+  },
+  agentStats(id) {
+    const fs = this.open().filter(f => f.agent === id);
+    const intact = fs.filter(f => ['g'].indexOf(this.status(f)) >= 0).length;
+    const r = fs.filter(f => this.status(f) === 'r').length, a = fs.filter(f => this.status(f) === 'a').length;
+    return { files: fs.length, pct: fs.length ? Math.round(intact / fs.length * 100) : 100, r, a, ps: r ? r + ' red' : a ? a + ' amber' : 'Clean', pc: r ? 'p-r' : a ? 'p-a' : 'p-g' };
+  },
+  compliance() {
+    // share of files that reached a step and hold its record
+    const held = (i) => { const c = this.stepCount(i); const due = c.pass + c.x + c.w; const bits = []; if (c.x) bits.push(c.x + ' missing'); if (c.w) bits.push(c.w + ' waiting'); return { v: due ? Math.round(c.pass / due * 100) : 100, bad: c.x > 0, warn: c.w > 0, open: c.x + c.w, label: bits.join(' · ') || 'Clean' }; };
+    const s0 = held(1), s2 = held(2), s4 = held(4), s6 = held(6);
+    return [
+      Object.assign({ t: 'Situation and future plans' }, s0),
+      Object.assign({ t: 'Financial capacity confirmed' }, s2),
+      Object.assign({ t: 'Material risks disclosed' }, s4),
+      Object.assign({ t: 'Consumer acknowledgement' }, s6),
+      { t: 'FINTRAC records, 5 years', v: 100, bad: false, warn: false, open: 0, label: 'Clean' }
+    ];
+  }
+};
+
+/* ---------- actions (every control calls one of these) ---------- */
+const A = {
+  log(f, a, d) { f.log = f.log || []; f.log.unshift({ t: Store.stamp(), a, d }); },
+  activity(a, d) { Store.s.activity.unshift({ t: Store.stamp(), a, d }); if (Store.s.activity.length > 12) Store.s.activity.pop(); },
+  setChain(f, i, c) { const arr = f.chain.split(''); arr[i] = c; f.chain = arr.join(''); },
+
+  /* evidence chain */
+  sendDisclosure(id) {
+    const f = D.file(id); if (!f) return;
+    A.setChain(f, 4, 'W');
+    f.docs.push({ n: 'Written risk disclosure', f: 'Agent', t: 'now', s: 'awaiting signature' });
+    A.log(f, 'Disclosure sent to the consumer.', 'Drafted from the top ' + Math.min(3, f.risks) + ' risks on their card. Waiting for their acknowledgement on their phone.');
+    A.activity('Disclosure sent on ' + id + '.', 'Waiting for the consumer to acknowledge.');
+    f.last = 'now'; Store.commit();
+  },
+  consumerSigns(id) {
+    const f = D.file(id); if (!f) return;
+    const arr = f.chain.split('');
+    let i = arr.findIndex(c => c === 'W' || c === 'X');
+    if (i < 0) i = arr.indexOf('O');
+    if (i < 0) return;
+    arr[i] = 'S';
+    // a recommendation recorded out of order reseals once risks are disclosed
+    if (i === 4 && arr[5] === 'W') arr[5] = 'S';
+    f.chain = arr.join('');
+    if (f.chain[4] === 'S') f.held = false;
+    if (f.coConsent === 'W') f.coConsent = 'S';
+    if (f.consentDays <= 14) f.consentDays = 365;
+    if (f.chain.indexOf('X') < 0 && f.chain.indexOf('W') < 0) f.issue = '';
+    f.docs.forEach(d => { if (d.s === 'awaiting signature' || d.s === 'not sealed') d.s = seal(i + 1, id); });
+    A.log(f, STEPS[i].name + ' sealed.', 'Seal ' + seal(i + 1, id) + '. Signed by ' + (f.names || 'the consumer') + ' on their phone.');
+    A.activity(STEPS[i].name + ' sealed on ' + id + '.', 'Chain is ' + D.sealed(f) + ' of 9.');
+    if (f.chain === 'SSSSSSSSS') { f.closed = 'today'; f.issue = 'Closed today · kept 5 years'; }
+    f.last = 'now'; Store.commit();
+  },
+  sendReminder(id) { const f = D.file(id); if (!f) return; A.log(f, 'Reminder sent.', 'Short note with the one risk they marked unclear.'); A.activity('Reminder sent on ' + id + '.', 'Acknowledgement still waiting.'); f.last = 'now'; Store.commit(); },
+  request(id, what) {
+    const f = D.file(id); if (!f) return;
+    if (what === 'renewal') { f.consentDays = 365; f.issue = 'Consent renewal requested'; A.log(f, 'Bank consent renewal requested.', 'The consumer renews it on their phone. Capacity stays confirmed through closing.'); }
+    if (what === 'invite') { f.issue = 'Co-borrower invite resent'; A.log(f, 'Co-borrower invite resent.', 'The 3 minute version of the card.'); }
+    if (what === 'gift') { f.issue = 'Gift letter requested'; f.docs.push({ n: 'Gift letter', f: 'Consumer', t: 'requested', s: 'pending' }); A.log(f, 'Gift letter requested.', "With the donor's bank confirmation, so FINTRAC records stay complete."); }
+    A.activity(f.issue + ' on ' + id + '.', ''); f.last = 'now'; Store.commit();
+  },
+  reassign(id, agentId) { const f = D.file(id); if (!f) return; const from = D.agent(f.agent).name, to = D.agent(agentId).name; f.agent = agentId; A.log(f, 'Reassigned to ' + to + '.', 'From ' + from + '. Logged to the file.'); A.activity(id + ' reassigned to ' + to + '.', ''); Store.commit(); },
+  share(id) { const f = D.file(id); if (!f) return; A.log(f, 'Record shared with the consumer.', 'They see the same sealed chain on their phone.'); Store.commit(); },
+  note(id, text) { const f = D.file(id); if (!f || !text) return; A.log(f, 'Note by ' + Store.s.user.name + '.', text); Store.commit(); },
+
+  /* agents */
+  invite(name, role) { const parts = name.trim().split(/\s+/); const id = parts.join('-').toLowerCase().replace(/[^a-z-]/g, '') || ('a' + Date.now()); const colors = ['#7C5CE0', '#1F9D6A', '#D9910B', '#E0362C']; Store.s.agents.push({ id, name: name.trim(), role: role || 'Agent', color: colors[Store.s.agents.length % colors.length], ini: parts.map(p => p[0]).join('').slice(0, 2).toUpperCase(), review: 0, invited: true }); A.activity(name.trim() + ' invited.', 'Their own space is ready. They see only their files.'); Store.commit(); return id; },
+  coach(agentId, text) { A.activity('Coaching note sent to ' + D.agent(agentId).name + '.', text); Store.commit(); },
+
+  /* AI monitor */
+  rail(id) { const r = Store.s.ai.rails.find(x => x.id === id); if (!r || r.lock) return false; r.on = !r.on; Store.commit(); return true; },
+  tighten(toolId) { const t = Store.s.ai.tools.find(x => x.id === toolId); if (!t) return; t.status = 'g'; t.st = 'Tightened'; t.sees = 'Public rates page. Scripted answers only'; Store.s.ai.events.forEach(e => { if (e.tool === toolId) e.open = false; }); A.activity(t.name + ' tightened.', 'Scripted answers only. No promises, no product picks.'); Store.commit(); },
+  resolveEvent(id) { const e = Store.s.ai.events.find(x => x.id === id); if (!e) return; e.open = false; e.action = e.k === 'leak' ? 'Reviewed' : 'Sent'; e.pc = 'p-g'; A.activity('AI flag closed on ' + e.file + '.', e.title); Store.commit(); },
+  addTool(name, use) { const id = 't' + Date.now(); Store.s.ai.tools.push({ id, name, use: use || 'New tool', sees: 'Redacted prompts only, until you widen it', checks: 0, flags: 0, status: 'g', st: 'Connected', on: true }); A.activity(name + ' connected to the AI monitor.', 'Every call goes through 4ormIQ first.'); Store.commit(); },
+  toolToggle(id) { const t = Store.s.ai.tools.find(x => x.id === id); if (!t) return; t.on = !t.on; t.st = t.on ? 'Healthy' : 'Paused'; t.status = t.on ? 'g' : 'n'; Store.commit(); },
+
+  /* connections */
+  connToggle(id) { const c = Store.s.connections.find(x => x.id === id); if (!c) return; c.on = !c.on; c.ps = c.on ? 'Healthy' : 'Paused'; c.pc = c.on ? 'p-g' : 'p-n'; Store.commit(); },
+  addConn(name, cat) { Store.s.connections.push({ id: 'c' + Date.now(), k: 'other', name, cat: cat || 'Custom', mono: name.slice(0, 2).toUpperCase(), lc: '#4A5570', ps: 'Connected', pc: 'p-g', gets: 'Only what you allow here', never: 'Evidence, bank data, risk details', sync: 'just now', on: true }); A.activity(name + ' connected.', 'It gets its own light on the control map.'); Store.commit(); },
+
+  /* settings */
+  rule(id) { const r = Store.s.rules.find(x => x.id === id); if (!r || r.lock) return false; r.on = !r.on; Store.commit(); return true; },
+  saveBrokerage(obj) { Object.assign(Store.s.brokerage, obj); Store.commit(); },
+
+  /* reports */
+  schedule(r, when, to) { Store.s.schedules.push({ id: 's' + Date.now(), r, when, to, st: 'Scheduled', pc: 'p-b' }); Store.commit(); },
+  unschedule(id) { Store.s.schedules = Store.s.schedules.filter(s => s.id !== id); Store.commit(); },
+
+  /* process builder */
+  procClone() { return Store.s.process.lanes.map(l => Object.assign({}, l, { steps: l.steps.map(s => Object.assign({}, s)) })); },
+  procLog(lanes, text) { const p = Store.s.process; p.lanes = lanes; p.changes.push({ time: Store.stamp(), text }); Store.commit(); },
+  procInsert(li, at, tpl) {
+    if (!tpl || tpl.type === 'plug') return null;
+    const lanes = A.procClone(); const p = Store.s.process; p.n++; const id = 'n' + p.n;
+    lanes[li].steps.splice(at, 0, { id, kind: tpl.kind, name: tpl.name, meta: tpl.meta || 'Agent', rule: null, plug: null, mine: true, key: null });
+    A.procLog(lanes, 'Added "' + tpl.name + '" to ' + lanes[li].title); return id;
+  },
+  procAttach(id, tpl) { const lanes = A.procClone(); let name = ''; lanes.forEach(l => l.steps.forEach(s => { if (s.id === id) { s.plug = tpl.label + ' · ' + tpl.who; name = s.name; } })); A.procLog(lanes, 'Connected ' + tpl.who + ' to "' + name + '"'); },
+  procRemove(id) { const lanes = A.procClone(); let name = ''; lanes.forEach(l => { const i = l.steps.findIndex(s => s.id === id); if (i >= 0 && l.steps[i].mine) { name = l.steps[i].name; l.steps.splice(i, 1); } }); if (name) A.procLog(lanes, 'Removed "' + name + '"'); return name; },
+  procRename(id, name) { const lanes = A.procClone(); lanes.forEach(l => l.steps.forEach(s => { if (s.id === id && s.mine) s.name = name; })); A.procLog(lanes, 'Renamed a block to "' + name + '"'); },
+  procReset() { Store.s.process = baseProcess(); Store.commit(); },
+  procPublish() { const p = Store.s.process; const k = p.changes.length; const [a, b] = p.version.split('.').map(Number); p.version = a + '.' + (b + 1); p.published = 'published ' + Store.stamp() + ' with ' + k + ' change' + (k === 1 ? '' : 's'); p.changes = []; A.activity('Process v' + p.version + ' published to every agent.', 'The control map now carries your blocks.'); Store.commit(); },
+  procHas(name) { let r = false; Store.s.process.lanes.forEach(l => l.steps.forEach(s => { if (s.name === name) r = true; })); return r; }
+};
+
+/* views · every page is a pure function of Store.s + U (ui state) */
+const U = {
+  route: 'overview', range: '30', ovTab: 'all',
+  fTab: 'all', fAgent: 'all', fStage: 'all', fSel: 'MB-2041',
+  eSel: 'MB-2041', eTab: 'chain',
+  mSel: 's2', mAgent: 'all',
+  rSel: 'weekly', rRange: 'w',
+  aiSel: 'e1', aiTab: 'all',
+  agSel: 'marcus', agMode: 'b',
+  cTab: 'all',
+  sSec: 'profile',
+  bSel: 's2', bArmed: null, bDrag: null, bOver: null
+};
+const h = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const ST = { r: ['p-r', 'Blocked'], a: ['p-a', 'Waiting'], g: ['p-g', 'On track'], k: ['p-n', 'Kept'] };
+const CM = { S: 's', X: 'x', W: 'w', O: 'o' };
+const pill = (st, txt) => `<span class="pill ${ST[st][0]}"><i></i>${h(txt || ST[st][1])}</span>`;
+const pillc = (cls, txt) => `<span class="pill ${cls}"><i></i>${h(txt)}</span>`;
+const chainHTML = (f, cls) => `<div class="chain ${cls || ''}">${f.chain.split('').map(c => `<i class="${CM[c]}"></i>`).join('')}</div>`;
+const av = (a, size) => `<span class="av" style="background:${a.color}${size ? ';width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * .38) + 'px' : ''}">${h(a.ini)}</span>`;
+const btn = (label, action, extra, cls) => `<button class="${cls || 'btn'}" data-a="${action}" ${extra || ''}>${h(label)}</button>`;
+const NAV = [
+  ['Workspace', [['overview', 'Overview'], ['files', 'Files'], ['evidence', 'Evidence'], ['map', 'Control map'], ['reports', 'Reports']]],
+  ['Oversight', [['ai', 'AI monitor']]],
+  ['Brokerage', [['agents', 'Agents'], ['builder', 'Process builder'], ['connections', 'Connections'], ['settings', 'Settings']]]
+];
+const TITLES = { overview: 'Overview', files: 'Files', evidence: 'Evidence', map: 'Control map', reports: 'Reports', ai: 'AI monitor', agents: 'Agents', builder: 'Process builder', connections: 'Connections', settings: 'Settings' };
+
+function sidebar() {
+  const s = Store.s, c = D.counts();
+  const openAI = s.ai.events.filter(e => e.open).length;
+  const badge = (k) => k === 'files' ? `<span class="ct">${c.open}</span>` : k === 'evidence' && c.r ? `<span class="ct r">${c.r}</span>` : k === 'ai' && openAI ? `<span class="ct a">${openAI}</span>` : k === 'agents' ? `<span class="ct">${s.agents.length}</span>` : k === 'connections' ? `<span class="ct">${s.connections.length}</span>` : '';
+  return `<aside class="side">
+  <button class="ws" data-a="nav" data-v="overview"><div class="mark">${h(s.brokerage.mark)}</div><div style="display:flex;flex-direction:column;min-width:0"><span style="color:#fff;font-weight:600;font-size:14px">${h(s.brokerage.short)}</span><span style="font-size:12px;color:#8C97B2">Brokerage · ${s.agents.length} agents</span></div></button>
+  ${NAV.map(([sec, items]) => `<div><div class="sec">${sec}</div>${items.map(([k, l]) => `<button class="nl${U.route === k ? ' on' : ''}" data-a="nav" data-v="${k}"><span>${l}</span>${badge(k)}</button>`).join('')}</div>`).join('')}
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
+    <button class="ws" data-a="nav" data-v="reports" style="flex-direction:column;align-items:stretch;background:rgba(46,107,242,.12);padding:12px"><div style="font-size:12px;color:#fff;font-weight:600">Audit ready</div><div style="font-size:12px;color:#A9B4CE;margin-top:3px">${c.intact} of ${c.open} files hold a complete chain</div><div style="height:5px;border-radius:3px;background:rgba(255,255,255,.1);margin-top:9px;overflow:hidden"><i style="display:block;height:100%;width:${c.pct}%;background:#6A93F7;border-radius:3px"></i></div></button>
+    <button class="ws" data-a="nav" data-v="settings" style="background:transparent"><span class="av" style="background:#7C5CE0;width:30px;height:30px">${h(s.user.ini)}</span><div style="display:flex;flex-direction:column;min-width:0"><span style="color:#fff;font-size:13.5px;font-weight:600">${h(s.user.name)}</span><span style="font-size:12px;color:#8C97B2">${h(s.user.role)}</span></div></button>
+    <a class="bk" href="/">Back to the main site</a>
+    <div class="mono" style="font-size:10.5px;letter-spacing:.1em;color:#5E6A88;padding:0 6px">POWERED BY 4ORM<span style="color:#6A93F7">IQ</span></div>
+  </div></aside>`;
+}
+function header(crumb, actions) {
+  return `<div class="hdr"><span class="title">${crumb}</span><button class="search" data-a="search.open"><span>Search files, consumers, agents</span><span class="kbd">⌘ K</span></button><div style="flex:1"></div><span class="sub mono">${NOW.day} · ${String(NOW.h).padStart(2, '0')}:${String(NOW.m).padStart(2, '0')}</span>${actions || ''}</div>`;
+}
+function issueRow(f) {
+  const st = D.status(f), a = D.agent(f.agent);
+  const cta = st === 'r' && f.chain[4] === 'X' ? btn('Fix', 'file.fix', `data-id="${f.id}"`, 'btn sm') : st === 'r' ? btn('Nudge', 'file.remind', `data-id="${f.id}"`, 'btn sm') : btn('Open', 'file.open', `data-id="${f.id}"`, 'btn2 sm');
+  return `<div class="tr issues" data-a="file.open" data-id="${f.id}"><span class="mono" style="font-size:12.5px;color:#1F4FBF">${f.id}</span><div style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:600" class="ell">${h(D.issue(f))}</span><span>${st === 'r' ? pillc('p-r', f.chain[4] === 'X' ? 'Blocks lender submission' : 'Blocks closing') : `<span class="sub">${h(f.what)}</span>`}</span></div><div style="display:flex;align-items:center;gap:8px">${av(a)}<span class="ell">${h(a.name.split(' ')[0])}</span></div><span class="mono sub" style="text-align:right">${h(f.last)}</span><span>${cta}</span></div>`;
+}
+
+/* ---------- Overview ---------- */
+function vOverview() {
+  const s = Store.s, c = D.counts(), g = U.range;
+  const d30 = s.cards.d30, w13 = s.cards.w13;
+  const lab30 = d30.map((_, i) => i < 4 ? (27 + i) + ' Sep' : (i - 3) + ' Oct');
+  const wl = ['27 Jul', '3 Aug', '10 Aug', '17 Aug', '24 Aug', '31 Aug', '7 Sep', '14 Sep', '21 Sep', '28 Sep', '5 Oct', '12 Oct', '19 Oct'];
+  let vals, labs, sub, tot, totl, xs, k1d;
+  if (g === '7') { vals = d30.slice(-7); labs = lab30.slice(-7); sub = 'Per day, last 7 days'; tot = vals.reduce((a, b) => a + b, 0); totl = '+125% vs prior 7 days'; xs = [labs[0], labs[3], 'Today']; k1d = '+125%'; }
+  else if (g === '90') { vals = w13; labs = wl.map(w => 'Week of ' + w); sub = 'Per week, last 13 weeks'; tot = vals.reduce((a, b) => a + b, 0); totl = 'cards in 90 days'; xs = ['27 Jul', '31 Aug', 'This week']; k1d = '+38%'; }
+  else { vals = d30; labs = lab30; sub = 'Per day, last 30 days'; tot = vals.reduce((a, b) => a + b, 0); totl = '21 so far in October'; xs = ['27 Sep', '11 Oct', 'Today']; k1d = '+33%'; }
+  const mx = Math.max(...vals) <= 4 ? 4 : 10;
+  const bars = vals.map((v, i) => `<div class="bar${i === vals.length - 1 ? ' last' : ''}"><i style="height:${Math.max(2, v / mx * 100)}%"></i><span class="tip">${labs[i]} · ${v} card${v === 1 ? '' : 's'}</span></div>`).join('');
+  const open = D.open();
+  const rows = D.sortFiles(open.filter(f => U.ovTab === 'all' || (U.ovTab === 'att' && 'ra'.indexOf(D.status(f)) >= 0) || (U.ovTab === 'new' && f.nw))).slice(0, U.ovTab === 'all' ? 8 : 40);
+  const st = D.byStage();
+  const pipe = (name, fs) => { const r = fs.filter(f => D.status(f) === 'r').length, a = fs.filter(f => D.status(f) === 'a').length, g2 = fs.length - r - a; return `<div class="stg"><span style="font-weight:500">${name}</span><span class="num" style="text-align:right;font-weight:600">${fs.length}</span><div class="trk"><i style="width:${g2 / c.open * 100}%;background:#2E6BF2"></i><i style="width:${a / c.open * 100}%;background:#F2B544"></i><i style="width:${r / c.open * 100}%;background:#E0362C"></i></div><span class="sub" style="grid-column:1/-1">${g2} on track${a ? ' · ' + a + ' waiting' : ''}${r ? ' · ' + r + ' blocked' : ''}</span></div>`; };
+  const alerts = D.alerts();
+  const first = alerts.find(x => x.st === 'r');
+  const banner = first ? `<div class="banner">${pillc('p-r', 'Blocked')}<div style="flex:1;min-width:0;font-size:13.5px"><b style="font-weight:600">${first.f.id} ${first.f.chain[4] === 'X' ? 'cannot go to the lender.' : 'cannot close.'}</b> <span style="color:#5A3A38">${h(D.issue(first.f))}.${first.f.held ? ' Submission is held for ' + first.f.lenderAt + '.' : ''}</span></div>${btn('Review file', 'file.open', `data-id="${first.f.id}"`, 'btn sm')}</div>` : `<div class="banner ok">${pillc('p-g', 'Clear')}<div style="flex:1;font-size:13.5px"><b style="font-weight:600">No file is blocked.</b> <span style="color:#33405C">Every open chain is intact or waiting on a consumer.</span></div></div>`;
+  const comp = D.compliance();
+  const agentsRows = s.agents.map(a => { const x = D.agentStats(a.id); return `<div class="tr agents" data-a="ag.open" data-id="${a.id}"><div style="display:flex;align-items:center;gap:9px">${av(a)}<span class="ell">${h(a.name)}</span></div><span class="num">${x.files}</span><div style="display:flex;align-items:center;gap:8px"><div class="trk" style="flex:1"><i style="width:${x.pct}%;background:${x.pct === 100 ? '#1F9D6A' : '#2E6BF2'}"></i></div><span class="mono" style="font-size:12px">${x.pct}%</span></div><span class="mono sub" style="text-align:right">${a.review ? a.review + ' m' : 'new'}</span></div>`; }).join('');
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+  <div><div class="h1">Good morning, ${h(s.user.name.split(' ')[0])}</div><div class="sub" style="font-size:14px;margin-top:4px">${c.open} open files across ${s.agents.length} agents. ${c.r ? c.r + (c.r === 1 ? ' is' : ' are') + ' blocked and need' + (c.r === 1 ? 's' : '') + ' you before ' + (c.r === 1 ? 'it moves' : 'they move') + '.' : 'Nothing is blocked.'}</div></div>
+  <div class="seg">${[['7', '7 days'], ['30', '30 days'], ['90', '90 days']].map(([k, l]) => `<button class="${g === k ? 'on' : ''}" data-a="ov.range" data-v="${k}">${l}</button>`).join('')}</div>
+</div>
+${banner}
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+  <div class="card kpi"><span class="sub">New consumers</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${tot}</span><span class="delta up">${k1d}</span></div><svg viewBox="0 0 200 36" width="100%" height="36" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E6BF2" stop-opacity=".22"/><stop offset="1" stop-color="#2E6BF2" stop-opacity="0"/></linearGradient></defs><path d="M0 26 L28 22 L57 22 L86 14 L114 26 L143 18 L171 22 L200 4 L200 36 L0 36Z" fill="url(#g1)"/><path d="M0 26 L28 22 L57 22 L86 14 L114 26 L143 18 L171 22 L200 4" fill="none" stroke="#2E6BF2" stroke-width="2" stroke-linejoin="round"/></svg></div>
+  <div class="card kpi"><span class="sub">Evidence complete</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${c.pct}%</span><span class="delta up">${c.intact} of ${c.open}</span></div><div style="height:10px;border-radius:5px;background:#EEF1F6;overflow:hidden;margin:8px 0"><i style="display:block;height:100%;width:${c.pct}%;background:#2E6BF2;border-radius:5px"></i></div><span class="sub">Chains with no broken or waiting link</span></div>
+  <div class="card kpi"><span class="sub">Card to first review, median</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">27<span style="font-size:16px;color:#6B7590;font-weight:500"> min</span></span><span class="delta dn">−58%</span></div><svg viewBox="0 0 200 36" width="100%" height="36" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F9D6A" stop-opacity=".2"/><stop offset="1" stop-color="#1F9D6A" stop-opacity="0"/></linearGradient></defs><path d="M0 4 L28 7 L57 11 L86 13 L114 17 L143 20 L171 23 L200 25 L200 36 L0 36Z" fill="url(#g3)"/><path d="M0 4 L28 7 L57 11 L86 13 L114 17 L143 20 L171 23 L200 25" fill="none" stroke="#1F9D6A" stroke-width="2" stroke-linejoin="round"/></svg></div>
+  <div class="card kpi"><span class="sub">Open issues</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${c.r + c.a}</span><span class="delta ${c.r ? 'bad' : 'up'}">${c.r} blocked</span></div><div style="display:flex;gap:6px;margin-top:auto;padding-top:8px;flex-wrap:wrap">${pillc('p-r', c.r + ' red')}${pillc('p-a', c.a + ' amber')}${pillc('p-b', c.held + ' held')}</div></div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:16px">
+  <div class="card">
+    <div class="ch"><div><div class="ct1">Decision Cards received</div><div class="sub" style="margin-top:2px">${sub}</div></div><div style="text-align:right"><div class="num" style="font-size:22px;font-weight:600;letter-spacing:-.02em">${tot}</div><div class="sub">${totl}</div></div></div>
+    <div style="padding:22px 20px 16px;display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px">
+      <div style="position:relative;height:190px"><div class="grid-y"><span>${mx}</span><span>${mx / 2}</span><span>0</span></div></div>
+      <div style="position:relative"><div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none"><i style="display:block;height:1px;background-image:linear-gradient(90deg,#E3E7EF 50%,transparent 0);background-size:6px 1px"></i><i style="display:block;height:1px;background-image:linear-gradient(90deg,#E3E7EF 50%,transparent 0);background-size:6px 1px"></i><i></i></div><div class="bars">${bars}</div></div>
+      <span></span><div style="display:flex;justify-content:space-between;font-size:11.5px;color:#8A93A8" class="mono"><span>${xs[0]}</span><span>${xs[1]}</span><span>${xs[2]}</span></div>
+    </div>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column">
+    <div class="ch"><div><div class="ct1">Pipeline</div><div class="sub" style="margin-top:2px">Open files by stage</div></div>${btn('Control map', 'nav', 'data-v="map"', 'btn2 sm')}</div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:18px;flex:1">${pipe('Intake', st['Intake'])}${pipe('Suitability', st['Suitability'])}${pipe('Close and keep', st['Close and keep'])}
+      <div style="margin-top:auto;display:flex;gap:16px;font-size:12px;color:#6B7590"><span style="display:flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;background:#2E6BF2;display:block"></i>On track</span><span style="display:flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;background:#F2B544;display:block"></i>Waiting</span><span style="display:flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;background:#E0362C;display:block"></i>Blocked</span></div>
+    </div>
+  </div>
+</div>
+<div class="card" style="overflow:hidden">
+  <div class="ch" style="padding-bottom:14px">
+    <div class="tabs">${[['all', 'All files', c.open], ['att', 'Needs attention', c.r + c.a], ['new', 'New this week', c.nw]].map(([k, l, n]) => `<button class="tab${U.ovTab === k ? ' on' : ''}" data-a="ov.tab" data-v="${k}">${l}<span class="c">${n}</span></button>`).join('')}</div>
+    <div style="display:flex;gap:8px;align-items:center"><span class="sub">Sorted by priority</span>${btn('All files', 'nav', 'data-v="files"', 'btn2 sm')}</div>
+  </div>
+  <div class="th files"><span>File</span><span>Consumer's decision</span><span>Agent</span><span>Stage</span><span>Evidence chain</span><span>Status</span><span style="text-align:right">Updated</span></div>
+  ${rows.map(f => { const a = D.agent(f.agent), st2 = D.status(f); return `<div class="tr files" data-a="file.open" data-id="${f.id}"><span class="mono" style="font-size:12.5px;font-weight:500;color:#1F4FBF">${f.id}</span><div style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:600" class="ell">${h(f.what)}</span><span class="sub">${f.who} · ${f.risks} risks ranked</span></div><div style="display:flex;align-items:center;gap:9px">${av(a)}<span class="ell">${h(a.name)}</span></div><span style="color:#3A4560">${D.stage(f)}</span><div style="display:flex;flex-direction:column;gap:5px">${chainHTML(f)}<span class="mono" style="font-size:11px;color:#7A849C">${D.sealed(f)}/9 sealed</span></div><span>${pill(st2)}</span><span class="mono" style="font-size:12px;color:#6B7590;text-align:right">${h(f.last)}</span></div>`; }).join('')}
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;font-size:12.5px;color:#6B7590"><span>Showing ${rows.length} of ${c.open} files</span><div style="display:flex;gap:14px;align-items:center">${[['#2E6BF2', 'Sealed'], ['#F2B544', 'Waiting'], ['#E0362C', 'Broken'], ['#E6EAF1', 'Not reached']].map(([cc, l]) => `<span style="display:flex;align-items:center;gap:6px"><i style="width:12px;height:8px;border-radius:2px;background:${cc};display:block"></i>${l}</span>`).join('')}</div></div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px">
+  <div class="card" style="overflow:hidden">
+    <div class="ch" style="padding-bottom:14px"><div><div class="ct1">Issues</div><div class="sub" style="margin-top:2px">Every broken or waiting link, blocked first</div></div>${alerts.length ? pillc('p-r', alerts.length + ' open') : pillc('p-g', 'None open')}</div>
+    <div class="th issues"><span>File</span><span>Issue</span><span>Owner</span><span>Age</span><span></span></div>
+    ${alerts.map(x => issueRow(x.f)).join('') || '<div style="padding:18px 20px" class="sub">Nothing open. Every file is moving.</div>'}
+  </div>
+  <div class="card" style="padding-bottom:12px">
+    <div class="ch"><div><div class="ct1">Activity</div><div class="sub" style="margin-top:2px">Every event is sealed into its file</div></div>${pillc('p-g', 'Live')}</div>
+    <div style="padding:10px 20px 0">${s.activity.slice(0, 7).map(x => `<div class="act"><span class="mono sub">${h(x.t)}</span><div><b style="font-weight:600">${h(x.a)}</b> <span style="color:#4A5570">${h(x.d)}</span></div></div>`).join('')}</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,.85fr);gap:16px">
+  <div class="card" style="padding-bottom:20px"><div class="ch"><div><div class="ct1">Compliance report</div><div class="sub" style="margin-top:2px">Files that reached a step and hold its record</div></div></div>
+    <div style="padding:18px 20px 0;display:flex;flex-direction:column;gap:14px">${comp.map(r => `<div class="stg"><span>${r.t}</span><span class="mono" style="text-align:right;font-size:12.5px;${r.bad ? 'color:#B42318' : ''}">${r.v}%</span><div class="trk"><i style="width:${r.v}%;background:${r.bad ? '#E0362C' : r.warn ? '#D9910B' : '#2E6BF2'}"></i></div></div>`).join('')}</div></div>
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:14px"><div><div class="ct1">Agents</div><div class="sub" style="margin-top:2px">Open files and chain health</div></div>${btn('View agents', 'nav', 'data-v="agents"', 'btn2 sm')}</div>
+    <div class="th agents"><span>Agent</span><span>Files</span><span>Evidence complete</span><span style="text-align:right">Review</span></div>${agentsRows}</div>
+  <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:18px 20px 20px"><div style="align-self:stretch" class="ct1">Audit readiness</div>
+    <div style="position:relative;width:150px;height:150px;margin:16px 0 10px"><svg viewBox="0 0 120 120" width="150" height="150" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="#EEF1F6" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="#2E6BF2" stroke-width="12" stroke-linecap="round" stroke-dasharray="${(c.pct / 100 * 314.2).toFixed(1)} 314.2" transform="rotate(-90 60 60)"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="num" style="font-size:30px;font-weight:600;letter-spacing:-.03em">${c.pct}%</span><span class="sub">${c.intact} of ${c.open}</span></div></div>
+    <div class="sub" style="text-align:center;max-width:220px">If a regulator asked today, ${c.intact} files are ready to hand over as they are.</div>${btn('Build regulator pack', 'r.pack', '', 'btn2 sm')}<span style="height:0"></span></div>
+</div>`;
+}
+
+/* ---------- Files ---------- */
+function fileSteps(f) {
+  return f.chain.split('').map((c, i) => `<div class="step"><span class="node ${({ S: 'n-s', X: 'n-x', W: 'n-w', O: 'n-o' })[c]}">${i + 1}</span><span style="font-size:13px;${c === 'X' ? 'color:#B42318;font-weight:600' : c === 'O' ? 'color:#9AA3B7' : ''}">${STEPS[i].name}</span><span class="mono" style="font-size:11px;color:#9AA3B7">${c === 'S' ? 'sealed' : c === 'X' ? 'broken' : c === 'W' ? 'waiting' : ''}</span></div>`).join('');
+}
+function fileActions(f, compact) {
+  const st = D.status(f); const out = [];
+  if (f.chain[4] === 'X') out.push(btn('Prepare disclosure', 'file.fix', `data-id="${f.id}"`));
+  else if (f.chain[6] === 'X') out.push(btn('Send reminder', 'file.remind', `data-id="${f.id}"`));
+  if (f.chain.indexOf('W') >= 0 || f.coConsent === 'W') out.push(btn('Consumer signs (demo)', 'file.sign', `data-id="${f.id}"`, 'btn2'));
+  if (f.consentDays <= 14) out.push(btn('Request consent renewal', 'file.request', `data-id="${f.id}" data-v="renewal"`, 'btn2'));
+  if (f.coConsent === 'W' && f.issue.indexOf('resent') < 0) out.push(btn('Resend invite', 'file.request', `data-id="${f.id}" data-v="invite"`, 'btn2'));
+  if (f.gift && !f.docs.some(d => d.n === 'Gift letter')) out.push(btn('Request gift letter', 'file.request', `data-id="${f.id}" data-v="gift"`, 'btn2'));
+  if (st === 'g' && f.chain !== 'SSSSSSSSS') out.push(btn('Seal next step (demo)', 'file.sign', `data-id="${f.id}"`, 'btn2'));
+  return out.join('');
+}
+function vFiles() {
+  const c = D.counts(), s = Store.s;
+  const all = s.files;
+  const byT = f => U.fTab === 'all' ? D.status(f) !== 'k' : U.fTab === 'r' ? D.status(f) === 'r' : U.fTab === 'a' ? D.status(f) === 'a' : U.fTab === 'new' ? f.nw && D.status(f) !== 'k' : D.status(f) === 'k';
+  const vis = D.sortFiles(all.filter(f => byT(f) && (U.fAgent === 'all' || f.agent === U.fAgent) && (U.fStage === 'all' || D.stage(f) === U.fStage)));
+  if (!vis.find(f => f.id === U.fSel) && vis.length) U.fSel = vis[0].id;
+  const p = D.file(U.fSel) || vis[0] || all[0];
+  const pa = D.agent(p.agent), pst = D.status(p);
+  const T = [['all', 'All open', c.open], ['r', 'Blocked', c.r], ['a', 'Waiting', c.a], ['new', 'New this week', c.nw], ['k', 'Kept', c.kept]];
+  const chips = (cur, list, act) => list.map(([k, l]) => `<button class="fchip${cur === k ? ' on' : ''}" data-a="${act}" data-v="${k}">${l}</button>`).join('');
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Files</div><div class="sub" style="font-size:14px;margin-top:4px">Every consumer who sent a Decision Card, with their evidence chain.</div></div>
+  <div class="tabs">${T.map(([k, l, n]) => `<button class="tab${U.fTab === k ? ' on' : ''}" data-a="f.tab" data-v="${k}">${l}<span class="c">${n}</span></button>`).join('')}</div></div>
+<div class="flt"><span class="lbl" style="margin-right:2px">Agent</span>${chips(U.fAgent, [['all', 'All']].concat(s.agents.map(a => [a.id, a.name.split(' ')[0]])), 'f.agent')}<span style="width:14px"></span><span class="lbl" style="margin-right:2px">Stage</span>${chips(U.fStage, [['all', 'All'], ['Intake', 'Intake'], ['Suitability', 'Suitability'], ['Close and keep', 'Close and keep']], 'f.stage')}</div>
+<div style="display:flex;gap:16px;align-items:flex-start">
+  <div class="card" style="flex:1;overflow:hidden;min-width:0">
+    <div class="th ftab"><span>File</span><span>Consumer's decision</span><span>Agent</span><span>Stage</span><span>Evidence chain</span><span>Status</span><span style="text-align:right">Updated</span></div>
+    ${vis.map(f => { const a = D.agent(f.agent); return `<button class="tr ftab${f.id === U.fSel ? ' sel' : ''}" data-a="f.sel" data-id="${f.id}"><span class="mono" style="font-size:12.5px;font-weight:500;color:#1F4FBF">${f.id}</span><div style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:600" class="ell">${h(f.what)}</span><span class="sub ell">${f.who} · ${f.risks} risks ranked</span></div><div style="display:flex;align-items:center;gap:8px" title="${h(a.name)}">${av(a)}<span class="ell">${h(a.name.split(' ')[0])}</span></div><span style="color:#3A4560;font-size:13px">${D.stage(f)}</span><div style="display:flex;flex-direction:column;gap:5px">${chainHTML(f)}<span class="mono" style="font-size:11px;color:#7A849C">${D.sealed(f)}/9 sealed</span></div><span>${pill(D.status(f))}</span><span class="mono" style="font-size:12px;color:#6B7590;text-align:right">${h(f.last)}</span></button>`; }).join('') || '<div style="padding:24px 20px" class="sub">No files match these filters.</div>'}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;font-size:12.5px;color:#6B7590"><span>Showing ${vis.length} file${vis.length === 1 ? '' : 's'}</span><span>Sorted by priority, blocked first</span></div>
+  </div>
+  <div class="card drawer">
+    <div style="padding:18px 20px 0;display:flex;justify-content:space-between;align-items:center"><span class="mono" style="font-size:12px;color:#6B7590">${p.id} · ${D.stage(p)}</span>${pill(pst)}</div>
+    <div style="padding:8px 20px 0"><div style="font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25">${h(p.what)}</div><div class="sub" style="margin-top:4px;display:flex;align-items:center;gap:8px">${av(pa, 22)}${h(pa.name)} · ${p.who} · ${p.risks} risks ranked</div></div>
+    <div style="margin:16px 20px 0;padding:14px;border-radius:12px;background:${pst === 'r' ? '#FFF6F5' : '#F5F8FF'}"><div style="font-size:11px;font-weight:600;color:${pst === 'r' ? '#B42318' : '#2E6BF2'};letter-spacing:.04em">${pst === 'r' ? 'BLOCKED' : 'NEXT STEP'}</div><div style="font-size:13.5px;font-weight:500;margin-top:5px;line-height:1.45">${h(D.issue(p))}</div></div>
+    <div style="padding:16px 20px 4px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600">Evidence chain</span><span class="mono sub">${D.sealed(p)} of 9</span></div>${fileSteps(p)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px 8px">${fileActions(p)}</div>
+    <div style="display:flex;gap:8px;padding:0 20px 20px;flex-wrap:wrap">${btn('Open evidence', 'file.open', `data-id="${p.id}"`, 'btn2 sm')}${btn('Reassign', 'file.reassign', `data-id="${p.id}"`, 'btn2 sm')}${btn('Add note', 'file.note', `data-id="${p.id}"`, 'btn2 sm')}</div>
+  </div>
+</div>`;
+}
+
+/* ---------- Evidence ---------- */
+function vEvidence() {
+  const s = Store.s;
+  const list = D.sortFiles(D.open()).slice(0, 9);
+  if (!D.file(U.eSel)) U.eSel = list[0].id;
+  const f = D.file(U.eSel), a = D.agent(f.agent), st = D.status(f);
+  const SEALT = ['Sat 10:14', 'Sat 10:21', 'Sat 10:32', 'Sat 10:40', '', '', '', '', ''];
+  const links = f.chain.split('').map((c, i) => {
+    const nxt = f.chain[i + 1]; const S = STEPS[i];
+    const detail = c === 'X' && i === 4 ? 'No written disclosure on file. A recommendation was drafted first' + (f.held ? ', so the lender submission for ' + f.lenderAt + ' is held.' : '.') : c === 'X' ? 'Not signed after 48 hours. The file cannot close until it is.' : c === 'W' && i === 5 ? 'Drafted before link 5. It reseals once risks are disclosed.' : c === 'W' && i === 4 ? 'Sent to the consumer. Waiting for their acknowledgement on their phone.' : c === 'W' ? 'Sent. Waiting on the consumer.' : S.detail;
+    const state = c === 'S' ? 'Sealed' : c === 'X' ? 'Missing' : c === 'W' ? (i === 5 ? 'Out of order' : 'Waiting') : 'Not reached';
+    const fix = c === 'X' && i === 4 ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${btn('Prepare disclosure from the card', 'file.fix', `data-id="${f.id}"`, 'btn sm')}${btn('Assign to someone else', 'file.reassign', `data-id="${f.id}"`, 'btn2 sm')}</div>` : c === 'X' ? `<div style="display:flex;gap:8px;margin-top:12px">${btn('Send reminder', 'file.remind', `data-id="${f.id}"`, 'btn sm')}${btn('Consumer signs (demo)', 'file.sign', `data-id="${f.id}"`, 'btn2 sm')}</div>` : c === 'W' && f.chain.slice(0, i).indexOf('X') < 0 ? `<div style="display:flex;gap:8px;margin-top:12px">${btn('Consumer signs (demo)', 'file.sign', `data-id="${f.id}"`, 'btn2 sm')}</div>` : '';
+    return `<div class="link"><div class="rail"><span class="enode ${({ S: 'n-s', X: 'n-x', W: 'n-w', O: 'n-o' })[c]}">${i + 1}</span><span class="wire" style="background:${i === 8 ? 'transparent' : c === 'S' && nxt === 'S' ? '#2E6BF2' : '#E3E7EF'}"></span></div><div class="lk${c === 'X' ? ' bad' : c === 'W' ? ' wait' : c === 'O' ? ' off' : ''}"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><span style="font-weight:600;font-size:14.5px">${S.name}</span><span style="font-size:12.5px;font-weight:600;color:${c === 'S' ? '#1F4FBF' : c === 'X' ? '#B42318' : c === 'W' ? '#995C00' : '#9AA3B7'}">${state}</span></div><div style="margin-top:4px;font-size:13px;color:#4A5570">${detail}</div><div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap"><span class="mono" style="font-size:11.5px;color:#7A849C">${S.src}</span>${c === 'S' ? `<span class="mono" style="font-size:11.5px;color:#7A849C">seal ${seal(i + 1, f.id)}${SEALT[i] ? ' · ' + SEALT[i] : ''}</span>` : ''}</div>${fix}</div></div>`;
+  }).join('');
+  const docs = `<div class="card" style="overflow:hidden"><div class="th" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 110px 120px"><span>Document</span><span>From</span><span>Added</span><span>Seal</span></div>${f.docs.map(d => `<div class="tr" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 110px 120px;cursor:default"><span style="font-weight:600">${h(d.n)}</span><span class="sub" style="font-size:13px">${h(d.f)}</span><span class="mono sub">${h(d.t)}</span><span class="mono" style="font-size:11.5px;color:${/^[0-9A-F]{4}$/.test(d.s) ? '#1F4FBF' : '#995C00'}">${h(d.s)}</span></div>`).join('')}<div style="padding:12px 20px">${btn('Request a document', 'file.reqdoc', `data-id="${f.id}"`, 'btn2 sm')}</div></div>`;
+  const baseLog = [{ t: 'Sat 10:40', a: 'Consumers', d: 'ranked their risks.' }, { t: 'Sat 10:32', a: 'Bank data', d: 'confirmed income, with consent.' }, { t: 'Sat 10:14', a: 'Decision Card', d: 'received from 4ormIQ.' }];
+  const log = `<div class="card" style="padding:16px 20px">${(f.log || []).concat(baseLog).map(g => `<div class="alog"><span class="mono sub">${h(g.t)}</span><div><b style="font-weight:600">${h(g.a)}</b> <span style="color:#4A5570">${h(g.d)}</span></div></div>`).join('')}</div>`;
+  const rq = (c) => c === 'S' ? pillc('p-g', 'Held') : c === 'X' ? pillc('p-r', 'Missing') : c === 'W' ? pillc('p-a', 'Waiting') : pillc('p-n', 'Later');
+  return `
+<div style="display:grid;grid-template-columns:270px minmax(0,1fr) 300px;gap:16px;align-items:start">
+  <div class="card" style="padding:14px 10px"><div style="padding:2px 8px 10px;display:flex;justify-content:space-between;align-items:baseline"><span class="ct1">Files</span><span class="sub">by risk</span></div>
+    ${list.map(x => `<button class="fl${x.id === f.id ? ' on' : ''}" data-a="e.sel" data-id="${x.id}"><span class="dot d-${D.status(x)}"></span><div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-weight:600;font-size:13px" class="ell">${h(x.what)}</span><span class="mono" style="font-size:11.5px;color:#7A849C">${x.id} · ${D.agent(x.agent).name.split(' ')[0]}</span></div><span class="mono" style="font-size:11.5px;color:#7A849C">${D.sealed(x)}/9</span></button>`).join('')}
+    ${btn('All ' + D.counts().open + ' files', 'nav', 'data-v="files"', 'btn2 sm')}</div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <div class="card" style="padding:20px 22px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div class="mono sub">${f.id} · ${D.stage(f)}</div><div class="h1" style="margin-top:6px">${h(f.what)}</div><div class="sub" style="margin-top:6px;display:flex;align-items:center;gap:8px;font-size:13px">${av(a, 22)}${h(a.name)} · ${f.who} · ${f.risks} risks ranked</div></div>${pill(st)}</div>
+      <div class="tabs" style="margin-top:18px">${[['chain', 'Evidence chain'], ['docs', 'Documents'], ['log', 'Audit log']].map(([k, l]) => `<button class="tab${U.eTab === k ? ' on' : ''}" data-a="e.tab" data-v="${k}">${l}</button>`).join('')}</div></div>
+    ${U.eTab === 'chain' ? `<div>${links}</div>` : U.eTab === 'docs' ? docs : log}
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="padding:18px 20px"><div class="ct1">Chain integrity</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:12px"><span class="kv num">${D.sealed(f)}<span style="font-size:16px;color:#6B7590;font-weight:500"> of 9</span></span></div>${chainHTML(f, '')}<div class="kvr" style="margin-top:10px"><span class="sub">Seals verified</span><span>${D.sealed(f)} of ${D.sealed(f)}, nightly 08:02</span></div><div class="kvr"><span class="sub">Kept until</span><span>Oct 2031 (5 years)</span></div><div class="kvr"><span class="sub">Consumer view</span><span>Same record, on their phone</span></div>${btn('Export sealed record', 'file.export', `data-id="${f.id}"`, 'btn2 sm')}</div>
+    <div class="card" style="padding:18px 20px"><div class="ct1">This file must show</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;font-size:13px"><div style="display:flex;justify-content:space-between"><span>Situation and plans</span>${rq(f.chain[1])}</div><div style="display:flex;justify-content:space-between"><span>Capacity confirmed</span>${rq(f.chain[2])}</div><div style="display:flex;justify-content:space-between"><span>Risks disclosed in writing</span>${rq(f.chain[4])}</div><div style="display:flex;justify-content:space-between"><span>Acknowledged</span>${rq(f.chain[6])}</div><div style="display:flex;justify-content:space-between"><span>FINTRAC records</span>${pillc('p-g', 'Held')}</div></div></div>
+    <div class="card" style="padding:18px 20px;background:#0B1530;color:#fff"><div class="lbl" style="color:#8C97B2">From the consumer's card</div><div style="font-size:15.5px;font-weight:500;line-height:1.45;margin-top:10px">${h(f.quote)}</div><div style="font-size:12.5px;color:#A9B4CE;margin-top:10px">${h(f.qmeta)}</div></div>
+  </div>
+</div>`;
+}
+
+/* ---------- Control map ---------- */
+function mapGeom() {
+  const W = 116, NH = 74, LH = 140, P = 130, LX = [0, 148, 426, 704];
+  const lanes = Store.s.process.lanes;
+  const nodes = [], wires = [], labels = []; let maxR = 0;
+  let start = 0;
+  lanes.forEach((L, li) => {
+    const x0 = li < 4 ? LX[li] : start; const y = li * LH;
+    labels.push({ t: L.num + ' ' + L.title, x: x0 + (li ? 50 : 0), y });
+    L.steps.forEach((s, k) => {
+      const x = x0 + k * P, ny = y + 20;
+      nodes.push({ s, x, y: ny });
+      if (k < L.steps.length - 1) wires.push({ c: 'h', x: x + W + 1, y: ny + NH / 2 - 1, w: P - W - 3 });
+      if (k === L.steps.length - 1 && li < lanes.length - 1) wires.push({ c: 'v', x: x + W / 2 - 1, y: ny + NH + 2, h: LH - NH - 4 });
+      maxR = Math.max(maxR, x + W);
+    });
+    start = x0 + (L.steps.length - 1) * P + 48;
+  });
+  return { nodes, wires, labels, w: maxR, h: lanes.length * LH };
+}
+function vMap() {
+  const s = Store.s, c = D.counts(), ag = U.mAgent;
+  const g = mapGeom();
+  const filesFor = (fs) => ag === 'all' ? fs : fs.filter(f => f.agent === ag);
+  const nodesHTML = g.nodes.map(n => {
+    const st = n.s; const cnt = st.key ? D.nodeCount(st.key) : null;
+    let c2 = 'n', label;
+    if (cnt) { c2 = cnt.x ? 'r' : cnt.w ? 'a' : 'g'; label = cnt.keptLabel ? cnt.pass + ' kept' : cnt.sent ? cnt.pass + ' sent' + (cnt.w ? ' · ' + cnt.w + ' held' : '') : cnt.pass + ' of ' + cnt.total; } else { label = 'your block'; }
+    return `<button class="nd${c2 === 'r' ? ' red' : c2 === 'a' ? ' amb' : ''}${st.mine ? ' mine' : ''}${U.mSel === st.id ? ' sel' : ''}" style="left:${n.x}px;top:${n.y}px" data-a="m.sel" data-id="${st.id}"><span class="t">${h(st.name)}</span><span class="c" style="${c2 === 'r' ? 'color:#B42318' : ''}">${label}</span><span class="dot d-${c2}"></span></button>`;
+  }).join('');
+  const sel = (() => { let r = null; s.process.lanes.forEach(L => L.steps.forEach(x => { if (x.id === U.mSel) r = Object.assign({ lane: L }, x); })); return r || Object.assign({ lane: s.process.lanes[2] }, s.process.lanes[2].steps[1]); })();
+  const cnt = sel.key ? D.nodeCount(sel.key) : { pass: 0, total: c.open, x: 0, w: 0, files: [] };
+  const selFiles = filesFor(cnt.files || []);
+  const alerts = D.alerts().filter(x => ag === 'all' || x.f.agent === ag);
+  const agentChips = [['all', 'All agents']].concat(s.agents.map(a => [a.id, a.name.split(' ')[0]])).map(([k, l]) => `<button class="fchip${ag === k ? ' on' : ''}" data-a="m.agent" data-v="${k}">${l}</button>`).join('');
+  const openCount = ag === 'all' ? c.open : D.open().filter(f => f.agent === ag).length;
+  const red = alerts.find(x => x.st === 'r');
+  const TIMES = { card: '14m', shared: '1m', opened: '27m', capacity: '1.2d', coconsent: '0.8d', situation: '0m', disclosed: '2.1d', advice: '1.4d', ack: '0.6d', lender: '0.3d', kept: 'auto' };
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Control map</div><div class="sub" style="font-size:14px;margin-top:4px">Your whole process with a light on every step. Click a step to see the files at it.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${agentChips}</div></div>
+${red ? `<div class="banner">${pillc('p-r', 'Red light · ' + red.f.last)}<div style="flex:1;font-size:13.5px"><b style="font-weight:600">${red.f.id} · ${h(D.issue(red.f))}.</b> <span style="color:#5A3A38">${h(red.agent.name)}'s file.${red.f.held ? ' The lender submission for ' + red.f.lenderAt + ' is held.' : ''}</span></div>${btn('Open file', 'file.open', `data-id="${red.f.id}"`, 'btn sm')}</div>` : `<div class="banner ok">${pillc('p-g', 'Clear')}<div style="flex:1;font-size:13.5px"><b style="font-weight:600">No red lights${ag === 'all' ? '' : ' for ' + D.agent(ag).name.split(' ')[0]}.</b></div></div>`}
+<div class="card" style="padding:22px 20px 18px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px"><div><div class="ct1">${ag === 'all' ? 'All agents' : D.agent(ag).name} · ${openCount} open files</div><div class="sub" style="margin-top:2px">Process v${s.process.version} · ${s.process.published}</div></div><div style="display:flex;gap:16px;font-size:12.5px;color:#4A5570;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:7px"><span class="dot d-g"></span>All passed</span><span style="display:flex;align-items:center;gap:7px"><span class="dot d-a"></span>Needs attention soon</span><span style="display:flex;align-items:center;gap:7px"><span class="dot d-r"></span>Blocked until fixed</span><span style="display:flex;align-items:center;gap:7px"><span class="dot" style="background:#7CC4A3"></span>Your block</span></div></div>
+  <div style="overflow-x:auto"><div class="map" style="width:${Math.max(g.w, 1080)}px;height:${g.h - 40}px">${g.labels.map(l => `<span class="ln" style="left:${l.x}px;top:${l.y}px">${h(l.t)}</span>`).join('')}${g.wires.map(w => `<div class="${w.c}" style="left:${w.x}px;top:${w.y}px;${w.w ? 'width:' + w.w + 'px' : 'height:' + w.h + 'px'}"></div>`).join('')}${nodesHTML}</div></div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px">
+  <div class="card" style="padding:18px 20px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="ct1">${h(sel.name)}</span><span class="mono sub">${sel.lane.num} ${sel.lane.title}</span></div>
+    <div style="display:flex;gap:28px;margin-top:14px"><div><div class="sub">Passed</div><div class="kv num" style="font-size:26px">${cnt.pass}</div></div><div><div class="sub">Open here</div><div class="kv num" style="font-size:26px">${(cnt.x || 0) + (cnt.w || 0)}</div></div><div><div class="sub">Median time</div><div class="kv num" style="font-size:26px">${TIMES[sel.key] || 'new'}</div></div></div>
+    <div class="kvr" style="margin-top:10px"><span class="sub">Rule</span><span>${sel.rule ? 'Required · ' + h(sel.rule) : sel.mine ? 'Your block · added in the builder' : 'Base model'}</span></div><div class="kvr"><span class="sub">Who does it</span><span>${h(sel.meta)}</span></div>${sel.plug ? `<div class="kvr"><span class="sub">Connected</span><span>${h(sel.plug)}</span></div>` : ''}
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">${selFiles.map(f => `<button class="opt" data-a="file.open" data-id="${f.id}"><span class="dot d-${D.status(f)}"></span><span class="mono" style="font-size:12px;color:#1F4FBF">${f.id}</span><span style="font-weight:500;flex:1" class="ell">${h(D.issue(f))}</span><span class="sub">${D.agent(f.agent).name.split(' ')[0]}</span></button>`).join('') || `<div style="padding:10px 12px;border-radius:10px;background:#F2FAF6;color:#137A50;font-size:13px;font-weight:500">${sel.key ? 'Every file passed this step.' : 'No file has reached your block yet. It will light up on the next file.'}</div>`}</div>
+    <div style="display:flex;gap:8px;margin-top:14px">${btn('Edit in builder', 'nav', 'data-v="builder"', 'btn2 sm')}</div></div>
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:14px"><span class="ct1">Alerts</span><span class="sub">${alerts.length ? alerts.length + ' open' : 'None open'}</span></div><div class="th mlog"><span>Time</span><span></span><span>File</span><span>What happened</span><span>Agent</span></div>
+    ${alerts.map(x => `<div class="tr mlog" data-a="file.open" data-id="${x.f.id}"><span class="mono sub">${h(x.t)}</span><span class="dot d-${x.st}"></span><span class="mono" style="font-size:12.5px;color:#1F4FBF">${x.f.id}</span><span style="font-weight:500" class="ell">${h(x.w)}</span><span class="sub">${x.agent.name.split(' ')[0]}</span></div>`).join('') || '<div style="padding:18px 20px" class="sub">Nothing open.</div>'}</div>
+</div>`;
+}
+
+/* ---------- Reports ---------- */
+function reportData(k, range) {
+  const c = D.counts(), s = Store.s, comp = D.compliance();
+  const RG = { w: { label: '19 to 25 Oct 2026', n: 8, x0: '7 Sep' }, m: { label: 'October 2026, to date', n: 13, x0: '27 Jul' }, q: { label: 'Q4 2026, to date', n: 13, x0: '27 Jul' } }[range || 'w'];
+  const ok = 'font-size:12px;color:#137A50;font-weight:600', bad = 'font-size:12px;color:#B42318;font-weight:600', neu = 'font-size:12px;color:#6B7590', wn = 'font-size:12px;color:#995C00;font-weight:600';
+  const mk = (vals) => { const mx = Math.max(...vals, 1); return vals.map((v, i) => ({ v, h: Math.max(4, v / mx * 100), last: i === vals.length - 1 })); };
+  const openAI = s.ai.events.filter(e => e.open).length;
+  const R = {
+    weekly: { name: 'Weekly compliance report', kicker: 'Compliance', period: RG.label, sched: 'Every Monday 07:00', ps: c.r ? c.r + ' breaks' : 'Clean', pc: c.r ? 'p-r' : 'p-g',
+      head: (() => { const dis = D.stepCount(4).x, ack = D.stepCount(6).x; const bits = []; if (dis) bits.push(dis + (dis === 1 ? ' file has' : ' files have') + ' no written risk disclosure'); if (ack) bits.push(ack + (ack === 1 ? ' is' : ' are') + ' waiting on a consumer acknowledgement past 48 hours'); return `The evidence chain held on ${c.open - c.r} of ${c.open} open files.` + (bits.length ? ' ' + bits.join(', and ').replace(/^./, m => m.toUpperCase()) + '.' : ' No file is blocked.'); })(),
+      metrics: [{ l: 'Open files', v: c.open, d: '+' + c.nw + ' this week', dc: neu }, { l: 'Audit ready', v: c.pct + '%', d: c.intact + ' of ' + c.open, dc: ok }, { l: 'Breaks', v: c.r, d: c.r ? 'fixable today' : 'none', dc: c.r ? bad : ok }, { l: 'Card to review', v: '27m', d: '−58% since Sep', dc: ok }],
+      barT: 'Decision Cards received', barS: 'per week · ' + s.cards.w13.slice(-RG.n).reduce((a, b) => a + b, 0) + ' in the period', bars: mk(s.cards.w13.slice(-RG.n)), x0: RG.x0, x1: 'This week', th: ['Requirement', 'Held', 'Status'], rows: comp.map(r => ({ a: r.t, b: r.v + '%', c: r.label, cc: r.bad ? bad : r.warn ? wn : ok })), seal: 'R-77C1' },
+    reg: { name: 'Regulator pack', kicker: 'For BCFSA', period: 'All files, last 5 years', sched: 'Built on request', ps: 'Ready', pc: 'p-g',
+      head: 'One sealed bundle a regulator can open without asking for anything else: every file, its chain, who saw it, and when.',
+      metrics: [{ l: 'Files in pack', v: s.files.length + 46, d: c.open + ' open, ' + (c.kept + 46) + ' kept', dc: neu }, { l: 'Complete chains', v: c.intact + 46, d: Math.round((c.intact + 46) / (s.files.length + 46) * 100) + '%', dc: ok }, { l: 'Seals verified', v: '868', d: 'none altered', dc: ok }, { l: 'Access events', v: '1,906', d: 'all logged', dc: neu }],
+      barT: 'Files by stage', barS: 'today', bars: mk([D.byStage()['Intake'].length, D.byStage()['Suitability'].length, D.byStage()['Close and keep'].length, c.kept + 46]), x0: 'Intake', x1: 'Kept', th: ['Section', 'Items', 'Status'], rows: [{ a: 'Suitability records', b: String(s.files.length + 46), c: 'Sealed', cc: ok }, { a: 'Risk disclosures', b: String(s.files.length + 46 - D.stepCount(4).x), c: D.stepCount(4).x ? D.stepCount(4).x + ' open' : 'Sealed', cc: D.stepCount(4).x ? bad : ok }, { a: 'Consumer acknowledgements', b: String(c.kept + 46 + D.stepCount(6).pass), c: D.stepCount(6).x ? D.stepCount(6).x + ' open' : 'Sealed', cc: D.stepCount(6).x ? bad : ok }, { a: 'Consent records', b: '131', c: 'Sealed', cc: ok }, { a: 'Access log', b: '1,906', c: 'Sealed', cc: ok }], seal: 'R-PACK' },
+    fintrac: { name: 'FINTRAC records check', kicker: 'Record keeping', period: 'October 2026', sched: 'Monthly, 1st 07:00', ps: 'Clean', pc: 'p-g',
+      head: 'Every file has identity, source of funds and a 5 year retention date.' + (D.open().some(f => f.gift && !f.docs.some(d => d.n === 'Gift letter')) ? ' One source of funds is still being confirmed.' : ''),
+      metrics: [{ l: 'ID verified', v: c.open + '/' + c.open, d: 'clean', dc: ok }, { l: 'Source of funds', v: (c.open - D.open().filter(f => f.gift && !f.docs.some(d => d.n === 'Gift letter')).length) + '/' + c.open, d: 'gift letters', dc: wn }, { l: 'Retention set', v: '100%', d: '5 years', dc: ok }, { l: 'Third parties', v: '0', d: 'none flagged', dc: ok }],
+      barT: 'Records added', barS: 'per week', bars: mk([18, 22, 21, 30, 17, 26, 24, 41]), x0: '7 Sep', x1: 'This week', th: ['Check', 'Files', 'Status'], rows: [{ a: 'Photo ID', b: String(c.open), c: 'Clean', cc: ok }, { a: 'Source of funds', b: String(c.open - 1), c: '1 waiting', cc: wn }, { a: 'Beneficial owner', b: String(c.open), c: 'Clean', cc: ok }, { a: 'Retention date', b: String(c.open), c: 'Clean', cc: ok }], seal: 'R-F10' },
+    agents: { name: 'Agent performance', kicker: 'Team', period: 'Last 30 days', sched: 'Fridays 16:00', ps: 'Ready', pc: 'p-g',
+      head: (() => { const best = s.agents.map(a => Object.assign({ ag: a }, D.agentStats(a.id))).sort((x, y) => y.pct - x.pct || x.ag.review - y.ag.review)[0]; const most = s.agents.map(a => Object.assign({ ag: a }, D.agentStats(a.id))).sort((x, y) => y.files - x.files)[0]; return `${best.ag.name.split(' ')[0]} keeps the cleanest chain. ${most.ag.name.split(' ')[0]} carries the most files${most.r ? ' and ' + most.r + ' red light' + (most.r > 1 ? 's' : '') : ''}.`; })(),
+      metrics: [{ l: 'Agents', v: s.agents.length, d: 'all active', dc: neu }, { l: 'Best chain', v: Math.max(...s.agents.map(a => D.agentStats(a.id).pct)) + '%', d: '', dc: ok }, { l: 'Fastest review', v: Math.min(...s.agents.filter(a => a.review).map(a => a.review)) + 'm', d: '', dc: ok }, { l: 'Red lights', v: c.r, d: '', dc: c.r ? bad : ok }],
+      barT: 'Open files', barS: 'by agent', bars: mk(s.agents.map(a => D.agentStats(a.id).files)), x0: s.agents[0].name.split(' ')[0], x1: s.agents[s.agents.length - 1].name.split(' ')[0], th: ['Agent', 'Complete', 'Review'], rows: s.agents.map(a => { const x = D.agentStats(a.id); return { a: a.name, b: x.pct + '%', c: a.review ? a.review + ' m' : 'new', cc: x.pct === 100 ? ok : neu }; }), seal: 'R-A23' },
+    ai: { name: 'AI monitor report', kicker: 'Oversight', period: 'Last 7 days', sched: 'Monthly, 1st 07:00', ps: openAI ? openAI + ' flags' : 'Clean', pc: openAI ? 'p-a' : 'p-g',
+      head: `${s.ai.tools.length} AI tools checked ${s.ai.tools.reduce((t, x) => t + x.checks, 0).toLocaleString()} times. ${s.ai.events.filter(e => e.k === 'leak').length} attempts to send personal data were redacted, and ${s.ai.events.filter(e => e.k === 'mis').length} misleading messages were stopped before a consumer saw them.`,
+      metrics: [{ l: 'Checks', v: s.ai.tools.reduce((t, x) => t + x.checks, 0).toLocaleString(), d: s.ai.tools.length + ' tools', dc: neu }, { l: 'Data redacted', v: s.ai.events.filter(e => e.k === 'leak').length, d: 'nothing left the firm', dc: ok }, { l: 'Misleading stopped', v: s.ai.events.filter(e => e.k === 'mis').length, d: openAI + ' still open', dc: openAI ? bad : ok }, { l: 'AI labelled', v: '100%', d: 'to consumers', dc: ok }],
+      barT: 'Flags', barS: 'per day', bars: mk([1, 0, 2, 1, 3, 2, 3]), x0: 'Tue', x1: 'Today', th: ['Tool', 'Checks', 'Flags'], rows: s.ai.tools.map(t => ({ a: t.name, b: String(t.checks), c: String(t.flags), cc: t.status === 'r' ? bad : t.flags > 1 ? wn : neu })), seal: 'R-AI7' },
+    outcomes: { name: 'Consumer outcomes', kicker: 'Outcomes', period: 'Files kept this year', sched: 'Quarterly', ps: 'Ready', pc: 'p-g',
+      head: 'Consumers lowered their top risk on 9 of 10 closed files. Average readiness went from 4 to 7 out of 10.',
+      metrics: [{ l: 'Closed files', v: c.kept + 46, d: 'this year', dc: neu }, { l: 'Top risk lowered', v: '91%', d: 'after protection', dc: ok }, { l: 'Readiness', v: '4 to 7', d: 'out of 10', dc: ok }, { l: 'Complaints', v: '0', d: 'this year', dc: ok }],
+      barT: 'Readiness after', barS: 'out of 10', bars: mk([2, 4, 9, 18, 21, 9]), x0: '5', x1: '10', th: ['Top risk', 'Files', 'Lowered'], rows: [{ a: 'Payment shock at renewal', b: '22', c: '95%', cc: ok }, { a: 'Income drop', b: '17', c: '88%', cc: ok }, { a: 'Rate rise', b: '14', c: '93%', cc: ok }, { a: 'Job change', b: '10', c: '80%', cc: neu }], seal: 'R-Q3' }
+  };
+  return R[k];
+}
+const REPORT_ORDER = ['weekly', 'reg', 'fintrac', 'agents', 'ai', 'outcomes'];
+function vReports() {
+  const s = Store.s, c = D.counts();
+  const p = reportData(U.rSel, U.rRange);
+  const lib = REPORT_ORDER.map(k => { const r = reportData(k); return `<button class="ri${U.rSel === k ? ' on' : ''}" data-a="r.sel" data-v="${k}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-weight:600">${r.name}</span>${pillc(r.pc, r.ps)}</div><span class="sub">${r.sched}</span></button>`; }).join('');
+  const bars = `<div class="vb">${p.bars.map(b => `<div><span class="mono" style="font-size:10.5px;color:${b.last ? '#0B1324' : '#7A849C'}">${b.v}</span><i class="${b.last ? 'last' : ''}" style="height:${b.h}%"></i></div>`).join('')}</div>`;
+  const o = D.open();
+  const breaks = [
+    ['Risks disclosed late', o.filter(f => f.chain[4] === 'X' || f.chain[4] === 'W').length + 5, '#E0362C'],
+    ['Acknowledgement slow', o.filter(f => f.chain[6] === 'X' || f.chain[6] === 'W').length + 2, '#D9910B'],
+    ['Consent expiring', o.filter(f => f.consentDays <= 14).length + 1, '#D9910B'],
+    ['Source of funds', o.filter(f => f.gift && !f.docs.some(d => d.n === 'Gift letter')).length + 1, '#2E6BF2']
+  ].sort((a, b) => b[1] - a[1]);
+  const bmax = Math.max(...breaks.map(b => b[1]), 1);
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Reports</div><div class="sub" style="font-size:14px;margin-top:4px">Built from the sealed evidence, so every number traces back to a file.</div></div><div class="seg">${[['w', 'This week'], ['m', 'This month'], ['q', 'Quarter']].map(([k, l]) => `<button class="${U.rRange === k ? 'on' : ''}" data-a="r.range" data-v="${k}">${l}</button>`).join('')}</div></div>
+<div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start">
+  <div class="card" style="padding:12px 8px"><div style="padding:6px 14px 8px" class="ct1">Report library</div>${lib}${btn('New custom report', 'r.custom', '', 'btn2 sm')}</div>
+  <div class="doc" id="report-doc">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><div class="lbl" style="color:#2E6BF2">${p.kicker}</div><div style="font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:8px">${p.name}</div><div class="sub" style="margin-top:4px">${h(s.brokerage.name)} · ${p.period}</div></div><div style="display:flex;gap:8px">${btn('Schedule', 'r.schedule', `data-v="${U.rSel}"`, 'btn2 sm')}${btn('Send', 'r.send', `data-v="${U.rSel}"`, 'btn2 sm')}${btn('Download PDF', 'r.pdf', `data-v="${U.rSel}"`, 'btn sm')}</div></div>
+    <div style="font-size:17px;line-height:1.5;margin-top:20px;max-width:760px">${p.head}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px">${p.metrics.map(m => `<div class="m"><span class="sub">${m.l}</span><span class="mval num">${m.v}</span><span style="${m.dc}">${m.d}</span></div>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;margin-top:26px">
+      <div><div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-weight:600">${p.barT}</span><span class="sub">${p.barS}</span></div>${bars}<div style="display:flex;justify-content:space-between;margin-top:6px" class="mono sub"><span>${p.x0}</span><span>${p.x1}</span></div></div>
+      <div><div class="rt hd"><span>${p.th[0]}</span><span>${p.th[1]}</span><span>${p.th[2]}</span></div>${p.rows.map(r => `<div class="rt"><span style="font-weight:500">${h(r.a)}</span><span class="mono">${h(r.b)}</span><span style="${r.cc}">${h(r.c)}</span></div>`).join('')}</div>
+    </div>
+    <div style="margin-top:22px;padding:12px 14px;border-radius:12px;background:#F5F8FF;font-size:12.5px;color:#4A5570">Every figure links to its sealed records. Generated ${NOW.day} 07:00 · seal ${p.seal}</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+  <div class="card" style="padding:18px 20px"><div style="display:flex;justify-content:space-between"><span class="ct1">Evidence complete</span><span class="sub">12 weeks</span></div><svg viewBox="0 0 300 120" width="100%" height="130" style="margin-top:12px" aria-hidden="true"><defs><linearGradient id="re1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E6BF2" stop-opacity=".22"/><stop offset="1" stop-color="#2E6BF2" stop-opacity="0"/></linearGradient></defs><line x1="0" x2="300" y1="30" y2="30" stroke="#E6EAF1" stroke-dasharray="3 4"/><line x1="0" x2="300" y1="70" y2="70" stroke="#E6EAF1" stroke-dasharray="3 4"/><path d="M0 92 L27 90 L55 86 L82 88 L109 80 L136 74 L164 70 L191 64 L218 60 L245 52 L273 46 L300 ${120 - c.pct} L300 120 L0 120Z" fill="url(#re1)"/><path d="M0 92 L27 90 L55 86 L82 88 L109 80 L136 74 L164 70 L191 64 L218 60 L245 52 L273 46 L300 ${120 - c.pct}" fill="none" stroke="#2E6BF2" stroke-width="2.5" stroke-linejoin="round"/><circle cx="297" cy="${120 - c.pct}" r="4.5" fill="#2E6BF2" stroke="#fff" stroke-width="2"/></svg><div style="display:flex;justify-content:space-between" class="mono sub"><span>Aug · 61%</span><span>Now · ${c.pct}%</span></div></div>
+  <div class="card" style="padding:18px 20px"><div style="display:flex;justify-content:space-between"><span class="ct1">Where chains break</span><span class="sub">30 days</span></div><div style="display:flex;flex-direction:column;gap:13px;margin-top:16px">${breaks.map(([t, n, cc]) => `<div class="stg"><span>${t}</span><span class="mono" style="text-align:right">${n}</span><div class="trk"><i style="width:${n / bmax * 100}%;background:${cc}"></i></div></div>`).join('')}</div></div>
+  <div class="card" style="padding:18px 20px"><div style="display:flex;justify-content:space-between"><span class="ct1">Files closed and kept</span><span class="sub">per month</span></div><div class="vb" style="margin-top:16px;height:110px">${[9, 11, 12, 14, c.kept].map((v, i) => `<div><span class="mono" style="font-size:10.5px;color:${i === 4 ? '#0B1324' : '#7A849C'}">${v}</span><i class="${i === 4 ? 'last' : ''}" style="height:${v / 17 * 100}%"></i></div>`).join('')}</div><div style="display:flex;justify-content:space-between;margin-top:6px" class="mono sub"><span>Jun</span><span>Oct</span></div></div>
+</div>
+<div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:14px"><span class="ct1">Scheduled deliveries</span>${btn('Add schedule', 'r.schedule', `data-v="${U.rSel}"`, 'btn2 sm')}</div><div class="th sch"><span>Report</span><span>When</span><span>Sent to</span><span>Status</span><span></span></div>
+  ${s.schedules.map(x => `<div class="tr sch" style="cursor:default"><span style="font-weight:600">${reportData(x.r).name}</span><span class="mono sub">${h(x.when)}</span><span class="ell">${h(x.to)}</span>${pillc(x.pc, x.st)}<span>${btn('Remove', 'r.unschedule', `data-id="${x.id}"`, 'btn2 sm')}</span></div>`).join('')}</div>`;
+}
+
+/* ---------- AI monitor ---------- */
+function vAI() {
+  const s = Store.s, ai = s.ai;
+  const vis = ai.events.filter(e => U.aiTab === 'all' || e.k === U.aiTab);
+  if (!ai.events.find(e => e.id === U.aiSel)) U.aiSel = (vis[0] || ai.events[0]).id;
+  const d = ai.events.find(e => e.id === U.aiSel) || ai.events[0];
+  const tool = (id) => ai.tools.find(t => t.id === id) || { name: 'Removed tool' };
+  const openN = ai.events.filter(e => e.open).length;
+  const kc = d.k === 'leak' ? '#1F4FBF' : d.pc === 'p-r' ? '#B42318' : '#995C00';
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">AI monitor</div><div class="sub" style="font-size:14px;margin-top:4px;max-width:720px">Every AI tool your brokerage uses goes through 4ormIQ first. Personal data is stripped before it leaves, and anything misleading is stopped before a consumer sees it.</div></div>${pillc('p-g', 'Watching ' + ai.tools.filter(t => t.on).length + ' tools · live')}</div>
+<div class="card" style="padding:18px 20px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span class="ct1">How every AI call is checked</span><span class="sub">average 140 ms added</span></div>
+  <div class="flow"><div class="fs"><span class="lbl">1 · Agent or chat</span><span style="font-weight:600;font-size:13.5px">Prompt written</span><span class="sub">in Copilot, ChatGPT or the website chat</span></div><div class="fs hot"><span class="lbl" style="color:#8C97B2">2 · 4ormIQ in</span><span style="font-weight:600;font-size:13.5px">Personal data removed</span><span style="font-size:12.5px;color:#A9B4CE">SIN, account numbers, ID swapped for tokens</span></div><div class="fs"><span class="lbl">3 · AI tool</span><span style="font-weight:600;font-size:13.5px">Model answers</span><span class="sub">never sees the real data</span></div><div class="fs hot"><span class="lbl" style="color:#8C97B2">4 · 4ormIQ out</span><span style="font-weight:600;font-size:13.5px">Checked for misleading claims</span><span style="font-size:12.5px;color:#A9B4CE">promises, product picks, missing risks, no AI label</span></div><div class="fs"><span class="lbl">5 · Sealed</span><span style="font-weight:600;font-size:13.5px">Logged to the file</span><span class="sub">prompt, answer and decision kept as evidence</span></div></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+  <div class="card kpi"><span class="sub">Checks, last 7 days</span><span class="kv num">${ai.tools.reduce((t, x) => t + x.checks, 0).toLocaleString()}</span><span class="sub">across ${ai.tools.length} tools</span></div>
+  <div class="card kpi"><span class="sub">Data leaks stopped</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${ai.events.filter(e => e.k === 'leak').length}</span><span class="delta up">0 got out</span></div><span class="sub">redacted before leaving the firm</span></div>
+  <div class="card kpi"><span class="sub">Misleading messages caught</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">${ai.events.filter(e => e.k === 'mis').length}</span><span class="delta ${ai.events.filter(e => e.k === 'mis' && e.open).length ? 'bad' : 'up'}">${ai.events.filter(e => e.k === 'mis' && e.open).length} still open</span></div><span class="sub">none reached a consumer</span></div>
+  <div class="card kpi"><span class="sub">Consumer messages labelled as AI</span><div style="display:flex;align-items:baseline;gap:10px"><span class="kv num">100%</span><span class="delta up">1 fixed</span></div><span class="sub">221 website chats</span></div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start">
+  <div class="card" style="padding:12px 8px"><div style="display:flex;justify-content:space-between;align-items:center;padding:6px 16px 8px;flex-wrap:wrap;gap:8px"><span class="ct1">Flagged</span><div class="tabs">${[['all', 'All', ai.events.length], ['leak', 'Data', ai.events.filter(e => e.k === 'leak').length], ['mis', 'Misleading', ai.events.filter(e => e.k === 'mis').length]].map(([k, l, n]) => `<button class="tab${U.aiTab === k ? ' on' : ''}" data-a="ai.tab" data-v="${k}">${l}<span class="c">${n}</span></button>`).join('')}</div></div>
+    ${vis.map(e => `<button class="ev${e.id === d.id ? ' on' : ''}" data-a="ai.sel" data-id="${e.id}"><span class="mono sub">${h(e.t)}</span><span class="dot ${e.open ? e.dot : 'd-n'}"></span><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-weight:600;font-size:13.5px">${h(e.title)}</span><span class="sub">${h(tool(e.tool).name)} · ${h(e.file)}</span></div>${pillc(e.pc, e.action)}</button>`).join('')}</div>
+  <div class="card" style="padding:20px 22px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div class="lbl" style="color:${kc}">${h(d.kind)}</div><div style="font-size:19px;font-weight:600;letter-spacing:-.015em;margin-top:6px">${h(d.title)}</div><div class="sub" style="margin-top:4px">${h(tool(d.tool).name)} · ${h(d.who)} · ${h(d.file)} · ${h(d.t)}</div></div>${pillc(d.pc, d.action)}</div>
+    <div class="lbl" style="margin-top:18px;margin-bottom:6px">${d.l1}</div><div class="quote q-bad">${h(d.before)}</div><div class="lbl" style="margin-top:14px;margin-bottom:6px">${d.l2}</div><div class="quote q-good">${h(d.after)}</div>
+    <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;font-size:13px;margin-top:16px"><span class="sub">Why</span><span>${h(d.why)}</span><span class="sub">Sealed</span><span class="mono" style="font-size:12px">${h(d.seal)}</span></div>
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">${d.open ? btn(d.cta, d.ctaAct, `data-id="${d.id}" data-tool="${d.tool}"`, 'btn sm') : pillc('p-g', 'Closed')}${/^MB-/.test(d.file) ? btn('Open file', 'file.open', `data-id="${d.file}"`, 'btn2 sm') : ''}${d.who.indexOf('consumer') < 0 ? btn('Coach agent', 'ai.coach', `data-id="${d.id}"`, 'btn2 sm') : ''}</div></div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start">
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:14px"><span class="ct1">Connected AI tools</span>${btn('Add a tool', 'ai.add', '', 'btn2 sm')}</div><div class="th tool"><span>Tool</span><span>What it can see</span><span>Checks</span><span>Flags</span><span>Status</span><span></span></div>
+    ${ai.tools.map(t => `<div class="tr tool" style="cursor:default"><div><div style="font-weight:600">${h(t.name)}</div><div class="sub">${h(t.use)}</div></div><span style="font-size:12.5px;color:#4A5570">${h(t.sees)}</span><span class="mono">${t.checks}</span><span class="mono">${t.flags}</span>${pillc(t.status === 'r' ? 'p-r' : t.status === 'a' ? 'p-a' : t.status === 'n' ? 'p-n' : 'p-g', t.st)}<span>${btn(t.on ? 'Pause' : 'Resume', 'ai.tool', `data-id="${t.id}"`, 'btn2 sm')}</span></div>`).join('')}
+    <div style="padding:12px 20px" class="sub">Example tools. 4ormIQ sits between your team and any AI model, so no tool sees personal data and nothing goes to a lender's AI.</div></div>
+  <div class="card" style="padding:18px 20px"><div class="ct1">Guardrails</div><div class="sub" style="margin-top:2px">Set once for the brokerage. Agents can't switch these off. Locked ones are required by 4orm.</div><div style="margin-top:8px">${ai.rails.map(g => `<div class="gr"><div><div style="font-weight:500;font-size:13.5px">${h(g.t)}</div><div class="sub">${h(g.s)}${g.lock ? ' · required' : ''}</div></div><button class="toggle${g.on ? '' : ' off'}${g.lock ? ' lock' : ''}" data-a="ai.rail" data-id="${g.id}" aria-label="${h(g.t)}"></button></div>`).join('')}</div></div>
+</div>`;
+}
+
+/* ---------- Agents ---------- */
+function vAgents() {
+  const s = Store.s;
+  if (!s.agents.find(a => a.id === U.agSel)) U.agSel = s.agents[0].id;
+  const sel = D.agent(U.agSel), x = D.agentStats(sel.id), first = sel.name.split(' ')[0];
+  const rows = D.sortFiles(D.open().filter(f => f.agent === sel.id));
+  const COACH = { marcus: "Both of Marcus's breaks this month came from drafting the recommendation first. A 5 minute walk through the risks-first order will fix it.", dev: "Dev's files stall at acknowledgement. Try sending the summary with the one risk the consumer marked unclear.", hannah: 'Hannah has the most first-time buyers. Ask for bank consent renewal at the first call so it never runs out.', priya: "Priya's chain is perfect and her review time is the fastest. Worth having her show the team her first call." };
+  const coach = COACH[sel.id] || `${first} is new. Their space is set up with the brokerage process and no files yet.`;
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Agents</div><div class="sub" style="font-size:14px;margin-top:4px">Each agent works in their own space. You see everything. They see only their own files.</div></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">${s.agents.map(a => { const y = D.agentStats(a.id); return `<button class="card agc${U.agSel === a.id ? ' on' : ''}" data-a="ag.sel" data-id="${a.id}"><div style="display:flex;align-items:center;gap:10px">${av(a, 36)}<div style="min-width:0"><div style="font-weight:600" class="ell">${h(a.name)}</div><div class="sub">${h(a.role)}</div></div>${pillc(y.pc, y.ps)}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div><div class="sub">Files</div><div class="num" style="font-size:20px;font-weight:600">${y.files}</div></div><div><div class="sub">Complete</div><div class="num" style="font-size:20px;font-weight:600">${y.pct}%</div></div><div><div class="sub">Review</div><div class="num" style="font-size:20px;font-weight:600">${a.review ? a.review + 'm' : 'new'}</div></div></div><div class="trk" style="grid-column:auto"><i style="width:${y.pct}%;background:${y.pct === 100 ? '#1F9D6A' : '#2E6BF2'}"></i></div></button>`; }).join('')}</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start">
+  <div class="card" style="overflow:hidden"><div class="ch" style="padding-bottom:14px"><div><div class="ct1">${h(sel.name)}'s files</div><div class="sub" style="margin-top:2px">${x.files} open · sorted by priority</div></div>${btn('Open in Files', 'ag.files', `data-id="${sel.id}"`, 'btn2 sm')}</div><div class="th af"><span>File</span><span>Consumer's decision</span><span>Stage</span><span>Evidence chain</span><span>Status</span></div>
+    ${rows.map(f => `<div class="tr af" data-a="file.open" data-id="${f.id}"><span class="mono" style="font-size:12.5px;color:#1F4FBF">${f.id}</span><div><div style="font-weight:600" class="ell">${h(f.what)}</div><div class="sub">${h(D.issue(f))}</div></div><span style="font-size:13px;color:#3A4560">${D.stage(f)}</span>${chainHTML(f)}<span>${pill(D.status(f))}</span></div>`).join('') || '<div style="padding:18px 20px" class="sub">No files yet. The first Decision Card routed here will show up on the control map.</div>'}</div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card" style="padding:18px 20px"><div class="ct1">Access and isolation</div><div class="acc"><span>${first} sees</span>${pillc('p-b', 'Own files only')}</div><div class="acc"><span>You see</span>${pillc('p-n', 'Every file')}</div><div class="acc"><span>Other agents see</span>${pillc('p-g', 'Nothing of ' + first + "'s")}</div><div class="acc"><span>Consumer data to lenders</span>${pillc('p-g', 'Never')}</div><div class="acc"><span>Every view logged</span>${pillc('p-g', 'On')}</div></div>
+    <div class="card" style="padding:18px 20px"><div class="ct1">Working mode</div><div class="sub" style="margin-top:2px">The same space works for a solo agent.</div><div class="seg" style="margin-top:12px">${[['b', 'In a brokerage'], ['i', 'Independent']].map(([k, l]) => `<button class="${U.agMode === k ? 'on' : ''}" data-a="ag.mode" data-v="${k}">${l}</button>`).join('')}</div><div style="font-size:13px;color:#4A5570;margin-top:12px;line-height:1.5">${U.agMode === 'b' ? 'Files sit under ' + h(s.brokerage.short) + '. The principal broker sees every file and every red light. Rules come from the brokerage process.' : 'The agent owns their space and their evidence. They set their own process from the 4orm base model, and no brokerage can see in.'}</div></div>
+    <div class="card" style="padding:18px 20px;background:#0B1530;color:#fff"><div class="lbl" style="color:#8C97B2">Coaching note</div><div style="font-size:14.5px;line-height:1.5;margin-top:8px">${coach}</div>${btn('Send to ' + first, 'ag.coach', `data-id="${sel.id}"`, 'btn sm')}</div>
+  </div>
+</div>`;
+}
+
+/* ---------- Process builder ---------- */
+const BK = { step: ['#2E6BF2', 'Step'], doc: ['#0E9384', 'Document'], appr: ['#7A5AF8', 'Approval'], check: ['#B7791F', 'Check'], wait: ['#5B6884', 'Wait'] };
+const LIB = {
+  blocks: [{ kind: 'step', label: 'Step', name: 'New step' }, { kind: 'doc', label: 'Document to collect', name: 'New document' }, { kind: 'appr', label: 'Approval', name: 'New approval', meta: 'Principal broker' }, { kind: 'check', label: 'Check', name: 'New check' }, { kind: 'wait', label: 'Wait or reminder', name: 'Reminder after 48 hours', meta: 'Automatic' }],
+  docs: [{ kind: 'doc', label: 'Gift letter', name: 'Collect a gift letter' }, { kind: 'doc', label: 'Employment letter', name: 'Collect an employment letter' }, { kind: 'doc', label: 'Notice of assessment', name: 'Collect notice of assessment' }, { kind: 'doc', label: 'Property appraisal', name: 'Order an appraisal' }],
+  plugs: [{ type: 'plug', label: 'Bank data', who: 'Flinks' }, { type: 'plug', label: 'E-signature', who: 'DocuSign' }, { type: 'plug', label: 'Lender submission', who: 'Filogix' }, { type: 'plug', label: 'CRM', who: 'Go High Level' }, { type: 'plug', label: 'Files', who: 'Google Drive' }, { type: 'plug', label: 'Email and calendar', who: 'Google Workspace' }]
+};
+function libItem(group, i) { return LIB[group][i]; }
+function vBuilder() {
+  const p = Store.s.process; const cur = U.bDrag || U.bArmed;
+  const W = 120, G = 20, STEP = W + G, NH = 86, LH = 150, OFF = 24;
+  let start = 0, maxR = 0; const nodes = [], wires = [], slots = [], labels = []; let sel = null;
+  p.lanes.forEach((l, li) => {
+    const y = li * LH; labels.push(`<span class="ln" style="left:${start}px;top:${y}px">${l.num} ${h(l.title)}</span>`);
+    l.steps.forEach((s, j) => {
+      const x = start + j * STEP; const over = U.bOver === s.id;
+      nodes.push(`<button class="bnd${s.mine ? ' mine' : ''}${U.bSel === s.id ? ' sel' : ''}${over ? ' over' : ''}" style="left:${x}px;top:${y + OFF}px" data-a="b.node" data-id="${s.id}" data-li="${li}" data-j="${j}" data-drop="node"><span class="k" style="color:${BK[s.kind][0]}">${BK[s.kind][1]}</span><span class="t">${h(s.name)}</span>${s.plug ? `<span class="p">${h(s.plug.split(" · ").pop())}</span>` : ''}</button>`);
+      if (j < l.steps.length - 1) wires.push(`<div class="h" style="left:${x + W + 1}px;top:${y + OFF + NH / 2}px;width:${G - 2}px"></div>`);
+      if (U.bSel === s.id) sel = Object.assign({ stage: l.num + ' ' + l.title }, s);
+    });
+    const sx = start + l.steps.length * STEP;
+    slots.push(`<button class="slot${cur && cur.type !== 'plug' ? ' hot' : ''}${U.bOver === 'slot' + li ? ' over' : ''}" style="left:${sx}px;top:${y + OFF}px" data-a="b.slot" data-li="${li}" data-drop="slot">Drop here</button>`);
+    maxR = Math.max(maxR, sx + W + 24);
+    const cx = start + (l.steps.length - 1) * STEP + W / 2;
+    if (li < p.lanes.length - 1) wires.push(`<div class="v" style="left:${cx - 1}px;top:${y + OFF + NH + 1}px;height:${LH - NH - 3}px"></div>`);
+    start = cx - 60;
+  });
+  if (!sel) { const s = p.lanes[2].steps[1]; sel = Object.assign({ stage: '03 Suitability' }, s); U.bSel = s.id; }
+  const li = (group) => LIB[group].map((t, i) => `<button class="li${U.bArmed && U.bArmed.label === t.label ? ' armed' : ''}" draggable="true" data-a="b.arm" data-g="${group}" data-i="${i}"><span class="sw" style="background:${t.type === 'plug' ? '#0B1324' : BK[t.kind][0]}"></span>${h(t.label)}${t.who ? `<small>${h(t.who)}</small>` : ''}</button>`).join('');
+  const k = p.changes.length;
+  const hasGift = A.procHas('Collect a gift letter'), hasSign = A.procHas('Principal sign-off over $1M');
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Process builder</div><div class="sub" style="font-size:14px;margin-top:4px">Base model v${p.version} from 4orm · ${k === 0 ? 'no changes yet' : k + ' change' + (k === 1 ? '' : 's') + ' since last publish'}. Drag it in, review it, publish it.</div></div><div style="display:flex;gap:10px;flex-wrap:wrap">${btn('Reset to base model', 'b.reset', '', 'btn2')}${btn('Publish to your agents', 'b.publish', k ? '' : 'disabled')}</div></div>
+<div style="display:flex;gap:20px;align-items:flex-start">
+  <div class="card" style="flex:0 0 260px;display:flex;flex-direction:column;gap:8px;padding:20px"><span style="font-size:15px;font-weight:600">Library</span><span class="sub" style="line-height:1.45">Drag onto the map, or tap one then tap a slot.</span><span class="libh">Blocks</span>${li('blocks')}<span class="libh">Documents</span>${li('docs')}<span class="libh">Connections</span>${li('plugs')}</div>
+  <div class="canvas" style="flex:1;min-width:0;padding:16px 0 18px 20px">
+    <div style="display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;padding:0 20px 12px 0">${Object.keys(BK).filter(x => x !== 'wait').map(x => `<span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600"><span class="sw" style="background:${BK[x][0]}"></span>${BK[x][1]}</span>`).join('')}<span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600"><span class="sw" style="background:#7CC4A3"></span>Your block</span><span style="font-size:13px;font-weight:600;color:#2E6BF2;margin-left:auto">${U.bArmed ? (U.bArmed.type === 'plug' ? U.bArmed.who + ' picked. Tap the block it should power.' : U.bArmed.label + ' picked. Tap a Drop here slot, or a block to add after it.') : 'Drag a block onto Drop here. Drag a connection onto a block. The map scrolls sideways.'}</span></div>
+    <div class="scrollx" style="overflow-x:auto;padding-bottom:6px"><div class="bmap" style="width:${maxR}px;height:${p.lanes.length * LH}px">${labels.join('')}${wires.join('')}${nodes.join('')}${slots.join('')}</div></div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start">
+  <div class="card" style="display:flex;flex-direction:column;gap:12px;padding:20px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">Selected block</span><span class="lbl" style="color:${BK[sel.kind][0]}">${BK[sel.kind][1]}</span></div><span style="font-size:19px;font-weight:600;line-height:1.3">${h(sel.name)}</span>
+    <div class="kv2"><span class="lbl">Stage</span><span>${h(sel.stage)}</span></div><div class="kv2"><span class="lbl">Who</span><span>${h(sel.meta)}</span></div><div class="kv2"><span class="lbl">Rule</span><span style="font-weight:600;color:${sel.rule ? '#2E6BF2' : sel.mine ? '#1F7A4D' : '#33405C'}">${sel.rule ? 'Required · ' + h(sel.rule) + " · can't be removed" : sel.mine ? 'Your block · added by you' : 'Base model · optional'}</span></div><div class="kv2"><span class="lbl">Connected</span><span>${sel.plug ? h(sel.plug) : 'Nothing yet · drag a connection onto it'}</span></div><div class="kv2"><span class="lbl">On the map</span><span>Gets its own light on the control map</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${sel.mine ? btn('Rename', 'b.rename', `data-id="${sel.id}"`, 'btn2 sm') + `<button class="rm" data-a="b.remove" data-id="${sel.id}">Remove this block</button>` : btn('See it on the control map', 'b.map', `data-id="${sel.id}"`, 'btn2 sm')}</div></div>
+  <div class="card" style="display:flex;flex-direction:column;gap:12px;padding:20px"><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">Describe it instead</span><span class="sub">Say it the way you'd tell a new agent.</span></div><div class="say" style="background:#EEF3FE;align-self:flex-end;max-width:94%">We get a gift letter for any down payment that isn't from savings. And I sign off anything over $1M before it goes to a lender.</div><div class="say">That's two blocks:</div>
+    <div class="sug"><span class="lbl" style="color:#0E9384">Document · Intake</span><span style="font-size:13.5px;font-weight:600">Collect a gift letter</span>${btn(hasGift ? 'On the map' : 'Add to map', 'b.gift', hasGift ? 'disabled' : '', 'btn sm')}</div>
+    <div class="sug"><span class="lbl" style="color:#7A5AF8">Approval · Suitability</span><span style="font-size:13.5px;font-weight:600">Principal sign-off over $1M</span>${btn(hasSign ? 'On the map' : 'Add to map', 'b.sign', hasSign ? 'disabled' : '', 'btn sm')}</div>
+    <textarea class="input" data-f="b.describe" placeholder="Or type your own rule here and press Add" style="min-height:70px"></textarea>${btn('Add as a block', 'b.describeAdd', '', 'btn2 sm')}</div>
+  <div class="card" style="display:flex;flex-direction:column;gap:10px;padding:20px"><span style="font-size:15px;font-weight:600">Review before you publish</span>${k === 0 ? `<span class="sub" style="line-height:1.5">No changes yet. Your map matches v${p.version}.</span>` : p.changes.map(c => `<div style="display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;font-size:13.5px;line-height:1.45;background:#F7F9FC;border-radius:12px;padding:9px 12px"><span class="mono sub">${c.time}</span><span>${h(c.text)}</span></div>`).join('')}
+    <div style="background:#EEF3FE;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.5"><span style="font-weight:600">Every required block stays.</span> ${(() => { let n = 0; p.lanes.forEach(l => l.steps.forEach(s => { if (s.rule) n++; })); return n; })()} blocks carry a rule (BC MSA s.70, FINTRAC, consent). They can't be removed, so every file's evidence chain stays whole.</div>
+    ${btn('Version history', 'b.history', '', 'btn2 sm')}</div>
+</div>`;
+}
+
+/* ---------- Connections ---------- */
+function vConnections() {
+  const s = Store.s; const f = U.cTab;
+  const items = s.connections.filter(c => f === 'all' || c.k === f);
+  const T = [['all', 'All ' + s.connections.length], ['bank', 'Bank'], ['sign', 'Signing'], ['lend', 'Lenders'], ['ai', 'AI']];
+  return `
+<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div><div class="h1">Connections</div><div class="sub" style="font-size:14px;margin-top:4px">What 4ormIQ talks to, what each one can see, and what it never gets. Example connections.</div></div><div class="tabs">${T.map(([k, l]) => `<button class="tab${f === k ? ' on' : ''}" data-a="c.tab" data-v="${k}">${l}</button>`).join('')}</div></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">${items.map(c => `<div class="card cn"><div style="display:flex;align-items:center;gap:12px"><span class="logo" style="background:${c.lc}">${h(c.mono)}</span><div style="min-width:0;flex:1"><div style="font-weight:600">${h(c.name)}</div><div class="sub">${h(c.cat)}</div></div>${pillc(c.pc, c.ps)}</div><div class="cnk"><span class="sub">Shares</span><span>${h(c.gets)}</span></div><div class="cnk"><span class="sub">Never gets</span><span>${h(c.never)}</span></div><div class="cnk"><span class="sub">Last sync</span><span class="mono">${h(c.sync)}</span></div><div style="display:flex;gap:8px;margin-top:auto;flex-wrap:wrap">${btn('Settings', 'c.settings', `data-id="${c.id}"`, 'btn2 sm')}${btn('Activity', 'c.activity', `data-id="${c.id}"`, 'btn2 sm')}${btn(c.on ? 'Pause' : 'Resume', 'c.toggle', `data-id="${c.id}"`, 'btn2 sm')}</div></div>`).join('') || '<div class="card" style="padding:20px" class="sub">No connections in this group yet.</div>'}</div>
+<div class="card" style="padding:18px 20px;display:flex;align-items:center;gap:16px"><div style="flex:1"><div class="ct1">Add a connection</div><div class="sub" style="margin-top:2px">Bank data, e-signature, lender portals, CRM, email, or any AI tool your team uses. Each one gets its own light on the control map.</div></div>${btn('Browse connections', 'c.add')}</div>`;
+}
+
+/* ---------- Settings ---------- */
+function vSettings() {
+  const s = Store.s, b = s.brokerage;
+  const SEC = [['profile', 'Brokerage'], ['rules', 'Red light rules'], ['roles', 'Roles and access'], ['alerts', 'Notifications'], ['sec', 'Security'], ['demo', 'Demo data']];
+  const nProc = (() => { let n = 0; s.process.lanes.forEach(l => l.steps.forEach(x => { if (x.mine) n++; })); return n; })();
+  let body = '';
+  if (U.sSec === 'profile') body = `<div class="card" style="padding:20px 22px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <label class="field"><span class="sub">Brokerage name</span><input class="input" data-f="brokerage.name" value="${h(b.name)}"></label><label class="field"><span class="sub">Short name (menu)</span><input class="input" data-f="brokerage.short" value="${h(b.short)}"></label>
+    <label class="field"><span class="sub">Province</span><input class="input" data-f="brokerage.province" value="${h(b.province)}"></label><label class="field"><span class="sub">Regulator</span><input class="input" data-f="brokerage.regulator" value="${h(b.regulator)}"></label>
+    <label class="field"><span class="sub">Principal broker</span><input class="input" data-f="brokerage.principal" value="${h(b.principal)}"></label><div class="field"><span class="sub">Record keeping</span><div class="input">${h(b.retention)}</div></div>
+    <div class="field"><span class="sub">Process</span><div class="input">4orm base model v${s.process.version} + ${nProc} of your block${nProc === 1 ? '' : 's'}</div></div><div class="field" style="justify-content:flex-end"><div>${btn('Save changes', 's.save')}</div></div></div>`;
+  else if (U.sSec === 'rules') body = `<div class="card" style="padding:8px 22px">${s.rules.map(r => `<div class="srow"><div><div style="font-weight:500">${h(r.t)}</div><div class="sub">${h(r.s)}</div></div><button class="toggle${r.on ? '' : ' off'}${r.lock ? ' lock' : ''}" data-a="s.rule" data-id="${r.id}" aria-label="${h(r.t)}"></button></div>`).join('')}${(() => { const mine = []; s.process.lanes.forEach(l => l.steps.forEach(x => { if (x.mine) mine.push(x); })); return mine.map(x => `<div class="srow"><div><div style="font-weight:500">${h(x.name)}</div><div class="sub">Your block, added in the builder</div></div>${btn('Edit in builder', 'nav', 'data-v="builder"', 'btn2 sm')}</div>`).join(''); })()}</div>`;
+  else if (U.sSec === 'roles') body = `<div class="card" style="overflow:hidden"><div class="th" style="grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 80px"><span>Role</span><span>Can do</span><span>People</span></div>${[['Principal broker', 'Every file, rules, process, reports, AI monitor', 1], ['Compliance officer', 'Read every file, reports, regulator pack', 1], ['Agent', 'Own files only', s.agents.length], ['Assistant', 'Documents on assigned files, no bank data', 1]].map(([r, d, n]) => `<div class="tr" style="grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 80px;cursor:default"><span style="font-weight:600">${r}</span><span class="sub" style="font-size:13px">${d}</span><span class="mono">${n}</span></div>`).join('')}<div style="padding:12px 20px">${btn('Invite someone', 'ag.invite', '', 'btn2 sm')}</div></div>`;
+  else if (U.sSec === 'alerts') body = `<div class="card" style="padding:8px 22px">${[['Red light', 'Instantly, to the agent and to you', 'p-r', 'Instant'], ['Amber', 'Morning digest at 07:00', 'p-a', 'Daily'], ['AI monitor block', 'Instantly, to the agent and to you', 'p-r', 'Instant'], ['Weekly report', 'Mondays 07:00', 'p-b', 'Weekly']].map(([t, d, pc, l]) => `<div class="srow"><div><div style="font-weight:500">${t}</div><div class="sub">${d}</div></div>${pillc(pc, l)}</div>`).join('')}</div>`;
+  else if (U.sSec === 'sec') body = `<div class="card" style="padding:8px 22px">${[['Single sign-on', 'Microsoft 365', 'On'], ['Two-step sign-in', 'Required for everyone', 'Required'], ['Data stays in Canada', 'Files and evidence stored in Canadian data centres', 'On'], ['Every view logged', 'Who opened what, sealed to the file', 'On']].map(([t, d, l]) => `<div class="srow"><div><div style="font-weight:500">${t}</div><div class="sub">${d}</div></div>${pillc('p-g', l)}</div>`).join('')}</div>`;
+  else body = `<div class="card" style="padding:20px 22px;display:flex;flex-direction:column;gap:12px"><div class="ct1">Demo data</div><div class="sub" style="line-height:1.5">This is a working demo. Every click changes the data in this browser and stays after a reload. Reset puts the example brokerage back the way it started.</div><div style="display:flex;gap:8px">${btn('Reset demo data', 's.reset', '', 'btn red')}${btn('Download data as JSON', 's.export', '', 'btn2')}</div></div>`;
+  return `<div><div class="h1">Settings</div><div class="sub" style="font-size:14px;margin-top:4px">Brokerage rules that apply to every agent and every file.</div></div>
+<div style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start"><div class="snav">${SEC.map(([k, l]) => `<button class="${U.sSec === k ? 'on' : ''}" data-a="s.sec" data-v="${k}">${l}</button>`).join('')}</div><div style="display:flex;flex-direction:column;gap:16px">${body}</div></div>`;
+}
+
+const PAGES = { overview: vOverview, files: vFiles, evidence: vEvidence, map: vMap, reports: vReports, ai: vAI, agents: vAgents, builder: vBuilder, connections: vConnections, settings: vSettings };
+const HDR_ACTIONS = {
+  overview: () => btn('Reports', 'nav', 'data-v="reports"', 'btn2') + btn('Download audit report', 'r.audit'),
+  files: () => btn('Export CSV', 'r.audit', '', 'btn2'),
+  evidence: () => btn('Share with consumer', 'file.share', `data-id="${U.eSel}"`, 'btn2') + btn('Export record', 'file.export', `data-id="${U.eSel}"`),
+  map: () => btn('Edit process', 'nav', 'data-v="builder"', 'btn2'),
+  reports: () => btn('Download audit report', 'r.audit'),
+  ai: () => btn('AI report', 'r.open', 'data-v="ai"', 'btn2') + btn('Add AI tool', 'ai.add'),
+  agents: () => btn('Invite agent', 'ag.invite'),
+  builder: () => btn('Version history', 'b.history', '', 'btn2'),
+  connections: () => btn('Add connection', 'c.add'),
+  settings: () => btn('Save', 's.save')
+};
+
+/* app · router, events, modal, toast, search, downloads */
+const ROOT = document.getElementById('app');
+let undoSnap = null;
+
+function render() {
+  const crumb = U.route === 'files' ? `Files <span>· ${D.counts().open} open</span>` : U.route === 'ai' ? 'AI monitor <span>· Oversight</span>' : TITLES[U.route];
+  const page = (PAGES[U.route] || vOverview)();
+  ROOT.innerHTML = sidebar() + `<main class="main">${header(crumb, HDR_ACTIONS[U.route] ? HDR_ACTIONS[U.route]() : '')}<div class="body">${page}</div></main>`;
+  document.title = TITLES[U.route] + ' · ' + Store.s.brokerage.short;
+}
+function go(route, keepScroll) { if (!PAGES[route]) route = 'overview'; U.route = route; if (location.hash !== '#/' + route) history.replaceState(null, '', '#/' + route); render(); if (!keepScroll) window.scrollTo(0, 0); }
+Store.listeners.push(render);
+
+/* ---------- toast ---------- */
+let toastWrap;
+function toast(msg, opts) {
+  opts = opts || {};
+  if (!toastWrap) { toastWrap = document.createElement('div'); toastWrap.className = 'toasts'; document.body.appendChild(toastWrap); }
+  const el = document.createElement('div'); el.className = 'toast';
+  el.innerHTML = `<span>${h(msg)}</span>${opts.undo ? '<button data-t="undo">Undo</button>' : ''}<button data-t="x" aria-label="Dismiss">Dismiss</button>`;
+  el.querySelector('[data-t="x"]').onclick = () => el.remove();
+  if (opts.undo) el.querySelector('[data-t="undo"]').onclick = () => { opts.undo(); el.remove(); };
+  toastWrap.appendChild(el); setTimeout(() => el.remove(), opts.ms || 5000);
+}
+function withUndo(label, fn) { const snap = Store.snapshot(); fn(); toast(label, { undo: () => { Store.restore(snap); toast('Undone'); } }); }
+
+/* ---------- modal ---------- */
+let modalEl = null;
+function modal(o) {
+  closeModal();
+  modalEl = document.createElement('div'); modalEl.className = 'ovl'; modalEl.setAttribute('data-ovl', '1');
+  modalEl.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="mh"><div><div style="font-size:18px;font-weight:600;letter-spacing:-.015em">${h(o.title)}</div>${o.sub ? `<div class="sub" style="margin-top:4px">${h(o.sub)}</div>` : ''}</div><button class="btn2 sm" data-m="close">Close</button></div><div class="mb">${o.body || ''}</div><div class="mf">${(o.actions || []).map((a, i) => `<button class="${a.cls || (i === 0 ? 'btn' : 'btn2')}" data-m="act" data-i="${i}">${h(a.label)}</button>`).join('')}</div></div>`;
+  document.body.appendChild(modalEl);
+  modalEl.addEventListener('click', (e) => {
+    if (e.target === modalEl || e.target.closest('[data-m="close"]')) return closeModal();
+    const b = e.target.closest('[data-m="act"]'); if (b) { const a = o.actions[+b.dataset.i]; const r = a.run ? a.run(modalEl) : true; if (r !== false) closeModal(); }
+  });
+  const first = modalEl.querySelector('input,textarea'); if (first) first.focus();
+}
+function closeModal() { if (modalEl) { modalEl.remove(); modalEl = null; } }
+const val = (sel) => { const el = modalEl && modalEl.querySelector(sel); return el ? el.value.trim() : ''; };
+
+/* ---------- downloads ---------- */
+let dlCap; function download(name, text, type) {
+  const blob = new Blob([text], { type: type || 'text/plain' });
+  const direct = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
+  if (dlCap === undefined && window.claude && window.claude.use) { dlCap = claude.use('downloads').catch(() => null); }
+  if (dlCap && dlCap.then) { dlCap.then(d => { if (d && d.save) d.save({ filename: name, data: text }).catch(() => toast('Download declined.')); else direct(); }); return; }
+  direct();
+}
+function csv(rows) { return rows.map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\n'); }
+function auditCSV() {
+  const rows = [['File', 'Consumer decision', 'Borrowers', 'Risks ranked', 'Agent', 'Stage', 'Status', 'Sealed of 9', 'Chain', 'Issue', 'Last update']];
+  Store.s.files.forEach(f => rows.push([f.id, f.what, f.who, f.risks, D.agent(f.agent).name, D.stage(f), ST[D.status(f)][1], D.sealed(f), f.chain, D.issue(f), f.last]));
+  return csv(rows);
+}
+function printReport(k) {
+  const doc = document.getElementById('report-doc');
+  const html = doc ? doc.outerHTML : '<p>Open the report first.</p>';
+  const w = window.open('', '_blank');
+  if (!w) { toast('Allow pop-ups to download the PDF, or use Print from the browser menu.'); return; }
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${h(reportData(k).name)}</title><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><style>${document.getElementById('app-css').textContent}body{background:#fff;padding:24px;font-family:Geist,system-ui,sans-serif}.doc{box-shadow:none;padding:0}.btn,.btn2{display:none}</style></head><body>${html}<script>setTimeout(function(){window.print()},600)<\/script></body></html>`);
+  w.document.close();
+}
+
+/* ---------- search palette ---------- */
+let pal = null;
+function openSearch() {
+  if (pal) return;
+  pal = document.createElement('div'); pal.className = 'pal';
+  pal.innerHTML = `<div class="palbox"><input type="search" placeholder="Search files, consumers, agents, pages" aria-label="Search"><div data-res></div></div>`;
+  document.body.appendChild(pal);
+  const inp = pal.querySelector('input'), res = pal.querySelector('[data-res]');
+  let idx = 0, items = [];
+  const list = (q) => {
+    q = q.trim().toLowerCase(); items = [];
+    Object.keys(TITLES).forEach(k => { if (!q || TITLES[k].toLowerCase().indexOf(q) >= 0) items.push({ k: 'Page', t: TITLES[k], s: '', run: () => go(k) }); });
+    Store.s.agents.forEach(a => { if (!q || a.name.toLowerCase().indexOf(q) >= 0) items.push({ k: 'Agent', t: a.name, s: D.agentStats(a.id).files + ' open files', run: () => { U.agSel = a.id; go('agents'); } }); });
+    Store.s.files.forEach(f => { if (!q || (f.id + ' ' + f.what + ' ' + (f.names || '')).toLowerCase().indexOf(q) >= 0) items.push({ k: 'File', t: f.id + ' · ' + f.what, s: (f.names || '') + ' · ' + D.issue(f), run: () => openFile(f.id) }); });
+    items = items.slice(0, 9); idx = 0;
+    res.innerHTML = items.map((it, i) => `<button class="palr${i === idx ? ' on' : ''}" data-i="${i}"><span class="lbl">${it.k}</span><span class="ell" style="font-weight:500">${h(it.t)}</span><span class="sub ell" style="max-width:220px">${h(it.s)}</span></button>`).join('') || '<div style="padding:14px 18px" class="sub">Nothing matches.</div>';
+  };
+  list('');
+  inp.addEventListener('input', () => list(inp.value));
+  inp.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { idx = Math.min(idx + 1, items.length - 1); list(inp.value); inp.focus(); } if (e.key === 'ArrowUp') { idx = Math.max(idx - 1, 0); } if (e.key === 'Enter' && items[idx]) { items[idx].run(); closeSearch(); } if (e.key === 'Escape') closeSearch(); });
+  res.addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) { items[+b.dataset.i].run(); closeSearch(); } });
+  pal.addEventListener('click', (e) => { if (e.target === pal) closeSearch(); });
+  inp.focus();
+}
+function closeSearch() { if (pal) { pal.remove(); pal = null; } }
+function openFile(id) { U.eSel = id; U.fSel = id; U.eTab = 'chain'; go('evidence'); }
+
+/* ---------- modals for actions ---------- */
+function fixModal(id) {
+  const f = D.file(id); if (!f) return;
+  const risks = ['Payment during a leave (scored 16, now 12 after protection)', 'Rate rise at renewal (12)', 'Moving costs on top of the first payments (9)'].slice(0, Math.min(3, f.risks));
+  modal({ title: 'Prepare disclosure from the card', sub: f.id + ' · drafted by 4ormIQ from the risks ' + (f.names || 'the consumer') + ' ranked', body: `<div class="quote" style="background:#F5F8FF">Dear ${h(f.names || 'consumer')},<br><br>Before we recommend anything, here are the risks you ranked highest on your Decision Card, in writing:<br><br>${risks.map((r, i) => (i + 1) + '. ' + r).join('<br>')}<br><br>Please confirm on your phone that you have read this. Nothing moves to a lender until you do.</div><label class="field"><span class="sub">Add a note (optional)</span><textarea class="input" data-fx="note" style="min-height:70px" placeholder="Anything to add in your own words"></textarea></label><div class="sub">When they acknowledge, link 5 seals, link 6 reseals in order, and the lender hold lifts.</div>`,
+    actions: [{ label: 'Send to the consumer', run: () => { A.sendDisclosure(id); const n = val('[data-fx="note"]'); if (n) A.note(id, n); toast('Disclosure sent on ' + id + '. Waiting for the consumer to acknowledge.'); return true; } }, { label: 'Cancel' }] });
+}
+function reassignModal(id) {
+  const f = D.file(id); if (!f) return;
+  modal({ title: 'Reassign ' + f.id, sub: 'Logged to the file. The new agent sees it in their own space.', body: Store.s.agents.map(a => `<label class="opt"><input type="radio" name="ag" value="${a.id}" ${a.id === f.agent ? 'checked' : ''}>${av(a)}<span style="font-weight:500">${h(a.name)}</span><span class="sub" style="margin-left:auto">${D.agentStats(a.id).files} open</span></label>`).join(''),
+    actions: [{ label: 'Reassign', run: () => { const v = modalEl.querySelector('input[name="ag"]:checked'); if (!v || v.value === f.agent) { toast('Pick a different agent.'); return false; } withUndo(f.id + ' reassigned to ' + D.agent(v.value).name, () => A.reassign(id, v.value)); return true; } }, { label: 'Cancel' }] });
+}
+function noteModal(id) {
+  modal({ title: 'Add a note to ' + id, sub: 'Notes are sealed to the file with your name and the time.', body: `<textarea class="input" data-fx="note" placeholder="Type the note"></textarea>`, actions: [{ label: 'Save note', run: () => { const n = val('[data-fx="note"]'); if (!n) { toast('Type something first.'); return false; } A.note(id, n); toast('Note saved to ' + id); return true; } }, { label: 'Cancel' }] });
+}
+function reqDocModal(id) {
+  modal({ title: 'Request a document', sub: id + ' · the consumer gets a link on their phone', body: ['Gift letter', 'Employment letter', 'Notice of assessment', 'Property appraisal', 'Bank statement (90 days)'].map((d, i) => `<label class="opt"><input type="radio" name="doc" value="${d}" ${i === 0 ? 'checked' : ''}><span style="font-weight:500">${d}</span></label>`).join(''), actions: [{ label: 'Send request', run: () => { const v = modalEl.querySelector('input[name="doc"]:checked').value; const f = D.file(id); f.docs.push({ n: v, f: 'Consumer', t: 'requested', s: 'pending' }); A.log(f, v + ' requested.', 'The consumer uploads it from their phone.'); Store.commit(); toast(v + ' requested on ' + id); return true; } }, { label: 'Cancel' }] });
+}
+function inviteModal() {
+  modal({ title: 'Invite an agent', sub: 'They get their own space. They see only their files; you see everything.', body: `<label class="field"><span class="sub">Full name</span><input class="input" data-fx="name" placeholder="e.g. Jordan Blake"></label><label class="field"><span class="sub">Role</span><input class="input" data-fx="role" value="Agent"></label><label class="field"><span class="sub">Email</span><input class="input" data-fx="email" placeholder="name@lakeshoremortgage.ca"></label>`, actions: [{ label: 'Send invite', run: () => { const n = val('[data-fx="name"]'); if (n.length < 3) { toast('Enter their full name.'); return false; } const id = A.invite(n, val('[data-fx="role"]')); U.agSel = id; toast('Invite sent to ' + n + '. Their space is ready.'); go('agents'); return true; } }, { label: 'Cancel' }] });
+}
+function addToolModal() {
+  modal({ title: 'Add an AI tool', sub: 'Every call goes through 4ormIQ: personal data out, misleading claims stopped, everything sealed.', body: `<label class="field"><span class="sub">Tool name</span><input class="input" data-fx="name" placeholder="e.g. Gemini for Workspace"></label><label class="field"><span class="sub">What your team uses it for</span><input class="input" data-fx="use" placeholder="e.g. Drafting client emails"></label>`, actions: [{ label: 'Connect', run: () => { const n = val('[data-fx="name"]'); if (!n) { toast('Enter the tool name.'); return false; } A.addTool(n, val('[data-fx="use"]')); toast(n + ' connected. Starts with redacted prompts only.'); return true; } }, { label: 'Cancel' }] });
+}
+function addConnModal() {
+  const opts = ['Equifax (credit, with consent)', 'Velocity (lender submission)', 'Google Workspace', 'Salesforce', 'Dropbox'];
+  modal({ title: 'Browse connections', sub: 'Each one gets its own light on the control map and its own "never gets" list.', body: opts.map((o, i) => `<label class="opt"><input type="radio" name="cn" value="${o}" ${i === 0 ? 'checked' : ''}><span style="font-weight:500">${o}</span></label>`).join('') + `<label class="field"><span class="sub">Or name another</span><input class="input" data-fx="other" placeholder="Tool name"></label>`, actions: [{ label: 'Connect', run: () => { const other = val('[data-fx="other"]'); const v = other || modalEl.querySelector('input[name="cn"]:checked').value; A.addConn(v.replace(/\s*\(.*\)$/, ''), v.match(/\((.*)\)/) ? v.match(/\((.*)\)/)[1] : 'Custom'); toast(v + ' connected.'); return true; } }, { label: 'Cancel' }] });
+}
+function connModal(id, which) {
+  const c = Store.s.connections.find(x => x.id === id); if (!c) return;
+  if (which === 'settings') modal({ title: c.name + ' settings', sub: c.cat, body: `<div class="kvr"><span class="sub">Shares</span><span>${h(c.gets)}</span></div><div class="kvr"><span class="sub">Never gets</span><span>${h(c.never)}</span></div><div class="kvr"><span class="sub">Consent</span><span>Per consumer, on their phone. Withdrawn consent stops the feed the same minute.</span></div><div class="kvr"><span class="sub">Status</span><span>${c.on ? 'Active' : 'Paused'}</span></div>`, actions: [{ label: c.on ? 'Pause connection' : 'Resume connection', cls: 'btn2', run: () => { A.connToggle(id); toast(c.name + (c.on ? ' resumed' : ' paused')); return true; } }, { label: 'Done' }] });
+  else modal({ title: c.name + ' activity', sub: 'Every exchange is sealed to a file', body: `<div class="alog"><span class="mono sub">${c.sync}</span><div><b style="font-weight:600">Sync completed.</b> <span style="color:#4A5570">3 files updated, nothing outside their consent.</span></div></div><div class="alog"><span class="mono sub">08:40</span><div><b style="font-weight:600">Request refused.</b> <span style="color:#4A5570">Asked for a field the consumer did not consent to. Logged.</span></div></div><div class="alog"><span class="mono sub">Sun</span><div><b style="font-weight:600">Consent renewed.</b> <span style="color:#4A5570">MB-2047, both borrowers.</span></div></div>`, actions: [{ label: 'Done' }] });
+}
+function scheduleModal(r) {
+  modal({ title: 'Schedule ' + reportData(r).name, body: `<label class="field"><span class="sub">When</span><input class="input" data-fx="when" value="Mon 07:00" placeholder="e.g. Fri 16:00"></label><label class="field"><span class="sub">Send to</span><input class="input" data-fx="to" value="${h(Store.s.user.name)}"></label>`, actions: [{ label: 'Schedule', run: () => { A.schedule(r, val('[data-fx="when"]') || 'Mon 07:00', val('[data-fx="to"]') || Store.s.user.name); toast('Scheduled. It shows under Scheduled deliveries.'); return true; } }, { label: 'Cancel' }] });
+}
+function sendModal(r) {
+  modal({ title: 'Send ' + reportData(r).name, sub: 'Sent as a sealed PDF. Recipients see the same figures you see.', body: `<label class="field"><span class="sub">To</span><input class="input" data-fx="to" placeholder="name@regulator.ca"></label><label class="field"><span class="sub">Message</span><textarea class="input" data-fx="msg" placeholder="Optional note"></textarea></label>`, actions: [{ label: 'Send', run: () => { const to = val('[data-fx="to"]'); if (!to) { toast('Enter who it goes to.'); return false; } A.activity(reportData(r).name + ' sent to ' + to + '.', ''); Store.commit(); toast('Sent to ' + to); return true; } }, { label: 'Cancel' }] });
+}
+function packModal() {
+  const c = D.counts();
+  modal({ title: 'Build regulator pack', sub: 'One sealed bundle: every file, its chain, who saw it, and when.', body: `<div class="kvr"><span class="sub">Files</span><span>${Store.s.files.length} (${c.open} open, ${c.kept} kept this month)</span></div><div class="kvr"><span class="sub">Ready as they are</span><span>${c.intact} of ${c.open} open files</span></div><div class="kvr"><span class="sub">Not yet complete</span><span>${c.r + c.a} files, listed with what is missing</span></div><div class="kvr"><span class="sub">Format</span><span>CSV index now. The full sealed bundle is produced by the records vault.</span></div>`, actions: [{ label: 'Download index (CSV)', run: () => { download('4orm-regulator-pack-index.csv', auditCSV(), 'text/csv'); A.activity('Regulator pack built.', c.intact + ' of ' + c.open + ' files complete.'); Store.commit(); toast('Regulator pack index downloaded.'); return true; } }, { label: 'Cancel' }] });
+}
+function historyModal() {
+  const p = Store.s.process;
+  modal({ title: 'Process version history', body: `<div class="alog"><span class="mono sub">v${p.version}</span><div><b style="font-weight:600">Current.</b> <span style="color:#4A5570">${h(p.published)}.</span></div></div>${p.version !== '1.0' ? `<div class="alog"><span class="mono sub">v1.0</span><div><b style="font-weight:600">Base model from 4orm.</b> <span style="color:#4A5570">11 blocks, 9 required.</span></div></div>` : ''}${p.changes.length ? `<div class="sub">${p.changes.length} unpublished change${p.changes.length === 1 ? '' : 's'} on the map.</div>` : ''}`, actions: [{ label: 'Done' }] });
+}
+function renameModal(id) {
+  let cur = ''; Store.s.process.lanes.forEach(l => l.steps.forEach(s => { if (s.id === id) cur = s.name; }));
+  modal({ title: 'Rename block', body: `<input class="input" data-fx="name" value="${h(cur)}">`, actions: [{ label: 'Save', run: () => { const n = val('[data-fx="name"]'); if (!n) return false; A.procRename(id, n); return true; } }, { label: 'Cancel' }] });
+}
+
+/* ---------- builder helpers ---------- */
+function bInsertAt(li, j, tpl) { if (!tpl) return; const lanes = Store.s.process.lanes; if (tpl.type === 'plug') { const s = lanes[li] && lanes[li].steps[j]; if (s) { A.procAttach(s.id, tpl); toast(tpl.who + ' connected to "' + s.name + '"'); } return; } const id = A.procInsert(li, j, tpl); if (id) { U.bSel = id; toast('"' + tpl.name + '" added. It gets its own light on the control map.'); render(); } }
+
+/* ---------- event delegation ---------- */
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-a]'); if (!el || el.disabled) return;
+  // nested actions: prefer the innermost
+  const a = el.dataset.a, id = el.dataset.id, v = el.dataset.v;
+  const stop = () => { e.stopPropagation(); };
+  switch (a) {
+    case 'nav': go(v); break;
+    case 'search.open': openSearch(); break;
+    /* overview */
+    case 'ov.range': U.range = v; render(); break;
+    case 'ov.tab': U.ovTab = v; render(); break;
+    /* files */
+    case 'f.tab': U.fTab = v; render(); break;
+    case 'f.agent': U.fAgent = v; render(); break;
+    case 'f.stage': U.fStage = v; render(); break;
+    case 'f.sel': U.fSel = id; render(); break;
+    case 'file.open': stop(); openFile(id); break;
+    case 'file.fix': stop(); fixModal(id); break;
+    case 'file.remind': stop(); A.sendReminder(id); toast('Reminder sent on ' + id); break;
+    case 'file.sign': stop(); withUndo('Signed on the consumer\'s phone. Link sealed on ' + id + '.', () => A.consumerSigns(id)); break;
+    case 'file.request': stop(); A.request(id, v); toast({ renewal: 'Consent renewal requested', invite: 'Invite resent', gift: 'Gift letter requested' }[v] + ' on ' + id); break;
+    case 'file.reassign': stop(); reassignModal(id); break;
+    case 'file.note': stop(); noteModal(id); break;
+    case 'file.reqdoc': reqDocModal(id); break;
+    case 'file.share': A.share(id); toast('Link sent. The consumer sees the same sealed chain on their phone.'); break;
+    case 'file.export': { const f = D.file(id); download(id + '-sealed-record.json', JSON.stringify({ file: f, steps: STEPS, exported: NOW.day + ' ' + Store.stamp() }, null, 2), 'application/json'); toast('Sealed record exported for ' + id); break; }
+    /* evidence */
+    case 'e.sel': U.eSel = id; render(); break;
+    case 'e.tab': U.eTab = v; render(); break;
+    /* map */
+    case 'm.sel': U.mSel = id; render(); break;
+    case 'm.agent': U.mAgent = v; render(); break;
+    /* reports */
+    case 'r.sel': U.rSel = v; render(); break;
+    case 'r.range': U.rRange = v; render(); break;
+    case 'r.open': U.rSel = v; go('reports'); break;
+    case 'r.pdf': toast('Opening the print view. Choose Save as PDF.'); printReport(v); break;
+    case 'r.send': sendModal(v); break;
+    case 'r.schedule': scheduleModal(v); break;
+    case 'r.unschedule': withUndo('Schedule removed', () => A.unschedule(id)); break;
+    case 'r.audit': download('4orm-audit-report.csv', auditCSV(), 'text/csv'); toast('Audit report downloaded (CSV, every file and its chain).'); break;
+    case 'r.pack': packModal(); break;
+    case 'r.custom': modal({ title: 'New custom report', sub: 'Pick what it should count. It is built from the sealed evidence like the others.', body: ['Files by agent and stage', 'Time at each step', 'Consumer acknowledgements by week', 'AI flags by tool'].map((o, i) => `<label class="opt"><input type="radio" name="cr" value="${o}" ${i === 0 ? 'checked' : ''}><span style="font-weight:500">${o}</span></label>`).join(''), actions: [{ label: 'Create', run: () => { toast('Custom reports are built by the records vault. This demo keeps the six standard ones.'); return true; } }, { label: 'Cancel' }] }); break;
+    /* ai */
+    case 'ai.tab': U.aiTab = v; render(); break;
+    case 'ai.sel': U.aiSel = id; render(); break;
+    case 'ai.rail': { if (!A.rail(id)) toast('Required by 4orm. This guardrail cannot be switched off.'); break; }
+    case 'ai.tighten': withUndo('Tool tightened. Scripted answers only.', () => { A.tighten(el.dataset.tool); A.resolveEvent(id); }); break;
+    case 'ai.resolve': withUndo('Flag closed and sealed to the file.', () => A.resolveEvent(id)); break;
+    case 'ai.view': toast('Opens the sealed record for this flag.'); break;
+    case 'ai.coach': { const ev = Store.s.ai.events.find(x => x.id === id); modal({ title: 'Coach ' + (ev ? ev.who : 'agent'), body: `<textarea class="input" data-fx="msg">${h(ev ? 'Quick one on ' + ev.file + ': ' + ev.why + ' 4ormIQ caught it, nothing went out. Worth a 5 minute chat.' : '')}</textarea>`, actions: [{ label: 'Send', run: () => { A.activity('Coaching note sent.', ev ? ev.title : ''); Store.commit(); toast('Sent.'); return true; } }, { label: 'Cancel' }] }); break; }
+    case 'ai.add': addToolModal(); break;
+    case 'ai.tool': { A.toolToggle(id); const t = Store.s.ai.tools.find(x => x.id === id); toast(t.name + (t.on ? ' resumed. Calls go through 4ormIQ again.' : ' paused. No calls go through until you resume it.')); break; }
+    /* agents */
+    case 'ag.sel': U.agSel = id; render(); break;
+    case 'ag.open': U.agSel = id; go('agents'); break;
+    case 'ag.files': U.fAgent = id; U.fTab = 'all'; go('files'); break;
+    case 'ag.mode': U.agMode = v; render(); break;
+    case 'ag.invite': inviteModal(); break;
+    case 'ag.coach': A.coach(id, ''); toast('Coaching note sent to ' + D.agent(id).name.split(' ')[0]); break;
+    /* connections */
+    case 'c.tab': U.cTab = v; render(); break;
+    case 'c.settings': connModal(id, 'settings'); break;
+    case 'c.activity': connModal(id, 'activity'); break;
+    case 'c.toggle': { A.connToggle(id); const c = Store.s.connections.find(x => x.id === id); toast(c.name + (c.on ? ' resumed.' : ' paused. Nothing is shared until you resume it.')); break; }
+    case 'c.add': addConnModal(); break;
+    /* settings */
+    case 's.sec': U.sSec = v; render(); break;
+    case 's.rule': { if (!A.rule(id)) toast('Required block. It cannot be switched off.'); break; }
+    case 's.save': { const o = {}; document.querySelectorAll('[data-f^="brokerage."]').forEach(i => { o[i.dataset.f.split('.')[1]] = i.value.trim() || Store.s.brokerage[i.dataset.f.split('.')[1]]; }); if (Object.keys(o).length) { o.mark = (o.short || Store.s.brokerage.short).split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(); A.saveBrokerage(o); } toast('Saved.'); break; }
+    case 's.reset': modal({ title: 'Reset demo data?', sub: 'Puts the example brokerage back the way it started. Your clicks in this browser are cleared.', actions: [{ label: 'Reset', cls: 'btn red', run: () => { Store.reset(); U.fSel = U.eSel = 'MB-2041'; toast('Demo data reset.'); return true; } }, { label: 'Cancel' }] }); break;
+    case 's.export': download('4orm-broker-demo-data.json', Store.snapshot(), 'application/json'); toast('Data downloaded.'); break;
+    /* builder */
+    case 'b.arm': { const t = libItem(el.dataset.g, +el.dataset.i); U.bArmed = U.bArmed && U.bArmed.label === t.label ? null : t; render(); break; }
+    case 'b.node': { const li = +el.dataset.li, j = +el.dataset.j; if (U.bArmed) { const t = U.bArmed; U.bArmed = null; if (t.type === 'plug') bInsertAt(li, j, t); else bInsertAt(li, j + 1, t); } else { U.bSel = id; render(); } break; }
+    case 'b.slot': { const li = +el.dataset.li; if (U.bArmed && U.bArmed.type !== 'plug') { const t = U.bArmed; U.bArmed = null; bInsertAt(li, Store.s.process.lanes[li].steps.length, t); } else toast('Pick a block from the library first, then tap Drop here.'); break; }
+    case 'b.remove': { const snap = Store.snapshot(); const name = A.procRemove(id); if (name) { U.bSel = 's2'; render(); toast('"' + name + '" removed', { undo: () => { Store.restore(snap); toast('Block restored.'); } }); } break; }
+    case 'b.rename': renameModal(id); break;
+    case 'b.map': U.mSel = id; go('map'); break;
+    case 'b.gift': if (!A.procHas('Collect a gift letter')) { const nid = A.procInsert(1, 2, { kind: 'doc', name: 'Collect a gift letter', meta: "Agent, when the down payment isn't from savings" }); U.bSel = nid; render(); toast('Added to Intake.'); } break;
+    case 'b.sign': if (!A.procHas('Principal sign-off over $1M')) { const nid = A.procInsert(2, Store.s.process.lanes[2].steps.length, { kind: 'appr', name: 'Principal sign-off over $1M', meta: Store.s.brokerage.principal }); U.bSel = nid; render(); toast('Added to Suitability.'); } break;
+    case 'b.describeAdd': { const ta = document.querySelector('[data-f="b.describe"]'); const txt = ta ? ta.value.trim() : ''; if (!txt) { toast('Describe the rule first.'); break; } const kind = /sign|approv|over \$/i.test(txt) ? 'appr' : /letter|document|statement|proof|appraisal/i.test(txt) ? 'doc' : /check|verify|confirm/i.test(txt) ? 'check' : 'step'; const lane = kind === 'appr' ? 2 : 1; const nid = A.procInsert(lane, Store.s.process.lanes[lane].steps.length, { kind, name: txt.length > 42 ? txt.slice(0, 40) + '…' : txt, meta: kind === 'appr' ? Store.s.brokerage.principal : 'Agent' }); U.bSel = nid; render(); toast('Added as ' + BK[kind][1].toLowerCase() + ' block.'); break; }
+    case 'b.reset': modal({ title: 'Reset to the base model?', sub: 'Your blocks come off the map. Required blocks are unchanged either way.', actions: [{ label: 'Reset', cls: 'btn red', run: () => { A.procReset(); U.bSel = 's2'; toast('Back to the 4orm base model.'); return true; } }, { label: 'Cancel' }] }); break;
+    case 'b.publish': { const k = Store.s.process.changes.length; modal({ title: 'Publish to your agents?', sub: k + ' change' + (k === 1 ? '' : 's') + ' go live for every agent. New files follow the new process; open files keep theirs.', actions: [{ label: 'Publish', run: () => { A.procPublish(); toast('Published v' + Store.s.process.version + '. The control map carries your blocks.'); return true; } }, { label: 'Cancel' }] }); break; }
+    case 'b.history': historyModal(); break;
+    default: toast('Coming soon: ' + a);
+  }
+});
+
+/* drag and drop (builder) */
+document.addEventListener('dragstart', (e) => { const el = e.target.closest('[data-a="b.arm"]'); if (!el) return; U.bDrag = libItem(el.dataset.g, +el.dataset.i); try { e.dataTransfer.setData('text/plain', U.bDrag.label); e.dataTransfer.effectAllowed = 'copy'; } catch (x) { } });
+document.addEventListener('dragend', () => { U.bDrag = null; U.bOver = null; if (U.route === 'builder') render(); });
+document.addEventListener('dragover', (e) => { const t = e.target.closest('[data-drop]'); if (t && U.bDrag) { e.preventDefault(); const key = t.dataset.drop === 'slot' ? 'slot' + t.dataset.li : t.dataset.id; if (U.bOver !== key) { U.bOver = key; t.classList.add('over'); } } });
+document.addEventListener('dragleave', (e) => { const t = e.target.closest && e.target.closest('[data-drop]'); if (t) t.classList.remove('over'); });
+document.addEventListener('drop', (e) => { const t = e.target.closest('[data-drop]'); if (!t || !U.bDrag) return; e.preventDefault(); const tpl = U.bDrag; U.bDrag = null; U.bOver = null; const li = +t.dataset.li; if (t.dataset.drop === 'slot') { if (tpl.type !== 'plug') bInsertAt(li, Store.s.process.lanes[li].steps.length, tpl); else toast('Drop a connection onto a block, not a slot.'); } else { const j = +t.dataset.j; tpl.type === 'plug' ? bInsertAt(li, j, tpl) : bInsertAt(li, j + 1, tpl); } });
+
+/* keyboard */
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') { closeSearch(); closeModal(); if (U.bArmed) { U.bArmed = null; render(); } }
+});
+window.addEventListener('hashchange', () => { const r = location.hash.replace(/^#\/?/, '') || 'overview'; if (r !== U.route) go(r, true); });
+
+/* boot */
+Store.load();
+go((location.hash.replace(/^#\/?/, '') || 'overview'), true);
+
+</script>
+</body>
+</html>
