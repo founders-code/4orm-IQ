@@ -45,19 +45,19 @@
   "rewrites": [
     {
       "source": "/real-run-live-go",
-      "destination": "/check.html"
+      "destination": "/check"
     },
     {
       "source": "/real-run-live-go/",
-      "destination": "/check.html"
+      "destination": "/check"
     },
     {
       "source": "/real-run-live-go/room",
-      "destination": "/admin.html"
+      "destination": "/admin"
     },
     {
       "source": "/real-run-live-go/evidence",
-      "destination": "/evidence.html"
+      "destination": "/evidence"
     }
   ],
   "cleanUrls": true,
