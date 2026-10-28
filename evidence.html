@@ -183,6 +183,11 @@ h1 em{font-style:normal;color:var(--blue)}
 .msg .note{margin-top:6px;font-family:var(--mono);font-size:9.5px;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;color:var(--gold-dp)}
 
+/* At 320 the third column's content held this table at 334px inside a 264px
+   column, and the whole page scrolled sideways with it. The table scrolls in
+   its own box instead. Wide content scrolls; the body never does. */
+.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:560px){ .mapwrap table.map{min-width:420px} }
 table.map{width:100%;border-collapse:collapse;margin-top:22px}
 table.map th{text-align:left;font-family:var(--mono);font-size:9.5px;font-weight:800;
   letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3);
@@ -675,7 +680,7 @@ pick("intake");
       second audience, because a second generation is a second version, and two versions of
       the truth is the thing an audit is looking for.</p>
 
-    <table class="map">
+    <div class="mapwrap"><table class="map">
       <thead><tr><th>What is held</th><th>The consumer sees</th><th>The company sees</th>
         <th>The regulator sees</th></tr></thead>
       <tbody>
@@ -704,7 +709,7 @@ pick("intake");
           <td>Nothing held about them beyond the corpus period.</td>
           <td>The deletion schedule, and evidence it ran on each day.</td></tr>
       </tbody>
-    </table>
+    </table></div>
   </section>
 
   <section class="sec">
