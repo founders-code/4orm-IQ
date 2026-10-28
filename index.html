@@ -80,98 +80,107 @@ section[id]{scroll-margin-top:104px}
 }
 
 /* ---------- hero ---------- */
-.hero{position:relative;padding:76px 0 24px;overflow:hidden}
-.wash{position:absolute;inset:-120px 0 auto 0;height:700px;z-index:0;pointer-events:none;
-  background:radial-gradient(900px 420px at 50% 60px,#DCE8FE 0%,#EEF4FE 46%,rgba(255,255,255,0) 76%)}
+.hero{position:relative;padding:72px 0 20px;overflow:hidden}
+.wash{position:absolute;inset:-120px 0 auto 0;height:720px;z-index:0;pointer-events:none;
+  background:radial-gradient(900px 430px at 50% 60px,#DCE8FE 0%,#EEF4FE 46%,rgba(255,255,255,0) 76%)}
 .hero .wrap{position:relative;z-index:1}
 .kick{font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--blue-dp)}
-h1{font-size:clamp(38px,6.1vw,72px);line-height:1.04;letter-spacing:-.038em;font-weight:800;margin:18px 0 0;
-  max-width:16ch;text-wrap:balance}
-.lede{font-size:clamp(16px,1.6vw,19px);line-height:1.56;color:var(--tx-2);margin:20px 0 0;max-width:60ch}
+h1{font-size:clamp(36px,5.6vw,66px);line-height:1.05;letter-spacing:-.038em;font-weight:800;margin:18px 0 0;
+  max-width:17ch;text-wrap:balance}
+.lede{font-size:clamp(15.5px,1.5vw,18px);line-height:1.58;color:var(--tx-2);margin:20px 0 0;max-width:56ch}
+.herogrid{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:clamp(32px,4.4vw,60px);align-items:center}
+@media(max-width:980px){.herogrid{grid-template-columns:minmax(0,1fr);gap:42px}}
+.herocta{display:flex;flex-wrap:wrap;gap:12px;margin:32px 0 0}
 
-/* the operable control */
-.runner{margin:34px 0 0;max-width:760px}
-.runform{display:flex;gap:10px;align-items:stretch;background:var(--surface);border-radius:var(--r);
-  padding:9px;box-shadow:var(--sh-lg);border:1px solid var(--border)}
-.runform input{flex:1;min-width:0;border:0;background:transparent;font-family:var(--sans);font-size:16px;
-  color:var(--tx);padding:0 14px;height:52px;border-radius:var(--r-sm)}
-.runform input::placeholder{color:var(--tx-3)}
-.runform input:focus{outline:none;background:var(--bg-2)}
-.runform input:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-.go{flex:none;height:52px;padding:0 26px;border-radius:var(--r-sm);background:var(--blue);color:#fff;border:0;
-  font-size:15px;font-weight:600;cursor:pointer;transition:background .2s var(--ease),transform .18s var(--pop);white-space:nowrap}
-.go:hover{background:var(--blue-dp)}
-.go:active{transform:scale(.97)}
-.runnote{font-size:13px;color:var(--tx-3);margin:14px 2px 0;line-height:1.55}
-@media(max-width:620px){
-  .runform{flex-direction:column}
-  .runform input{height:48px}
-  .go{height:48px;width:100%}
-}
+/* ---------- the broker's view panel ---------- */
+.panel{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-xl);border:1px solid var(--border);
+  padding:22px;display:flex;flex-direction:column;gap:14px}
+.ptop{display:flex;flex-direction:column;gap:5px}
+.pname{font-size:17px;font-weight:700;letter-spacing:-.018em}
+.pwarn{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3)}
+.rows{display:flex;flex-direction:column;gap:7px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;
+  background:var(--surface-2);border-radius:var(--r-sm);padding:11px 13px}
+.rsrc{font-size:13.5px;font-weight:500;color:var(--tx);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rst{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  border-radius:999px;padding:5px 10px;white-space:nowrap}
+.rst.ok{background:var(--ok-bg);color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok-br)}
+.rst.nul{background:var(--surface-3);color:var(--tx-2);box-shadow:inset 0 0 0 1px var(--border-strong)}
+.rst.bl{background:var(--blue-50);color:var(--blue-dp);box-shadow:inset 0 0 0 1px var(--blue-100)}
+.pfoot{font-size:12.5px;line-height:1.55;color:var(--tx-2)}
+.pfoot b{color:var(--tx);font-weight:700}
+@media(max-width:360px){.row{grid-template-columns:minmax(0,1fr)}.rst{justify-self:start}}
 
-/* ---------- doors ---------- */
-.sec{padding:96px 0}
-.sec.tight{padding-top:12px}
-h2{font-size:clamp(28px,3.6vw,44px);line-height:1.08;letter-spacing:-.034em;font-weight:800;margin:16px 0 0;
+/* ---------- sections ---------- */
+.sec{padding:92px 0}
+.sec.tight{padding-top:8px}
+h2{font-size:clamp(27px,3.4vw,42px);line-height:1.09;letter-spacing:-.034em;font-weight:800;margin:16px 0 0;
   max-width:22ch;text-wrap:balance}
-.subh{font-size:16px;line-height:1.6;color:var(--tx-2);margin:16px 0 0;max-width:62ch}
+.subh{font-size:16px;line-height:1.6;color:var(--tx-2);margin:16px 0 0;max-width:60ch}
 
-.seg{display:inline-flex;gap:4px;background:var(--surface-2);border-radius:999px;padding:5px;margin:30px 0 0;
-  box-shadow:inset 0 0 0 1px var(--border)}
-.segb{border:0;background:transparent;border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;
-  color:var(--tx-2);cursor:pointer;min-height:44px;transition:background .25s var(--ease),color .25s var(--ease),box-shadow .25s var(--ease);white-space:nowrap}
-.segb[aria-selected="true"]{background:var(--surface);color:var(--tx);box-shadow:var(--sh-sm),0 0 0 1px var(--border)}
-.segb:hover:not([aria-selected="true"]){color:var(--tx)}
+/* ---------- the three doors ---------- */
+.doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(282px,1fr));gap:18px;margin:36px 0 0}
+.door{background:var(--surface);border-radius:var(--r-lg);padding:28px 26px;box-shadow:var(--sh-sm),0 0 0 1px var(--border);
+  display:flex;flex-direction:column;gap:10px;transition:box-shadow .3s var(--ease),transform .3s var(--spring)}
+.door:hover{box-shadow:var(--sh-lg),0 0 0 1px var(--border-strong);transform:translateY(-3px)}
+.door.lead{background:linear-gradient(170deg,#F4F8FF,var(--surface) 62%)}
+.dwho{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--blue-dp)}
+.dt{font-size:20px;font-weight:700;letter-spacing:-.022em;line-height:1.22}
+.dd{font-size:14px;line-height:1.58;color:var(--tx-2);flex:1}
+.dgo{display:inline-flex;align-items:center;align-self:flex-start;min-height:46px;padding:0 22px;border-radius:999px;
+  background:var(--blue);color:#fff;font-size:14.5px;font-weight:600;margin-top:6px;transition:background .2s var(--ease)}
+.dgo:hover{background:var(--blue-dp)}
+.dgo.ghost{background:var(--surface);color:var(--tx);box-shadow:0 0 0 1px var(--border-strong)}
+.dgo.ghost:hover{background:var(--surface-2)}
 
-.pane{margin:30px 0 0}
-.doorgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:16px}
-.door{background:var(--surface);border-radius:var(--r-lg);padding:26px 24px 24px;box-shadow:var(--sh-sm),0 0 0 1px var(--border);
-  display:flex;flex-direction:column;gap:9px;transition:box-shadow .3s var(--ease),transform .3s var(--spring)}
-.door:hover{box-shadow:var(--sh),0 0 0 1px var(--border-strong);transform:translateY(-2px)}
-.dnum{font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.18em;color:var(--blue-dp)}
-.dt{font-size:17.5px;font-weight:700;letter-spacing:-.016em;line-height:1.25}
-.dd{font-size:14px;line-height:1.58;color:var(--tx-2)}
-.doorfoot{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:26px 0 0}
-.cta{display:inline-flex;align-items:center;min-height:48px;padding:0 26px;border-radius:999px;background:var(--blue);
-  color:#fff;font-size:15px;font-weight:600;transition:background .2s var(--ease)}
+.cta{display:inline-flex;align-items:center;min-height:50px;padding:0 28px;border-radius:999px;background:var(--blue);
+  color:#fff;font-size:15.5px;font-weight:600;transition:background .2s var(--ease)}
 .cta:hover{background:var(--blue-dp)}
 .cta.ghost{background:var(--surface);color:var(--tx);box-shadow:0 0 0 1px var(--border-strong)}
 .cta.ghost:hover{background:var(--surface-2)}
-.demonote{font-size:13px;color:var(--tx-3);line-height:1.55;max-width:56ch}
 
-/* ---------- what a result says ---------- */
-.states{display:grid;grid-template-columns:repeat(auto-fit,minmax(262px,1fr));gap:16px;margin:34px 0 0}
-.st{background:var(--surface);border-radius:var(--r);padding:22px;box-shadow:var(--sh-sm),0 0 0 1px var(--border);
-  display:flex;flex-direction:column;gap:10px}
-.stlab{display:inline-flex;align-self:flex-start;align-items:center;border-radius:999px;padding:5px 13px;
-  font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
-.stlab.ok{background:var(--ok-bg);color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok-br)}
-.stlab.nul{background:var(--surface-3);color:var(--tx-2);box-shadow:inset 0 0 0 1px var(--border-strong)}
-.stlab.wn{background:var(--caution-bg);color:var(--caution);box-shadow:inset 0 0 0 1px var(--caution-br)}
-.stlab.bd{background:var(--bad-bg);color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad-br)}
-.stis{font-size:14.5px;line-height:1.55;color:var(--tx);font-weight:600}
-.stnot{font-size:13.5px;line-height:1.55;color:var(--tx-2)}
-.stnot b{font-weight:700;color:var(--tx)}
+/* ---------- the flow, both sides ---------- */
+.flow{display:flex;flex-direction:column;gap:14px;margin:38px 0 0}
+.step{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:22px;align-items:start;
+  background:var(--surface);border-radius:var(--r);padding:22px 24px;box-shadow:var(--sh-sm),0 0 0 1px var(--border)}
+.sn{font-family:var(--mono);font-size:22px;font-weight:800;color:var(--blue);letter-spacing:-.02em;line-height:1.1}
+.sbody{min-width:0}
+.sth{font-size:17px;font-weight:700;letter-spacing:-.018em;line-height:1.3}
+.sdd{font-size:14px;line-height:1.58;color:var(--tx-2);margin-top:6px;max-width:66ch}
+.side{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  border-radius:999px;padding:6px 12px;white-space:nowrap;align-self:center}
+.side.c{background:var(--blue-50);color:var(--blue-dp);box-shadow:inset 0 0 0 1px var(--blue-100)}
+.side.b{background:var(--surface-3);color:var(--tx-2);box-shadow:inset 0 0 0 1px var(--border-strong)}
+@media(max-width:720px){
+  .step{grid-template-columns:44px minmax(0,1fr);gap:14px}
+  .side{grid-column:2;justify-self:start;margin-top:10px}
+}
 
-/* ---------- closing ---------- */
-.close{background:var(--ink);border-radius:var(--r-xl);padding:clamp(40px,6vw,76px);color:#fff;position:relative;overflow:hidden}
+/* ---------- gets ---------- */
+.gets{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:16px;margin:36px 0 0}
+.get{background:var(--surface);border-radius:var(--r);padding:24px;box-shadow:var(--sh-sm),0 0 0 1px var(--border)}
+.gt{font-size:16.5px;font-weight:700;letter-spacing:-.016em;line-height:1.3}
+.gd{font-size:13.5px;line-height:1.58;color:var(--tx-2);margin-top:8px}
+
+/* ---------- close ---------- */
+.close{background:var(--ink);border-radius:var(--r-xl);padding:clamp(38px,5.6vw,72px);color:#fff;position:relative;overflow:hidden}
 .close::after{content:"";position:absolute;inset:auto -10% -60% 40%;height:420px;border-radius:50%;
   background:radial-gradient(closest-side,rgba(46,107,242,.38),rgba(46,107,242,0));pointer-events:none}
 .close .inner{position:relative;z-index:1}
 .close h2{color:#fff;max-width:20ch}
 .close .subh{color:#AFBDD6;max-width:58ch}
-.slog{display:flex;align-items:baseline;gap:2px;font-size:clamp(22px,2.8vw,34px);font-weight:800;letter-spacing:-.03em;margin:0}
-.slog img{height:clamp(22px,2.8vw,34px);width:auto;display:block;transform:translateY(3px)}
+.slog{display:flex;align-items:baseline;gap:2px;font-size:clamp(21px,2.6vw,32px);font-weight:800;letter-spacing:-.03em;margin:0}
+.slog img{height:clamp(21px,2.6vw,32px);width:auto;display:block;transform:translateY(3px)}
 .tag{font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--blue-lt);margin:16px 0 0}
 
 /* ---------- footer ---------- */
-footer{padding:58px 0 72px;background:var(--bg-2)}
+footer{padding:56px 0 70px;background:var(--bg-2)}
 .frow{display:flex;flex-wrap:wrap;gap:30px 48px;align-items:flex-start;justify-content:space-between}
 .fgroup{display:flex;flex-direction:column;gap:11px;min-width:150px}
 .fh{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--tx-3)}
 .fl{font-size:14px;color:var(--tx-2);min-height:24px;display:inline-flex;align-items:center}
 .fl:hover{color:var(--blue-dp)}
-.legal{margin:44px 0 0;font-size:12.5px;line-height:1.65;color:var(--tx-3);max-width:76ch}
+.legal{margin:42px 0 0;font-size:12.5px;line-height:1.65;color:var(--tx-3);max-width:76ch}
 
 /* ---------- reveal ---------- */
 .rv{opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease),transform .7s var(--spring)}
@@ -183,42 +192,19 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
 }
 
 /* ---------- narrow ---------- */
-/* At 320 the two tabs sat side by side at their natural width and ran 25px
-   past the viewport. They share the row instead, and the page gutter comes
-   in, which is the only place the container padding is allowed to move. */
+/* The nav button's full label is 189px, which runs past a 320 viewport once
+   the mark beside it is counted. It takes a short form instead of wrapping. */
+.cts{display:none}
+@media(max-width:560px){
+  .ctl{display:none}
+  .cts{display:inline}
+  .navcta{padding:10px 15px}
+}
 @media(max-width:480px){
   .wrap{padding:0 18px}
-  .seg{display:flex;width:100%}
-  .segb{flex:1 1 0;min-width:0;padding:11px 8px;font-size:13px}
-  .doorfoot{gap:10px}
-  .cta{width:100%;justify-content:center}
-  .sec{padding:64px 0}
-}
-
-/* ---------- hero grid: the copy on the left, the product on the right ---------- */
-.herogrid{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:clamp(32px,4.4vw,64px);align-items:center}
-@media(max-width:980px){.herogrid{grid-template-columns:minmax(0,1fr);gap:44px}}
-
-.sample{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-xl);border:1px solid var(--border);
-  padding:22px;display:flex;flex-direction:column;gap:14px}
-.samptop{display:flex;flex-direction:column;gap:5px}
-.sampname{font-size:17px;font-weight:700;letter-spacing:-.018em}
-.sampwarn{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3)}
-.rows{display:flex;flex-direction:column;gap:7px}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;
-  background:var(--surface-2);border-radius:var(--r-sm);padding:11px 13px}
-.rsrc{font-size:13.5px;font-weight:500;color:var(--tx);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rst{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  border-radius:999px;padding:5px 10px;white-space:nowrap}
-.rst.ok{background:var(--ok-bg);color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok-br)}
-.rst.nul{background:var(--surface-3);color:var(--tx-2);box-shadow:inset 0 0 0 1px var(--border-strong)}
-.rst.wn{background:var(--caution-bg);color:var(--caution);box-shadow:inset 0 0 0 1px var(--caution-br)}
-.rst.bd{background:var(--bad-bg);color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad-br)}
-.sampfoot{font-size:12.5px;line-height:1.55;color:var(--tx-2)}
-.sampfoot b{color:var(--tx);font-weight:700}
-@media(max-width:360px){
-  .row{grid-template-columns:minmax(0,1fr)}
-  .rst{justify-self:start}
+  .sec{padding:62px 0}
+  .cta,.dgo{width:100%;justify-content:center}
+  .herocta{gap:10px}
 }
 </style>
 </head>
@@ -232,10 +218,11 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
     </a>
     <span class="navsp"></span>
     <div class="navlinks">
-      <button class="navlink" type="button" data-door="consumer">For consumers</button>
-      <button class="navlink" type="button" data-door="business">For business</button>
+      <a class="navlink" href="/client">Client experience</a>
+      <a class="navlink" href="/business">Brokers and agents</a>
+      <a class="navlink" href="/check">Check a company</a>
     </div>
-    <a class="navcta" href="/check">Check a company</a>
+    <a class="navcta" href="/business"><span class="ctl">See the brokerage view</span><span class="cts">Brokerage view</span></a>
   </nav>
 </div>
 
@@ -244,34 +231,30 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
   <div class="wrap">
    <div class="herogrid">
     <div>
-    <p class="kick">Free for consumers</p>
-    <h1>Find out who you are dealing with.</h1>
-    <p class="lede">A company name is enough to start. Give us a name, a website, an email address or a wallet, and 4ormIQ shows you what the public record can verify, what it cannot, and where the sources disagree.</p>
-
-    <div class="runner">
-      <form class="runform" id="runform" action="/check" method="get">
-        <label class="visually-hidden" for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Company name, website, email address or wallet</label>
-        <input id="q" name="q" type="text" placeholder="Company name, website, email or wallet" autocomplete="off" spellcheck="false">
-        <button class="go" type="submit">Check it</button>
-      </form>
-      <p class="runnote">This opens the check with what you typed already in the box. Nothing you enter is sent to a lender, a brokerage or anyone selling you something.</p>
-    </div>
+      <p class="kick">For brokers, agents and the brokerages behind them</p>
+      <h1>Your client arrives having done the thinking.</h1>
+      <p class="lede">They work through the decision privately first: what they are trying to achieve, what could go wrong, and what protects them. Then they choose what to share. You start the meeting where you used to finish it, and the record of how they got there is already written.</p>
+      <div class="herocta">
+        <a class="cta" href="/business">See the brokerage view</a>
+        <a class="cta ghost" href="/client">Go through it as a client</a>
+      </div>
     </div>
 
-    <aside class="sample" aria-label="An example of what a check returns">
-      <div class="samptop">
-        <p class="kick">What comes back</p>
-        <p class="sampname">Atlas Capital Partners Ltd</p>
-        <p class="sampwarn">Invented company. Example only.</p>
+    <aside class="panel" aria-label="An example of the file as a broker sees it">
+      <div class="ptop">
+        <p class="kick">What you see</p>
+        <p class="pname">MB-2041 &middot; Joint application</p>
+        <p class="pwarn">Invented file. Example only.</p>
       </div>
       <div class="rows">
-        <div class="row"><span class="rsrc">Corporations Canada</span><span class="rst ok">Record located</span></div>
-        <div class="row"><span class="rsrc">BC Registry</span><span class="rst ok">Record located</span></div>
-        <div class="row"><span class="rsrc">CSA disciplined list</span><span class="rst nul">Reached, held nothing</span></div>
-        <div class="row"><span class="rsrc">FINTRAC MSB registry</span><span class="rst wn">Could not be reached</span></div>
-        <div class="row"><span class="rsrc">Review platforms</span><span class="rst bd">Sources disagree</span></div>
+        <div class="row"><span class="rsrc">Discovery</span><span class="rst ok">Complete, 14 answers</span></div>
+        <div class="row"><span class="rsrc">What they want</span><span class="rst bl">In their own words</span></div>
+        <div class="row"><span class="rsrc">Risks they scored</span><span class="rst bl">5, top one 16 to 12</span></div>
+        <div class="row"><span class="rsrc">Identity</span><span class="rst ok">Verified, not exposed</span></div>
+        <div class="row"><span class="rsrc">Income</span><span class="rst ok">Verified, not exposed</span></div>
+        <div class="row"><span class="rsrc">Full financial package</span><span class="rst nul">Sealed until selected</span></div>
       </div>
-      <p class="sampfoot"><b>135 registers asked.</b> The ones we could not reach are named, counted and never reported as clear.</p>
+      <p class="pfoot"><b>You see the status, never the documents.</b> Each layer is released separately by the client, and each one can be withdrawn.</p>
     </aside>
    </div>
   </div>
@@ -279,103 +262,119 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
 
 <section class="sec tight" id="doors">
   <div class="wrap">
-    <p class="kick rv">Two sides of one record</p>
-    <h2 class="rv">Pick the side you are on.</h2>
-    <p class="subh rv">The consumer works out what they are deciding and what could go wrong. The business sees the same record on their own desk, with the evidence behind it. Neither side is guessing what the other was told.</p>
+    <p class="kick rv">Three ways in</p>
+    <h2 class="rv">Where do you want to start?</h2>
+    <p class="subh rv">The brokerage view and the client experience are two halves of the same file. The company check stands on its own and is free to anyone.</p>
 
-    <div class="seg rv" role="tablist" aria-label="Choose a side">
-      <button class="segb" type="button" role="tab" id="tab-consumer" aria-controls="pane-consumer" aria-selected="true" data-door="consumer">I am a consumer</button>
-      <button class="segb" type="button" role="tab" id="tab-business" aria-controls="pane-business" aria-selected="false" data-door="business">I am a business</button>
-    </div>
+    <div class="doors">
+      <article class="door lead rv">
+        <p class="dwho">Brokers and agents</p>
+        <h3 class="dt">The brokerage view</h3>
+        <p class="dd">Every file and where it stands, by agent and by stage. The evidence chain behind each one, with the breaks marked where they happened. Your own process as a map you can change. And monitoring for the AI tools your people already run.</p>
+        <a class="dgo" href="/business">Open the dashboard</a>
+      </article>
 
-    <div class="pane" id="pane-consumer" role="tabpanel" aria-labelledby="tab-consumer" tabindex="0">
-      <div class="doorgrid">
-        <article class="door">
-          <p class="dnum">01</p>
-          <h3 class="dt">Check who you are dealing with</h3>
-          <p class="dd">Nine categories of public record, every source named, every gap published, and the contradictions laid side by side rather than averaged away.</p>
-        </article>
-        <article class="door">
-          <p class="dnum">02</p>
-          <h3 class="dt">Work out the decision itself</h3>
-          <p class="dd">Name what you are deciding, score what could go wrong, and write down what protects you. The card keeps a record of what you understood and when.</p>
-        </article>
-        <article class="door">
-          <p class="dnum">03</p>
-          <h3 class="dt">The documents, in the order they are needed</h3>
-          <p class="dd">Every document a British Columbia mortgage asks for across nine stages, what each one is for, and the stage where the paper flows back to you.</p>
-        </article>
-        <article class="door">
-          <p class="dnum">04</p>
-          <h3 class="dt">What nobody tells you</h3>
-          <p class="dd">Twenty things that cost consumers money, each with what to do about it, what it is worth, and the source behind it. Starting with the rate being negotiable.</p>
-        </article>
-      </div>
-      <div class="doorfoot">
-        <a class="cta" href="/check">Open the check</a>
-        <a class="cta ghost" href="/card">Open the decision card</a>
-      </div>
-      <p class="demonote" style="margin-top:16px">The decision card runs on an invented file with invented names and figures, so you can work through it without entering anything real.</p>
-    </div>
+      <article class="door lead rv">
+        <p class="dwho">Your client</p>
+        <h3 class="dt">The client experience</h3>
+        <p class="dd">Intake and discovery, in a conversation rather than a form. It asks what they are trying to achieve, in their own words, then works through what could go wrong and what protects them. It ends with a card they choose to share.</p>
+        <a class="dgo" href="/client">Go through it</a>
+      </article>
 
-    <div class="pane" id="pane-business" role="tabpanel" aria-labelledby="tab-business" tabindex="0" hidden>
-      <div class="doorgrid">
-        <article class="door">
-          <p class="dnum">01</p>
-          <h3 class="dt">Every file, and where each one stands</h3>
-          <p class="dd">The whole book of business in one view, by agent and by stage, with the files that have stopped moving raised rather than buried.</p>
-        </article>
-        <article class="door">
-          <p class="dnum">02</p>
-          <h3 class="dt">The evidence chain</h3>
-          <p class="dd">What was asked, what was said, what was understood and what was signed, in sequence, with the breaks in the chain marked where they happened.</p>
-        </article>
-        <article class="door">
-          <p class="dnum">03</p>
-          <h3 class="dt">The control map</h3>
-          <p class="dd">Your own process laid out as a map you can change. Add a step, add a document, and the map tells you the moment a required control has been dropped.</p>
-        </article>
-        <article class="door">
-          <p class="dnum">04</p>
-          <h3 class="dt">Monitoring for the AI you already run</h3>
-          <p class="dd">4ormIQ connects to the tools your people use and watches them: what left the building, what a tool asserted, and which guardrails cannot be switched off.</p>
-        </article>
-      </div>
-      <div class="doorfoot">
-        <a class="cta" href="/business">Open the dashboard</a>
-        <a class="cta ghost" href="mailto:register@4ormfinance.com?subject=4ormIQ%20for%20our%20brokerage">Talk to us about your brokerage</a>
-      </div>
-      <p class="demonote" style="margin-top:16px">The dashboard runs on an invented brokerage with invented agents, files and figures. Nothing in it is drawn from a real firm.</p>
+      <article class="door rv">
+        <p class="dwho">Anyone, free</p>
+        <h3 class="dt">Check a company</h3>
+        <p class="dd">A name, a website, an email address or a wallet is enough to start. 4ormIQ shows what the public record can verify, what it cannot, and where the sources disagree. A source we could not reach is reported as unreached, never as clear.</p>
+        <a class="dgo ghost" href="/check">Open the check</a>
+      </article>
     </div>
   </div>
 </section>
 
-<section class="sec" id="result">
+<section class="sec" id="experience">
   <div class="wrap">
-    <p class="kick rv">What a result is allowed to say</p>
-    <h2 class="rv">Silence is never clearance.</h2>
-    <p class="subh rv">Most checks answer with a tick. A tick cannot tell the difference between a source that was searched and held nothing, and a source that could not be reached at all. 4ormIQ writes which one happened, in words, every time.</p>
+    <p class="kick rv">The experience, both sides</p>
+    <h2 class="rv">One file. The client fills it, you read it.</h2>
+    <p class="subh rv">Nothing here is a form the client abandons halfway. Discovery is a conversation, and every answer they give lands in the same record you open.</p>
 
-    <div class="states">
-      <div class="st rv">
-        <span class="stlab ok">Official record located</span>
-        <p class="stis">One authoritative record exists, and here it is.</p>
-        <p class="stnot">It does <b>not</b> mean anything broader than that one record.</p>
+    <div class="flow">
+      <div class="step rv">
+        <span class="sn">01</span>
+        <div class="sbody">
+          <h3 class="sth">They start on their own, before you have met</h3>
+          <p class="sdd">Intake asks who is deciding and what they are deciding. Nothing is scored yet and nothing is shared. If they stop here, you never see it.</p>
+        </div>
+        <span class="side c">Client</span>
       </div>
-      <div class="st rv">
-        <span class="stlab nul">Source reached, no result</span>
-        <p class="stis">The search completed and the source held nothing.</p>
-        <p class="stnot">It does <b>not</b> mean risk or misconduct is absent.</p>
+
+      <div class="step rv">
+        <span class="sn">02</span>
+        <div class="sbody">
+          <h3 class="sth">Discovery, in their words rather than yours</h3>
+          <p class="sdd">What they do, how long they have done it, what lands in the account, what is already on the mortgage. Then the one question nobody asks them: what would make this a good outcome. That answer is a blank box, never a menu, because a menu is us deciding what good looks like.</p>
+        </div>
+        <span class="side c">Client</span>
       </div>
-      <div class="st rv">
-        <span class="stlab wn">Source unavailable</span>
-        <p class="stis">The retrieval did not complete, and we say so.</p>
-        <p class="stnot">It does <b>not</b> mean the check came back clean.</p>
+
+      <div class="step rv">
+        <span class="sn">03</span>
+        <div class="sbody">
+          <h3 class="sth">What could go wrong, and what protects them</h3>
+          <p class="sdd">They score each risk on how likely it is and how badly it would land, then decide what to do about it and watch the score move. Every figure carries whether it was confirmed, stated, estimated, or not known yet.</p>
+        </div>
+        <span class="side c">Client</span>
       </div>
-      <div class="st rv">
-        <span class="stlab bd">Conflict or stale</span>
-        <p class="stis">Sources disagree, or the currency needs review.</p>
-        <p class="stnot">It does <b>not</b> give us permission to show you the convenient one.</p>
+
+      <div class="step rv">
+        <span class="sn">04</span>
+        <div class="sbody">
+          <h3 class="sth">They choose what to share, and send you a link</h3>
+          <p class="sdd">4ormIQ never contacts you. The client hands over the link, and only then does the file appear on your side and ask for access. Identity and income come across as verified, not exposed. The full package stays sealed until they select a lender.</p>
+        </div>
+        <span class="side c">Client</span>
+      </div>
+
+      <div class="step rv">
+        <span class="sn">05</span>
+        <div class="sbody">
+          <h3 class="sth">You open a file that already explains itself</h3>
+          <p class="sdd">What they were asked, what they said, what they understood and what they signed, in sequence. When somebody asks two years from now why this was suitable, the answer is already written and dated rather than reconstructed.</p>
+        </div>
+        <span class="side b">You</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="gets" style="padding-top:0">
+  <div class="wrap">
+    <p class="kick rv">What it changes for the business</p>
+    <h2 class="rv">Less time in discovery. More of the file already done.</h2>
+
+    <div class="gets">
+      <div class="get rv">
+        <h3 class="gt">Discovery arrives finished</h3>
+        <p class="gd">The questions you ask in the first two meetings are answered before the first one, in the client's own words and with the date each answer arrived.</p>
+      </div>
+      <div class="get rv">
+        <h3 class="gt">The record is a by-product</h3>
+        <p class="gd">Nobody writes it afterwards. It is made as the decision is made, which is the only time it can be made honestly.</p>
+      </div>
+      <div class="get rv">
+        <h3 class="gt">The client understood it</h3>
+        <p class="gd">A record of what was put in front of them and what they did about it, rather than a box they ticked saying they understood.</p>
+      </div>
+      <div class="get rv">
+        <h3 class="gt">Your process, not ours</h3>
+        <p class="gd">Add a step, add a document, change the order. The control map tells you the moment a required control has been dropped out of your own process.</p>
+      </div>
+      <div class="get rv">
+        <h3 class="gt">The AI your people already use</h3>
+        <p class="gd">Connected and watched: what left the building, what a tool asserted, and which guardrails cannot be switched off by anyone.</p>
+      </div>
+      <div class="get rv">
+        <h3 class="gt">The client keeps their copy</h3>
+        <p class="gd">They hold the same record you do. Nothing in it is a surprise to them later, which is where most of the trouble starts.</p>
       </div>
     </div>
   </div>
@@ -387,8 +386,12 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
       <div class="inner">
         <p class="kick" style="color:var(--blue-lt)">4orm Finance</p>
         <h2>A decision nobody can reconstruct is a decision nobody can defend.</h2>
-        <p class="subh">4ormIQ is the free consumer layer in front of 4orm Finance: the intelligence and evidence layer that turns suitability into a shared, auditable record between the business and the consumer. The consumer keeps their copy. The business keeps theirs. They are the same record.</p>
-        <p class="slog" style="margin-top:38px" aria-label="4orming trust into financial decisions.">
+        <p class="subh">4orm is the intelligence and evidence layer that turns suitability into a shared, auditable record between the business and the consumer. The client keeps their copy. You keep yours. They are the same record.</p>
+        <div class="herocta">
+          <a class="cta" href="/business">See the brokerage view</a>
+          <a class="cta ghost" href="mailto:register@4ormfinance.com?subject=4ormIQ%20for%20our%20brokerage" style="background:transparent;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.26)">Talk to us about your brokerage</a>
+        </div>
+        <p class="slog" style="margin-top:40px" aria-label="4orming trust into financial decisions.">
           <img src="assets/mark-4.png?v=20261028" alt="" aria-hidden="true"><span aria-hidden="true">orming trust into financial decisions.</span>
         </p>
         <p class="tag">People &middot; Trust &middot; Clear Outcomes</p>
@@ -401,17 +404,19 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
   <div class="wrap">
     <div class="frow">
       <div class="fgroup">
-        <p class="fh">For consumers</p>
-        <a class="fl" href="/check">Check a company</a>
-        <a class="fl" href="/card">The decision card</a>
-        <a class="fl" href="/card">The documents</a>
-        <a class="fl" href="/card">What nobody tells you</a>
-      </div>
-      <div class="fgroup">
-        <p class="fh">For business</p>
-        <a class="fl" href="/business">The dashboard</a>
+        <p class="fh">Brokers and agents</p>
+        <a class="fl" href="/business">The brokerage view</a>
         <a class="fl" href="/evidence">The evidence scaffolding</a>
         <a class="fl" href="mailto:register@4ormfinance.com">Talk to us</a>
+      </div>
+      <div class="fgroup">
+        <p class="fh">Your client</p>
+        <a class="fl" href="/client">The client experience</a>
+        <a class="fl" href="/card">The decision card</a>
+      </div>
+      <div class="fgroup">
+        <p class="fh">Free to anyone</p>
+        <a class="fl" href="/check">Check a company</a>
       </div>
       <div class="fgroup">
         <p class="fh">4orm Finance</p>
@@ -420,97 +425,30 @@ footer{padding:58px 0 72px;background:var(--bg-2)}
         <a class="fl" href="mailto:compliance@4ormiq.com">Compliance</a>
       </div>
     </div>
-    <p class="legal">4ormIQ is published by 4orm Finance. It reports what named public sources hold and what they do not, with the date and scope of each. It is not a credit check, a background check, a legal opinion or financial advice, and it does not clear, rate or recommend any company. A source we could not reach is reported as unreached, never as clear.</p>
+    <p class="legal">4ormIQ is published by 4orm Finance. The brokerage view and the client experience run on invented files, invented names and invented figures. The company check reports what named public sources hold and what they do not, with the date and scope of each; it is not a credit check, a background check, a legal opinion or financial advice, and it does not clear, rate or recommend any company. A source we could not reach is reported as unreached, never as clear.</p>
   </div>
 </footer>
 
 <script>
 (function(){
   "use strict";
-
-  /* ---- the two doors. one state, three ways to reach it ---- */
-  var tabs = Array.prototype.slice.call(document.querySelectorAll('.segb'));
-  var panes = { consumer: document.getElementById('pane-consumer'),
-                business: document.getElementById('pane-business') };
-
-  function show(which, moveFocus){
-    if(!panes[which]) return;
-    tabs.forEach(function(t){
-      var on = t.getAttribute('data-door') === which;
-      t.setAttribute('aria-selected', on ? 'true' : 'false');
-      if(on && moveFocus) t.focus();
-    });
-    Object.keys(panes).forEach(function(k){
-      panes[k].hidden = (k !== which);
-    });
-  }
-
-  document.addEventListener('click', function(e){
-    var b = e.target.closest ? e.target.closest('[data-door]') : null;
-    if(!b) return;
-    var which = b.getAttribute('data-door');
-    show(which, false);
-    if(b.classList.contains('navlink')){
-      e.preventDefault();
-      var d = document.getElementById('doors');
-      if(d) d.scrollIntoView({behavior: 'smooth', block: 'start'});
-    }
-  });
-
-  /* left and right arrows walk the tablist, as a tablist must */
-  tabs.forEach(function(t, i){
-    t.addEventListener('keydown', function(e){
-      var n = null;
-      if(e.key === 'ArrowRight') n = tabs[(i+1) % tabs.length];
-      else if(e.key === 'ArrowLeft') n = tabs[(i-1+tabs.length) % tabs.length];
-      else return;
-      e.preventDefault();
-      show(n.getAttribute('data-door'), true);
-    });
-  });
-
-  /* ---- hand the typed value to the check, trimmed ---- */
-  var form = document.getElementById('runform');
-  if(form){
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      var el = document.getElementById('q');
-      var v = el ? String(el.value || '').trim() : '';
-      window.location.href = v ? '/check?q=' + encodeURIComponent(v) : '/check';
-    });
-  }
-
-  /* ---- reveal. observer plus a sweep, because a fast fling outruns the observer ---- */
   var rv = Array.prototype.slice.call(document.querySelectorAll('.rv'));
   function sweep(){
     var h = window.innerHeight || 0;
     for(var i = rv.length - 1; i >= 0; i--){
-      var el = rv[i];
-      if(el.getBoundingClientRect().top < h - 60){
-        el.classList.add('in');
-        rv.splice(i, 1);
-      }
+      if(rv[i].getBoundingClientRect().top < h - 60){ rv[i].classList.add('in'); rv.splice(i,1); }
     }
   }
   if('IntersectionObserver' in window){
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){
-          en.target.classList.add('in');
-          io.unobserve(en.target);
-        }
-      });
-    }, {rootMargin: '0px 0px -60px 0px'});
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, {rootMargin:'0px 0px -60px 0px'});
     rv.forEach(function(el){ io.observe(el); });
   }
-  var ticking = false;
-  function onScroll(){
-    if(ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(function(){ sweep(); ticking = false; });
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', onScroll, {passive:true});
+  var t = false;
+  function s(){ if(t) return; t = true; window.requestAnimationFrame(function(){ sweep(); t = false; }); }
+  window.addEventListener('scroll', s, {passive:true});
+  window.addEventListener('resize', s, {passive:true});
   sweep();
 })();
 </script>

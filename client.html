@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The client experience &middot; 4ormIQ</title>
+<meta name="description" content="Intake and discovery with a client, as a conversation rather than a form. Every answer lands in a record, tagged with whether it was confirmed, stated, estimated or not known yet.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=20261028">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF; --bg-2:#F7F9FC; --surface:#FFFFFF; --surface-2:#F4F7FB; --surface-3:#EAEFF6;
+  --border:#E6EBF3; --border-strong:#CCD6E4;
+  --tx:#142036; --tx-2:#46556E; --tx-3:#5E6E88;
+  --blue:#2E6BF2; --blue-lt:#5B8CFF; --blue-dp:#1B4ABE; --blue-50:#EAF1FE; --blue-100:#CFE0FD;
+  --caution:#8A5200; --caution-bg:#FFF6E5; --caution-br:#F2C879;
+  --ok:#0E8A5F; --ok-bg:#E3F6EE; --ok-br:#9CCFBB;
+  --ink:#0B1530;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --r-sm:12px; --r:18px; --r-lg:26px;
+  --sh-sm:0 1px 2px rgba(16,32,64,.05);
+  --sh:0 10px 34px rgba(16,32,64,.08);
+  --sh-lg:0 28px 70px rgba(16,32,64,.14);
+  --spring:cubic-bezier(.32,.72,0,1); --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+p,h1,h2,h3{margin:0}
+html,body{margin:0;padding:0;background:var(--bg-2)}
+body{font-family:var(--sans);color:var(--tx);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:8px}
+
+.top{position:sticky;top:0;z-index:40;background:rgba(247,249,252,.92);backdrop-filter:blur(8px);padding:14px 24px}
+.topin{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.home{display:inline-flex;align-items:center;gap:9px;background:var(--ink);border-radius:999px;padding:8px 16px 8px 12px;min-height:40px}
+.home img{height:17px;width:auto;display:block}
+.home span{color:#fff;font-size:13px;font-weight:600}
+.crumb{font-size:13.5px;color:var(--tx-3);font-weight:500}
+.sp{flex:1}
+.restart{background:var(--surface);border:0;box-shadow:0 0 0 1px var(--border-strong);border-radius:999px;
+  padding:0 16px;min-height:40px;font-size:13px;font-weight:600;color:var(--tx-2);cursor:pointer}
+.restart:hover{background:var(--surface-2);color:var(--tx)}
+
+.shell{max-width:1180px;margin:0 auto;padding:10px 24px 70px;display:grid;
+  grid-template-columns:minmax(0,1fr) 358px;gap:28px;align-items:start}
+@media(max-width:940px){.shell{grid-template-columns:minmax(0,1fr);gap:22px}}
+
+/* ---------- progress ---------- */
+.prog{display:flex;gap:6px;margin:0 0 18px}
+.pseg{flex:1 1 0;height:5px;border-radius:3px;background:var(--surface-3)}
+.pseg.on{background:var(--blue)}
+.plab{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tx-3);margin:0 0 9px}
+
+/* ---------- the conversation ---------- */
+.convo{display:flex;flex-direction:column;gap:14px}
+.turn{display:flex;flex-direction:column;gap:6px;max-width:76ch}
+.turn.me{align-self:flex-end;align-items:flex-end}
+.who{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--tx-3)}
+.bub{border-radius:var(--r);padding:15px 18px;font-size:15px;line-height:1.56;box-shadow:var(--sh-sm)}
+.turn.iq .bub{background:var(--surface);color:var(--tx);border:1px solid var(--border);border-bottom-left-radius:7px}
+.turn.me .bub{background:var(--blue);color:#fff;border-bottom-right-radius:7px;box-shadow:0 2px 10px rgba(46,107,242,.22)}
+.bub b{font-weight:700}
+.bub .work{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--tx-2);background:var(--surface-2);
+  border-radius:10px;padding:10px 12px;margin-top:10px;display:block;overflow-x:auto}
+
+/* ---------- the answer area ---------- */
+.ask{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-lg);border:1px solid var(--border);
+  padding:22px;margin-top:22px;display:flex;flex-direction:column;gap:14px}
+.qh{font-size:16.5px;font-weight:700;line-height:1.4;letter-spacing:-.012em}
+.qhint{font-size:13px;line-height:1.55;color:var(--tx-3)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:0;box-shadow:inset 0 0 0 1px var(--border);
+  border-radius:var(--r-sm);padding:13px 15px;font-size:14.5px;line-height:1.45;color:var(--tx);cursor:pointer;min-height:48px;
+  transition:background .18s var(--ease),box-shadow .18s var(--ease)}
+.opt:hover{background:var(--blue-50);box-shadow:inset 0 0 0 1px var(--blue-100)}
+.boxrow{display:flex;gap:10px;align-items:stretch}
+.box{flex:1;min-width:0;border:0;box-shadow:inset 0 0 0 1px var(--border-strong);border-radius:var(--r-sm);
+  background:var(--surface-2);padding:0 14px;height:52px;font-family:var(--sans);font-size:15.5px;color:var(--tx)}
+.box.tall{height:auto;min-height:104px;padding:14px;resize:vertical;line-height:1.55}
+.box::placeholder{color:var(--tx-3)}
+.box:focus{outline:none;background:var(--surface);box-shadow:inset 0 0 0 2px var(--blue)}
+.send{flex:none;height:52px;padding:0 24px;border-radius:var(--r-sm);background:var(--blue);color:#fff;border:0;
+  font-size:15px;font-weight:600;cursor:pointer;transition:background .18s var(--ease)}
+.send:hover{background:var(--blue-dp)}
+.send:disabled{background:#B9CDF9;cursor:default}
+.dunno{background:transparent;border:0;color:var(--tx-3);font-size:13.5px;font-weight:500;cursor:pointer;
+  align-self:flex-start;padding:10px 2px;min-height:44px;text-decoration:underline;text-underline-offset:3px}
+.dunno:hover{color:var(--tx-2)}
+.orline{font-size:13px;color:var(--tx-3);margin-top:2px}
+
+/* ---------- the record ---------- */
+.rec{position:sticky;top:78px;background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh);border:1px solid var(--border);
+  padding:20px;display:flex;flex-direction:column;gap:13px}
+@media(max-width:940px){.rec{position:static}}
+.rech{display:flex;flex-direction:column;gap:4px}
+.rect{font-size:15.5px;font-weight:700;letter-spacing:-.014em}
+.recs{font-size:12.5px;color:var(--tx-3);line-height:1.5}
+.items{display:flex;flex-direction:column;gap:8px;max-height:none}
+.item{background:var(--surface-2);border-radius:var(--r-sm);padding:11px 13px;display:flex;flex-direction:column;gap:5px}
+.ilab{font-size:11.5px;color:var(--tx-3);font-weight:600;letter-spacing:.01em}
+.ival{font-size:14px;font-weight:600;line-height:1.4;color:var(--tx);word-break:break-word}
+.tag{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  border-radius:999px;padding:4px 9px;align-self:flex-start}
+.tag.stated{background:var(--blue-50);color:var(--blue-dp);box-shadow:inset 0 0 0 1px var(--blue-100)}
+.tag.est{background:var(--caution-bg);color:var(--caution);box-shadow:inset 0 0 0 1px var(--caution-br)}
+.tag.unk{background:var(--surface-3);color:var(--tx-2);box-shadow:inset 0 0 0 1px var(--border-strong)}
+.tag.conf{background:var(--ok-bg);color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok-br)}
+.empty{font-size:13px;color:var(--tx-3);line-height:1.55;background:var(--surface-2);border-radius:var(--r-sm);padding:14px}
+.recfoot{font-size:12px;line-height:1.55;color:var(--tx-3);border-top:1px solid var(--border);padding-top:12px}
+.recfoot b{color:var(--tx-2);font-weight:700}
+
+/* ---------- the end ---------- */
+.done{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-lg);border:1px solid var(--border);
+  padding:30px;margin-top:22px;display:flex;flex-direction:column;gap:14px}
+.dh{font-size:23px;font-weight:800;letter-spacing:-.026em;line-height:1.2}
+.dp{font-size:14.5px;line-height:1.6;color:var(--tx-2);max-width:62ch}
+.layers{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.lay{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface-2);
+  border-radius:var(--r-sm);padding:12px 14px}
+.layn{font-size:14px;font-weight:600;min-width:0}
+.layd{font-size:12.5px;color:var(--tx-3);margin-top:3px;line-height:1.45}
+.donecta{display:flex;flex-wrap:wrap;gap:11px;margin-top:8px}
+.cta{display:inline-flex;align-items:center;min-height:50px;padding:0 26px;border-radius:999px;background:var(--blue);
+  color:#fff;font-size:15px;font-weight:600;transition:background .18s var(--ease)}
+.cta:hover{background:var(--blue-dp)}
+.cta.ghost{background:var(--surface);color:var(--tx);box-shadow:0 0 0 1px var(--border-strong)}
+.cta.ghost:hover{background:var(--surface-2)}
+@media(max-width:480px){
+  .shell{padding:10px 16px 60px}
+  .top{padding:12px 16px}
+  .boxrow{flex-direction:column}
+  .send{height:48px;width:100%}
+  .cta{width:100%;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="topin">
+    <a class="home" href="/"><img src="assets/mark-4orm-iq.png?v=20261028" alt=""><span>IQ</span></a>
+    <span class="crumb">The client experience</span>
+    <span class="sp"></span>
+    <button class="restart" type="button" id="restart">Start again</button>
+  </div>
+</div>
+
+<div class="shell">
+  <main>
+    <p class="plab" id="plab">Intake</p>
+    <div class="prog" id="prog" aria-hidden="true"></div>
+    <div class="convo" id="convo" role="log" aria-live="polite" aria-label="The conversation so far"></div>
+    <div id="stage"></div>
+  </main>
+
+  <aside class="rec" aria-label="The record as it fills in">
+    <div class="rech">
+      <p class="rect">The record</p>
+      <p class="recs">Every answer lands here as it is given, tagged with how much weight it can carry.</p>
+    </div>
+    <div class="items" id="items"></div>
+    <p class="recfoot"><b>Nothing here has been shared.</b> It stays on this side until the client chooses to hand it over, and each layer is released separately.</p>
+  </aside>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------------
+   The discovery runs in the order the approved script runs it: the
+   client opens, then work, tenure, a change, pay, the mortgage itself,
+   what is worrying them, an options question, and the goal last.
+
+   Three rules decide the shape of every question and they are not
+   interchangeable:
+     a  a fact about themselves (balance, rate, pay, term end) is an
+        open box. Never chips and never a range, because a range
+        anchors the answer before they have thought about it. It gets
+        a locator telling them where to find it and a way to say they
+        do not know without it feeling like a failure.
+     b  a choice between real alternatives offers options, and the set
+        has to be exhaustive: it always carries "I didn't know that
+        was a choice" and "I don't know enough yet", in neutral order,
+        with nothing emphasised, and a way to answer in their own
+        words alongside.
+     c  the goal is a blank box. A menu of goals is us deciding what a
+        good outcome is for somebody else's life.
+   ------------------------------------------------------------------ */
+
+var STEPS = [
+  { phase:'Intake',
+    me:"We're selling our place in Calgary and buying in Kelowna. I don't know what to do about the mortgage.",
+    iq:"That's a big move. Let's take it one step at a time.",
+    kind:'a',
+    ask:"When does your current mortgage term end?",
+    hint:"It's on your last statement, or in online banking under the mortgage details. A rough month is fine.",
+    ph:"April 2027",
+    def:"12 April 2027",
+    rec:{ label:'Term ends', tag:'stated' },
+    unk:{ text:"I'm not sure", val:"Not known yet", tag:'unk' } },
+
+  { phase:'Intake',
+    iq:"About six months out, then. That's a common place to be, and it's the right time to be asking.",
+    kind:'a',
+    ask:"What do you do for work?",
+    hint:"Just the job itself for now.",
+    ph:"Operating room nurse",
+    def:"Operating room nurse",
+    rec:{ label:'Work', tag:'stated' } },
+
+  { phase:'Intake',
+    iq:"Thanks.",
+    kind:'a',
+    ask:"And how long have you been doing it?",
+    hint:"Roughly is fine.",
+    ph:"11 years",
+    def:"11 years",
+    rec:{ label:'Time in role', tag:'stated' } },
+
+  { phase:'Discovery',
+    iq:"Over a decade of service. Congratulations, that's a long run.",
+    kind:'d',
+    ask:"Is anything about your work changing in the next year?",
+    opts:[
+      "Parental leave is coming up",
+      "Changing employer",
+      "Same job, same employer",
+      "Hours or role are changing",
+      "Not sure yet"
+    ],
+    other:"Or tell me in your own words",
+    rec:{ label:'Work changing', tag:'stated' } },
+
+  { phase:'Discovery',
+    iq:"Good to know early. Leave changes what a payment has to survive, and we can build that in rather than find out later.",
+    kind:'a',
+    ask:"Roughly what lands in your account each pay, after tax?",
+    hint:"After-tax, the amount that actually arrives. A round number is fine, and we'll mark it as an estimate until something confirms it.",
+    ph:"3,100 every two weeks",
+    def:"$3,100 every two weeks",
+    rec:{ label:'Take-home pay', tag:'est' },
+    unk:{ text:"I'd have to check", val:"Not known yet", tag:'unk' } },
+
+  { phase:'Discovery',
+    iq:"That's enough to work with. It's marked as an estimate, and it stays one until a statement says otherwise.",
+    kind:'a',
+    ask:"What's still owing on the mortgage?",
+    hint:"The principal remaining, on your last statement or in online banking. Not the original amount.",
+    ph:"412,480",
+    def:"$412,480",
+    rec:{ label:'Balance owing', tag:'stated' },
+    unk:{ text:"I don't know this one", val:"Not known yet", tag:'unk' } },
+
+  { phase:'Discovery',
+    iq:"Thank you.",
+    kind:'a',
+    ask:"And the rate on it?",
+    hint:"Same place as the balance. If it's fixed it will be a single number.",
+    ph:"2.89",
+    def:"2.89% fixed",
+    rec:{ label:'Rate', tag:'stated' } },
+
+  { phase:'Discovery',
+    iq:"Here's the one thing worth knowing before anyone quotes you a number. Breaking a fixed mortgage costs the greater of three months' interest or the interest rate differential, and which one it is changes everything.",
+    work:"$412,480 &times; 2.89% &divide; 12 &times; 3 months = $2,980\nThat's the three months' interest side. The differential side\ndepends on what your lender is posting today, so it is theirs\nto quote, not ours to guess.",
+    kind:'b',
+    ask:"Have you asked your lender what breaking it would cost?",
+    opts:[
+      "Yes, I have the figure",
+      "No, not yet",
+      "I didn't know I could ask",
+      "I don't know enough yet to ask"
+    ],
+    other:"Or tell me in your own words",
+    rec:{ label:'Break cost asked', tag:'stated' } },
+
+  { phase:'Discovery',
+    iq:"We'll put it on the list to get in writing. A figure over the phone isn't one you can hold anyone to.",
+    kind:'b',
+    ask:"When you took this mortgage out, did you compare more than one lender?",
+    opts:[
+      "Yes, I compared a few",
+      "No, I went with who I bank with",
+      "I didn't know I had a choice",
+      "I don't know enough yet"
+    ],
+    other:"Or tell me in your own words",
+    rec:{ label:'Compared lenders', tag:'stated' } },
+
+  { phase:'Discovery',
+    iq:"That's where most people land, and it's worth saying out loud: the rate you're offered is usually negotiable, and so is the one at renewal. Most people are never told that.",
+    kind:'c',
+    ask:"What would make this a good outcome for you?",
+    hint:"In your own words. There's no list here on purpose, because a list would be us deciding what good looks like for your family.",
+    ph:"Write it however it comes out.",
+    def:"We want a payment that still works while I'm on leave, and not to lose money on the timing.",
+    rec:{ label:'What a good outcome looks like', tag:'stated' } },
+
+  { phase:'Discovery',
+    iq:"That's the sentence the whole file should be judged against, so it goes in exactly as you wrote it.",
+    kind:'c',
+    ask:"Is anything else worrying you about this?",
+    hint:"Anything at all. It doesn't have to be about money.",
+    ph:"Or leave it empty and carry on.",
+    def:"The two closings not lining up and us carrying both.",
+    allowEmpty:true,
+    rec:{ label:'Still worrying them', tag:'stated' } }
+];
+
+var LAST = "Those two are the ones to work on first, and they're now the top of your card rather than a note in somebody's margin.";
+
+var ROOT=document.getElementById('convo'), STAGE=document.getElementById('stage'),
+    ITEMS=document.getElementById('items'), PROG=document.getElementById('prog'), PLAB=document.getElementById('plab');
+var i=0, rec=[], turns=[];
+
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function drawProg(){
+  var n=STEPS.length+1, h='';
+  for(var k=0;k<n;k++) h+='<span class="pseg'+(k<=i?' on':'')+'"></span>';
+  PROG.innerHTML=h;
+  PLAB.textContent = i>=STEPS.length ? 'Ready to share' : STEPS[i].phase;
+}
+
+function drawTurns(){
+  ROOT.innerHTML = turns.map(function(t){
+    return '<div class="turn '+(t.me?'me':'iq')+'"><span class="who">'+(t.me?'You':'4ormIQ')+'</span>'+
+           '<div class="bub">'+t.html+(t.work?'<span class="work">'+t.work+'</span>':'')+'</div></div>';
+  }).join('');
+}
+
+function drawRec(){
+  if(!rec.length){ ITEMS.innerHTML='<p class="empty">Nothing yet. It fills in as you answer, and you will see exactly what is in it before anything is shared.</p>'; return; }
+  ITEMS.innerHTML = rec.map(function(r){
+    var names={stated:'You said it',est:'Estimated',unk:'Not known yet',conf:'Confirmed'};
+    return '<div class="item"><span class="ilab">'+esc(r.label)+'</span><span class="ival">'+esc(r.val)+
+           '</span><span class="tag '+r.tag+'">'+names[r.tag]+'</span></div>';
+  }).join('');
+}
+
+function put(label,val,tag){ rec.push({label:label,val:val,tag:tag}); drawRec(); }
+
+function answer(val, tag){
+  var s=STEPS[i];
+  turns.push({me:true, html:esc(val)});
+  if(s.rec) put(s.rec.label, val, tag || s.rec.tag);
+  i++;
+  drawTurns(); drawProg();
+  if(i<STEPS.length){ turns.push({me:false, html:esc(STEPS[i].iq), work:STEPS[i].work||''}); drawTurns(); stage(); }
+  else { turns.push({me:false, html:esc(LAST)}); drawTurns(); finish(); }
+  STAGE.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function stage(){
+  var s=STEPS[i], h='<div class="ask"><p class="qh">'+esc(s.ask)+'</p>';
+  if(s.hint) h+='<p class="qhint">'+esc(s.hint)+'</p>';
+
+  if(s.kind==='b'||s.kind==='d'){
+    h+='<div class="opts">';
+    s.opts.forEach(function(o,k){ h+='<button class="opt" type="button" data-opt="'+k+'">'+esc(o)+'</button>'; });
+    h+='</div><p class="orline">'+esc(s.other)+'</p>'+
+       '<div class="boxrow"><input class="box" id="free" type="text" placeholder="In your own words" aria-label="'+esc(s.ask)+'">'+
+       '<button class="send" type="button" id="go">Send</button></div>';
+  } else {
+    var tall = s.kind==='c';
+    h+='<div class="boxrow">'+
+       (tall ? '<textarea class="box tall" id="free" placeholder="'+esc(s.ph)+'" aria-label="'+esc(s.ask)+'"></textarea>'
+             : '<input class="box" id="free" type="text" placeholder="'+esc(s.ph)+'" aria-label="'+esc(s.ask)+'">')+
+       '<button class="send" type="button" id="go">Send</button></div>';
+    if(s.unk) h+='<button class="dunno" type="button" id="dunno">'+esc(s.unk.text)+'</button>';
+  }
+  h+='</div>';
+  STAGE.innerHTML=h;
+
+  var box=document.getElementById('free'), go=document.getElementById('go');
+  function send(){
+    var v=(box.value||'').trim();
+    if(!v) v = s.allowEmpty ? '' : (s.def||'');
+    if(!v && !s.allowEmpty) return;
+    answer(v || 'Nothing else right now');
+  }
+  go.addEventListener('click', send);
+  box.addEventListener('keydown', function(e){
+    if(e.key==='Enter' && !e.shiftKey && s.kind!=='c'){ e.preventDefault(); send(); }
+  });
+  STAGE.querySelectorAll('[data-opt]').forEach(function(b){
+    b.addEventListener('click', function(){ answer(s.opts[+b.getAttribute('data-opt')]); });
+  });
+  var d=document.getElementById('dunno');
+  if(d) d.addEventListener('click', function(){ answer(s.unk.val, s.unk.tag); });
+  box.focus({preventScroll:true});
+}
+
+function finish(){
+  var unknowns = rec.filter(function(r){ return r.tag==='unk'; }).length;
+  var ests = rec.filter(function(r){ return r.tag==='est'; }).length;
+  STAGE.innerHTML =
+   '<div class="done">'+
+   '<p class="dh">That is the discovery done.</p>'+
+   '<p class="dp">'+rec.length+' answers, in your own words, with the date each one arrived. '+
+     (ests?ests+' of them are marked as estimates and ':'')+
+     (unknowns?unknowns+' are marked as not known yet. ':'')+
+     'An estimate never reaches a broker looking like a confirmed figure.</p>'+
+   '<p class="dp">Nothing has been shared. When you are ready, you choose what to hand over, one layer at a time.</p>'+
+   '<div class="layers">'+
+     '<div class="lay"><div><div class="layn">What you said here</div><div class="layd">The discovery above, released on your say-so</div></div><span class="tag stated">Your choice</span></div>'+
+     '<div class="lay"><div><div class="layn">Identity and income</div><div class="layd">The broker sees the status, never the documents or the transactions</div></div><span class="tag conf">Verified, not exposed</span></div>'+
+     '<div class="lay"><div><div class="layn">The full financial package</div><div class="layd">Held here, released only to the lender you pick, for that application</div></div><span class="tag unk">Sealed until selected</span></div>'+
+   '</div>'+
+   '<p class="dp">Each one can be withdrawn separately. Information already shared, or lawfully kept, may not be recoverable, and we would rather say that plainly than let you find out later.</p>'+
+   '<div class="donecta">'+
+     '<a class="cta" href="/card">Carry it into the card</a>'+
+     '<a class="cta ghost" href="/business">See what the broker gets</a>'+
+   '</div></div>';
+  PLAB.textContent='Ready to share';
+}
+
+function start(){
+  i=0; rec=[]; turns=[];
+  turns.push({me:true, html:esc(STEPS[0].me)});
+  turns.push({me:false, html:esc(STEPS[0].iq)});
+  drawTurns(); drawRec(); drawProg(); stage();
+}
+
+document.getElementById('restart').addEventListener('click', function(){ start(); window.scrollTo(0,0); });
+start();
+})();
+</script>
+</body>
+</html>
