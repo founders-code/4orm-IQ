@@ -12,7 +12,7 @@
  * to be the same gutter.
  */
 import { chromium } from 'playwright';
-const URL = 'file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1';
+const URL = new URL('../check.html?demo=1&debug=1', import.meta.url).href;
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const fails = [];
 

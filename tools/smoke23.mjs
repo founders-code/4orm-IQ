@@ -8,7 +8,7 @@
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 
-const file = '/home/claude/kbys/build/4orm-iq/index.html';
+const file = new URL('../check.html', import.meta.url);
 const html = fs.readFileSync(file, 'utf8');
 const fails = [];
 const errs = [];

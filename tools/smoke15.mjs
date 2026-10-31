@@ -1,6 +1,6 @@
 /* The one page summary: does it hold every main point, and does it print. */
 import fs from 'fs'; import { JSDOM } from 'jsdom';
-const html=fs.readFileSync('/home/claude/kbys/build/4orm-iq/index.html','utf8');
+const html=fs.readFileSync(new URL('../check.html', import.meta.url),'utf8');
 const errs=[];
 const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/?demo=1&debug=1',
  beforeParse(w){ w.IntersectionObserver=class{observe(){}unobserve(){}disconnect(){}};

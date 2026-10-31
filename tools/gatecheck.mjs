@@ -19,7 +19,7 @@ const fails = [];
 {
   const p = await b.newPage({ viewport:{width:1280,height:900} });
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
-  await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?real-run-live-go');
+  await p.goto(new URL('../check.html?real-run-live-go', import.meta.url).href);
   await p.waitForTimeout(700);
   const g = await p.evaluate(() => ({
     live: window.LIVE === true || (typeof LIVE !== 'undefined' && LIVE === true),
@@ -49,7 +49,7 @@ const fails = [];
 /* And the demo path is untouched: no strip, no surprise spend. */
 {
   const p = await b.newPage({ viewport:{width:1280,height:900} });
-  await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1');
+  await p.goto(new URL('../check.html?demo=1', import.meta.url).href);
   await p.waitForTimeout(500);
   const strip = await p.evaluate(() => !!document.getElementById('runGate'));
   if (strip) fails.push('the demo page is flying the real run strip');
@@ -61,7 +61,7 @@ const fails = [];
 {
   const p = await b.newPage({ viewport:{width:1280,height:1000} });
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
-  await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+  await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
   await p.waitForTimeout(800);
   const base = extra => ({
     verdict:'YELLOW', headline:'', statement:'Records were found.', idc:60, cov:55,

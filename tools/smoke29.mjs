@@ -51,7 +51,7 @@ const FEED = {
 
 await p.route('**/api/register*', r =>
   r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FEED) }));
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(1200);
 
 /* Under the search bar, not above it. It is a second thought after the thing
@@ -132,7 +132,7 @@ if (order !== true) fail('the rules and the right of reply sit below the names, 
 await p.route('**/api/register*', r =>
   r.fulfill({ status: 200, contentType: 'application/json',
               body: JSON.stringify({ ok: false, reason: 'no_database', items: [], counts: null }) }));
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(1200);
 if (await p.evaluate(() => !document.getElementById('regRow').hidden))
   fail('the pill is shown when the register is switched off, so it opens an empty page');

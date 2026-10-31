@@ -5,7 +5,7 @@
 import { chromium } from 'playwright';
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1280, height: 1000 }, deviceScaleFactor: 2 });
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(1300);
 await p.evaluate(()=>{const l=document.querySelector('#room .lit'); if(l){l.style.animationPlayState='paused';l.style.animationDelay='0s';}});
 await p.screenshot({ path: '/tmp/ctx-0.png' });

@@ -12,7 +12,11 @@ import fs from 'fs';
 import path from 'path';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+/* The console. It serves at /check; index.html is the site landing, which
+   has its own harness. Every check below was written against the console,
+   so pointing this at index.html silently passes nothing and guards nothing:
+   the privacy-notice gate in particular went blind when the two were split. */
+const html = fs.readFileSync(path.join(root, 'check.html'), 'utf8');
 const admin = fs.readFileSync(path.join(root, 'admin.html'), 'utf8');
 const eviPage = fs.readFileSync(path.join(root, 'evidence.html'), 'utf8');
 const metrics = fs.readFileSync(path.join(root, 'api/admin-metrics.js'), 'utf8');
@@ -524,7 +528,11 @@ const styleBlock = (html.match(/<style[^>]*>([\s\S]*?)<\/style>/) || [])[1] || '
   {
     const vc = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
     const rw = (vc.rewrites || []).map(r => r.source + ' -> ' + r.destination);
-    for (const need of ['/real-run-live-go -> /index.html', '/real-run-live-go/room -> /admin.html'])
+    /* The destinations are clean URLs, matching vercel.json's cleanUrls. Whether a
+     rewrite may target a clean URL, or must name the file, decides whether the
+     three hidden addresses serve or redirect, and that cannot be settled from
+     the repository. It needs the three to be opened on the deployment. */
+  for (const need of ['/real-run-live-go -> /check', '/real-run-live-go/room -> /admin'])
       if (!rw.includes(need)) fails.push('the real run door is not routed: ' + need);
     const noindex = (vc.headers || []).some(h => /real-run-live-go/.test(h.source)
       && h.headers.some(x => /X-Robots-Tag/i.test(x.key) && /noindex/i.test(x.value)));
@@ -4181,7 +4189,7 @@ if (!/body\.pathfull \.sheet\{position:fixed;z-index:90/.test(admin))
   fails.push('in full screen a card opens underneath the drawing');
 
 /* A way back to the consumer page. */
-if (!/id="homebtn"/.test(admin) || !/href="index\.html" id="homebtn"/.test(admin))
+if (!/id="homebtn"/.test(admin) || !/href="\/check" id="homebtn"/.test(admin))
   fails.push('there is no way home from the back office');
 if (/<div class="house" id="house">/.test(admin))
   fails.push('the panel lamps are back on the drawing header, where they read as part of the process');
@@ -4570,7 +4578,14 @@ if (prev && fs.existsSync(prev)) {
   const pages = { 'index.html': html, 'evidence.html': eviPage, 'admin.html': admin };
   const pats = [/(\d{2,4}) registers\b/g, /catalogue of (\d{2,4})\b/g,
                 /the (\d{2,4}) in the catalogue/g, /catalogue:(\d{2,4})\b/g];
-  for (const [name, body] of Object.entries(pages)) {
+  /* The embedded change register quotes figures it is recording the
+     correction OF. Reading those as live claims makes every fix a permanent
+     failure, and would push somebody to stop writing the history down. The
+     register is cut out before the scan; everything the page asserts in its
+     own voice is still read. */
+  const REG = /\/\* AUDIT-REGISTER-START \*\/[\s\S]*?\/\* AUDIT-REGISTER-END \*\//g;
+  for (const [name, raw] of Object.entries(pages)) {
+    const body = String(raw).replace(REG, '');
     for (const re of pats) {
       for (const m of body.matchAll(re)) {
         const n = Number(m[1]);

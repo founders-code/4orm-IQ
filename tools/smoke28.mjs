@@ -6,7 +6,7 @@
    whether this person is signed in, and it is measured here. */
 import { chromium } from 'playwright';
 import fs from 'node:fs';
-const FILE = '/home/claude/kbys/build/4orm-iq/admin.html';
+const FILE = new URL('../admin.html', import.meta.url);
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
 const errs = []; p.on('pageerror', e => errs.push(String(e)));
@@ -20,7 +20,7 @@ await p.route('**/clerk.browser.js', async r => {
   await new Promise(x => setTimeout(x, 1500));
   await r.abort();
 });
-await p.goto('file:///home/claude/kbys/build/4orm-iq/admin.html');
+await p.goto(new URL('../admin.html', import.meta.url).href);
 await p.waitForTimeout(250);
 /* The attribute has to be in the markup, not added by script, or the first
    paint still shows the shell. */

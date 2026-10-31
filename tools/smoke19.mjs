@@ -5,7 +5,7 @@
  * actually draws. The control is only real if turning it on changes what a
  * reader sees. */
 import fs from 'fs'; import { JSDOM } from 'jsdom';
-const base = fs.readFileSync('/home/claude/kbys/build/4orm-iq/index.html','utf8');
+const base = fs.readFileSync(new URL('../check.html', import.meta.url),'utf8');
 
 async function run(enforce){
   const html = base.replace(/var SR001_ENFORCE = (true|false);/,'var SR001_ENFORCE = '+enforce+';');

@@ -10,7 +10,7 @@ const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
 const errs = []; p.on('pageerror', e => errs.push(String(e)));
 const fail = m => { console.error('FAIL: ' + m); process.exit(1); };
 
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1');
+await p.goto(new URL('../check.html?demo=1', import.meta.url).href);
 await p.waitForTimeout(900);
 
 const gone = await p.evaluate(() => ({

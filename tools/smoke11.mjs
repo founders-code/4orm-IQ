@@ -1,6 +1,6 @@
 /* The four board states, the new gap words, the wait clock and the branding. */
 import fs from 'fs'; import { JSDOM } from 'jsdom';
-const P='/home/claude/kbys/build/4orm-iq/index.html';
+const P=new URL('../check.html', import.meta.url);
 const html=fs.readFileSync(P,'utf8');
 const errs=[];
 const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://4ormiq.com/?demo=1&debug=1',

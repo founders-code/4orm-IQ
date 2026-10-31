@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport:{width:1920,height:1080} });
 const errs=[]; p.on('pageerror', e=>errs.push('PAGEERROR: '+e.message));
-await p.goto('file:///home/claude/kbys/build/4orm-iq/admin.html?demo=1', { waitUntil:'load' });
+await p.goto(new URL('../admin.html?demo=1', import.meta.url).href, { waitUntil:'load' });
 await p.waitForTimeout(2400);
 
 /* Revision 3's own acceptance checks, run on BOTH data sets. The trouble data

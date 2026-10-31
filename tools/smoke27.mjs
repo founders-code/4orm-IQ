@@ -10,7 +10,7 @@ const errs = []; p.on('pageerror', e => errs.push(String(e)));
 const fail = m => { console.error('FAIL: ' + m); process.exit(1); };
 
 /* A URL somebody has bookmarked from the old build. */
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?live=1&demo=1&debug=1');
+await p.goto(new URL('../check.html?live=1&demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(900);
 const url = await p.evaluate(() => location.search);
 console.log('address bar after load:', url);

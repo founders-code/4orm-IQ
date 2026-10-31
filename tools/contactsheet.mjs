@@ -24,7 +24,7 @@ const shot = async (n, full) => {
   await p.screenshot({ path: `${OUT}/${tag}-${n}.png`, fullPage: !!full });
   console.log('  ' + tag + '-' + n);
 };
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(900);
 
 await shot('01-landing');

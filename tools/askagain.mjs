@@ -47,7 +47,7 @@ const RESOLVED = base({
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1280, height: 1000 } });
 const errs = []; p.on('pageerror', e => errs.push(String(e)));
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(900);
 
 const fails = [];

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { JSDOM } from 'jsdom';
 
-const html = fs.readFileSync('/home/claude/kbys/build/4orm-iq/index.html','utf8');
+const html = fs.readFileSync(new URL('../check.html', import.meta.url),'utf8');
 const errs = [];
 const dom = new JSDOM(html, {
   runScripts: 'dangerously',

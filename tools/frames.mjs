@@ -28,7 +28,7 @@ const SCREENS = [
 for (const q of ['Goliath Ventures', 'atlanticglobalwealth.com', 'investhelm.com']) {
   for (const vw of [1440, 820]) {
     const p = await b.newPage({ viewport: { width: vw, height: 1000 } });
-    await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+    await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
     await p.waitForTimeout(700);
     await p.evaluate(x => window.__KBYS__.check(x), q);
     await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */

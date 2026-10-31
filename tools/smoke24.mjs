@@ -9,7 +9,7 @@
  * A regex cannot see that. This renders the page and measures boxes. */
 import { chromium } from 'playwright';
 
-const URL = 'file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1';
+const URL = new URL('../check.html?demo=1&debug=1', import.meta.url).href;
 const fails = [];
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1280, height: 1000 } });

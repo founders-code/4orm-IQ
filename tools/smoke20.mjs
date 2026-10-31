@@ -3,7 +3,7 @@
    exists. It also asserts the one thing this page must never grow: a column,
    label or table showing what was searched or who a check was about. */
 import fs from 'fs'; import { JSDOM } from 'jsdom';
-const html = fs.readFileSync('/home/claude/kbys/build/4orm-iq/admin.html', 'utf8');
+const html = fs.readFileSync(new URL('../admin.html', import.meta.url), 'utf8');
 
 const payload = {
   build:{ api:'20260905.0838', page:'20260905.0838', match:true },

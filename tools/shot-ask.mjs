@@ -11,7 +11,7 @@ const d = { verdict:'GREY', headline:'', statement:'A record was found.', idc:30
 };
 const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport:{width:1280,height:1000}, deviceScaleFactor:2 });
-await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
 await p.waitForTimeout(900);
 await p.screenshot({ path:'/home/claude/out/shot-landing.png', clip:{x:0,y:120,width:1280,height:560} });
 await p.evaluate(x => { window.__KBYS__.runCtx({stage:'BEFORE'}); window.__KBYS__.enter(x,''); }, d);

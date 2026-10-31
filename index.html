@@ -100,23 +100,8 @@ h1{font-size:clamp(34px,5vw,59px);line-height:1.06;letter-spacing:-.036em;font-w
 .herocta{display:flex;flex-wrap:wrap;gap:12px;margin:32px 0 0}
 
 /* ---------- the broker's view panel ---------- */
-.panel{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-xl);border:1px solid var(--border);
-  padding:22px;display:flex;flex-direction:column;gap:14px}
-.ptop{display:flex;flex-direction:column;gap:5px}
-.pname{font-size:17px;font-weight:700;letter-spacing:-.018em}
-.pwarn{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3)}
-.rows{display:flex;flex-direction:column;gap:7px}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;
-  background:var(--surface-2);border-radius:var(--r-sm);padding:11px 13px}
-.rsrc{font-size:13.5px;font-weight:500;color:var(--tx);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rst{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  border-radius:999px;padding:5px 10px;white-space:nowrap}
-.rst.ok{background:var(--ok-bg);color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok-br)}
-.rst.nul{background:var(--surface-3);color:var(--tx-2);box-shadow:inset 0 0 0 1px var(--border-strong)}
-.rst.bl{background:var(--blue-50);color:var(--blue-dp);box-shadow:inset 0 0 0 1px var(--blue-100)}
-.pfoot{font-size:12.5px;line-height:1.55;color:var(--tx-2)}
 .pfoot b{color:var(--tx);font-weight:700}
-@media(max-width:360px){.row{grid-template-columns:minmax(0,1fr)}.rst{justify-self:start}}
+@media(max-width:360px){}
 
 /* ---------- the two halves, as the two devices they run on ---------- */
 .stage{position:relative;padding:0 0 24px;max-width:596px;margin-left:auto}
@@ -127,12 +112,6 @@ h1{font-size:clamp(34px,5vw,59px);line-height:1.06;letter-spacing:-.036em;font-w
    navigation rail and nothing that has to be read. */
 .mon{position:relative;width:min(468px,100%);margin-left:auto}
 .monscr{background:#0B1530;border-radius:11px;padding:7px;box-shadow:var(--sh-xl),0 0 0 1px rgba(11,21,48,.5)}
-.monscr>*{}
-.monscr{display:block}
-.mon .wrapin{}
-.monscr{overflow:hidden}
-.monscr{display:grid}
-.monscr>.rail{display:none}
 .mon .neck{display:block;width:62px;height:17px;background:linear-gradient(180deg,#C6CCDA,#9AA3B7);margin:0 auto;
   border-radius:0 0 4px 4px}
 .mon .base{display:block;width:168px;height:7px;background:linear-gradient(180deg,#AEB6C6,#8C95AA);margin:0 auto;
@@ -142,14 +121,6 @@ h1{font-size:clamp(34px,5vw,59px);line-height:1.06;letter-spacing:-.036em;font-w
 .monscr{position:relative}
 .monscr::after{content:"";position:absolute;inset:7px;border-radius:5px;pointer-events:none;
   background:linear-gradient(142deg,rgba(255,255,255,.14),rgba(255,255,255,0) 44%)}
-
-/* ===== the application inside it ===== */
-.monscr{grid-template-columns:1fr}
-.monscr>div.appwin{}
-.monscr{padding:7px}
-.monscr .rail,.monscr .work{}
-.monscr{display:block}
-.monscr>.railwrap{}
 
 /* real layout: rail + work, inside the bezel */
 .monscr{display:block}
@@ -257,7 +228,6 @@ h1{font-size:clamp(34px,5vw,59px);line-height:1.06;letter-spacing:-.036em;font-w
 .pbody>*{flex:none}
 .pnav{display:flex;align-items:center;gap:5px;padding:1px 0 3px}
 .pmark{height:13px;width:auto;display:block}
-.pname{font-size:11.5px;font-weight:800;letter-spacing:-.022em;color:var(--tx);flex:1}
 .pav{width:19px;height:19px;border-radius:50%;background:var(--blue-50);color:var(--blue-dp);font-size:7.5px;
   font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--blue-100)}
 .ptitle{font-size:19px;font-weight:800;letter-spacing:-.032em;line-height:1.14}
@@ -283,7 +253,6 @@ h1{font-size:clamp(34px,5vw,59px);line-height:1.06;letter-spacing:-.036em;font-w
   font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}
 .prv{font-size:8.5px;line-height:1.4;color:var(--tx-3)}
 
-.pfoot{flex:none;padding:7px 11px 0;background:linear-gradient(180deg,rgba(255,255,255,0),var(--surface) 42%)}
 .pbtn{display:block;text-align:center;background:var(--blue);color:#fff;border-radius:10px;padding:9px;
   font-size:10px;font-weight:700;box-shadow:0 3px 10px rgba(46,107,242,.28)}
 

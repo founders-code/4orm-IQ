@@ -26,7 +26,7 @@ console.log('THE IDENTITY ROWS, WHERE THE CARD IS NARROW');
 /* 1. the identity rows */
 for (const [w,h] of [[1440,1000],[1080,900],[900,900],[820,900],[700,900],[640,900],[480,900],[390,844],[360,780]]) {
   const p = await b.newPage({ viewport:{width:w,height:h} });
-  await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+  await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
   await p.waitForTimeout(700);
   await p.evaluate(()=>window.__KBYS__.check('atlanticglobalwealth.com'));
   await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
@@ -59,7 +59,7 @@ for (const [w,h] of [[1440,1000],[1080,900],[900,900],[820,900],[700,900],[640,9
 console.log('THE WAITING SCREEN ON A SHORT WINDOW');
 for (const [w,h] of [[390,844],[390,664],[414,716],[360,780],[360,640],[430,700],[820,900],[820,760],[820,600],[768,650],[821,760]]) {
   const p = await b.newPage({ viewport:{width:w,height:h} });
-  await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+  await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
   await p.waitForTimeout(700);
   await p.evaluate(()=>window.__KBYS__.check('atlanticglobalwealth.com'));
   await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
@@ -94,7 +94,7 @@ for (const [w,h] of [[390,844],[390,664],[414,716],[360,780],[360,640],[430,700]
 console.log('\nTHE FINDINGS MEASURE ON A PHONE');
 for (const w of [1440,640,560,480,390,360]) {
   const p = await b.newPage({ viewport:{width:w,height:900} });
-  await p.goto('file:///home/claude/kbys/build/4orm-iq/index.html?demo=1&debug=1');
+  await p.goto(new URL('../check.html?demo=1&debug=1', import.meta.url).href);
   await p.waitForTimeout(700);
   await p.evaluate(()=>window.__KBYS__.check('atlanticglobalwealth.com'));
   await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
