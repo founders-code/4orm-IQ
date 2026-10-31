@@ -1,0 +1,235 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4orm IQ build checks audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#111416;--surface:#181C1F;--sunk:#0C0F11;--ink:#EDEFF0;--ink-2:#BFC5C8;--ink-3:#8B9296;
+  --rule:#2C3235;--rule-soft:#22282B;--p0:#E2775A;--p1:#D6AC55;--p2:#7FB2B6;--ok:#7FB2B6;
+  --p0w:#2A1B16;--p1w:#26200F;--p2w:#152122}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink-2);
+  font:16px/1.6 "IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;padding:44px 16px 80px}
+.w{max-width:940px;margin:0 auto}
+.mast{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}
+.kick{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+h1{font:600 33px/1.15 Spectral,Georgia,serif;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+.dek{max-width:64ch;margin:0;color:var(--ink-2)}
+h2{font:600 19px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:38px 0 10px}
+h3{font:600 15px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);margin:22px 0 6px}
+p{margin:0 0 12px;max-width:74ch}
+.sechead{display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--rule);padding-top:22px;margin-top:34px}
+.sechead .n{font:500 12px/1 "IBM Plex Mono",monospace;color:var(--ink-3)}
+.sechead h2{margin:0}
+ol,ul{margin:8px 0 0;padding-left:20px} li{margin:0 0 10px;max-width:74ch}
+b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;table-layout:fixed}
+th{font:500 11px/1.3 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  text-align:left;border-bottom:1px solid var(--rule);padding:8px 10px}
+td{padding:10px;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+td.k{color:var(--ink);font-weight:500;width:32%}
+.chip{display:inline-block;font:500 10.5px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 8px;border-radius:3px;white-space:nowrap}
+.p0{background:var(--p0w);color:var(--p0)} .p1{background:var(--p1w);color:var(--p1)} .p2{background:var(--p2w);color:var(--p2)}
+.quote{border-left:3px solid var(--p2);background:var(--surface);padding:14px 18px;margin:14px 0}
+.quote.hot{border-left-color:var(--p0)}
+.src{font:400 11px/1.5 "IBM Plex Mono",monospace;color:var(--ink-3);margin:8px 0 0}
+a{color:var(--p2)}
+.foot{margin-top:52px;border-top:1px solid var(--rule);padding-top:14px;
+  font:400 11px/1.5 "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:640px){h1{font-size:27px}td.k{width:42%}}
+
+@media print{
+  html,body{background:#111416 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding:14mm 14mm 4mm;font-size:10.5pt;line-height:1.5}
+  .w{max-width:none}
+  .mast{padding-bottom:10pt;margin-bottom:16pt}
+  h1{font-size:20pt}
+  h2{font-size:13pt}
+  h3{font-size:11pt;break-after:avoid}
+  p,li{max-width:none}
+  table{font-size:9pt}
+  pre{font-size:8.6pt}
+  .sechead{break-after:avoid;margin-top:18pt;padding-top:12pt}
+  tr,li,.quote,pre{break-inside:avoid}
+  .foot{margin-top:20pt}
+}
+
+.heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:26px 0 8px}
+.heads>div{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:14px 16px}
+.hl{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.heads h3{font:600 15px/1.3 Spectral,Georgia,serif;color:var(--ink);margin:9px 0 6px}
+.heads p{font-size:13px;line-height:1.5;margin:0;color:var(--ink-3)}
+pre.code{background:var(--sunk);border:1px solid var(--rule);border-radius:4px;padding:14px 16px;
+  font:400 13px/1.7 "IBM Plex Mono",monospace;color:var(--ink-2);overflow-x:auto;margin:14px 0}
+code{font:400 .92em/1 "IBM Plex Mono",monospace;color:var(--ink)}
+@media print{ .heads{break-inside:avoid} pre.code{font-size:8.6pt} }
+</style>
+<style>code{font:500 13px/1.4 "IBM Plex Mono",monospace;color:var(--ink)}
+.big{display:flex;gap:30px;flex-wrap:wrap;margin:20px 0 6px}
+.big div{min-width:92px}.big .n{font:600 34px/1 Spectral,Georgia,serif;color:var(--ink)}
+.big .l{font:500 10.5px/1.3 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}</style>
+</head><body><div class="w">
+
+<div class="mast">
+  <div class="kick"><span>AUD-004</span><span>31 October 2026</span><span>Internal</span><span>Commit b3c88d7</span></div>
+  <h1>The build checks that were not running</h1>
+  <p class="dek">This repository holds ninety-one check tools. A quarter of them were
+  invoked by nothing, nine of them could not run at all, and the suite had never been
+  recorded end to end. This is the first dated run, and the account of what it took to
+  get one.</p>
+</div>
+
+<div class="sechead"><span class="n">01</span><h2>The recorded run</h2></div>
+<p>Every figure below is from one sequential run, on the commit named above. It is the
+number a bid may carry. Anything else is a count of files.</p>
+<div class="big">
+  <div><div class="n">62</div><div class="l">passed</div></div>
+  <div><div class="n">2</div><div class="l">failed</div></div>
+  <div><div class="n">0</div><div class="l">timed out</div></div>
+</div>
+<table>
+<tr><td class="k">Commit</td><td><code>b3c88d7</code></td></tr><tr><td class="k">Date</td><td><code>2026-10-31 07:53 UTC</code></td></tr><tr><td class="k">Node</td><td><code>v22.22.0</code></td></tr><tr><td class="k">Host</td><td><code>cloud container, no credentials, file:// pages</code></td></tr>
+</table>
+<p><code>frames.mjs</code> passed in a run of its own: it drives three queries at two
+viewports and needs about six minutes, which is longer than the per-check ceiling.
+<code>protocheck.mjs</code> and <code>protoclip.mjs</code> are excluded and explained
+in section 04.</p>
+
+<h3>What failed, and what it means</h3>
+<table><tr><th>Check</th><th>Message</th></tr>
+<tr><td class="k"><code>smoke31.mjs</code></td><td>FAIL: the waiting screen was never up long enough to measure</td></tr><tr><td class="k"><code>complycheck.mjs</code></td><td>Items 01 to 03 of the review are release blockers. This is that gate.</td></tr>
+</table>
+
+<div class="sechead"><span class="n">02</span><h2>Nine checks that could not run</h2></div>
+<p>The console moved from <code>index.html</code> to <code>check.html</code> when the
+landing page was built. Nine tools were still opening the old address, or a build tree
+that no longer exists on any machine. Each one either crashed on startup or passed
+against a page it was never written for, and a check that passes against the wrong page
+guards nothing.</p>
+<table>
+<tr><th>Check</th><th>What it was doing</th></tr>
+<tr><td class="k"><code>shapecheck</code></td><td>Reported five fields of <code>/api/check</code> that no page reads. True of the landing, false of the console. It was the loud one, and the loudest symptom was mistaken for a finding.</td></tr>
+<tr><td class="k"><code>smoke18</code> <code>smoke33</code> <code>uxgate</code> <code>doorcheck</code> <code>nextcheck</code> <code>termscheck</code> <code>complycheck</code></td><td>Opened the landing expecting the console. Four crashed looking for <code>#kbInput</code>; the rest asserted against markup that was not there.</td></tr>
+<tr><td class="k"><code>smoke21</code></td><td>Imported <code>api/_ops.js</code> by an absolute path into the old build tree. Module not found.</td></tr>
+<tr><td class="k"><code>smoke24</code> <code>spacecheck</code> <code>waitstable</code></td><td><code>const URL = new URL(...)</code>, which shadows the constructor on its own line. Introduced by the path migration that fixed fifty-four other files. Ours.</td></tr>
+</table>
+<div class="quote hot"><b>The finding worth keeping.</b> A previous pass reported that the
+gates had been put back in service. They had not: that pass matched one spelling of the
+old path and missed three others, including the form with a query string. The lesson is
+not about paths. It is that a repair to a test suite has to be proved by running the
+suite, and the suite had never been run.</div>
+
+<div class="sechead"><span class="n">03</span><h2>Two rules that failed correct behaviour</h2></div>
+<p>Both were outside the gate, and both blamed the product for a copy edit.</p>
+<table>
+<tr><th>Rule</th><th>What was actually wrong</th></tr>
+<tr><td class="k"><code>gatecheck</code></td><td>Asserted the literal phrase <i>our gap and not a finding</i>. The line now reads <i>a gap in our coverage, not a finding about the business</i>, which says the same thing better. The rule now tests the two halves of the meaning: that the line claims the gap as ours, and that it disclaims a finding.</td></tr>
+<tr><td class="k"><code>askagain</code></td><td>Grepped <i>too short</i> while the refusal says <i>still too broad</i>. Its failure message read <i>accepted and spent a run</i>, which was never true: the guard fires and refuses before any spend. The rule now accepts any refusal that tells the reader the identifier is too vague.</td></tr>
+</table>
+<p>A rule that fails correct behaviour is the same wound as a rule that cannot fail. One
+teaches people to ignore the suite; the other lets anything through. The repository
+already says so, in the header of <code>tools/compliance.mjs</code>: a rule that still
+passes with its subject removed is a green light with nothing behind it.</p>
+
+<div class="sechead"><span class="n">04</span><h2>npm test could not have passed on a clean clone</h2></div>
+<p><code>tools/protocheck.mjs</code> sat inside <code>npm test</code> and navigated to
+<code>file:///home/claude/kbys/proto/flow.html</code>, a prototype that is in no commit.
+Because the loop exits on the first failure, the gate stopped there for anybody who was
+not on the one machine that held that file. It is now out of <code>npm test</code>, and
+both proto tools carry a header saying they are out of service and why. Neither was
+deleted: deleting a check is how coverage disappears quietly, and neither was pointed at
+a substitute page, because a check that silently passes against the wrong target is the
+fault this audit is about.</p>
+
+<div class="sechead"><span class="n">05</span><h2>Nine working checks that nothing invoked</h2></div>
+<p>Twenty-three of ninety-one tools were named by no script in
+<code>package.json</code>. Seven were real checks and were passing, unobserved; two were
+the stale rules above. Eight are now in <code>npm test</code>.</p>
+<table><tr><th>Check</th><th>Result in this record</th></tr><tr><td class="k"><code>gatecheck</code></td><td><span class="chip p2">pass</span> after the rule was corrected</td></tr><tr><td class="k"><code>askagain</code></td><td><span class="chip p2">pass</span> after the rule was corrected</td></tr><tr><td class="k"><code>institutions</code></td><td><span class="chip p2">pass</span> the bystander test</td></tr><tr><td class="k"><code>srcheck</code></td><td><span class="chip p2">pass</span> the signed register against the catalogue</td></tr><tr><td class="k"><code>reachcheck</code></td><td><span class="chip p2">pass</span> whether an enabled register can actually be asked</td></tr><tr><td class="k"><code>tickcheck</code></td><td><span class="chip p2">pass</span> the first sentence of the strip is readable</td></tr><tr><td class="k"><code>netmeasure</code></td><td><span class="chip p2">pass</span> rotated label geometry</td></tr><tr><td class="k"><code>complycheck</code></td><td><span class="chip p0">fail</span> two content blockers, section 08</td></tr></table>
+<div class="quote"><b><code>institutions.mjs</code> is the one to notice.</b> Its own
+header says every other check asks whether we catch the bad ones, and this one asks the
+question that actually ends a company: do we accuse a real one. It was written because
+the product once did, to a Crown corporation of eighty-eight years. It was outside the
+gate.</div>
+<p>Two tools were deliberately left out. <code>audit-embed.mjs</code> writes two files,
+so it is a build step and does not belong in a gate.
+<code>langpass.mjs</code> says in its own header that it is a reading tool and that
+<code>verify.mjs</code> holds the gates; it was reading <code>index.html</code>, so it
+was reporting on the landing's words when it was written for the console, and it now
+defaults to the console and takes a page argument.</p>
+
+<div class="sechead"><span class="n">06</span><h2>One product defect, found by a repaired check</h2></div>
+<p><code>smoke33</code> is the phone contract, and the moment it could run it failed.
+The console header gained a way home and a label. Below 334 points that row is wider
+than the screen, so it wraps to the second line the nav is built to give it and the nav
+ends at 113 points instead of 73. The headline starts at 90 and was passing behind it.
+The clearance rule at 340 puts the headline at 114. Measured at 318, 322, 326, 330, 334,
+340, 360, 375, 390, 414 and 430 points, with no sideways overflow at any of them.</p>
+<p>The defect was ours, introduced the same week, and it was on the live site. It was
+found by a test that had been dead for long enough that nobody knew it was dead.</p>
+
+<div class="sechead"><span class="n">07</span><h2>Two findings that outrank all of the above</h2></div>
+
+<h3>The back office was being served to the public, with this register inside it</h3>
+<p><code>admin.html</code> was deployed. It is a static asset, so Vercel sent all 731KB of
+it to anybody who asked, carrying the change register that <code>tools/audit-embed.mjs</code>
+writes into it at build time, including CR-0013's four still-open items, the ten control
+standards with their NO-GO states, and the release posture. The Clerk check on that page
+runs in the browser: it decides what is <b>drawn</b>, not what is <b>sent</b>. There is no
+middleware in this repository, and the page was confirmed served with no deployment
+protection in front of it.</p>
+<div class="quote hot">CR-0013 excluded <code>docs/</code> to stop this register being
+downloadable. It did not stop it being readable. A file excluded and a page carrying the
+same text deployed are the same disclosure with different plumbing, and the exclusion's own
+comment said the quiet part: <i>admin.html embeds the register at build time, so it is not
+fetched at runtime.</i></div>
+<p>Closed: <code>admin.html</code> is excluded, with the two ways to put it back written
+beside the line. <code>tools/deploycheck.mjs</code> is the gate, and it is section 04's
+answer as well as this one's. Filed as CR-0014, p0.</p>
+
+<h3>The product prints 175 registers in scope and the catalogue holds 135</h3>
+<p><code>api/_sr001.json</code> carries <code>total: 153</code> and an
+<code>enabled</code> array of <b>175</b> strings. That array is a name and alias allowlist
+and it also holds check descriptions, so its length is not a quantity of registers:
+<b>95 of the 175 match no register at all</b>. <code>POLICY.sources_enabled</code> is that
+length, <code>api/check.js:1123</code> sends it as <code>registers_in_scope</code>, and the
+report tells the reader the run covered 175 registers.</p>
+<p>The caption is the smaller half. <code>api/check.js</code> counts a register
+<code>out_of_scope</code> when its <code>display_name</code> is absent from that array by
+exact string match. <b>55 of the 135 enabled registers are absent</b>, so about two
+registers in five are counted out of scope on every run where they apply, and
+<code>sources_out_of_scope</code> is a hashed field in all three canonical versions in
+<code>api/_ops.js</code>.</p>
+<div class="quote hot"><b>So the tamper-evident chain is attesting a coverage figure that is
+wrong for two registers in five</b>, against the promise written at
+<code>api/check.js:869</code>: <i>coverage is COUNTED from the retrieval log rather than
+asserted.</i> Do not cite the chain as coverage evidence until this is closed.</div>
+<p>Not fixed, deliberately. Three numbers could be right and they mean different things:
+<b>135</b>, every enabled register, which is what <code>README.md</code> says a page
+printing a register count must use; <b>96</b>, the registers applicable to the run's
+vertical, which is the honest reading of the words <i>in scope</i>; <b>153</b>, the
+manifest's own total. SR-001 is a signed workbook, so reinterpreting it is a governance
+decision and not a patch. <code>tools/scopecheck.mjs</code> fails the build on all four
+contradictions with the measured drift named, so the figure cannot be hashed into the chain
+unnoticed while the decision is open. Filed as CR-0016, p0.</p>
+
+<div class="sechead"><span class="n">08</span><h2>What is still open</h2></div>
+<ol>
+<li><b><code>complycheck</code> is in the gate and red.</b> It reports two content
+blockers: that the review process names a reviewer, a clock and the test but is a promise
+rather than a process, and that the privacy notice's route to it is only in the
+compliance statement, where nobody looking for privacy will find it. Both are copy and
+policy decisions, not code. Nothing in the deploy path runs <code>npm test</code>, so a
+red gate blocks no deploy. It blocks a claim, which is the point.</li>
+<li><b><code>protocheck</code> and <code>protoclip</code></b> need a target in this
+repository or retirement.</li>
+<li><b><code>frames.mjs</code> needs its own budget.</b> At six minutes it does not fit
+the per-check ceiling, so it is recorded separately and could be missed.</li>
+<li><b>The suite is sequential and slow.</b> A full record takes roughly twenty-five
+minutes, which is why it had never been taken.</li>
+</ol>
+
+<div class="foot"><span>4orm IQ &middot; AUD-004 &middot; internal</span><span>Not reachable from 4ormiq.com</span></div>
+</div></body></html>

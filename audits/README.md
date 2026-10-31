@@ -12,8 +12,26 @@ edited after it is filed; a later finding gets a later number.
 | [AUD-001](AUD-001-full-audit.html) | 2026 | Full audit of the engine | Superseded by AUD-002 |
 | [AUD-002](AUD-002-operations-audit.html) | 30 Sep 2026 | Operations: what is running, what is broken, what is counted wrongly | RDAP domain lookups failing; chain walk not run on a schedule; public site still carries the test-build banner pending SR-001 and eight unsigned control documents |
 | [AUD-003](AUD-003-repository-cleanup.html) | 28 Oct 2026 | Repository: a second copy of the application, and everything internal, served publicly | Credential rotation as a precaution; full git-history secret walk; a build gate to stop the fault recurring |
+| [AUD-004](AUD-004-build-checks.html) | 31 Oct 2026 | The build checks that were not running, and the two findings that came out of running them | The coverage figure (CR-0016) is undecided and the chain attests it; complycheck is red on two content blockers; protocheck and protoclip need a target or retirement |
 
 AUD-002 also has a PDF beside it.
+
+## AUD-004 in one paragraph
+
+The suite had never been recorded. Running it took repairing it: nine tools were opening
+a page that had moved or a build tree that is gone, `npm test` could not pass on a clean
+clone because a check inside it pointed at a prototype in no commit, two rules failed
+correct behaviour by grepping copy that had been reworded, and twenty-three of
+ninety-one tools were invoked by nothing, among them the check that asks whether the
+product accuses a real institution. First recorded run: 62 passed, 2 failed, 0 timed out.
+Two findings outrank all of that. `admin.html` was deployed, so Vercel served the whole
+change register, the ten control standards with their NO-GO states and the release
+posture to anybody who asked, with only a browser-side session check in front of it. And
+the product prints 175 registers in scope while the catalogue holds 135, because the
+figure is the length of a typed alias list; the same list drives the out-of-scope count,
+which is a hashed field, so the chain attests a coverage number that is wrong for two
+registers in five. The first is closed and gated. The second is left open on purpose,
+because three numbers could be right and the manifest is a signed document.
 
 ## AUD-003 in one paragraph
 
