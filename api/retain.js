@@ -107,6 +107,18 @@ export default async function handler(req, res) {
     const out = await client.query(
       'select table_name, rows_deleted from purge_expired()');
     const result = out.rows.map(r => ({ table: r.table_name, rows: Number(r.rows_deleted) }));
+
+    /* THE NINETY DAY NAME EXPIRY. purge_expired() deletes rows; this clears a
+       name off a row that stays. The privacy notice promises a pulse label is
+       gone ninety days after it was written, db/retention.neon.sql has had the
+       function since the promise was made, and nothing called it, so the
+       promise was kept only on paper. It is counted separately because it
+       cleared a field rather than removing a row, and reporting it inside the
+       table counts would overstate what was deleted. */
+    const lab = await client.query('select purge_pulse_labels() as n');
+    const labels = Number(lab.rows[0] ? lab.rows[0].n : 0);
+    result.push({ table: 'search_pulse labels cleared', rows: labels });
+
     const total = result.reduce((a, b) => a + b.rows, 0);
 
     await client.query(

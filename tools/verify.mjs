@@ -3036,6 +3036,14 @@ if (!/id="waitForming"/.test(html))
       const ret = fs.readFileSync(path.join(root, 'db/retention.neon.sql'), 'utf8');
       if (!/purge_pulse_labels/.test(ret))
         fails.push('a pulse name is written with nothing to clear it at ninety days');
+      /* AND THAT SOMETHING CALLS IT. The line above only ever proved the
+         function had been written. It was written, it was green, and no code
+         called it for as long as the promise has existed. A check that asserts
+         a function exists asserts nothing about whether it runs. */
+      const rtn = fs.readFileSync(path.join(root, 'api/retain.js'), 'utf8');
+      if (!/purge_pulse_labels\(\)/.test(rtn))
+        fails.push('purge_pulse_labels exists and nothing calls it, so the ninety day '
+                 + 'name expiry the privacy notice promises is never enforced');
       if (!/interval '90 days'/.test(ret))
         fails.push('the pulse label clock is not the ninety days the notice promises');
     }
