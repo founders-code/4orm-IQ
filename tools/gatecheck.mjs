@@ -85,7 +85,15 @@ const fails = [];
   else {
     if (!/Thailand/.test(th.t)) fails.push('the gap line does not name the country: ' + th.t);
     if (!/sec\.or\.th/.test(th.t)) fails.push('the gap line does not say which authority to ask: ' + th.t);
-    if (!/our gap and not a finding/.test(th.t))
+    /* WHAT THIS RULE IS FOR, not the words it used to grep. The line has to
+       frame an uncovered jurisdiction as OUR missing coverage, never as
+       something held against the business. It used to assert the literal
+       phrase "our gap and not a finding". The copy now reads "a gap in our
+       coverage, not a finding about the business", which says the same thing
+       better, and the rule failed correct copy for weeks because nothing ran
+       it. Test the two halves of the meaning instead: it claims the gap as
+       ours, and it disclaims a finding. */
+    if (!/gap in our coverage|our gap/i.test(th.t) || !/not a finding/i.test(th.t))
       fails.push('the gap line reads as something against them: ' + th.t);
   }
   console.log('  ' + (th.up ? 'ok    ' : 'FAIL  ') + 'Thailand is named, with the authority to ask');

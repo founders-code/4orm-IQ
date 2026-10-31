@@ -1,3 +1,9 @@
+/* OUT OF SERVICE. This drives a prototype that is not in this repo:
+   /home/claude/kbys/proto/flow.html, on one machine. It is kept because
+   whoever still has that prototype can still run it, and deleting a check
+   is how coverage disappears quietly. It is NOT in npm test: it was, and a
+   hard exit there meant npm test could not pass on a clean clone. Point it
+   at a page in this repo or retire it; do not leave it skipping silently. */
 import { chromium } from 'playwright';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const p=await b.newPage({viewport:{width:1440,height:960}});

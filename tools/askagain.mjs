@@ -97,8 +97,12 @@ console.log('\nTHE SECOND ATTEMPT\n');
     document.getElementById('rpAskGo').click();
     setTimeout(() => r(document.getElementById('rpAskNote').textContent.trim()), 400);
   }));
-  const ok = /too short/i.test(note);
-  if (!ok) fails.push('a second identifier as short as the first was accepted and spent a run: "' + note + '"');
+  /* The guard fires and refuses before any spend. This rule only ever tested
+     the WORDING of the refusal, and it grepped "too short" while the copy says
+     "still too broad", so it reported a spend leak that was not there. Accept
+     any refusal that tells the reader the identifier is not specific enough. */
+  const ok = /too short|too broad|still too|not enough|more specific|full legal name/i.test(note);
+  if (!ok) fails.push('a second short identifier was not refused: "' + note + '"');
   console.log('  ' + (ok ? 'ok    ' : 'FAIL  ') + 'a second short name is refused before it costs a run');
 
   const empty = await p.evaluate(() => new Promise(r => {

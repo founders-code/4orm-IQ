@@ -4,7 +4,11 @@
    the page. Reports what the house standard forbids. This is a reading tool,
    not a gate; verify.mjs holds the gates. */
 import { readFileSync } from 'node:fs';
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+/* Takes a page to read; defaults to the console, which is what it was written
+   for. It opened ../index.html, and the console moved to check.html, so it was
+   reading the landing and reporting on the wrong words. */
+const PAGE = process.argv[2] || 'check.html';
+const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
 const markup = html
   .replace(/<script[\s\S]*?<\/script>/g, ' ')
