@@ -194,6 +194,37 @@ rule('C16', 'CR-002', 'the back office locks rather than opens when misconfigure
   return null;
 });
 
+/* C17 exists because C16 was not enough and we found out the hard way. C16
+   checks that _auth.js refuses when it is misconfigured, which it does. It
+   says nothing about whether any route calls it, and /api/audit never did:
+   it served the whole change register, CR-0013's open items included, to
+   anybody who asked. Sixty-two harness files and more than a thousand
+   assertions, and requireAdmin was asserted in three places, all about two
+   named files. Nothing enumerated the routes. A control that is implemented
+   correctly and invoked nowhere is the gap this rule closes. */
+rule('C17', 'CR-002', 'every route that serves internal records is gated', () => {
+  const PRIVILEGED = {
+    'admin-metrics.js': 'the operations board',
+    'audit.js':         'the change register',
+    'evidence.js':      'the chain walk',
+    'retain.js':        'the purge'
+  };
+  const open = [];
+  for (const [f, what] of Object.entries(PRIVILEGED)) {
+    const s = code('api/' + f);
+    if (!s) { open.push(f + ' is named here and is not in api/'); continue; }
+    const imports = /requireAdmin\b[^]*?from '\.\/_auth\.js'/.test(s)
+                 || /from '\.\/_auth\.js'/.test(s);
+    const calls   = /requireAdmin\(req\)/.test(s);
+    /* retain.js has a second, signed door for the scheduler, which is a
+       stronger control than a session, not a weaker one. */
+    const signed  = /requireSchedule\(/.test(s);
+    if (!imports || !(calls || signed))
+      open.push(f + ' serves ' + what + ' and calls neither requireAdmin nor requireSchedule');
+  }
+  return open.length ? open.join('; ') : null;
+});
+
 /* ------------------------------------------------------------------ *
  * RUN
  * ------------------------------------------------------------------ */

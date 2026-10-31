@@ -14,8 +14,22 @@
    different problem with a different answer. */
 import fs from 'fs';
 
-/* What the public gets. Anything not on this list is not served. */
-const SERVED = ['index.html', 'admin.html', 'evidence.html', 'robots.txt', 'vercel.json'];
+/* What the public gets, COMPUTED from .vercelignore rather than typed. The
+   list here was hand written and had drifted to five names while nine pages
+   were being deployed, so this gate reported a clean scan of the site while
+   never opening check.html, the consumer console and the largest page in the
+   repository. It printed that result in its own success line. */
+import { deployed } from './_deployed.mjs';
+import { fileURLToPath } from 'url';
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
+const DEP = deployed(ROOT);
+if (DEP.unreadable.length) {
+  console.log('scanner FAILED');
+  console.log('  .vercelignore holds a pattern this tool cannot read, so it cannot '
+            + 'tell what is served: ' + DEP.unreadable.join(', '));
+  process.exit(1);
+}
+const SERVED = [...DEP.pages, 'robots.txt', 'vercel.json'];
 
 const findings = [];
 const seen = new Set();

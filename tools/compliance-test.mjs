@@ -33,6 +33,10 @@ const BREAK = [
   ['C15', 'robots.txt',          s => s.replace('Disallow: /api/', '')],
   ['C16', 'api/_auth.js',        s => s.replace('if (!secret) return { ok: false, status: 503',
                                                 'if (false) return { ok: false, status: 503')],
+  /* The realistic shape of this one is the shape it actually had: a route that
+     reads internal records and simply never calls the gate. */
+  ['C17', 'api/audit.js',        s => s.replace('const auth = await requireAdmin(req);',
+                                                'const auth = { ok: true };')],
 ];
 
 const fails = [];

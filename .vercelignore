@@ -9,6 +9,26 @@ tools/
 # register at build time, so it is not fetched at runtime.
 docs/
 
+# THE BACK OFFICE. Excluding docs/ protected the register as a file and did
+# nothing for the register as embedded text: audit-embed.mjs writes it into
+# admin.html, and admin.html was deployed. The page is a static asset, so
+# Vercel served all 731KB of it to anybody who asked, with the whole change
+# register inside, CR-0013's four open items among them, the ten control
+# standards with their NO-GO states and the release posture. The Clerk check
+# on that page is client-side: it decides what is DRAWN, not what is SENT.
+# There is no middleware in this repository, so nothing refused the bytes.
+#
+# A file excluded and a page carrying the same text deployed are the same
+# disclosure with different plumbing. tools/deploycheck.mjs is now the gate.
+#
+# TO PUT THE BACK OFFICE BACK ON THE WEB, one of these first, then delete
+# this line:
+#   turn on Vercel Deployment Protection for the project, which refuses the
+#     request before the file is served, or
+#   stop embedding the register and read it from /api/audit, which is gated.
+# Until then it opens as a local file, which is what the embed was for.
+admin.html
+
 # Schema, applied by hand against the database
 db/
 
