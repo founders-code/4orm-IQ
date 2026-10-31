@@ -404,6 +404,22 @@ body[data-stage="landing"] .searchbox{margin-top:40px;box-shadow:var(--sh-lg)}
   body[data-stage="landing"] .cbdeck{margin-top:18px;font-size:15px;line-height:1.5;max-width:38ch}
   body[data-stage="landing"] .searchbox{margin-top:18px}
 }
+
+/* AND ONE STEP NARROWER, WHERE THE NAV IS TWO ROWS.
+   The rule above clears a nav that ends at 73 points, which was true while the
+   row held the mark and two pills. It now also holds the way home, and below
+   334 points that is more than the row can take, so the pills drop to the
+   second row the nav is built to give them and the nav ends at 113 instead.
+   The headline was starting at 90 and passing behind them. 98 and the same 16
+   above the text puts it at 114, which is clear by a point and keeps the step
+   continuous with the rule above. The wrap was measured at 318, 322, 326 and
+   330, and 334 upward holds one row. The breakpoint is set at 340 rather than
+   333 so a different font metric cannot land a wrapped nav outside the rule,
+   at the cost of 24 points of air across a seven point band of widths.
+   tools/smoke33.mjs is the gate that caught it. */
+@media(max-width:340px){
+  body[data-stage="landing"] .cbmain{padding:98px 0 30px}
+}
 /* It sits at the foot now, under the disclaimer, so it reads as an instrument
    rather than a headline. Smaller, with air above it and a rule to separate it
    from the sentence it is evidence for. */

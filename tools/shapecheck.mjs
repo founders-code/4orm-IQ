@@ -13,7 +13,7 @@
 import fs from 'fs';
 
 const fails = [], notes = [];
-const page  = fs.readFileSync('index.html', 'utf8');
+const page  = fs.readFileSync('check.html', 'utf8');
 const admin = fs.readFileSync('admin.html', 'utf8');
 
 /* A field counts as drawn where the page names it at all: as a property, in a

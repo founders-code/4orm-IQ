@@ -13,7 +13,7 @@ import { chromium } from 'playwright';
 
 const fails = [];
 const ok = (c, m) => { if (!c) fails.push(m); };
-const src = fs.readFileSync('index.html', 'utf8');
+const src = fs.readFileSync('check.html', 'utf8');
 
 /* ---- 1. The text says what it must, and does not say what it must not ---- */
 const i = src.indexOf('<div id="rpTermsBody">');
@@ -99,7 +99,7 @@ try {
   const tap = re => p.evaluate(r => { const x = [...document.querySelectorAll('button')]
     .find(y => y.offsetParent && new RegExp(r, 'i').test(y.innerText));
     if (x) { x.click(); return 1; } return 0; }, re);
-  await p.goto('file://' + process.cwd() + '/index.html?demo=1');
+  await p.goto('file://' + process.cwd() + '/check.html?demo=1');
   await p.waitForTimeout(400);
   await p.fill('#kbInput', 'Meridian Yield Partners'); await p.click('#kbGo');
   await p.waitForTimeout(2200); await tap('investment'); await p.waitForTimeout(1400);

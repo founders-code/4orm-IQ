@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const html = fs.readFileSync(new URL('../check.html', import.meta.url), 'utf8');
 const dom = new JSDOM(html, { runScripts:'dangerously', url:'https://x/?demo=1&debug=1',
   pretendToBeVisual:true });
 const { window } = dom;

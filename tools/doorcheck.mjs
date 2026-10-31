@@ -12,7 +12,7 @@ import { chromium } from 'playwright';
 
 const fails = [];
 const ok = (c, m) => { if (!c) fails.push(m); };
-const src = fs.readFileSync('index.html', 'utf8');
+const src = fs.readFileSync('check.html', 'utf8');
 
 /* ---- 1. No status colour on the door, in the stylesheet ---------------- */
 {
@@ -72,7 +72,7 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 try {
   const p = await b.newPage({ viewport: { width: 1440, height: 1000 } });
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
-  await p.goto('file://' + process.cwd() + '/index.html?demo=1');
+  await p.goto('file://' + process.cwd() + '/check.html?demo=1');
   await p.waitForTimeout(400);
   /* The same walk uxgate takes: the two context questions have to be answered
      or the run never starts. */
@@ -133,7 +133,7 @@ try {
   const tap2 = re => q.evaluate(r => { const x = [...document.querySelectorAll('button')]
     .find(y => y.offsetParent && new RegExp(r, 'i').test(y.innerText));
     if (x) { x.click(); return 1; } return 0; }, re);
-  await q.goto('file://' + process.cwd() + '/index.html?demo=1&debug=1');
+  await q.goto('file://' + process.cwd() + '/check.html?demo=1&debug=1');
   await q.waitForTimeout(400);
   await q.fill('#kbInput', 'Meridian Yield Partners'); await q.click('#kbGo');
   await q.waitForTimeout(250);

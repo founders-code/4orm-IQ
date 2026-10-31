@@ -1,7 +1,7 @@
 /* The chain, tested without a database. rowHash is pure, so the property that
    matters can be proved directly: change any field and the hash moves, and a
    chain built on a changed row stops matching from that point forward. */
-import { rowHash } from '/home/claude/kbys/build/4orm-iq/api/_ops.js';
+import { rowHash } from '../api/_ops.js';
 
 const base = () => ({
   at:'2026-08-29T12:00:00.000Z', visitor_day:'a1b2c3d4e5f6', input_type:'WEBSITE',

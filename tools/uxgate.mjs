@@ -123,19 +123,19 @@ const PROBE = `(() => {
    a stage that is only reachable by running a real check has to be reached
    by running a real check. */
 const SCENES = [
-  { key:'landing', page:'index.html?demo=1', widths:[1440,390,320], reach: async () => {} },
+  { key:'landing', page:'check.html?demo=1', widths:[1440,390,320], reach: async () => {} },
   /* THE WAITING SCREEN, MEASURED WHILE IT IS ACTUALLY WAITING.
      It used to answer the two context questions on the way in. Answering one
      starts the check again, which puts the primer back over the screen this
      scene exists to measure, and pressing through that primer acknowledges the
      disclaimer, which closes the wait and lands the walk on the report. So the
      scene stops at the screen it is named after. */
-  { key:'waiting', page:'index.html?demo=1', widths:[1440,390],
+  { key:'waiting', page:'check.html?demo=1', widths:[1440,390],
     reach: async p => { await p.fill('#kbInput','Meridian Yield Partners'); await p.click('#kbGo');
       await p.waitForTimeout(250);
       await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b && !b.disabled) b.click();});
       await p.waitForTimeout(900); } },
-  { key:'report',  page:'index.html?demo=1', widths:[1440,390,320],
+  { key:'report',  page:'check.html?demo=1', widths:[1440,390,320],
     reach: async p => { await p.fill('#kbInput','Meridian Yield Partners'); await p.click('#kbGo');
     await p.waitForTimeout(250); await p.evaluate(()=>{const b=document.getElementById('primOk'); if(b) b.click();}); /* through the primer */
       await p.waitForTimeout(2200); await tap(p,'investment'); await p.waitForTimeout(1400);

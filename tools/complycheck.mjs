@@ -5,8 +5,9 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
-const R = '/home/claude/kbys/build/4orm-iq/';
-const html = fs.readFileSync(R + 'index.html', 'utf8');
+import { fileURLToPath } from 'url';
+const R = fileURLToPath(new globalThis.URL('../', import.meta.url));
+const html = fs.readFileSync(R + 'check.html', 'utf8');
 const chk  = fs.readFileSync(R + 'api/check.js', 'utf8');
 const cue  = fs.readFileSync(R + 'api/_cue.js', 'utf8');
 const fails = [];
@@ -65,7 +66,7 @@ fails.forEach(n => console.log('  FAIL  ' + n));
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
 const errs = []; p.on('pageerror', e => errs.push(String(e)));
-await p.goto('file://' + R + 'index.html?demo=1');
+await p.goto('file://' + R + 'check.html?demo=1');
 await p.waitForTimeout(700);
 
 const type = async v => {

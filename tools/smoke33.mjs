@@ -19,7 +19,7 @@ for (const name of PHONES) {
   const p = await ctx.newPage();
   const errs = [];
   p.on('pageerror', e => errs.push(String(e).slice(0, 140)));
-  await p.goto('file://' + process.cwd() + '/index.html', { waitUntil: 'domcontentloaded' });
+  await p.goto('file://' + process.cwd() + '/check.html', { waitUntil: 'domcontentloaded' });
   await p.waitForTimeout(900);
 
   const m = await p.evaluate(() => {

@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 
 const fails = [];
 const ok = (c, m) => { if (!c) fails.push(m); };
-const src = fs.readFileSync('index.html', 'utf8');
+const src = fs.readFileSync('check.html', 'utf8');
 
 /* ---- 1. The page exists and every fact carries its source ------------- */
 const a = src.indexOf('<div class="rp-sheet" id="rpNext"');
@@ -64,7 +64,7 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 try {
   const p = await b.newPage({ viewport: { width: 1440, height: 1000 } });
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
-  await p.goto('file://' + process.cwd() + '/index.html?demo=1&debug=1');
+  await p.goto('file://' + process.cwd() + '/check.html?demo=1&debug=1');
   await p.waitForTimeout(400);
   ok(kind[0] === 'VC startup', 'rpKind prints ' + JSON.stringify(kind[0]));
   ok(kind[1] === 'NFT marketplace', 'rpKind prints ' + JSON.stringify(kind[1]));
@@ -110,7 +110,7 @@ try {
   /* ---- 6. Keep reading only when the way on is out of sight ---------- */
   for (const [h, want] of [[1400, false], [620, true]]) {
     const c = await b.newPage({ viewport: { width: 1440, height: h } });
-    await c.goto('file://' + process.cwd() + '/index.html?demo=1&debug=1');
+    await c.goto('file://' + process.cwd() + '/check.html?demo=1&debug=1');
     await c.waitForTimeout(400);
     const tp = re => c.evaluate(r => { const x = [...document.querySelectorAll('button')]
       .find(y => y.offsetParent && new RegExp(r, 'i').test(y.innerText)); if (x) x.click(); }, re);

@@ -25,7 +25,7 @@
 import { chromium } from 'playwright';
 const BROWSER = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 
-const URL = new URL('../check.html?demo=1&debug=1', import.meta.url).href;
+const URL = new globalThis.URL('../check.html?demo=1&debug=1', import.meta.url).href;
 const VIEWPORTS = [[1440,900],[1366,768],[1280,800],[1680,1050],[414,896],[390,844],[360,780]];
 
 /* One key per element, by its position in the tree, so an element with no id
