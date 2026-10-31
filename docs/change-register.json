@@ -13,7 +13,80 @@
       "detail": "admin.html added to .vercelignore, with the two ways to put it back written beside the line: Vercel Deployment Protection, which refuses the request before the file is served, or reading the register from /api/audit, which is now gated. tools/deploycheck.mjs added and wired into npm test: it computes what Vercel would SEND and reads those bytes, failing when a page that would be sent carries an internal record, when a deck or archive or document would be sent, or when tools/scanner.mjs hand writes what it scans. This is CR-0013's fourth open item, and it is wider than that item asked for, because the fault recurred in a form the item would not have caught: nothing was outside the ignored directories.",
       "actor": "Chad Johnston",
       "severity": "p0",
-      "report": "audits/AUD-004-build-checks.html"
+      "report": [
+        {
+          "t": "h2",
+          "x": "What was happening"
+        },
+        {
+          "t": "p",
+          "x": "admin.html was deployed. A page is a static asset, so Vercel sent all 731KB of it to anybody who asked, and tools/audit-embed.mjs writes this register into it at build time. So the bytes carried this register with CR-0013's four still-open items inside it, the ten control standards with their NO-GO states, and the release posture."
+        },
+        {
+          "t": "p",
+          "x": "The Clerk check on that page runs in the browser. It decides what is drawn, not what is sent, and there is no middleware in this repository to refuse the request. The page was confirmed served with no deployment protection in front of it."
+        },
+        {
+          "t": "h2",
+          "x": "Why CR-0013 did not catch it"
+        },
+        {
+          "t": "p",
+          "x": "CR-0013 excluded docs/ to stop this register being downloadable as a file. It did not stop it being readable as embedded text, and the exclusion's own comment said the quiet part: admin.html embeds the register at build time, so it is not fetched at runtime. A file excluded and a page carrying the same text deployed are the same disclosure with different plumbing."
+        },
+        {
+          "t": "h2",
+          "x": "What was done"
+        },
+        {
+          "t": "li",
+          "x": "admin.html added to .vercelignore, with the two ways to put it back written beside the line: Vercel Deployment Protection, which refuses the request before the file is served, or reading the register from /api/audit, which is now gated."
+        },
+        {
+          "t": "li",
+          "x": "tools/deploycheck.mjs added and wired into npm test. It computes what Vercel would SEND and reads those bytes, rather than asking what is in the repository."
+        },
+        {
+          "t": "li",
+          "x": "/api/audit gated with requireAdmin. It had served the same register to anybody who asked, and the tool that embeds the register states the rule it broke: the text must never be a URL that can be requested without the gate."
+        },
+        {
+          "t": "li",
+          "x": "Compliance C17 added: every route that serves internal records is gated. C16 checked that _auth.js refuses when misconfigured, which it does, and said nothing about whether any route calls it."
+        },
+        {
+          "t": "h2",
+          "x": "Why a new rule was needed and not just a fix"
+        },
+        {
+          "t": "p",
+          "x": "Across 62 harness files and more than a thousand assertions, requireAdmin was asserted in three places, all about two named files. Nothing enumerated the routes. That is the structural reason an open route shipped, and it is the thing C17 closes."
+        },
+        {
+          "t": "h2",
+          "x": "What could not be confirmed"
+        },
+        {
+          "t": "li",
+          "x": "Whether the page was ever fetched by anybody. Access logs were not examined."
+        },
+        {
+          "t": "li",
+          "x": "Whether Vercel project-level Deployment Protection was ever on. It is not on now, and that is the only thing that would have stood in front of the file."
+        },
+        {
+          "t": "h2",
+          "x": "Open"
+        },
+        {
+          "t": "li",
+          "x": "Decide whether the back office returns to the web behind Deployment Protection, or stays a local file, which is what the embed was designed for."
+        },
+        {
+          "t": "li",
+          "x": "admin.html commits a Clerk pk_test key pointing at a development instance. It is a publishable key and not a credential, but a test instance behind a production back office is a readiness defect, and README.md claims nothing is committed."
+        }
+      ]
     },
     {
       "id": "CR-0015",
@@ -25,7 +98,137 @@
       "detail": "First recorded run: 62 passed, 2 failed, 0 timed out, on commit b3c88d7. Nine tools repointed at check.html or at relative paths. Two rules that failed correct behaviour corrected: gatecheck asserted a literal phrase the copy no longer uses, and askagain grepped 'too short' while the refusal says 'too broad' and accused the product of spending a run on a rejected identifier, which was never true. Nine checks wired into npm test. tools/scanner.mjs scanned five files of nine, so check.html, the consumer console and the largest page here, was never scanned for a credential, an internal host or a stack trace; both it and deploycheck now compute the served set from .vercelignore through tools/_deployed.mjs. One product defect found the moment its check could run: the console header gained a way home, and below 334 points the row wraps and the headline was passing behind the nav.",
       "actor": "Chad Johnston",
       "severity": "p1",
-      "report": "audits/AUD-004-build-checks.html"
+      "report": [
+        {
+          "t": "h2",
+          "x": "The recorded run"
+        },
+        {
+          "t": "table",
+          "rows": [
+            [
+              "Figure",
+              "Value"
+            ],
+            [
+              "Passed",
+              "62"
+            ],
+            [
+              "Failed",
+              "2"
+            ],
+            [
+              "Timed out",
+              "0"
+            ],
+            [
+              "Commit",
+              "b3c88d7"
+            ],
+            [
+              "Taken",
+              "31 October 2026, 07:53 UTC"
+            ],
+            [
+              "Environment",
+              "cloud container, no credentials, pages served from the filesystem"
+            ]
+          ]
+        },
+        {
+          "t": "p",
+          "x": "The two failures are named. smoke31 is timing-sensitive and reported that the waiting screen was never up long enough to measure, which is a property of the container. complycheck is red on purpose: it reports two content blockers, that the review process names a reviewer and a clock but is a promise rather than a process, and that the privacy notice's route to it is only in the compliance statement."
+        },
+        {
+          "t": "h2",
+          "x": "Nine checks could not run"
+        },
+        {
+          "t": "p",
+          "x": "The console moved from index.html to check.html when the landing page was built. Nine tools were still opening the old address, or a build tree that no longer exists on any machine. Each one either crashed on startup or passed against a page it was never written for, and a check that passes against the wrong page guards nothing."
+        },
+        {
+          "t": "li",
+          "x": "shapecheck was the loud one. It reported five fields of /api/check that no page reads, which was true of the landing and false of the console, so the loudest symptom was mistaken for a finding."
+        },
+        {
+          "t": "li",
+          "x": "smoke18, smoke33, uxgate, doorcheck, nextcheck, termscheck and complycheck opened the landing expecting the console."
+        },
+        {
+          "t": "li",
+          "x": "smoke21 imported api/_ops.js by an absolute path into the old build tree."
+        },
+        {
+          "t": "li",
+          "x": "smoke24, spacecheck and waitstable carried const URL = new URL(...), which shadows the constructor on its own line. Introduced by the path migration that fixed fifty-four other files."
+        },
+        {
+          "t": "h2",
+          "x": "npm test could not have passed on a clean clone"
+        },
+        {
+          "t": "p",
+          "x": "tools/protocheck.mjs sat inside npm test and navigated to a prototype that is in no commit. The loop exits on the first failure, so the gate stopped there for anybody who was not on the one machine holding that file. It is out of npm test now, and both proto tools carry a header saying they are out of service and why. Neither was deleted, because deleting a check is how coverage disappears quietly, and neither was pointed at a substitute page, because a check that silently passes against the wrong target is this whole fault."
+        },
+        {
+          "t": "h2",
+          "x": "Two rules that failed correct behaviour"
+        },
+        {
+          "t": "li",
+          "x": "gatecheck asserted the literal phrase our gap and not a finding. The line reads a gap in our coverage, not a finding about the business, which says the same thing better. The rule now tests the two halves of the meaning."
+        },
+        {
+          "t": "li",
+          "x": "askagain grepped too short while the refusal says still too broad, and its failure message read accepted and spent a run, which was never true: the guard fires and refuses before any spend. The rule now accepts any refusal that says the identifier is too vague."
+        },
+        {
+          "t": "p",
+          "x": "A rule that fails correct behaviour is the same wound as a rule that cannot fail. One teaches people to ignore the suite, the other lets anything through."
+        },
+        {
+          "t": "h2",
+          "x": "Nine working checks that nothing invoked"
+        },
+        {
+          "t": "p",
+          "x": "Twenty-three of ninety-one tools were named by no script in package.json. Seven were real checks and were passing, unobserved. Eight are now in npm test. The one to notice is tools/institutions.mjs, whose own header says every other check asks whether we catch the bad ones and this one asks the question that actually ends a company: do we accuse a real one. It was written because the product once did, to a Crown corporation of eighty-eight years, and it was outside the gate."
+        },
+        {
+          "t": "h2",
+          "x": "The scanner was reading five files of nine"
+        },
+        {
+          "t": "p",
+          "x": "tools/scanner.mjs carried a hand-written list of served pages. Nine pages are deployed and it scanned five, so check.html, the consumer console and the largest page in the repository, was never scanned for a credential, an internal host, a dead route or a stack trace. It printed a clean result for the site in its own success line. Both it and deploycheck now compute the served set from .vercelignore through tools/_deployed.mjs, and a pattern neither can parse fails the build rather than being treated as matching nothing."
+        },
+        {
+          "t": "h2",
+          "x": "One product defect, found the moment its check could run"
+        },
+        {
+          "t": "p",
+          "x": "The console header gained a way home and a label. Below 334 points that row is wider than the screen, so it wraps to the second line the nav is built to give it and the nav ends at 113 points instead of 73. The headline started at 90 and was passing behind it. The clearance rule at 340 puts the headline at 114, measured at 318, 322, 326, 330, 334, 340, 360, 375, 390, 414 and 430 points with no sideways overflow at any of them."
+        },
+        {
+          "t": "h2",
+          "x": "What is still open"
+        },
+        {
+          "t": "li",
+          "x": "protocheck and protoclip need a target in this repository or retirement."
+        },
+        {
+          "t": "li",
+          "x": "frames.mjs needs about six minutes, which is longer than the per-check ceiling, so it is recorded separately and could be missed."
+        },
+        {
+          "t": "li",
+          "x": "A full record takes roughly twenty-five minutes, which is why it had never been taken."
+        }
+      ]
     },
     {
       "id": "CR-0016",
@@ -37,7 +240,93 @@
       "detail": "NOT FIXED, and deliberately. Three numbers could be right and they mean different things: 135, every enabled register in the catalogue, which is what README.md says a page printing a register count must use; 96, the registers applicable to the run's vertical, which is the honest reading of the words in scope; 153, the manifest's own total. SR-001 is a signed workbook, so reinterpreting it is a governance decision and not a patch. tools/scopecheck.mjs added and wired into npm test: it fails the build on all four contradictions with the measured drift named, so the figure cannot be hashed into the chain unnoticed while the decision is open. Do not cite the chain as coverage evidence until this is closed.",
       "actor": "Chad Johnston",
       "severity": "p0",
-      "report": "audits/AUD-004-build-checks.html"
+      "report": [
+        {
+          "t": "h2",
+          "x": "The three numbers"
+        },
+        {
+          "t": "table",
+          "rows": [
+            [
+              "Figure",
+              "Value",
+              "Where it comes from"
+            ],
+            [
+              "POLICY.sources_total",
+              "153",
+              "api/_sr001.json total"
+            ],
+            [
+              "POLICY.sources_enabled",
+              "175",
+              "the length of api/_sr001.json enabled"
+            ],
+            [
+              "TOTAL_SOURCES",
+              "135",
+              "computed by api/_catalogue.js: 152 entries, 17 disabled"
+            ]
+          ]
+        },
+        {
+          "t": "p",
+          "x": "A subset cannot be larger than the set it is drawn from. 175 is not a count of registers: the enabled array is a name and alias allowlist and it also holds check descriptions, so 95 of its 175 entries match no register at all."
+        },
+        {
+          "t": "h2",
+          "x": "What the reader is told"
+        },
+        {
+          "t": "p",
+          "x": "api/check.js sends POLICY.sources_enabled as registers_in_scope, and the report prints it under the heading The rules in force when we looked. So a consumer is told the run covered 175 registers while the catalogue holds 135 enabled."
+        },
+        {
+          "t": "h2",
+          "x": "The half that matters more"
+        },
+        {
+          "t": "p",
+          "x": "api/check.js counts a register out_of_scope when its display_name is absent from that array, by exact string match. 55 of the 135 enabled registers are absent, so roughly two registers in five are counted out of scope on every run where they apply. sources_out_of_scope is one of the hashed fields in all three canonical versions in api/_ops.js."
+        },
+        {
+          "t": "p",
+          "x": "So the tamper-evident chain is attesting a coverage figure that is wrong, against the promise written at api/check.js:869 that coverage is counted from the retrieval log rather than asserted. The chain must not be cited as coverage evidence until this is closed."
+        },
+        {
+          "t": "h2",
+          "x": "Why this is not fixed"
+        },
+        {
+          "t": "p",
+          "x": "Three numbers could be right and they mean different things. 135 is every enabled register, which is what README.md says a page printing a register count has to use. 96 is the registers applicable to the run's vertical, which is the honest reading of the words in scope. 153 is the manifest's own total. SR-001 is a signed workbook, so reinterpreting what its enabled list means is a governance decision and not a patch."
+        },
+        {
+          "t": "h2",
+          "x": "What was done instead"
+        },
+        {
+          "t": "p",
+          "x": "tools/scopecheck.mjs added and wired into npm test. It fails the build on all four contradictions with the measured drift named, so the figure cannot be hashed into the chain unnoticed while the decision is open. The gate is red now and is meant to be."
+        },
+        {
+          "t": "h2",
+          "x": "Open, in order"
+        },
+        {
+          "t": "li",
+          "x": "Decide which number registers_in_scope means, and make the page print it from a computed source."
+        },
+        {
+          "t": "li",
+          "x": "Reconcile the manifest against display_name and board with normalisation, or compute the enabled set from the catalogue, so out_of_scope counts something real."
+        },
+        {
+          "t": "li",
+          "x": "Decide what to say about rows already in the chain. The figure has been hashed wrong for as long as both fields have been computed."
+        }
+      ]
     },
     {
       "id": "CR-0001",
